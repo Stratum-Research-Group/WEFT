@@ -4,10 +4,12 @@ Comparing Standard FlashAttention / SDPA vs Production WeftAttention
 Ramping up token lengths: 1k, 2k, 4k, 8k, 16k, 32k, 64k, 128k, 256k, 512k, 1M+
 """
 
+import gc
 import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.attention import SDPBackend, sdpa_kernel
 
 from weft import WeftConfig
 from weft.modeling_weft import WeftAttention
@@ -24,11 +26,11 @@ def main():
     dtype = torch.float16
 
     print("=" * 105)
-    print("PROPER RAMP-UP BENCHMARK: STANDARD SDPA vs PRODUCTION WEFT ATTENTION")
+    print("PROPER RAMP-UP BENCHMARK: CAUSAL FLASHATTENTION (SDPA) vs PRODUCTION WEFT ATTENTION")
     print(f"Device: {torch.cuda.get_device_name(0)} | Free VRAM: ~{torch.cuda.mem_get_info()[0]/1024**3:.1f} GB | Precision: {dtype}")
-    print(f"Config: d_model={d_model}, n_heads={n_heads}, batch_size=1, window=256, rank=16")
+    print(f"Config: d_model={d_model}, n_heads={n_heads}, batch_size=1, window=256, rank=16 | SDPA: Backend=FLASH_ATTENTION, is_causal=True")
     print("=" * 105)
-    print(f"{'Sequence N':>12} | {'SDPA Latency':>14} | {'SDPA Peak VRAM':>15} | {'WEFT Latency':>15} | {'WEFT Peak VRAM':>17} | {'Speedup':>10}")
+    print(f"{'Sequence N':>12} | {'SDPA (Causal)':>14} | {'SDPA Peak VRAM':>15} | {'WEFT Latency':>15} | {'WEFT Peak VRAM':>17} | {'Speedup':>10}")
     print("-" * 105)
 
     seq_lengths = [
@@ -64,6 +66,7 @@ def main():
         sdpa_ms = None
 
         if sdpa_alive:
+            gc.collect()
             torch.cuda.empty_cache()
             torch.cuda.reset_peak_memory_stats()
             try:
@@ -73,14 +76,16 @@ def main():
 
                 iters = 10 if seq_len <= 32768 else (3 if seq_len <= 262144 else 1)
                 
-                # Warmup
-                _ = F.scaled_dot_product_attention(q, k, v)
+                # Warmup with explicit causal FlashAttention
+                with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
+                    _ = F.scaled_dot_product_attention(q, k, v, is_causal=True)
                 torch.cuda.synchronize()
 
                 torch.cuda.reset_peak_memory_stats()
                 t0 = time.perf_counter()
-                for _ in range(iters):
-                    _ = F.scaled_dot_product_attention(q, k, v)
+                with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
+                    for _ in range(iters):
+                        _ = F.scaled_dot_product_attention(q, k, v, is_causal=True)
                 torch.cuda.synchronize()
                 t1 = time.perf_counter()
 
@@ -92,6 +97,8 @@ def main():
                 else:
                     sdpa_time_str = f"{sdpa_ms/1000:.2f} s"
                 sdpa_mem_str = f"{sdpa_mem:.1f} MB"
+
+                del q, k, v
             except torch.cuda.OutOfMemoryError:
                 sdpa_alive = False
                 sdpa_time_str = "CUDA OOM"
@@ -102,6 +109,7 @@ def main():
                 sdpa_mem_str = "—"
 
         # 2. Benchmark Production WeftAttention
+        gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats()
         try:
@@ -132,6 +140,8 @@ def main():
                 speedup_str = f"{ratio:.1f}x"
             else:
                 speedup_str = "SDPA OOM"
+
+            del x
         except torch.cuda.OutOfMemoryError:
             st_time_str = "CUDA OOM"
             st_mem_str = "OOM"

@@ -13,7 +13,7 @@ Modern transformer-based Large Language Models (LLMs) are fundamentally constrai
 In this work, we introduce **WEFT** (**W**indowed **E**xponentially-decayed **F**actorized **T**ensor Attention), a dual-path sequence architecture that replaces dense pairwise attention with a local sliding-window softmax operator coupled with a continuous, multi-head exponentially-decayed low-rank tensor recurrence. The recurrent updates are executed entirely within on-chip GPU SRAM tiles, bypassing the materialization of intermediate state trajectories in global memory. Furthermore, we extend the tensor uncrossing factorization from sequence history to neural network parameters via **Associative Memory Weights (AMW)**, replacing static dense feed-forward networks (MLP) with a fast, rank-factorized associative memory lookup.
 
 Empirical validation on NVIDIA GPU hardware demonstrates:
-1. **Computational Scaling:** Strict $O(N)$ linear time complexity, delivering a **430.7x speedup over PyTorch FlashAttention (SDPA) at sequence length $N = 524{,}288$**, with linear streaming benchmarks executing a continuous **1-Billion Token unbroken hardware run across 15,259 chunks in 72.26s at 13.84 Million tokens/second in 648.3 MB peak VRAM** (prior extrapolation: 75.48s at 13.25M tok/s).
+1. **Computational Scaling:** Strict $O(N)$ linear time complexity, delivering a **16.7x speedup over causal PyTorch FlashAttention (SDPA) at sequence length $N = 524{,}288$** (733.1 ms vs. 12.26 s with exact backend `SDPBackend.FLASH_ATTENTION` and `is_causal=True`), with linear streaming benchmarks executing a continuous **1-Billion Token unbroken hardware run across 15,259 chunks in 72.26s at 13.84 Million tokens/second in 648.3 MB peak VRAM** (prior extrapolation: 75.48s at 13.25M tok/s).
 2. **Constant-Memory Decoding:** Replaces expanding multi-gigabyte KV-caches with a bounded local window KV cache plus a constant **16 KB to 128 KB recurrent state per layer**, ensuring strict $O(1)$ memory consumption and flat step latencies across indefinite token generation.
 3. **Retrieval Fidelity:** Resolves the "memory drowning" failure mode of un-gated linear models via learnable per-channel decay rates ($\gamma = \sigma(\text{decay\_logits})$), recovering syntax and grammatical structure.
 4. **Parameter-Efficient Feed-Forward Execution (AMW):** Replaces static dense feed-forward blocks with an input-dependent low-rank associative memory dictionary with dense softmax readout over all memory slots ($O(DR + MR + MD + D^2)$ per-token compute), cutting layer parameter overhead by **5.2x** (from 8.65M to 1.67M weights) while delivering a **1.50x–1.63x end-to-end training throughput acceleration** and **3.1x–4.1x feed-forward latency reduction** with comparable held-out loss (8.46 vs. 8.51 on held-out FineWeb-Edu, $\Delta = 0.052$).
@@ -110,19 +110,21 @@ where $K_w \in \mathbb{R}^{M \times R_{\text{amw}}}$ represents key slots and $V
 
 All empirical evaluations were performed in a standardized Linux environment on an **NVIDIA GeForce RTX 5060 Ti (16 GB GDDR6)**, running PyTorch 2.15.0+cu132 and Triton 3.9.0.
 
-### 4.1 Computational Scaling vs. FlashAttention (SDPA)
-We evaluate forward pass compute scaling against standard PyTorch FlashAttention (SDPA) with hidden dimension $d = 1024$ in `float16`:
+### 4.1 Computational Scaling vs. Causal FlashAttention (SDPA)
+We evaluate forward pass compute scaling against matched causal PyTorch FlashAttention (using `torch.nn.attention.sdpa_kernel(SDPBackend.FLASH_ATTENTION)` with `is_causal=True`) with hidden dimension $d = 1024$, $H=16$, and $W=256$ in `float16`:
 
-| Sequence Length ($N$) | FlashAttention (SDPA) | WEFT Recurrent Attention | Measured Speedup | Complexity Regime |
+| Sequence Length ($N$) | FlashAttention (Causal SDPA) | Production WEFT Attention | Measured Speedup | Complexity Regime |
 |---:|---:|---:|---:|:---:|
-| 2,048 | 0.31 ms | 1.47 ms | 0.2x | Overhead bound |
-| 8,192 | 3.26 ms | 3.56 ms | 0.9x | Parity crossover |
-| 16,384 | 12.28 ms | **6.47 ms** | **1.9x** | Linear advantage |
-| 32,768 | 47.82 ms | **13.05 ms** | **3.7x** | Linear advantage |
-| 65,536 | 192.31 ms | **28.54 ms** | **6.7x** | Linear advantage |
-| 131,072 | 769.94 ms | **58.81 ms** | **13.1x** | Linear advantage |
-| 262,144 | 3,130.00 ms (3.13 s) | **128.44 ms** | **24.4x** | Linear advantage |
-| **524,288** | 24,730.00 ms (24.73 s) | **57.42 ms** | **430.7x** | **Dominant Linear** |
+| 1,024 | 0.08 ms | 0.97 ms | 0.1x | Overhead bound |
+| 2,048 | 0.26 ms | 2.04 ms | 0.1x | Overhead bound |
+| 4,096 | 0.87 ms | 4.04 ms | 0.2x | Overhead bound |
+| 8,192 | 3.19 ms | 8.44 ms | 0.4x | Approaching crossover |
+| 16,384 | 12.25 ms | 22.14 ms | 0.6x | Approaching crossover |
+| 32,768 | 48.36 ms | **45.07 ms** | **1.1x** | Parity crossover |
+| 65,536 | 191.57 ms | **91.38 ms** | **2.1x** | Linear advantage |
+| 131,072 | 775.55 ms | **185.35 ms** | **4.2x** | Linear advantage |
+| 262,144 | 3,080.00 ms (3.08 s) | **364.86 ms** | **8.4x** | Linear advantage |
+| **524,288** | 12,260.00 ms (12.26 s) | **733.13 ms** | **16.7x** | **Dominant Linear** |
 
 ### 4.2 Streaming Throughput and Actual 1-Billion Token Hardware Execution
 To evaluate streaming stability and memory consumption over long horizons, WEFT was benchmarked using continuous sequential streaming of chunks:

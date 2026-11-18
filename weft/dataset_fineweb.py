@@ -23,7 +23,7 @@ class FineWebEduStreamer:
         self.token_queue = []
         self._consecutive_failures = 0
 
-    def _fetch_next_rows(self, count: int = 100):
+    def _fetch_next_rows(self, count: int = 25):
         url = (
             f"https://datasets-server.huggingface.co/rows?"
             f"dataset=HuggingFaceFW%2Ffineweb-edu&config=sample-10BT&split=train&"
@@ -48,26 +48,33 @@ class FineWebEduStreamer:
                 self._consecutive_failures = 0
                 return []
             self._consecutive_failures += 1
+            if self._consecutive_failures >= 3:
+                # If specific server row index times out or returns 502/504 gateway error, advance offset past corrupted slice
+                self.current_offset += count
+                self._consecutive_failures = 0
             return []
         except Exception as e:
-            # Do NOT reset current_offset on transient network timeout or connection reset
             self._consecutive_failures += 1
+            if self._consecutive_failures >= 3:
+                # Advance past unresponsive remote row chunk
+                self.current_offset += count
+                self._consecutive_failures = 0
             return []
 
     def get_batch(self):
         target_tokens = self.batch_size * self.seq_len
         retries = 0
-        max_retries = 10
+        max_retries = 20
         while len(self.token_queue) < target_tokens:
-            rows = self._fetch_next_rows(count=100)
+            rows = self._fetch_next_rows(count=25)
             if not rows:
                 retries += 1
-                if self._consecutive_failures >= max_retries or retries >= max_retries:
+                if retries >= max_retries:
                     raise RuntimeError(
                         f"FineWebEduStreamer failed after {max_retries} consecutive fetch attempts at offset {self.current_offset}"
                     )
                 import time
-                time.sleep(0.5)
+                time.sleep(1.0)
                 continue
             retries = 0
             for text in rows:

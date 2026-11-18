@@ -58,9 +58,10 @@ def evaluate_needle_recall(model, enc, context_lengths=[256, 512, 1024, 2048], d
         gen_tokens = gen[0, len(prompt_ids):].tolist()
         gen_text = enc.decode(gen_tokens).strip()
 
-        success = "8472" in gen_text or len(gen_text) > 0
+        # Strict exact-match verification: must contain the exact secret passcode
+        success = "8472" in gen_text
         status = "PASSED" if success else "FAILED"
-        print(f"{len(prompt_ids):16d} | {status:>18} | {elapsed_ms:12.2f} ms")
+        print(f"{len(prompt_ids):16d} | {status:>18} | {elapsed_ms:12.2f} ms | Output: {repr(gen_text[:20])}")
         results[clen] = (status, elapsed_ms)
 
     return results

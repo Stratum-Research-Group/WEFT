@@ -1,0 +1,76 @@
+WEFT / AMW CLAIMS ASSESSMENT
+============================
+
+Scope and provenance
+- Assessed code: WEFT at commit 32bc1dfc2c9e34f4c4ade511ade2486ec180f963 (remote HEAD re-checked at end of review; earlier reviewed state a3ac8fd was superseded).
+- Related proofs: LeanProofs at commit ac20d541474087e5c7935ca98ca68087fb5120ee.
+- Method: read-only source inspection. Parameter counts were independently recomputed with Python. No independent GPU benchmarks or training runs were performed; reported timings and losses are author-reported unless stated otherwise.
+- Earlier defects (batch>1 mask broadcasting; HF generate bypassing WeftCache, causing unbounded KV/beam recurrent-state growth) now have explicit fixes and regression tests in source, so they are NOT current bugs and are not counted against the claims below.
+
+CENTRAL OPINION
+The engineering direction is real and worth pursuing. The pasted claims turn early architecture/kernel results into field-wide conclusions the evidence does not yet support. WEFT is a different efficient model with a quality/capacity tradeoff, not a proof that exact Transformer behavior can be retained for free. The key remaining result is quality per byte and per second at meaningful training and context scale.
+
+
+1. THE BILLION-TOKEN RESULT IS AN EXTRAPOLATION, NOT A DEMONSTRATION
+benchmarks/benchmark_billion_tokens.py explicitly times 20 repeats of one 65,536-position synthetic activation chunk (1,310,720 positions total) and extrapolates to a billion. It is a prototype layer, not a complete language model or autoregressive generation. Its within-block attention is noncausal and its global aggregation reads the entire chunk. The README correctly describes this as extrapolation, but the paper reasserts a continuous billion-token run in 75.48s. That is a specific contradiction between documents, not merely missing logs.
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/benchmarks/benchmark_billion_tokens.py
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/paper/paper.md
+
+
+2. BOUNDED RECURRENT STATE IS REAL, BUT "65 KB" IS NOT TOTAL GENERATION MEMORY
+A constant-size recurrent state is a genuine architectural property for fixed width/rank/window. But the 65 KB figure is ONE state tensor, not total per-layer memory. Independently recomputed FP16 example (B=1, D=1024, R=32): recurrent state = 65,536 bytes. At window W=256 the bounded local KV alone adds 1,044,480 bytes per layer, before weights and work buffers. Output history and masks can also grow in a full generation API.
+A fixed-size compressed, exponentially forgetting state does not establish unlimited reliable recall or "lifelong memory". Useful-quality laptop/mobile deployment is not established. The universal "128k needs 8x H100" claim should be removed; serving cost depends on model, configuration, GQA, quantization, etc.
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/weft/modeling_weft.py
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/weft/cache.py
+
+
+3. O(N) SCALING IS DEFENSIBLE ARCHITECTURALLY; THE SPEED TABLE IS NOT YET ONE CONSISTENT RESULT
+Linear scaling in sequence length follows from the bounded-window plus recurrence computation with architecture dimensions fixed. It is not an exact reassociation of global softmax attention made cheaper without a tradeoff.
+The 1.9x/6.7x numbers trace to the older chunk-gated report; the paper appends a 430.7x row while the WEFT time itself falls from 128.44 ms at 262k to 57.42 ms at 524k, and the README shows a different curve again. These rows need per-row implementation and run provenance, not one unified scaling claim. (No particular reported timing was established as false.)
+The current ramp script compares bare noncausal SDPA against a causal WEFT module and does not force or record the selected SDPA backend, so the ratios are not end-to-end LM speedups at matched quality.
+Decode vs training memory must stay separate: the production prefill path routes to fused_autograd.py, which allocates a full (B,S,H,R,D) state trajectory with SAVE_S_ALL=True, so broad claims of never materializing intermediate states are not true for that path. Constant decode state does not imply constant training memory.
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/benchmarks/ramp_up_benchmark.py
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/weft/kernels/fused_autograd.py
+
+
+4. AMW: THE 5.2x PARAMETER REDUCTION CHECKS; THE "SELECTIVE ACCESS" EXPLANATION DOES NOT MATCH THE CODE
+Isolated block at D=1024, M=512, R=64: 1,674,240 vs 8,650,752 parameters, about 5.2x smaller. Verified by independent recomputation. The 3.1x-4.1x latency figures are author-reported isolated-block timings, not independently reproduced.
+However, the implementation scores EVERY memory slot, softmaxes across all of them and densely blends all values, plus a dense 1024x1024 gate. It does not dynamically fetch only an active rank basis. Per-position cost includes DR + MR + MD + D^2 terms, not simply RD independent of slot count. The learned dictionary is static at inference; only the mixture weights change with the input. That is input-dependent associative mixing with a smaller dense compute, which is real - but sparse selective associative access is not what is currently implemented.
+Also note: the 5.2x figure is an isolated-block comparison at one configuration, not 5.2x whole-model compression.
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/weft/associative_weight.py
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/benchmarks/profile_amw_speed.py
+
+
+5. "ZERO LOSS PENALTY" ON FINEWEB-EDU IS NOT ESTABLISHED
+The supplied comparison runs 40 steps at batch 4, sequence 128, D=256, four layers: 20,480 token positions per model. Using identical batches is good practice, but there are no seeds/repeats and NO held-out evaluation. The printed final loss is the final training-batch loss. The paper labels 8.5596 vs 8.5779 as held-out, whose provenance this script does not support. A separate single-model evaluation script exists, but there is no reproducible AMW-vs-dense held-out comparison.
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/benchmarks/benchmark_amw_training.py
+
+
+6. MATH / UNCROSSING CONNECTION: MEANINGFUL PRINCIPLE, NOT A TRANSFERRED THEOREM
+The tensor-network link is real: Lean Groundwork.Cross.Bit proves Boolean crossing = identity minus singlet product, sum_A gives the bitwise decomposition, and Cross.Cuts supplies actual integer row/column contraction factorizations. That is a genuine structural connection: replacing crossed interactions with separable contractions through an intermediate representation.
+But those exact discrete identities do not by themselves establish that WEFT's chosen continuous learned feature maps / AMW preserve arbitrary softmax attention or arbitrary dense MLP quality at tiny rank. The shared factorization principle is a motivation, not a transferred neural-model theorem.
+- https://github.com/Stratum-Research-Group/LeanProofs/blob/main/formal-math-repo/eth/proof/networks/Groundwork/Cross/Bit.lean
+- https://github.com/Stratum-Research-Group/LeanProofs/blob/main/formal-math-repo/eth/proof/networks/Groundwork/Cross/Cuts.lean
+
+
+7. THE "DEATH OF DOGMAS" FRAMING IS HISTORICALLY WRONG
+Linear attention, constant-state models and associative reads have substantial prior work:
+- Linear attention and the recurrent linear-time formulation, 2020: https://proceedings.mlr.press/v119/katharopoulos20a.html
+- Mamba already combines linear-time, constant-state recurrence and hardware-aware scans: https://arxiv.org/abs/2312.00752
+- Associative softmax reads over stored/learned patterns (modern Hopfield networks): https://arxiv.org/abs/2008.02217
+- Mistral 7B itself uses sliding-window attention and GQA: https://arxiv.org/abs/2310.06825
+- Sparse MoE already contradicts "every LLM token uses every MLP weight": https://www.jmlr.org/papers/v23/21-0998.html
+- FlashAttention keeps exact attention while avoiding materializing the quadratic matrix in HBM, so the repo's exabyte full-matrix comparison is not FlashAttention's actual memory requirement: https://arxiv.org/abs/2205.14135
+Prior art does not make WEFT worthless or settle its exact novelty. A well-engineered hybrid can still be valuable. The claim needs to be a measured quality/efficiency advance against strong alternatives, not the first discovery that linear-time models or associative weights are possible.
+
+
+8. EXTRA QUALITY WARNING ON RECALL EVALUATION
+benchmarks/evaluate_benchmarks.py currently marks a recall success whenever the output is nonempty, even if the passcode is wrong. The old 16k "100%" report used a single fixed target key/value (a constant-answer shortcut), not evidence that the current gated model reliably recalls arbitrary bindings. The new randomized recall script is a different ungated prototype, tested up to 4096. None of these should be used as lifelong-memory validation.
+- https://github.com/Stratum-Research-Group/WEFT/blob/master/benchmarks/evaluate_benchmarks.py
+
+
+WHAT WOULD BE PERSUASIVE
+One frozen commit/run manifest with: verified causal backend and config parity across compared systems; full memory accounting (state + local KV + weights + buffers); exact-answer randomized long-context recall tests; and repeated, seeded held-out AMW comparisons against a smaller dense MLP plus established linear/associative alternatives. A frozen WEFT model retaining useful held-out quality and exact-answer long-context recall while using materially less memory and time than strong matched baselines would be a valuable result - without declaring two walls dead.
+
+BOTTOM LINE
+A promising early research prototype with real computational savings, worth developing. The billion-token and zero-loss-penalty claims need correcting before they can carry the argument. Not yet evidence that two fundamental AI barriers have fallen.

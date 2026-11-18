@@ -3,7 +3,7 @@
 **Date:** 2026-11-18  
 **Hardware:** NVIDIA GeForce RTX 5060 Ti  
 **Framework:** PyTorch 2.15.0+cu132  
-**Implementation:** [benchmark_associative_recall.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_associative_recall.py)
+**Implementation:** [benchmark_associative_recall.py](../benchmarks/benchmark_associative_recall.py)
 
 ---
 

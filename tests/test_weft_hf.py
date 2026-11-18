@@ -255,6 +255,109 @@ def test_weft_attention_mask_invariance():
     assert diff == 0.0, f"Attention mask leaked across unmasked positions: diff = {diff}"
 
 
+def test_weft_masked_batch_equivalence():
+    """
+    N1 regression test:
+    Verify that attention_mask works correctly for batch sizes > 1 with num_state_heads != batch_size,
+    ensuring that left-padded batch items produce identical logits to unpadded single inputs,
+    and cached decode steps respect per-batch masking.
+    """
+    cfg = WeftConfig(
+        vocab_size=64,
+        hidden_size=32,
+        intermediate_size=64,
+        num_hidden_layers=2,
+        num_attention_heads=2,
+        num_state_heads=2,
+        state_rank=8,
+        window_size=16,
+    )
+    model = WeftForCausalLM(cfg).eval()
+
+    # Test b=3, num_state_heads=2 (broadcasting mismatch test)
+    x3 = torch.randint(0, 64, (3, 8))
+    mask3 = torch.ones(3, 8)
+    mask3[0, :2] = 0
+    mask3[1, :4] = 0
+    out3 = model(x3, attention_mask=mask3)
+    assert out3.logits.shape == (3, 8, 64)
+
+    # Test left-padded batch=2 vs unpadded single
+    seq_len = 6
+    pad_len = 4
+    unpadded_seq = torch.randint(0, 64, (1, seq_len))
+    padded_seq = torch.cat([torch.zeros(1, pad_len, dtype=torch.long), unpadded_seq], dim=1)
+    mask_padded = torch.cat([torch.zeros(1, pad_len), torch.ones(1, seq_len)], dim=1)
+
+    other_seq = torch.randint(0, 64, (1, seq_len + pad_len))
+    other_mask = torch.ones(1, seq_len + pad_len)
+
+    batch_input = torch.cat([padded_seq, other_seq], dim=0)
+    batch_mask = torch.cat([mask_padded, other_mask], dim=0)
+
+    with torch.no_grad():
+        out_single = model(unpadded_seq)
+        out_batch = model(batch_input, attention_mask=batch_mask)
+
+    diff = (out_single.logits[0, -1, :] - out_batch.logits[0, -1, :]).abs().max().item()
+    assert diff < 1e-4, f"Left-padded batch vs unpadded single mismatch: {diff}"
+
+    # Test step-by-step cached decode with mask (s=1 path)
+    with torch.no_grad():
+        res_prefill = model(batch_input[:, :-1], attention_mask=batch_mask[:, :-1], use_cache=True)
+        out_step = model(batch_input[:, -1:], past_key_values=res_prefill.past_key_values, attention_mask=batch_mask, use_cache=True)
+    step_diff = (out_step.logits[:, 0, :] - out_batch.logits[:, -1, :]).abs().max().item()
+    assert step_diff < 1e-4, f"Step decode vs full forward mismatch: {step_diff}"
+
+
+def test_weft_generate_bounded_cache_and_beam_search():
+    """
+    N2 regression test:
+    Verify that Hugging Face generate() routes through WeftCache:
+    1. Physical KV cache size is strictly bounded to window_size - 1.
+    2. Beam search on batched distinct prompts reorders recurrent state properly and matches
+       independent beam search generations.
+    """
+    cfg = WeftConfig(
+        vocab_size=50,
+        hidden_size=32,
+        intermediate_size=64,
+        num_hidden_layers=2,
+        num_attention_heads=2,
+        num_state_heads=2,
+        state_rank=8,
+        window_size=4,
+    )
+    model = WeftForCausalLM(cfg).eval()
+
+    # 1. Bounded physical cache check over a long generate call
+    prompt = torch.randint(0, 50, (1, 6))
+    gen_out = model.generate(
+        prompt, max_new_tokens=16, do_sample=False, return_dict_in_generate=True
+    )
+    cache = gen_out.past_key_values
+    from weft.cache import WeftCache, WeftCacheLayer
+    assert isinstance(cache, WeftCache), f"generate() did not use WeftCache: {type(cache)}"
+    for layer in cache.layers:
+        assert isinstance(layer, WeftCacheLayer)
+        assert layer.keys.shape[-2] <= cfg.window_size - 1, (
+            f"Physical keys {layer.keys.shape[-2]} exceeded bound {cfg.window_size - 1}"
+        )
+    assert cache.get_seq_length() == 6 + 16 - 1  # 21 steps completed
+
+    # 2. Beam search equivalence on distinct prompts
+    p_a = torch.tensor([[10, 11, 12, 13]])
+    p_b = torch.tensor([[20, 21, 22, 23]])
+    batch_p = torch.cat([p_a, p_b], dim=0)
+
+    out_batch = model.generate(batch_p, max_new_tokens=8, num_beams=2, do_sample=False)
+    out_a = model.generate(p_a, max_new_tokens=8, num_beams=2, do_sample=False)
+    out_b = model.generate(p_b, max_new_tokens=8, num_beams=2, do_sample=False)
+
+    assert torch.equal(out_batch[0:1], out_a), "Beam search output for prompt A deviated in batch"
+    assert torch.equal(out_batch[1:2], out_b), "Beam search output for prompt B deviated in batch"
+
+
 def test_weft_beam_reorder_recurrent_state():
     """
     Item 4 regression test:
@@ -312,3 +415,67 @@ def test_weft_use_cache_false_preserves_caller_state():
     assert next_c is None
     assert c.get_seq_length() == initial_len
     assert torch.equal(c.layers[0].keys, initial_keys)
+
+
+def test_weft_gradient_checkpointing_equivalence():
+    """
+    Item 9 regression test:
+    Verify that training with gradient checkpointing produces identical outputs
+    and gradients to standard forward/backward passes.
+    """
+    torch.manual_seed(42)
+    cfg = WeftConfig(
+        vocab_size=32,
+        hidden_size=16,
+        intermediate_size=32,
+        num_hidden_layers=2,
+        num_attention_heads=2,
+        num_state_heads=2,
+        state_rank=8,
+        window_size=4,
+    )
+
+    model_plain = WeftForCausalLM(cfg).train()
+    model_ckpt = WeftForCausalLM(cfg).train()
+    model_ckpt.load_state_dict(model_plain.state_dict())
+    model_ckpt.gradient_checkpointing_enable()
+
+    tokens = torch.randint(0, 32, (2, 8))
+    labels = tokens.clone()
+
+    # Forward & backward plain
+    out_plain = model_plain(tokens, labels=labels)
+    out_plain.loss.backward()
+
+    # Forward & backward checkpointed
+    out_ckpt = model_ckpt(tokens, labels=labels)
+    out_ckpt.loss.backward()
+
+    # Compare loss
+    assert torch.allclose(out_plain.loss, out_ckpt.loss, atol=1e-5), "Loss mismatch with gradient checkpointing"
+
+    # Compare gradients across all parameters
+    for (n_p, p_p), (n_c, p_c) in zip(model_plain.named_parameters(), model_ckpt.named_parameters()):
+        assert p_p.grad is not None and p_c.grad is not None, f"Missing gradient on {n_p}"
+        diff = (p_p.grad - p_c.grad).abs().max().item()
+        assert diff < 1e-4, f"Gradient mismatch on parameter {n_p}: {diff}"
+
+
+def test_weft_rmsnorm_numerical_stability():
+    """
+    Verify WeftRMSNorm stability under extreme float32 and float64 inputs.
+    """
+    from weft.modeling_weft import WeftRMSNorm
+    norm = WeftRMSNorm(16)
+
+    # 1. Extreme float32 inputs
+    x_f32 = torch.full((2, 16), 1e20, dtype=torch.float32)
+    y_f32 = norm(x_f32)
+    assert not torch.isnan(y_f32).any() and not torch.isinf(y_f32).any()
+    assert torch.allclose(y_f32, torch.ones_like(y_f32), atol=1e-4)
+
+    # 2. Extreme float64 inputs (> float32 max 3.4e38)
+    x_f64 = torch.full((2, 16), 1e40, dtype=torch.float64)
+    y_f64 = norm(x_f64)
+    assert not torch.isnan(y_f64).any() and not torch.isinf(y_f64).any()
+    assert torch.allclose(y_f64, torch.ones_like(y_f64), atol=1e-4)

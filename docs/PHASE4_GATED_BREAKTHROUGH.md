@@ -2,7 +2,7 @@
 
 **Task:** Language Modeling on TinyShakespeare (1,000 steps)  
 **Hardware:** NVIDIA GeForce RTX 5060 Ti  
-**Implementation:** [benchmark_gated_attention.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_gated_attention.py)
+**Implementation:** [benchmark_gated_attention.py](../benchmarks/benchmark_gated_attention.py)
 
 ---
 

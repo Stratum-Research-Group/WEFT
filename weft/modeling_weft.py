@@ -26,13 +26,15 @@ class WeftRMSNorm(nn.Module):
 
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
         input_dtype = hidden_states.dtype
-        hidden_states = hidden_states.to(torch.float32)
+        # Compute in float64 if input is float64, otherwise float32 to prevent downcast overflow
+        compute_dtype = torch.float64 if input_dtype == torch.float64 else torch.float32
+        hidden_states = hidden_states.to(compute_dtype)
         # Scaled RMSNorm formulation to protect against overflow on extreme finite magnitude inputs
         scale = hidden_states.abs().amax(dim=-1, keepdim=True).clamp_min(1.0)
         scaled_x = hidden_states / scale
         variance = scaled_x.pow(2).mean(-1, keepdim=True)
         normed = scaled_x * torch.rsqrt(variance + (self.eps / (scale * scale)))
-        return (self.weight * normed).to(input_dtype)
+        return (self.weight.to(compute_dtype) * normed).to(input_dtype)
 
 
 class WeftMLP(nn.Module):
@@ -96,6 +98,92 @@ def _build_sliding_window_mask(
         torch.tensor(float("-inf"), dtype=dtype, device=device),
     )
     return mask.unsqueeze(0).unsqueeze(0)  # (1, 1, q_len, k_len)
+
+
+def _chunked_sliding_window_sdpa(
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v: torch.Tensor,
+    window_size: int,
+    past_len: int = 0,
+    attention_mask: Optional[torch.Tensor] = None,
+    chunk_size: int = 1024,
+) -> torch.Tensor:
+    """
+    Computes causal sliding-window attention with bounded memory by tiling over query chunks.
+    Prevents allocating quadratic (q_len, k_len) attention masks for large sequence lengths.
+    """
+    b, h, q_len, d = q.shape
+    k_len = k.shape[-2]
+
+    # Fast path: if sequence already fits within chunk threshold, compute directly
+    if q_len <= chunk_size and k_len <= chunk_size + window_size:
+        mask = _build_sliding_window_mask(
+            q_len=q_len,
+            k_len=k_len,
+            past_len=past_len,
+            window_size=window_size,
+            attention_mask=attention_mask,
+            device=q.device,
+            dtype=q.dtype,
+        )
+        return F.scaled_dot_product_attention(q, k, v, attn_mask=mask)
+
+    out_chunks = []
+    k_offset = past_len + q_len - k_len
+
+    for i in range(0, q_len, chunk_size):
+        q_chunk = q[:, :, i : i + chunk_size, :]
+        cur_q_len = q_chunk.shape[-2]
+        q_start = past_len + i
+        q_end = q_start + cur_q_len
+
+        # Bound key-value slice to only positions that can fall within window_size
+        min_abs_k = max(k_offset, q_start - window_size + 1)
+        max_abs_k = min(past_len + q_len, q_end)
+
+        rel_k_start = min_abs_k - k_offset
+        rel_k_end = max_abs_k - k_offset
+
+        k_chunk = k[:, :, rel_k_start : rel_k_end, :]
+        v_chunk = v[:, :, rel_k_start : rel_k_end, :]
+
+        q_pos = torch.arange(q_start, q_end, device=q.device).unsqueeze(1)
+        k_pos = torch.arange(min_abs_k, max_abs_k, device=q.device).unsqueeze(0)
+
+        causal = k_pos <= q_pos
+        window = (q_pos - k_pos) < window_size
+        valid = causal & window
+
+        if attention_mask is not None and attention_mask.dim() == 2:
+            if attention_mask.shape[-1] >= past_len + q_len:
+                k_mask = attention_mask[:, min_abs_k : max_abs_k]
+            else:
+                k_mask = attention_mask[..., -k_len:][:, rel_k_start : rel_k_end]
+            valid = valid.unsqueeze(0) & (k_mask > 0).unsqueeze(1)
+            chunk_mask = torch.where(
+                valid,
+                torch.tensor(0.0, dtype=q.dtype, device=q.device),
+                torch.tensor(float("-inf"), dtype=q.dtype, device=q.device),
+            ).unsqueeze(1)
+        elif attention_mask is not None and attention_mask.dim() == 4:
+            sub_mask = attention_mask[:, :, i : i + cur_q_len, rel_k_start : rel_k_end]
+            chunk_mask = torch.where(
+                valid,
+                torch.tensor(0.0, dtype=q.dtype, device=q.device),
+                torch.tensor(float("-inf"), dtype=q.dtype, device=q.device),
+            ).unsqueeze(0).unsqueeze(0) + sub_mask
+        else:
+            chunk_mask = torch.where(
+                valid,
+                torch.tensor(0.0, dtype=q.dtype, device=q.device),
+                torch.tensor(float("-inf"), dtype=q.dtype, device=q.device),
+            ).unsqueeze(0).unsqueeze(0)
+
+        out_c = F.scaled_dot_product_attention(q_chunk, k_chunk, v_chunk, attn_mask=chunk_mask)
+        out_chunks.append(out_c)
+
+    return torch.cat(out_chunks, dim=-2)
 
 
 class WeftAttention(nn.Module):
@@ -200,16 +288,15 @@ class WeftAttention(nn.Module):
             # Optimal decode fast-path: all k_len tokens precede or are current query token
             local_out = F.scaled_dot_product_attention(q, k_local, v_local, is_causal=False)
         else:
-            attn_mask = _build_sliding_window_mask(
-                q_len=s,
-                k_len=k_len,
-                past_len=past_len,
+            local_out = _chunked_sliding_window_sdpa(
+                q=q,
+                k=k_local,
+                v=v_local,
                 window_size=self.window_size,
+                past_len=past_len,
                 attention_mask=attention_mask,
-                device=hidden_states.device,
-                dtype=q.dtype,
+                chunk_size=1024,
             )
-            local_out = F.scaled_dot_product_attention(q, k_local, v_local, attn_mask=attn_mask)
 
         local_out = local_out.transpose(1, 2).contiguous().view(b, s, d)
 
@@ -235,7 +322,7 @@ class WeftAttention(nn.Module):
             gamma_4d = gamma.view(1, self.num_state_heads, self.state_rank, 1)
 
             if mask_weight is not None:
-                m_1 = mask_weight[:, 0, :, :]
+                m_1 = mask_weight[:, 0:1, :, :]  # (b, 1, 1, 1)
                 new_state = torch.where(m_1 > 0, gamma_4d * recurrent_state + step_update, recurrent_state)
             else:
                 new_state = gamma_4d * recurrent_state + step_update
@@ -243,7 +330,7 @@ class WeftAttention(nn.Module):
             vp_1 = v_p[:, 0, :, :].unsqueeze(-2)
             out_head = torch.matmul(vp_1, new_state).squeeze(-2)
             if mask_weight is not None:
-                out_head = out_head * mask_weight[:, 0, :, :].squeeze(-1)
+                out_head = out_head * mask_weight[:, 0, :, :].view(b, 1, 1)
             global_out = out_head.view(b, 1, d) / (self.state_rank ** 0.5)
 
             if is_hf_cache and use_cache:
@@ -299,7 +386,7 @@ class WeftAttention(nn.Module):
                 step_update = kp_t * xh_t
 
                 if mask_weight is not None:
-                    m_t = mask_weight[:, t, :, :]
+                    m_t = mask_weight[:, t:t+1, :, :]  # (b, 1, 1, 1)
                     state = torch.where(m_t > 0, gamma_t * state + step_update, state)
                 else:
                     state = gamma_t * state + step_update
@@ -307,7 +394,7 @@ class WeftAttention(nn.Module):
                 vp_t = v_p[:, t, :, :].unsqueeze(-2)
                 out_head_t = torch.matmul(vp_t, state).squeeze(-2)
                 if mask_weight is not None:
-                    out_head_t = out_head_t * mask_weight[:, t, :, :].squeeze(-1)
+                    out_head_t = out_head_t * mask_weight[:, t, :, :].view(b, 1, 1)
                 global_out_steps.append(out_head_t)
 
             readout = torch.stack(global_out_steps, dim=1)
@@ -406,7 +493,9 @@ class WeftModel(WeftPreTrainedModel):
         hidden_states = self.embed_tokens(input_ids)
 
         is_hf_cache = isinstance(past_key_values, Cache)
-        if use_cache and past_key_values is None:
+        if is_hf_cache and not isinstance(past_key_values, WeftCache):
+            past_key_values = WeftCache.from_cache(past_key_values, window_size=self.config.window_size)
+        elif use_cache and past_key_values is None:
             past_key_values = WeftCache(window_size=self.config.window_size)
             is_hf_cache = True
 
@@ -470,6 +559,24 @@ class WeftForCausalLM(WeftPreTrainedModel, GenerationMixin):
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
         self.post_init()
+
+    def _prepare_cache_for_generation(
+        self,
+        generation_config,
+        model_kwargs: dict,
+        generation_mode,
+        batch_size: int,
+        max_cache_length: int,
+    ) -> bool:
+        """
+        Ensure generation uses WeftCache with sliding window and recurrent state tracking.
+        """
+        if model_kwargs.get("past_key_values") is None and generation_config.use_cache is not False:
+            model_kwargs["past_key_values"] = WeftCache(window_size=self.config.window_size)
+            return True
+        return super()._prepare_cache_for_generation(
+            generation_config, model_kwargs, generation_mode, batch_size, max_cache_length
+        )
 
     def prepare_inputs_for_generation(
         self,

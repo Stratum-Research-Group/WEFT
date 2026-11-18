@@ -79,3 +79,29 @@ class WeftCache(DynamicCache):
         self.window_size = window_size
         super().__init__(**kwargs)
         self.layer_class_to_replicate = lambda: WeftCacheLayer(window_size=self.window_size)
+
+    @classmethod
+    def from_cache(cls, cache: Any, window_size: int = 128) -> "WeftCache":
+        """
+        Convert an existing cache (such as a plain DynamicCache) into a WeftCache
+        preserving stored keys, values, logical sequence lengths, and recurrent state.
+        """
+        if isinstance(cache, cls):
+            return cache
+        weft_cache = cls(window_size=window_size)
+        if isinstance(cache, DynamicCache):
+            for layer in cache.layers:
+                if isinstance(layer, WeftCacheLayer):
+                    weft_cache.layers.append(layer)
+                else:
+                    wl = WeftCacheLayer(window_size=window_size)
+                    if getattr(layer, "is_initialized", False):
+                        wl.keys = layer.keys
+                        wl.values = layer.values
+                        wl.is_initialized = True
+                        wl.cumulative_length = layer.get_seq_length()
+                    if hasattr(layer, "weft_recurrent_state"):
+                        wl.weft_recurrent_state = layer.weft_recurrent_state
+                    weft_cache.layers.append(wl)
+            return weft_cache
+        raise TypeError(f"Unsupported cache type for conversion to WeftCache: {type(cache)}")

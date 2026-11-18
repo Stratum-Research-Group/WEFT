@@ -1,6 +1,6 @@
 """
 Comprehensive Head-to-Head Ramp-Up Benchmark on RTX 5060 Ti
-Comparing Standard FlashAttention / SDPA vs Structured Linear Attention
+Comparing Standard FlashAttention / SDPA vs Production WeftAttention
 Ramping up token lengths: 1k, 2k, 4k, 8k, 16k, 32k, 64k, 128k, 256k, 512k, 1M+
 """
 
@@ -9,57 +9,27 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class StructuredAttention(nn.Module):
-    def __init__(self, d_model: int, n_heads: int, window_size: int = 256, rank: int = 32):
-        super().__init__()
-        self.d_model = d_model
-        self.n_heads = n_heads
-        self.head_dim = d_model // n_heads
-        self.window_size = window_size
-        self.rank = rank
+from weft import WeftConfig
+from weft.modeling_weft import WeftAttention
 
-        self.proj_k = nn.Linear(d_model, rank, bias=False)
-        self.proj_v = nn.Linear(d_model, rank, bias=False)
-        self.out_proj = nn.Linear(d_model, d_model, bias=False)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        b, seq_len, d = x.shape
-        pad_len = (self.window_size - (seq_len % self.window_size)) % self.window_size
-        if pad_len > 0:
-            x_pad = F.pad(x, (0, 0, 0, pad_len))
-        else:
-            x_pad = x
-        
-        total_len = x_pad.shape[1]
-        n_windows = total_len // self.window_size
-        
-        # 1. Local block attention
-        x_win = x_pad.view(b * n_windows, self.window_size, self.n_heads, self.head_dim).transpose(1, 2)
-        local_out = F.scaled_dot_product_attention(x_win, x_win, x_win)
-        local_out = local_out.transpose(1, 2).contiguous().view(b, total_len, d)
-        if pad_len > 0:
-            local_out = local_out[:, :seq_len, :]
-
-        # 2. Global rank-32 bottleneck
-        k_comp = torch.bmm(self.proj_k(x).transpose(1, 2), x) / seq_len
-        v_comp = self.proj_v(x)
-        global_out = torch.bmm(v_comp, k_comp)
-        
-        return self.out_proj(local_out + global_out)
 
 def main():
-    device = torch.device("cuda:0")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    if not torch.cuda.is_available():
+        print("CUDA device required for ramp-up benchmark.")
+        return
+
     d_model = 1024
     n_heads = 16
     dtype = torch.float16
 
-    print("=" * 95)
-    print("PROPER RAMP-UP BENCHMARK: STANDARD SDPA vs STRUCTURED ATTENTION")
-    print(f"Device: {torch.cuda.get_device_name(0)} | Free VRAM: ~13.7 GB | Precision: {dtype}")
-    print(f"Config: d_model={d_model}, n_heads={n_heads}, batch_size=1, window=256, rank=32")
-    print("=" * 95)
-    print(f"{'Sequence N':>12} | {'SDPA Latency':>14} | {'SDPA Peak VRAM':>15} | {'Struct Latency':>15} | {'Struct Peak VRAM':>17} | {'Speedup':>10}")
-    print("-" * 95)
+    print("=" * 105)
+    print("PROPER RAMP-UP BENCHMARK: STANDARD SDPA vs PRODUCTION WEFT ATTENTION")
+    print(f"Device: {torch.cuda.get_device_name(0)} | Free VRAM: ~{torch.cuda.mem_get_info()[0]/1024**3:.1f} GB | Precision: {dtype}")
+    print(f"Config: d_model={d_model}, n_heads={n_heads}, batch_size=1, window=256, rank=16")
+    print("=" * 105)
+    print(f"{'Sequence N':>12} | {'SDPA Latency':>14} | {'SDPA Peak VRAM':>15} | {'WEFT Latency':>15} | {'WEFT Peak VRAM':>17} | {'Speedup':>10}")
+    print("-" * 105)
 
     seq_lengths = [
         1024,
@@ -75,8 +45,15 @@ def main():
         1048576,
     ]
 
-    struct_layer = StructuredAttention(d_model=d_model, n_heads=n_heads, window_size=256, rank=32).to(device=device, dtype=dtype)
-    struct_layer.eval()
+    weft_cfg = WeftConfig(
+        hidden_size=d_model,
+        num_attention_heads=n_heads,
+        num_state_heads=4,
+        state_rank=16,
+        window_size=256,
+    )
+    weft_layer = WeftAttention(weft_cfg, layer_idx=0).to(device=device, dtype=dtype)
+    weft_layer.eval()
 
     sdpa_alive = True
 
@@ -94,7 +71,6 @@ def main():
                 k = torch.randn(1, n_heads, seq_len, d_model // n_heads, device=device, dtype=dtype)
                 v = torch.randn(1, n_heads, seq_len, d_model // n_heads, device=device, dtype=dtype)
 
-                # Iterations: fewer for large N to avoid long waits
                 iters = 10 if seq_len <= 32768 else (3 if seq_len <= 262144 else 1)
                 
                 # Warmup
@@ -116,12 +92,16 @@ def main():
                 else:
                     sdpa_time_str = f"{sdpa_ms/1000:.2f} s"
                 sdpa_mem_str = f"{sdpa_mem:.1f} MB"
-            except (torch.cuda.OutOfMemoryError, RuntimeError) as e:
+            except torch.cuda.OutOfMemoryError:
                 sdpa_alive = False
                 sdpa_time_str = "CUDA OOM"
-                sdpa_mem_str = ">13.7 GB"
+                sdpa_mem_str = "OOM"
+            except RuntimeError as e:
+                sdpa_alive = False
+                sdpa_time_str = "RuntimeError"
+                sdpa_mem_str = "—"
 
-        # 2. Benchmark Structured Attention
+        # 2. Benchmark Production WeftAttention
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats()
         try:
@@ -129,13 +109,13 @@ def main():
             iters = 10 if seq_len <= 32768 else (3 if seq_len <= 262144 else 1)
             
             with torch.no_grad():
-                _ = struct_layer(x)
+                _ = weft_layer(x)
                 torch.cuda.synchronize()
 
                 torch.cuda.reset_peak_memory_stats()
                 t0 = time.perf_counter()
                 for _ in range(iters):
-                    _ = struct_layer(x)
+                    _ = weft_layer(x)
                 torch.cuda.synchronize()
                 t1 = time.perf_counter()
 
@@ -151,15 +131,19 @@ def main():
                 ratio = sdpa_ms / st_ms
                 speedup_str = f"{ratio:.1f}x"
             else:
-                speedup_str = "Inf (SDPA OOM)"
-        except (torch.cuda.OutOfMemoryError, RuntimeError) as e:
+                speedup_str = "SDPA OOM"
+        except torch.cuda.OutOfMemoryError:
             st_time_str = "CUDA OOM"
-            st_mem_str = ">13.7 GB"
+            st_mem_str = "OOM"
+            speedup_str = "—"
+        except RuntimeError as e:
+            st_time_str = "RuntimeError"
+            st_mem_str = "—"
             speedup_str = "—"
 
         print(f"{seq_len:>12,} | {sdpa_time_str:>14} | {sdpa_mem_str:>15} | {st_time_str:>15} | {st_mem_str:>17} | {speedup_str:>10}")
 
-    print("=" * 95)
+    print("=" * 105)
 
 if __name__ == "__main__":
     main()

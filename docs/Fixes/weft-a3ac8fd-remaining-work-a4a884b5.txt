@@ -1,0 +1,124 @@
+WEFT: READ-ONLY RE-REVIEW AND PASTE-READY REMAINING WORK
+18 November 2026
+Repository: https://github.com/Stratum-Research-Group/WEFT
+Reviewed commit: a3ac8fdcf1c01c07a3d7c3b7210afd405e553839 (remote HEAD, re-fetched at closeout)
+Previous review: bcd8199f48d27cc15841cde4265937f9a4b7e995 (24 items)
+Intervening commits: 71e39b7 (cache semantics, fsdp tests, modeling contracts), a3ac8fd (benchmark labeling, demo target shift)
+
+VERDICT
+Substantial, genuine progress. The core correctness blockers from the previous review (cache semantics, local-attention equivalence, masks at batch size 1, cache mutation, tuple past, demo objective, serving crash) are fixed and backed by new regression tests that pass here. However, two reproduced defects remain on paths the fixes do not cover: the new attention-mask handling breaks for batch size > 1, and Hugging Face generate() bypasses the new bounded WeftCache entirely, so beam search still mixes recurrent state between beams and physical KV storage still grows without bound during real generation. The incomplete custom Triton backward, most benchmark-methodology items, README/docs claims and the quality gates remain open. Still a research prototype; not production-ready.
+
+EVIDENCE LABELS
+REPRODUCED: independently exercised on CPU at the reviewed commit.
+STATIC: concrete source-level defect or risk; not executed on CUDA here.
+EVIDENCE GAP: the checked-in artifact does not establish the advertised result.
+VALIDATION GATE: additional validation needed, not a claimed reproduced failure.
+
+SAFE REVIEW CONDITIONS / DO NOT TOUCH
+- No source changes, fixes, pushes, training runs, GPU runs, distributed jobs, or paid compute were performed.
+- Preserve the dual-path architecture and the fixed single-operator sliding-window semantics; do not substitute a different attention operator to make tests pass.
+- Preserve all currently passing tests, checkpoint loadability, the exact integer identity checks, the measured quantization result and the new honest benchmark headers.
+- Do not weaken tolerances, catch failures as success, or label skipped tests passed.
+- Do not turn the algebra checks into a claim of Lean verification of this neural model.
+- Request explicit owner approval before long runs or new compute spending.
+
+ACTUALLY RUN
+Environment: Python 3.10, torch 2.14.1+cpu, transformers 5.20.2, pytest 9.2.0, numpy, safetensors. CPU only, no CUDA/Triton. Same versions as the previous review.
+1) PYTHONPATH=. python -m pytest tests/ -q at a3ac8fd
+   Result: 9 passed, 2 skipped in ~2.5s. Full collection now works on CPU (previously stopped on the unconditional Triton import). test_fused_bwd and test_fsdp skip cleanly with explicit hardware reasons. The 9 include the four new regression tests for items 1/2, 3, 4 and 6, plus verify_identity (now collected via pyproject python_files).
+2) Independent probes (tiny models, seeds fixed):
+   - Uneven chunk append (5+4 tokens, W=4) vs full pass: max logit diff 0.0.
+   - Tuple past roundtrip (extract tuple from WeftCache, continue): hidden diff 3.9e-07 vs full pass.
+   - Masked batch=2 forward vs batch=1 with identical weights: diff 0.0377 (WRONG; see N1).
+   - Masked batch=3 forward: RuntimeError, broadcast mismatch (see N1).
+   - Left-padded batch=2 vs unpadded single: last-position diff 0.0260 (same defect).
+   - generate() cache inspection: transformers 5.20.2 creates plain DynamicCache/DynamicLayer, not WeftCache (see N2). Beam reorder on that path: reordered decode vs recomputed prefixes diff 1.7158 (WRONG). Physical KV after 16 tokens with window 4: 16 stored (unbounded on this path).
+   - WeftCache path (model-created cache): reorder vs recompute diff 0.0; physical KV bound holds; get_seq_length tracks logical length.
+   - Serving engine with the shipped checkpoint: max_new_tokens=0 returns empty without crash, =1 works, negative raises ValueError. Previously both 0 and 1 raised ZeroDivisionError.
+   - Checkpoint loads under the new code; CPU backward gives finite nonzero gradients on proj_k, proj_v and decay_logits.
+   - gradient_checkpointing_enable() now works; flagged on, backward produces nonzero proj_k gradients. Previously raised ValueError.
+   - WeftRMSNorm: FP32 constant 1e20 now returns correct finite output (previously 0). FP64 constant 1e40 still returns NaN (float32 downcast overflows first).
+   - WeftCharTokenizer loads from the checkpoint's new vocab.json and round-trips; unknown characters are silently dropped.
+   - greedy and 2-beam generate() complete.
+3) Quantization was NOT rerun: only the quantize_weft.py docstring changed since bcd8199, so the previous reproduction (16.20 MB -> 4.13 MB, 3.93x, cosine 0.999955 on one prompt) stands for this commit.
+
+DISPOSITION OF THE PREVIOUS 24 ITEMS
+FIXED (verified here):
+ 1 Local-attention operator equivalence - one sliding-window mask operator across full/prefill/decode/append (modeling_weft.py:49-98, 191-213); regression test tests/test_weft_hf.py:168-224 plus my uneven-chunk probe (diff 0.0).
+ 3 Padding/attention masks at batch size 1 - mask plumbed through both paths (modeling_weft.py:227-235, 237-246); test :227-256. Batch > 1 still broken: see N1.
+ 5 Tuple past - parsed and honored (modeling_weft.py:153-163, 250-252, 315-319); roundtrip reproduced (3.9e-07).
+ 6 use_cache=False no longer mutates a supplied cache (modeling_weft.py:194-199, 417-431); test :289-310.
+10 Fallback no longer materializes the state trajectory; per-step readout with running state (modeling_weft.py:288-312).
+11 Training demo double shift - get_batch now returns (x, x.clone()) and relies on the model's internal shift (examples/train_weft_demo.py:70-77). Checkpoint provenance remains open (item 11 residue below).
+13 fast_parallel_scan now labeled EXPERIMENTAL/RETIRED with its instability documented (benchmarks/fast_parallel_scan.py:1-10).
+14 fused_chunk_gated now labeled a delayed chunk-level variant, a different operator (benchmarks/fused_chunk_gated.py:1-9).
+18 Serving 0/1/negative lengths fixed, CUDA synchronization added, overstated docstring claims removed (examples/serving_engine.py:24-83). Verified on CPU.
+20 FSDP static defects fixed: local-rank device mapping, try/finally cleanup, collected pytest test with a >=2-CUDA skip (tests/test_fsdp.py:30-103). Hardware gate still open.
+Partial (see remaining work): 2, 4, 7, 9, 12, 15, 16, 19, 21, 22, 23, 24.
+OPEN (unchanged): 8 (custom Triton backward still computes no v_p/decay gradients and ignores dfinal_state: weft/kernels/fused_autograd.py:203-234), 17 (benchmark comparability/memory-accounting methodology largely unchanged).
+
+NEW DEFECTS FOUND THIS ROUND
+N1 REPRODUCED. Masked recurrent path breaks for batch size > 1.
+   weft/modeling_weft.py:227 builds mask_weight as (b, s, 1, 1); lines 238 and 302 index it as mask_weight[:, t, :, :] giving (b, 1, 1), and lines 246 and 310 squeeze to (b, 1). Broadcast against state/output tensors of shape (b, num_state_heads, ...) aligns the batch dim with the head dim. With b=3, num_state_heads=2: RuntimeError ("size of tensor a (3) must match size of tensor b (2) at non-singleton dimension 1"). With b=2, num_state_heads=2 it runs silently but applies each batch item's mask to the wrong head: masked batch-2 vs batch-1 logits differ by 0.0377, and a left-padded batch differs from its unpadded single sequence by 0.0260. The new invariance test only covers b=1, so it cannot see this.
+N2 REPRODUCED. Hugging Face generate() bypasses WeftCache.
+   WeftCache is only created when the model itself instantiates the cache (modeling_weft.py:410-411). transformers 5.20.2 generate() pre-creates a plain DynamicCache (model._supports_default_dynamic_cache() is True and no _get_cache override exists), so real generation runs on DynamicLayer: physical KV storage grows unbounded (16 tokens stored with window 4) and reorder_cache does not reorder weft_recurrent_state - a reordered-then-decoded batch differs from recomputed prefixes by 1.7158. Items 2 and 4 are therefore fixed only on the WeftCache path; the actual HF generation path keeps both old defects. Single-path direct calls (serving engine) do get WeftCache and are correct.
+N3 STATIC. Shipped checkpoint metadata still marks ordinary characters as BOS/EOS.
+   weft_shakespeare_ckpt/config.json:5,7 and generation_config.json:3,4 carry bos_token_id=1 (" ") and eos_token_id=2 ("!"). Class defaults are now None (configuration_weft.py:24-26), but the checkpoint's own config overrides them, so generate() with the shipped checkpoint still terminates on "!". The vocab mapping itself (vocab.json) is fine and unchanged.
+
+NUMBERED WORK FOR THE CODING AGENT
+
+1. Fix the masked recurrent path for batch > 1.
+   REPRODUCED (N1). weft/modeling_weft.py:227, 237-246, 301-311.
+   Keep mask_weight 4-D through the gating: use mask_weight[:, t:t+1] (shape (b,1,1,1)) against state (b,H,R,D), and mask_weight[:, t] reshaped to (b,1,1) against per-step outputs (b,H,D) - never drop the singleton dims. Add masked tests at batch sizes 2 and 3 with num_state_heads != batch size (so broadcasting cannot pass silently), covering full forward, cached decode steps, and left-padded batch vs unpadded single equivalence.
+
+2. Route generate() through WeftCache (or reject foreign caches).
+   REPRODUCED (N2). weft/modeling_weft.py:410-411, 477-497; weft/cache.py:72-81.
+   Override the cache-creation hook GenerationMixin uses (e.g. _get_cache/_supports_default_dynamic_cache) so generate() instantiates WeftCache(window_size=config.window_size), or detect a plain DynamicCache in forward and either convert or raise. Then re-verify end-to-end: beam search with num_beams>=2 must match recomputed prefixes on distinct prompts, and physical KV must stay at <= window-1 over a long generate() call. Add both as regression tests; the current tests only exercise the model-created cache.
+
+3. Complete the custom Triton backward before any training dispatch uses it.
+   STATIC, CUDA UNRUN (item 8). weft/kernels/fused_chunk_scan.py and fused_autograd.py:203-234.
+   dv_p is allocated zero and never written; backward returns None for v_p and decay_logits; dfinal_state is ignored. Derive and implement all advertised derivatives; test with random upstream gradients, final-state-only losses, joint losses, multiple D tiles, non-contiguous inputs and FP32/FP16/BF16 against an FP64 reference. The grad-enabled dispatch guard (modeling_weft.py:265-272) is correct - keep it until the backward is complete.
+
+4. Fix the shipped checkpoint's special-token metadata.
+   STATIC (N3). weft_shakespeare_ckpt/config.json:5,7; weft_shakespeare_ckpt/generation_config.json:3,4.
+   Set bos/eos to null (or real reserved ids) in both checkpoint files. This changes metadata only, not the id mapping. Note the checkpoint's training provenance is still unestablished (it predates the item-11 objective fix): label next-token quality claims as unverified until it is retrained with the corrected objective or the original training log is recovered. Consider rejecting or warning on unknown characters in WeftCharTokenizer.encode (weft/tokenizer.py:24) instead of silently dropping them.
+
+5. Finish packaging and release hygiene (item 21 residues).
+   pyproject.toml and uv.lock now exist and pytest collection is clean - keep them. Still missing: README.md:273 clones a nonexistent org repo (github.com/weft-project/weft.git) - replace with the real URL; no LICENSE file; no CI workflow; dependency range is wrong: pyproject declares transformers>=4.40.0 but weft/cache.py relies on the transformers 5.x DynamicLayer/layers API, so declare a tested >=5.x range (checkpoint was built on 5.23.0, tests here ran 5.20.2). Verify pip install . then pytest from a clean checkout.
+
+6. Bring README and docs in line with the code (items 16/18/19/22/23/24 documentation residues).
+   - README.md:70-74 still defines the normalized singlet then writes SWAP = I - |s><s|; with the normalized singlet the identity is SWAP = I - 2|s><s| (tests/verify_identity.py now states and checks both conventions - mirror that). The unnormalized integer form is what the exact test verifies.
+   - README.md:61 and :86 say WEFT's grounding is "formally verified in Lean 4". The Lean artifacts verify the Boolean uncrossing construction and the ETH network theorem, not this neural model. Say the identity is formally verified and the architecture is inspired by it; the in-repo exact check is verify_identity.py.
+   - README.md:202-204, docs/BENCHMARK_1_BILLION_TOKENS.md:25-52 and docs/FINAL_REPORT.md:15-19 still describe a continuous billion-token stream; the script (benchmarks/benchmark_billion_tokens.py:1-13) now correctly calls itself a 20x65,536-token extrapolation microbenchmark. Align the prose and tables.
+   - README.md:241-249 still advertises a general "INT8 quantization engine"; the example header now correctly says weight-only storage quantization with floating-point compute. Align the README.
+   - Replace the file:///home/akarta/... links (README.md:68, 86, 124, 148, 202, 208, 218, 235, 243, 257 and docs/*) with tracked relative paths. Benchmark data paths themselves are fixed (benchmark_gated_attention.py:24-29, benchmark_lm_training.py:24-29).
+   - README.md:217-227 still describes the serving engine with the old claims; the code is now honest - align the text. Batch throughput/distribution metrics remain unimplemented.
+   - README.md:253-264 gate table still shows blanket PASSED; switch to per-commit statuses (reproduced / author-reported / static / gated). The O(1) memory claim (README.md:60) is only true once item 2 above lands on the generate() path.
+
+7. Rebuild the associative-recall evidence (item 15 residues).
+   benchmarks/benchmark_associative_recall.py:137-153 now counts and divides by the true 200 - good. Remaining: the task is still solvable by trivial strategies (single value token, no competing pairs); add constant/label-prior controls, multiple associations and swapped bindings; reconcile code config (window 256, rank 32, lengths 512-4096) with docs/ASSOCIATIVE_RECALL_RESULTS.md:12-17, 23-43 (window 32, rank 16, lengths 256-16384) and regenerate the report from the fixed scorer with exact seeds.
+
+8. Repair benchmark methodology (item 17, largely unchanged).
+   benchmarks/benchmark_attention.py:87-137; ramp_up_benchmark.py:84-157; benchmark_triton_kernel.py:31-93; benchmark_streaming_generation.py:136-187; README.md:170-183; docs/FINAL_REPORT.md:25-35.
+   Benchmark the shipped WeftAttention/WeftForCausalLM, not duplicate prototype classes; compare the Triton kernel against SDPA as well as the serial loop; separate forward-only from training latency; free or isolate memory between sides; use warmup plus synchronized repeated timing with distributions, seeds, commit and hardware metadata; never convert RuntimeError into OOM or OOM into infinite speedup; report local KV, recurrent state, scratch and output memory separately; publish raw machine-readable logs per table row.
+
+9. Close the remaining numerical and API gates (item 24 residues).
+   - WeftRMSNorm (modeling_weft.py:27-35): FP32 extremes fixed and verified; FP64 inputs above float32 range still NaN on the forced float32 downcast. Either support a float64 compute path for float64 inputs or document float32 as the supported compute dtype.
+   - max_position_embeddings is stored but not an implemented positional scheme or enforced context limit (configuration_weft.py) - document or enforce.
+   - Keep the new config validation (configuration_weft.py:38-57) and gradient checkpointing (modeling_weft.py:371, 389, 415-435, verified working); add a checkpointed-vs-plain loss/gradient equality test.
+   - Quality gates: evaluate the corrected HF model on a fixed held-out corpus with multi-seed matched baselines before restoring parity claims; TinyShakespeare character perplexity is not general LM parity.
+
+10. Hardware validation gates still open (not failures; unrun here).
+    CUDA: fused forward/backward numerical equivalence, return_final_state=False input immutability (the STORE_FINAL compile-time guard at fused_chunk_scan.py:31, 47, 91-95, 116-138 is a correct static fix - verify on device), autocast/dtype transitions, long-stream state finiteness. FSDP: real >=2-GPU run of tests/test_fsdp.py with finite/equal gradient checks and sharded save/reload. GPU speed tables remain author-reported. Do not launch billion-token or distributed runs without explicit approval.
+
+MATHEMATICAL-USE NOTE (design-intent mapping)
+Per the stated design intent, WEFT's use of the supplied uncrossing mathematics is a factorization-based design relationship, and the source supports reading it that way: an exact Boolean uncrossing identity is verified in-repo (tests/verify_identity.py: all 16 single-bit assignments, plus normalized projector idempotence and SWAP = I - 2|s><s|), and the neural layer combines positive learned write features (proj_k), signed learned read features (proj_v), per-rank exponential decay (gamma = sigmoid(decay_logits)) and local sliding-window softmax (modeling_weft.py:215-235, 284-312). The review findings above concern implementation fidelity of that design (caches, masks, kernels, evidence), not the validity of the construction; nothing here treats the absence of literal discrete uncrossing calls in the forward pass as non-use. The one mathematical defect is documentation-level only: the README's normalization (item 6 above).
+
+COVERAGE MAP
+Full diff bcd8199..a3ac8fd read (all 23 changed files including uv.lock summary). Current HEAD read in full: modeling_weft.py, cache.py, tokenizer.py, configuration_weft.py, __init__.py, tests (all four files), serving engine, train demo, quantize header, benchmark headers, pyproject.toml, checkpoint configs, vocab.json. Unchanged modules re-verified by hash/diff rather than re-read: fused_autograd.py, chunk_scan_pt.py, remaining benchmarks, docs, README (grep-verified line refs above). Checkpoint safetensors loaded and exercised. Logo assets inventoried, not audited.
+
+WHAT REMAINS UNRUN
+All CUDA/Triton execution, separate-device FSDP, corrected-objective training, matched-model quality comparisons, sustained long-stream runs, real concurrent serving, and every GPU speed table. None are implied passed by this review.
+
+SOURCE AND FRESHNESS
+Primary source is the public repository above, cloned and inspected at the exact commit named at the top; remote HEAD re-fetched immediately before closeout (a3ac8fd, pushed 18:07 SAST during the review and fully incorporated). All file/line references are to that snapshot. Author-supplied reports are evidence of claims, not independent confirmation of their numbers.

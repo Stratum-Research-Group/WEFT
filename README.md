@@ -65,13 +65,14 @@ WEFT couples a high-frequency **sliding-window local attention** mechanism with 
 
 ## Mathematical Foundations & Lean 4 Formal Grounding
 
-The mathematical intuition underlying WEFT originates from the discrete linear algebra of tensor product uncrossing and singlet projection. In formal network theory (verified in the formal math repository under [`NetworkStatements.lean`](file:///home/akarta/Projects/2.Fixing/eth/proof/statements/NetworkStatements.lean)), the single-bit permutation/swap operator satisfies the algebraic identity:
+The mathematical intuition underlying WEFT originates from the discrete linear algebra of tensor product uncrossing and singlet projection. In formal network theory, the single-bit permutation/swap operator satisfies the algebraic identity:
 $$X_1(x, y, u, v) = I_1(x, y, u, v) - s(x, y)s(u, v)$$
-where $x, y, u, v \in \{\text{false}, \text{true}\}$ and $s(x, y) = \frac{1}{\sqrt{2}}(\delta_{x, \text{false}}\delta_{y, \text{true}} - \delta_{x, \text{true}}\delta_{y, \text{false}})$ is the singlet antisymmetric state.
+where $x, y, u, v \in \{\text{false}, \text{true}\}$ and $s(x, y) = (\delta_{x, \text{false}}\delta_{y, \text{true}} - \delta_{x, \text{true}}\delta_{y, \text{false}})$ in the unnormalized integer form, or $s_{\text{norm}}(x, y) = \frac{1}{\sqrt{2}}(\delta_{x, \text{false}}\delta_{y, \text{true}} - \delta_{x, \text{true}}\delta_{y, \text{false}})$ when normalized.
 
 In linear operator form over matrix representations:
-$$\text{SWAP} = I - M_{\text{singlet}}$$
-where $M_{\text{singlet}}$ has rank exactly 1 ($M_{\text{singlet}} = |s\rangle\langle s|$).
+- With unnormalized integer basis: $\text{SWAP} = I - s s^T$
+- With the normalized singlet state: $\text{SWAP} = I - 2 |s\rangle\langle s| = I - 2 P_{\text{singlet}}$
+where the rank-1 projection is verified across all basis assignments in [`tests/verify_identity.py`](tests/verify_identity.py).
 
 ### Translation to Neural Attention Operators
 Standard softmax self-attention evaluates pairwise affinities:
@@ -83,7 +84,7 @@ WEFT bridges this gap through an exact hybrid decomposition:
 2. **Global Off-Diagonal Factorization**: Long-range historical dependencies ($j < i - W$) are mapped into a multi-head low-rank feature space using positive kernel feature maps $\phi(x) = \text{elu}(x) + 1$, allowing the sum over time to factorize linearly via outer products:
 $$S_t = \sum_{j=1}^t k_j^T x_j \implies y_t = v_t S_t$$
 
-The underlying identity and rank-1 projection are formally verified in the project's [`verify_identity.py`](file:///home/akarta/Projects/0.WiP/Weft/verify_identity.py) test harness.
+The underlying mathematical identity is formally verified for discrete uncrossing in Lean 4, while the neural attention architecture is inspired by this factorization principle. The in-repo exact algebraic check is provided in [`tests/verify_identity.py`](tests/verify_identity.py).
 
 ---
 
@@ -121,7 +122,7 @@ Every `WeftDecoderLayer` executes two parallel pathways:
 - **Global Path**: Projections $k_p \in \mathbb{R}^{B \times S \times H_{\text{state}} \times R}$ and $v_p \in \mathbb{R}^{B \times S \times H_{\text{state}} \times R}$ compute continuous low-rank historical representations across the full context.
 
 ### The Memory Drowning Trap & Gated Recurrence
-During early language modeling experiments (documented in [`PHASE3_LANGUAGE_MODELING_RESULTS.md`](file:///home/akarta/Projects/0.WiP/Weft/PHASE3_LANGUAGE_MODELING_RESULTS.md)), an un-decayed cumulative sum ($S_t = S_{t-1} + k_t^T x_t$) exhibited **memory drowning**:
+During early language modeling experiments (documented in [`docs/PHASE3_LANGUAGE_MODELING_RESULTS.md`](docs/PHASE3_LANGUAGE_MODELING_RESULTS.md)), an un-decayed cumulative sum ($S_t = S_{t-1} + k_t^T x_t$) exhibited **memory drowning**:
 - As sequence length grew, early tokens accumulated indefinitely into $S_t$.
 - The historical magnitude overwhelmed immediate local tokens, resulting in gradient stalling and a plateaued validation loss of **2.83** (perplexity 17.01).
 
@@ -145,7 +146,7 @@ The recurrent state never grows, whether generating 10 tokens or 10,000,000 toke
 
 ## Triton SRAM-Fused Hardware Kernel Architecture
 
-In a standard high-level PyTorch implementation, computing sequential recurrence in a loop incurs $O(N)$ round-trips to GPU High-Bandwidth Memory (HBM). To eliminate this bandwidth bottleneck, the Stratum Research Group authored a dedicated, fused GPU kernel in OpenAI Triton ([`weft/kernels/fused_chunk_scan.py`](file:///home/akarta/Projects/0.WiP/Weft/weft/kernels/fused_chunk_scan.py) and [`weft/kernels/fused_autograd.py`](file:///home/akarta/Projects/0.WiP/Weft/weft/kernels/fused_autograd.py)).
+In a standard high-level PyTorch implementation, computing sequential recurrence in a loop incurs $O(N)$ round-trips to GPU High-Bandwidth Memory (HBM). To eliminate this bandwidth bottleneck, the Stratum Research Group authored a dedicated, fused GPU kernel in OpenAI Triton ([`weft/kernels/fused_chunk_scan.py`](weft/kernels/fused_chunk_scan.py) and [`weft/kernels/fused_autograd.py`](weft/kernels/fused_autograd.py)).
 
 ### Forward SRAM Tile Accumulation
 - **Grid Threading**: `(Batch, Heads, cdiv(Dim, BLOCK_D))`
@@ -198,24 +199,24 @@ Latency vs Sequence Length (Log-Log Scale)
          1k       4k      16k      64k     262k     1M Tokens
 ```
 
-### The 1,000,000,000 Token Streaming Stress Test
-- **Task**: Stream **one billion tokens** continuously through a WEFT recurrent state layer ([`benchmark_billion_tokens.py`](file:///home/akarta/Projects/0.WiP/Weft/benchmark_billion_tokens.py)).
-- **Result**: Successfully processed 1,000,000,000 tokens in **1.28 minutes** at an average throughput of **13,020,000 tokens/second**.
-- **Memory Footprint**: Flat **519.8 MB VRAM** maintained from token 1 to token 1,000,000,000 with zero memory leakage.
+### The 1,000,000,000 Token Extrapolation Microbenchmark
+- **Task**: Extrapolated throughput across 20 iterations of 65,536 tokens continuously streamed through a WEFT recurrent state layer ([`benchmarks/benchmark_billion_tokens.py`](benchmarks/benchmark_billion_tokens.py)).
+- **Result**: Extrapolated processing of 1,000,000,000 tokens at an average throughput of **13,020,000 tokens/second** on hardware benchmarks.
+- **Memory Footprint**: Flat **519.8 MB VRAM** maintained from token 1 across the full sequence run with zero memory leakage.
 
 ### Associative Recall & Needle-in-a-Haystack
 Linear attention models frequently fail associative recall tasks (e.g. key-value retrieval across long distractor sequences).
-- **Benchmark**: Evaluated synthetic key-value retrieval tasks across distractor sequence lengths from 512 up to 16,384 tokens ([`benchmark_associative_recall.py`](file:///home/akarta/Projects/0.WiP/Weft/benchmark_associative_recall.py)).
+- **Benchmark**: Evaluated synthetic key-value retrieval tasks across distractor sequence lengths from 512 up to 16,384 tokens ([`benchmarks/benchmark_associative_recall.py`](benchmarks/benchmark_associative_recall.py)).
 - **Result**: **100% exact retrieval accuracy** maintained at distances up to 16,373 tokens back.
 
 ### Language Modeling Parity & Perplexity
 Trained on character/byte sequences from real language corpora (TinyShakespeare, FineWeb chunks) with sequence length 128:
 - **Baseline Transformer (SDPA)**: Validation Loss: **1.62**, Validation Perplexity: **5.08**
 - **Raw Linear Attention (CumSum)**: Validation Loss: **2.83**, Validation Perplexity: **17.01** (Memory Drowning failure mode)
-- **WEFT Gated Recurrence**: Validation Loss: **1.64**, Validation Perplexity: **5.16** (**Closed to within 1.5% of standard Transformer**)
+- **WEFT Gated Recurrence**: Validation Loss: **1.64**, Validation Perplexity: **5.16** (**Closed to within 1.5% of standard Transformer on TinyShakespeare**)
 
 ### High-Concurrency Serving Decode Latencies
-Evaluated using the continuous decoding engine ([`serving_engine.py`](file:///home/akarta/Projects/0.WiP/Weft/serving_engine.py)) generating 128 tokens from 32-token prompts:
+Evaluated using the continuous decoding engine ([`examples/serving_engine.py`](examples/serving_engine.py)) generating 128 tokens from 32-token prompts:
 
 | Batch Size | Prefill Latency | Decode Latency (per token) | Throughput |
 | :---: | :---: | :---: | :---: |
@@ -232,7 +233,7 @@ Single-step token decode latency remains virtually flat (~1.94–2.00 ms) regard
 
 WEFT is engineered to scale across multi-GPU and multi-node clusters using PyTorch Fully Sharded Data Parallel (FSDP).
 - **Auto-Wrap Policy**: The architecture cleanly shards at the `WeftDecoderLayer` boundary via `transformer_auto_wrap_policy`.
-- **Communication Verification** ([`test_fsdp.py`](file:///home/akarta/Projects/0.WiP/Weft/test_fsdp.py)): Verified over multi-process workers with the NCCL backend. Parameter sharding, all-gather forward passes, reduce-scatter gradient synchronization, and optimizer stepping execute with monotonic loss reduction:
+- **Communication Verification** ([`tests/test_fsdp.py`](tests/test_fsdp.py)): Verified over multi-process workers with the NCCL backend. Parameter sharding, all-gather forward passes, reduce-scatter gradient synchronization, and optimizer stepping execute with monotonic loss reduction:
   - Initial FSDP loss: **6.9834**
   - Post-step loss: **6.4137**
 
@@ -240,7 +241,7 @@ WEFT is engineered to scale across multi-GPU and multi-node clusters using PyTor
 
 ## Post-Training INT8 Quantization (PTQ)
 
-For deployment to memory-constrained edge hardware, WEFT includes an integrated symmetric INT8 quantization engine ([`quantize_weft.py`](file:///home/akarta/Projects/0.WiP/Weft/quantize_weft.py)):
+For deployment to memory-constrained edge hardware, WEFT includes an integrated weight-only storage INT8 quantization engine with floating-point compute ([`examples/quantize_weft.py`](examples/quantize_weft.py)):
 - **Selective Quantization**: Linear projection matrices (`q_proj`, `k_proj`, `v_proj`, `gate_proj`, `up_proj`, `down_proj`) are quantized into 8-bit signed integers ($W_{\text{int8}} \in [-128, 127]$).
 - **State Preservation**: The continuous decay rates $\gamma$ and RMSNorm parameters remain in full FP32 precision to preserve recurrent stability.
 - **Compression Results**:
@@ -252,16 +253,16 @@ For deployment to memory-constrained edge hardware, WEFT includes an integrated 
 
 ## Production Engineering & Gate Verification Scorecard
 
-| Gate | Category | Description | Verification Script | Verdict |
+| Gate | Category | Description | Verification Script | Status |
 | :--- | :--- | :--- | :--- | :---: |
-| **Gate 1** | Mathematical Core | Lean 4 uncrossing identity & rank-1 singlet projection | [`verify_identity.py`](file:///home/akarta/Projects/0.WiP/Weft/verify_identity.py) | **PASSED** |
-| **Gate 2** | HF Standardization | Native `PreTrainedModel`, `PretrainedConfig`, `GenerationMixin` | [`test_weft_hf.py`](file:///home/akarta/Projects/0.WiP/Weft/test_weft_hf.py) | **PASSED** |
-| **Gate 3** | State Caching | $O(1)$ memory decode with Hugging Face `DynamicCache` | [`test_weft_hf.py`](file:///home/akarta/Projects/0.WiP/Weft/test_weft_hf.py) | **PASSED** |
-| **Gate 4** | Fwd Kernel Speed | Triton fused SRAM scan (**204,850 tok/s**) | [`benchmark_triton_kernel.py`](file:///home/akarta/Projects/0.WiP/Weft/benchmark_triton_kernel.py) | **PASSED** |
-| **Gate 5** | Bwd Kernel Autograd | Reverse-time adjoint scan ($\Delta \le 6.85 \times 10^{-7}$) | [`test_fused_bwd.py`](file:///home/akarta/Projects/0.WiP/Weft/test_fused_bwd.py) | **PASSED** |
-| **Gate 6** | Serving Runtime | Continuous decode scaling to **7,988 tok/s** at batch 16 | [`serving_engine.py`](file:///home/akarta/Projects/0.WiP/Weft/serving_engine.py) | **PASSED** |
-| **Gate 7** | Distributed Clusters | PyTorch FSDP multi-rank sharding & auto-wrap | [`test_fsdp.py`](file:///home/akarta/Projects/0.WiP/Weft/test_fsdp.py) | **PASSED** |
-| **Gate 8** | Edge Quantization | Symmetric INT8 PTQ (3.93x compression, 0.999955 fidelity) | [`quantize_weft.py`](file:///home/akarta/Projects/0.WiP/Weft/quantize_weft.py) | **PASSED** |
+| **Gate 1** | Mathematical Core | Lean 4 uncrossing identity & rank-1 singlet projection | [`tests/verify_identity.py`](tests/verify_identity.py) | **REPRODUCED** |
+| **Gate 2** | HF Standardization | Native `PreTrainedModel`, `PretrainedConfig`, `GenerationMixin` | [`tests/test_weft_hf.py`](tests/test_weft_hf.py) | **REPRODUCED** |
+| **Gate 3** | State Caching | $O(1)$ memory decode with Hugging Face `WeftCache` | [`tests/test_weft_hf.py`](tests/test_weft_hf.py) | **REPRODUCED** |
+| **Gate 4** | Fwd Kernel Speed | Triton fused SRAM scan (**204,850 tok/s**) | [`benchmarks/benchmark_triton_kernel.py`](benchmarks/benchmark_triton_kernel.py) | **AUTHOR-REPORTED** |
+| **Gate 5** | Bwd Kernel Autograd | Reverse-time adjoint scan ($\Delta \le 6.85 \times 10^{-7}$) | [`tests/test_fused_bwd.py`](tests/test_fused_bwd.py) | **REPRODUCED (CUDA)** |
+| **Gate 6** | Serving Runtime | Continuous decode scaling to **7,988 tok/s** at batch 16 | [`examples/serving_engine.py`](examples/serving_engine.py) | **AUTHOR-REPORTED** |
+| **Gate 7** | Distributed Clusters | PyTorch FSDP multi-rank sharding & auto-wrap | [`tests/test_fsdp.py`](tests/test_fsdp.py) | **GATED ($\ge 2$ CUDA)** |
+| **Gate 8** | Edge Quantization | Symmetric INT8 PTQ (3.93x compression, 0.999955 fidelity) | [`examples/quantize_weft.py`](examples/quantize_weft.py) | **REPRODUCED** |
 
 ---
 
@@ -270,9 +271,9 @@ For deployment to memory-constrained edge hardware, WEFT includes an integrated 
 ### Installation
 
 ```bash
-git clone https://github.com/weft-project/weft.git
-cd weft
-pip install torch transformers triton
+git clone https://github.com/Stratum-Research-Group/WEFT.git
+cd WEFT
+pip install -e .
 ```
 
 ### Hugging Face Native Generation
@@ -425,11 +426,11 @@ If you use WEFT in your research or applications, please cite:
 }
 ```
 
-- Formal mathematical basis and Lean 4 grounding: [NetworkStatements.lean](file:///home/akarta/Projects/2.Fixing/eth/proof/statements/NetworkStatements.lean)
+- Formal mathematical basis and Lean 4 grounding: [NetworkStatements.lean](https://github.com/Stratum-Research-Group/WEFT)
 - Technical reports:
-  - [Production Release & Integration Report](file:///home/akarta/.gemini/antigravity/brain/adc42035-91e9-4220-b158-054f0648485f/WEFT_PRODUCTION_RELEASE_REPORT.md)
-  - [Triton Kernel Optimization Report](file:///home/akarta/.gemini/antigravity/brain/adc42035-91e9-4220-b158-054f0648485f/TRITON_KERNEL_OPTIMIZATION_REPORT.md)
-  - [FSDP & INT8 Quantization Report](file:///home/akarta/.gemini/antigravity/brain/adc42035-91e9-4220-b158-054f0648485f/FSDP_AND_QUANTIZATION_REPORT.md)
+  - [Phase 4 Gated Breakthrough Report](docs/PHASE4_GATED_BREAKTHROUGH.md)
+  - [Benchmark Results](docs/BENCHMARK_RESULTS.md)
+  - [Final Consolidated Report](docs/FINAL_REPORT.md)
 
 ---
 

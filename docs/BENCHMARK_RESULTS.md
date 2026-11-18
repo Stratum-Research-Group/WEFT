@@ -3,7 +3,7 @@
 **Date:** 2026-11-18  
 **Hardware:** NVIDIA GeForce RTX 5060 Ti (16 GB VRAM)  
 **Environment:** PyTorch 2.15.0+cu132, CUDA 13.2, Python 3.13  
-**Implementation:** [benchmark_attention.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_attention.py)
+**Implementation:** [benchmark_attention.py](../benchmarks/benchmark_attention.py)
 
 ---
 

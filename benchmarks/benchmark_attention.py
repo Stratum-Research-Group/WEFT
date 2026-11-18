@@ -1,12 +1,16 @@
 """
 Benchmark comparing standard PyTorch SDPA (FlashAttention / cuDNN)
-against structured block-diagonal + low-rank attention on RTX 5060 Ti.
+against production WeftAttention (Sliding-Window + Gated Low-Rank Recurrence)
+as well as the early prototype on GPU.
 """
 
 import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from weft import WeftConfig
+from weft.modeling_weft import WeftAttention
 
 
 class StructuredAttention(nn.Module):
@@ -79,10 +83,20 @@ def benchmark():
     struct_layer = StructuredAttention(d_model=d_model, n_heads=n_heads, window_size=256, rank=32).to(device=device, dtype=dtype)
     struct_layer.eval()
 
+    weft_cfg = WeftConfig(
+        hidden_size=d_model,
+        num_attention_heads=n_heads,
+        num_state_heads=4,
+        state_rank=16,
+        window_size=256,
+    )
+    weft_layer = WeftAttention(weft_cfg, layer_idx=0).to(device=device, dtype=dtype)
+    weft_layer.eval()
+
     print(f"Device: {torch.cuda.get_device_name(0)}")
     print(f"Config: d_model={d_model}, n_heads={n_heads}, batch_size={batch_size}, dtype={dtype}")
-    print(f"{'Seq Length':>10} | {'SDPA (ms)':>10} | {'SDPA Mem (MB)':>14} | {'Struct (ms)':>12} | {'Struct Mem (MB)':>16}")
-    print("-" * 72)
+    print(f"{'Seq Length':>10} | {'SDPA (ms)':>10} | {'SDPA Mem':>10} | {'Struct (ms)':>12} | {'Struct Mem':>12} | {'WEFT (ms)':>10} | {'WEFT Mem':>10}")
+    print("-" * 90)
 
     for seq_len in seq_lengths:
         torch.cuda.empty_cache()
@@ -139,12 +153,38 @@ def benchmark():
             struct_time = -1
             struct_mem = -1
 
-        s_time_str = f"{sdpa_time:.2f}" if sdpa_time != -1 else "OOM"
-        s_mem_str = f"{sdpa_mem:.1f}" if sdpa_mem != -1 else "OOM"
-        st_time_str = f"{struct_time:.2f}" if struct_time != -1 else "OOM"
-        st_mem_str = f"{struct_mem:.1f}" if struct_mem != -1 else "OOM"
+        # Benchmark Production WeftAttention
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
+        weft_time = None
+        weft_mem = None
+        try:
+            with torch.no_grad():
+                for _ in range(5):
+                    _ = weft_layer(x)
+                torch.cuda.synchronize()
 
-        print(f"{seq_len:>10} | {s_time_str:>10} | {s_mem_str:>14} | {st_time_str:>12} | {st_mem_str:>16}")
+                torch.cuda.reset_peak_memory_stats()
+                t0 = time.perf_counter()
+                iters = 20
+                for _ in range(iters):
+                    _ = weft_layer(x)
+                torch.cuda.synchronize()
+                t1 = time.perf_counter()
+                weft_time = (t1 - t0) / iters * 1000
+                weft_mem = torch.cuda.max_memory_allocated() / (1024 * 1024)
+        except torch.cuda.OutOfMemoryError:
+            weft_time = -1
+            weft_mem = -1
+
+        s_time_str = f"{sdpa_time:.2f}" if sdpa_time != -1 else "OOM"
+        s_mem_str = f"{sdpa_mem:.1f} MB" if sdpa_mem != -1 else "OOM"
+        st_time_str = f"{struct_time:.2f}" if struct_time != -1 else "OOM"
+        st_mem_str = f"{struct_mem:.1f} MB" if struct_mem != -1 else "OOM"
+        w_time_str = f"{weft_time:.2f}" if weft_time != -1 else "OOM"
+        w_mem_str = f"{weft_mem:.1f} MB" if weft_mem != -1 else "OOM"
+
+        print(f"{seq_len:>10} | {s_time_str:>10} | {s_mem_str:>10} | {st_time_str:>12} | {st_mem_str:>12} | {w_time_str:>10} | {w_mem_str:>10}")
 
 
 if __name__ == "__main__":

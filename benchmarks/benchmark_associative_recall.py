@@ -93,30 +93,47 @@ class StructuredAttentionModel(nn.Module):
         return self.head(out[:, -1, :])
 
 
-def generate_batch(batch_size: int, seq_len: int, vocab_size: int, needle_pos: int, device: torch.device):
+def generate_batch(
+    batch_size: int,
+    seq_len: int,
+    vocab_size: int,
+    needle_pos: int,
+    device: torch.device,
+    num_pairs: int = 4,
+):
     """
-    Generates a batch where:
+    Generates a batch with multiple competing key-value associations:
       - Random filler tokens throughout.
-      - At needle_pos: KEY token and VALUE token are placed.
-      - At seq_len - 1: KEY token is presented.
+      - Multiple distinct key-value pairs placed in history, including competing/swapped bindings.
+      - At needle_pos: target KEY and VALUE pair is placed.
+      - At seq_len - 1: target KEY is presented.
       - Target is the corresponding VALUE token.
     """
-    # Reserve tokens:
-    # 0: pad, 1..50: keys, 51..100: values, 101+: filler
-    keys = torch.randint(1, 50, (batch_size,), device=device)
-    values = torch.randint(51, 100, (batch_size,), device=device)
-    
-    # Fill background with random distractor tokens
+    # Key tokens: 1..50, Value tokens: 51..100, Filler: 101..vocab_size
     tokens = torch.randint(101, vocab_size, (batch_size, seq_len), device=device)
-    
-    # Place needle at needle_pos
-    tokens[:, needle_pos] = keys
-    tokens[:, needle_pos + 1] = values
-    
+
+    # Place multiple key-value pairs across the sequence to create competing associations
+    target_keys = torch.randint(1, 50, (batch_size,), device=device)
+    target_values = torch.randint(51, 100, (batch_size,), device=device)
+
+    # Target pair at needle_pos
+    tokens[:, needle_pos] = target_keys
+    tokens[:, needle_pos + 1] = target_values
+
+    # Additional distractor key-value pairs
+    step_spacing = max(2, (seq_len - 32) // (num_pairs + 1))
+    for p in range(num_pairs):
+        pos = min(seq_len - 30, (p + 1) * step_spacing)
+        if abs(pos - needle_pos) > 2:
+            dist_keys = torch.randint(1, 50, (batch_size,), device=device)
+            dist_values = torch.randint(51, 100, (batch_size,), device=device)
+            tokens[:, pos] = dist_keys
+            tokens[:, pos + 1] = dist_values
+
     # Query key at the end
-    tokens[:, -1] = keys
-    targets = values
-    
+    tokens[:, -1] = target_keys
+    targets = target_values
+
     return tokens, targets
 
 

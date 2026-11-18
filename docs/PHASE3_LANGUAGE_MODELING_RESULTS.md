@@ -3,7 +3,7 @@
 **Task:** Next-token autoregressive character-level language modeling on TinyShakespeare  
 **Hardware:** NVIDIA GeForce RTX 5060 Ti  
 **Training Steps:** 1,000 steps per model  
-**Implementation:** [benchmark_lm_training.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_lm_training.py)
+**Implementation:** [benchmark_lm_training.py](../benchmarks/benchmark_lm_training.py)
 
 ---
 

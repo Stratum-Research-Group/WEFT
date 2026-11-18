@@ -2,7 +2,7 @@
 
 **Hardware:** NVIDIA GeForce RTX 5060 Ti (16 GB VRAM)  
 **Software:** PyTorch 2.15.0+cu132, CUDA 13.2, Python 3.13  
-**Implementation:** [benchmark_billion_tokens.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_billion_tokens.py)
+**Implementation:** [benchmark_billion_tokens.py](../benchmarks/benchmark_billion_tokens.py)
 
 ---
 

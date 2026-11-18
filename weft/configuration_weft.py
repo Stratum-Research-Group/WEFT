@@ -6,6 +6,15 @@ from transformers import PretrainedConfig
 
 
 class WeftConfig(PretrainedConfig):
+    """
+    Configuration class for WEFT (Windowed Exponentially-decayed Factorized Tensor Attention).
+
+    Note on context length and positioning:
+        WEFT uses causal relative sliding-window local attention combined with continuous
+        exponentially-decayed recurrent state accumulation; absolute position embeddings
+        are not required. `max_position_embeddings` is provided for Hugging Face schema
+        compatibility and nominal maximum sequence length indication.
+    """
     model_type = "weft"
 
     def __init__(

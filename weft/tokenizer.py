@@ -4,7 +4,10 @@ Simple Character-level Tokenizer for WEFT demo checkpoint.
 
 from typing import List, Union, Any, Optional
 import json
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 
 class WeftCharTokenizer:
@@ -23,7 +26,19 @@ class WeftCharTokenizer:
         return cls(vocab_path)
 
     def encode(self, text: str) -> List[int]:
-        return [self.char_to_id[c] for c in text if c in self.char_to_id]
+        ids = []
+        unknown_chars = []
+        for c in text:
+            if c in self.char_to_id:
+                ids.append(self.char_to_id[c])
+            else:
+                unknown_chars.append(c)
+        if unknown_chars:
+            logger.warning(
+                "WeftCharTokenizer: Dropped unknown character(s) not in vocabulary: %s",
+                repr("".join(unknown_chars[:10]))
+            )
+        return ids
 
     def decode(self, token_ids: Union[List[int], Any]) -> str:
         if hasattr(token_ids, "tolist"):

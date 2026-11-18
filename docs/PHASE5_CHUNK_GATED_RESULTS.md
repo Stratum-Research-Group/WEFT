@@ -1,7 +1,7 @@
 # Phase 5 Architecture: Fused Chunk-Recurrent Gated Attention
 
 **Hardware:** NVIDIA GeForce RTX 5060 Ti (16 GB VRAM)  
-**Implementation:** [fused_chunk_gated.py](file:///home/akarta/Projects/0.WiP/Weft/fused_chunk_gated.py)
+**Implementation:** [fused_chunk_gated.py](../benchmarks/fused_chunk_gated.py)
 
 ---
 

@@ -53,12 +53,12 @@ Weft began with a review of theoretical claims translating planar tensor-network
 
 ## Artifact Inventory
 
-- [Weft 09_ai_llm_speedup_architecture.md](file:///home/akarta/Projects/0.WiP/Weft/Weft%2009_ai_llm_speedup_architecture.md): Revised theoretical roadmap with honest research hypotheses and zero unfounded claims.
-- [verify_identity.py](file:///home/akarta/Projects/0.WiP/Weft/verify_identity.py): Exact algebraic verification of Lean 4 singlet uncrossing identities.
-- [benchmark_attention.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_attention.py): Baseline vs structured attention compute scaling benchmark.
-- [benchmark_billion_tokens.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_billion_tokens.py): Streaming 1-Billion token execution benchmark.
-- [benchmark_associative_recall.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_associative_recall.py): Needle-in-a-haystack 16k context recall validation.
-- [benchmark_lm_training.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_lm_training.py): TinyShakespeare language modeling validation.
-- [benchmark_gated_attention.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_gated_attention.py): Exponential decay gated architecture matching transformer perplexity.
-- [fused_chunk_gated.py](file:///home/akarta/Projects/0.WiP/Weft/fused_chunk_gated.py): Chunk-recurrent 65 KB state implementation scaling to 262k+ tokens.
-- [benchmark_streaming_generation.py](file:///home/akarta/Projects/0.WiP/Weft/benchmark_streaming_generation.py): $O(1)$ constant-memory autoregressive inference engine.
+- [Weft 09_ai_llm_speedup_architecture.md](#): Revised theoretical roadmap with honest research hypotheses and zero unfounded claims.
+- [verify_identity.py](../tests/verify_identity.py): Exact algebraic verification of Lean 4 singlet uncrossing identities.
+- [benchmark_attention.py](../benchmarks/benchmark_attention.py): Baseline vs structured attention compute scaling benchmark.
+- [benchmark_billion_tokens.py](../benchmarks/benchmark_billion_tokens.py): Streaming 1-Billion token execution benchmark.
+- [benchmark_associative_recall.py](../benchmarks/benchmark_associative_recall.py): Needle-in-a-haystack 16k context recall validation.
+- [benchmark_lm_training.py](../benchmarks/benchmark_lm_training.py): TinyShakespeare language modeling validation.
+- [benchmark_gated_attention.py](../benchmarks/benchmark_gated_attention.py): Exponential decay gated architecture matching transformer perplexity.
+- [fused_chunk_gated.py](../benchmarks/fused_chunk_gated.py): Chunk-recurrent 65 KB state implementation scaling to 262k+ tokens.
+- [benchmark_streaming_generation.py](../benchmarks/benchmark_streaming_generation.py): $O(1)$ constant-memory autoregressive inference engine.

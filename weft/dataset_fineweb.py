@@ -41,10 +41,14 @@ class FineWebEduStreamer:
             return []
 
     def get_batch(self):
-        while len(self.token_queue) < self.batch_size * self.seq_len:
+        target_tokens = self.batch_size * self.seq_len
+        while len(self.token_queue) < target_tokens:
             rows = self._fetch_next_rows(count=100)
             if not rows:
-                break
+                # If network fetch temporarily failed or wrapped around, retry or sleep briefly
+                import time
+                time.sleep(0.5)
+                continue
             for text in rows:
                 if not text.strip():
                     continue

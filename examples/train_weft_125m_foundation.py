@@ -112,6 +112,10 @@ def train_125m_foundation(
                 f"VRAM: {vram_mb:.1f} MB | {tok_s:.1f} tok/s"
             )
 
+        if step % 250 == 0:
+            os.makedirs(save_dir, exist_ok=True)
+            model.save_pretrained(save_dir)
+
     # Save foundation checkpoint
     print(f"\nSaving WEFT-125M foundation checkpoint to ./{save_dir}/ ...")
     os.makedirs(save_dir, exist_ok=True)

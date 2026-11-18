@@ -154,3 +154,45 @@ class MathRuleVerifier:
                         if i + 3 * n <= len(words) and words[i + 2 * n : i + 3 * n] == words[i : i + n]:
                             return True
         return False
+
+    def verify_solution(
+        self,
+        completion_text: str,
+        ground_truth_numeric: float,
+        tol: float = 1e-4,
+    ) -> RewardBreakdown:
+        format_reward = 0.0
+        accuracy_reward = 0.0
+        loop_penalty = 0.0
+
+        # Check format tags
+        has_think_open = "<think>" in completion_text
+        has_think_close = "</think>" in completion_text
+        has_box_or_hash = ("####" in completion_text) or ("\\boxed" in completion_text)
+
+        if has_think_open and has_think_close:
+            format_reward += 0.3
+        elif has_think_open:
+            format_reward += 0.1
+
+        if has_box_or_hash:
+            format_reward += 0.2
+
+        if self.detect_loop(completion_text):
+            loop_penalty = -0.5
+
+        # Check numerical accuracy
+        extracted = self.extract_number(completion_text)
+        if extracted is not None:
+            if abs(extracted - ground_truth_numeric) <= tol:
+                accuracy_reward = 1.0
+
+        total_reward = max(0.0, format_reward + accuracy_reward + loop_penalty)
+        return RewardBreakdown(
+            total_reward=total_reward,
+            accuracy_reward=accuracy_reward,
+            format_reward=format_reward,
+            loop_penalty=loop_penalty,
+            details={"extracted": extracted, "ground_truth": ground_truth_numeric},
+        )
+

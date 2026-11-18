@@ -14,3 +14,4 @@ htmlcov/
 *.log
 weft_bpe_ckpt/
 weft_fineweb_ckpt/
+weft_125m_foundation_ckpt/

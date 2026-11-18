@@ -114,7 +114,8 @@ def fused_chunk_recurrent_forward_triton(
     """
     b, s, h, d = x.shape
     r = k_p.shape[-1]
-    assert r in (8, 16, 32, 64), f"State rank must be a power of 2, got {r}"
+    valid_ranks = (8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
+    assert r in valid_ranks, f"State rank must be a power of 2 in {valid_ranks}, got {r}"
 
     out = torch.empty_like(x)
     if return_final_state:

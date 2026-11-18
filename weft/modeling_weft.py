@@ -348,9 +348,10 @@ class WeftAttention(nn.Module):
 
         # Sequence training / prefilling
         # Dispatch to Triton autograd kernel when supported (exact analytical backward during training)
+        valid_triton_ranks = (8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
         use_triton = (
             hidden_states.is_cuda
-            and (self.state_rank in (8, 16, 32, 64))
+            and (self.state_rank in valid_triton_ranks)
             and recurrent_state is None
             and mask_weight is None
         )

@@ -57,9 +57,10 @@ To overcome these constraints, the **Stratum Research Group** developed **WEFT**
 
 WEFT couples a high-frequency **sliding-window local attention** mechanism with a continuous, **multi-head exponentially-decayed low-rank tensor recurrence**. The architecture delivers:
 - **$O(N)$ linear time complexity** with respect to sequence length.
-- **$O(1)$ constant memory consumption** during autoregressive token generation (~65 KB recurrent state per layer for a 1B model), freeing inference from the KV-cache scaling wall.
-- **Strict mathematical grounding** rooted in low-rank tensor uncrossing and Bell singlet projection formally verified in Lean 4.
-- **Full ecosystem compatibility** with Hugging Face `transformers` (`PreTrainedModel`, `PretrainedConfig`, `GenerationMixin`, and `DynamicCache`), PyTorch FSDP multi-rank sharding, and dedicated GPU SRAM kernels written in OpenAI Triton.
+- **$O(1)$ constant memory consumption** during autoregressive token generation (~16 KB–128 KB recurrent state per layer), freeing inference from the KV-cache scaling wall.
+- **Configurable state rank ($R \in \{16, 32, 64, 128, 256, 512, 1024, 2048, 4096\}$)** for granular control over associative recall capacity.
+- **Strict mathematical grounding** rooted in low-rank tensor uncrossing and Bell singlet projection formally verified for discrete Boolean uncrossing.
+- **Full ecosystem compatibility** with Hugging Face `transformers` (`PreTrainedModel`, `PretrainedConfig`, `GenerationMixin`, and `WeftCache`), OpenAI-compatible streaming API server (`/v1/chat/completions`), PyTorch FSDP multi-rank sharding, and dedicated GPU SRAM kernels written in OpenAI Triton.
 
 ---
 
@@ -321,11 +322,12 @@ num_params = sum(p.numel() for p in model.parameters())
 print(f"Instantiated WEFT Model with {num_params:,} parameters.")
 ```
 
-### Standalone Streaming Serving Engine
+### Standalone Streaming Serving Engine & OpenAI API Server
 
+#### 1. Python In-Process Streaming Engine:
 ```python
 import torch
-from serving_engine import WeftInferenceEngine
+from examples.serving_engine import WeftInferenceEngine
 
 engine = WeftInferenceEngine("./weft_shakespeare_ckpt", device="cuda")
 prompts = torch.randint(0, 65, (4, 32), device="cuda")
@@ -336,23 +338,42 @@ print(f"Decode latency:  {result['avg_decode_ms']:.3f} ms / token")
 print(f"Throughput:      {4 * result['tokens_per_sec']:.1f} tokens/second")
 ```
 
+#### 2. OpenAI-Compatible High-Throughput HTTP / SSE Server:
+```bash
+# Launch high-concurrency streaming server (FastAPI + Uvicorn)
+uvicorn weft.serving_server:app --host 0.0.0.0 --port 8000
+```
+
+Query via curl or any OpenAI SDK client:
+```bash
+curl http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "weft-causal-lm",
+    "messages": [{"role": "user", "content": "ROMEO:\n"}],
+    "max_tokens": 64,
+    "stream": true
+  }'
+```
+
 ### Running the Verification Test Suite
 
 ```bash
-# 1. Hugging Face compatibility and numerical equivalence
-python tests/test_weft_hf.py
+# Run complete test suite (21 unit and integration targets)
+pytest tests/
 
-# 2. Triton fused backward kernel autograd
-python tests/test_fused_bwd.py
+# Or run specific test targets:
+# 1. Hugging Face compatibility, cache bounding, and numerical equivalence
+pytest tests/test_weft_hf.py
 
-# 3. PyTorch FSDP distributed sharding
-python tests/test_fsdp.py
+# 2. Triton fused backward kernel autograd (all derivatives in SRAM)
+pytest tests/test_fused_bwd.py
 
-# 4. INT8 post-training quantization benchmark
-python examples/quantize_weft.py
+# 3. OpenAI-compatible streaming server endpoint tests
+pytest tests/test_serving_server.py
 
-# 5. Full latency and sequence ramp-up benchmark
-python benchmarks/ramp_up_benchmark.py
+# 4. PyTorch FSDP distributed sharding
+pytest tests/test_fsdp.py
 ```
 
 ---
@@ -365,6 +386,10 @@ python benchmarks/ramp_up_benchmark.py
 │   ├── __init__.py                 # Exported classes and config
 │   ├── configuration_weft.py       # WeftConfig definition
 │   ├── modeling_weft.py            # WeftModel and WeftForCausalLM implementations
+│   ├── cache.py                    # WeftCache bounded KV & recurrent state
+│   ├── tokenizer.py                # Character and byte tokenizer helpers
+│   ├── dataset_loader.py           # High-throughput BPE token packing loader
+│   ├── serving_server.py           # OpenAI-compatible streaming API server
 │   └── kernels/
 │       ├── fused_chunk_scan.py     # Fused forward Triton GPU SRAM kernel
 │       ├── fused_autograd.py       # Fused backward Triton reverse-scan autograd
@@ -373,10 +398,15 @@ python benchmarks/ramp_up_benchmark.py
 ├── tests/                          # Automated unit and integration test suite
 │   ├── test_weft_hf.py             # Hugging Face interface and serialization tests
 │   ├── test_fused_bwd.py           # Triton reverse-time adjoint scan autograd test
+│   ├── test_serving_server.py      # OpenAI SSE streaming endpoint test suite
 │   ├── test_fsdp.py                # Multi-rank PyTorch FSDP sharding verification
 │   └── verify_identity.py          # Discrete singlet projection verification
 │
 ├── benchmarks/                     # Hardware and empirical benchmark suite
+│   ├── autotune_triton.py          # Block tile and warp count hardware autotuner
+│   ├── benchmark_precisions.py     # Multi-precision (FP32/FP16/BF16) profiling
+│   ├── profile_ranks.py            # State rank scaling profile (R=16 to 4096)
+│   ├── evaluate_benchmarks.py      # Downstream task & long-context needle recall
 │   ├── benchmark_attention.py      # O(N) vs O(N^2) scaling benchmark
 │   ├── benchmark_billion_tokens.py # 1-billion token streaming stress test
 │   ├── benchmark_triton_kernel.py  # Microsecond latency benchmark suite
@@ -387,7 +417,8 @@ python benchmarks/ramp_up_benchmark.py
 │
 ├── examples/                       # Production usage and pre-training examples
 │   ├── serving_engine.py           # High-throughput streaming inference engine
-│   ├── train_weft_demo.py          # Pre-training and verification pipeline
+│   ├── train_weft_dataset.py       # BPE token-packed pretraining pipeline
+│   ├── train_weft_demo.py          # Character-level pretraining and reload demo
 │   └── quantize_weft.py            # INT8 Post-Training Quantization benchmark
 │
 ├── data/                           # Demonstration datasets

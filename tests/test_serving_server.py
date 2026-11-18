@@ -2,12 +2,14 @@
 Test client for WEFT OpenAI-compatible server.
 """
 import pytest
+import torch
 from fastapi.testclient import TestClient
 from weft.serving_server import app, load_model
 
 @pytest.fixture(scope="module")
 def client():
-    load_model("weft_shakespeare_ckpt", device="cuda")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    load_model("weft_shakespeare_ckpt", device=device)
     return TestClient(app)
 
 def test_health(client):

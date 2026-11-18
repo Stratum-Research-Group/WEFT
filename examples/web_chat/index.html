@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEFT Interactive Serving Playground</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-border: #334155;
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+            --badge-bg: #0369a1;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--surface-border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-title { display: flex; align-items: center; gap: 0.75rem; }
+        .badge { background: var(--badge-bg); color: #fff; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 9999px; text-transform: uppercase; }
+        .metrics-bar { display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-muted); }
+        .metric-val { color: var(--accent); font-weight: 600; }
+
+        main { flex: 1; display: flex; overflow: hidden; }
+        .chat-container { flex: 1; display: flex; flex-direction: column; padding: 1.5rem; max-width: 900px; margin: 0 auto; width: 100%; }
+        .messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 0.5rem; }
+        
+        .msg { max-width: 80%; padding: 0.85rem 1.15rem; border-radius: 1rem; line-height: 1.5; font-size: 0.95rem; word-break: break-word; }
+        .msg.user { align-self: flex-end; background: var(--primary); color: #000; border-bottom-right-radius: 0.2rem; font-weight: 500; }
+        .msg.assistant { align-self: flex-start; background: var(--surface); border: 1px solid var(--surface-border); border-bottom-left-radius: 0.2rem; }
+
+        .input-bar {
+            margin-top: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        input[type="text"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            outline: none;
+        }
+        button {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        button:hover { background: var(--primary-hover); color: #fff; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .sidebar {
+            width: 320px;
+            background: var(--surface);
+            border-left: 1px solid var(--surface-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .sidebar h3 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .param-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .param-group label { font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .param-group input[type="range"] { accent-color: var(--primary); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">
+            <h2>WEFT</h2>
+            <span class="badge">O(1) Memory Streaming</span>
+        </div>
+        <div class="metrics-bar">
+            <div>Hardware: <span class="metric-val">NVIDIA RTX 5060 Ti</span></div>
+            <div>Recurrent State: <span class="metric-val">O(1) (~32 KB)</span></div>
+            <div>Throughput: <span class="metric-val" id="tps-counter">-- tok/s</span></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="chat-container">
+            <div class="messages" id="messages-box">
+                <div class="msg assistant">
+                    Hello! I am running on the <strong>WEFT-125M</strong> architecture powered by Windowed Exponentially-decayed Factorized Tensor Attention.
+                    Ask a question or enter a prompt to test continuous real-time token streaming.
+                </div>
+            </div>
+            <div class="input-bar">
+                <input type="text" id="prompt-input" placeholder="Enter a prompt (e.g. 'Artificial intelligence and human reasoning')..." autocomplete="off">
+                <button id="send-btn" onclick="sendPrompt()">Generate</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div>
+                <h3>Inference Parameters</h3>
+                <div class="param-group" style="margin-bottom: 1rem;">
+                    <label><span>Max Tokens</span><span id="max-tok-val">64</span></label>
+                    <input type="range" id="max-tokens" min="16" max="256" value="64" oninput="document.getElementById('max-tok-val').innerText = this.value">
+                </div>
+                <div class="param-group">
+                    <label><span>Temperature</span><span id="temp-val">0.8</span></label>
+                    <input type="range" id="temperature" min="0.1" max="1.5" step="0.1" value="0.8" oninput="document.getElementById('temp-val').innerText = this.value">
+                </div>
+            </div>
+
+            <div>
+                <h3>Architecture Specs</h3>
+                <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+                    <div>• <strong>Layers:</strong> 12 Decoder Layers</div>
+                    <div>• <strong>Hidden Dim:</strong> 768</div>
+                    <div>• <strong>Attention Heads:</strong> 12</div>
+                    <div>• <strong>Sliding Window:</strong> 128 Tokens</div>
+                    <div>• <strong>Recurrent State Rank:</strong> 64</div>
+                    <div>• <strong>AMW Factorized Weights:</strong> Active</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8088/v1/chat/completions";
+        const messagesBox = document.getElementById("messages-box");
+        const promptInput = document.getElementById("prompt-input");
+        const sendBtn = document.getElementById("send-btn");
+        const tpsCounter = document.getElementById("tps-counter");
+
+        promptInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !sendBtn.disabled) sendPrompt();
+        });
+
+        async function sendPrompt() {
+            const text = promptInput.value.trim();
+            if (!text) return;
+
+            promptInput.value = "";
+            sendBtn.disabled = true;
+
+            // Add user message
+            const userMsg = document.createElement("div");
+            userMsg.className = "msg user";
+            userMsg.innerText = text;
+            messagesBox.appendChild(userMsg);
+
+            // Add assistant stream placeholder
+            const assistantMsg = document.createElement("div");
+            assistantMsg.className = "msg assistant";
+            assistantMsg.innerText = "";
+            messagesBox.appendChild(assistantMsg);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+
+            const maxTokens = parseInt(document.getElementById("max-tokens").value);
+            const temperature = parseFloat(document.getElementById("temperature").value);
+
+            let tokenCount = 0;
+            const t0 = performance.now();
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        messages: [{ role: "user", content: text }],
+                        max_tokens: maxTokens,
+                        temperature: temperature,
+                        stream: true
+                    })
+                });
+
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed.startsWith("data: ")) continue;
+                        const dataStr = trimmed.slice(6);
+                        if (dataStr === "[DONE]") break;
+
+                        try {
+                            const parsed = JSON.parse(dataStr);
+                            const chunk = parsed.choices[0]?.delta?.content || "";
+                            assistantMsg.innerText += chunk;
+                            tokenCount++;
+                            messagesBox.scrollTop = messagesBox.scrollHeight;
+
+                            const elapsedSec = (performance.now() - t0) / 1000.0;
+                            const tokS = (tokenCount / elapsedSec).toFixed(1);
+                            tpsCounter.innerText = `${tokS} tok/s`;
+                        } catch (err) {}
+                    }
+                }
+            } catch (err) {
+                assistantMsg.innerText += "\n[Error: Connection to WEFT Serving Engine failed. Is the server running on port 8088?]";
+            } finally {
+                sendBtn.disabled = false;
+                promptInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>

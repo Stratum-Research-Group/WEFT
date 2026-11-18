@@ -12,7 +12,9 @@ import time
 import uuid
 from typing import List, Optional, Union
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import torch
 
@@ -21,6 +23,14 @@ from weft.tokenizer import WeftCharTokenizer
 
 
 app = FastAPI(title="WEFT Inference Server", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Global engine state
 class GlobalEngine:
@@ -255,3 +265,13 @@ async def completions(req: CompletionRequest):
             "total_tokens": len(prompt_text) + len(generated_text),
         },
     }
+
+
+# Serve the web playground at root /
+import os
+playground_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "examples", "web_chat")
+if os.path.exists(playground_path):
+    from fastapi.responses import FileResponse
+    @app.get("/")
+    def serve_playground():
+        return FileResponse(os.path.join(playground_path, "index.html"))

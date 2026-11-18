@@ -21,6 +21,7 @@ class FineWebEduStreamer:
         self.current_offset = 0
         self.buffer = []
         self.token_queue = []
+        self._consecutive_failures = 0
 
     def _fetch_next_rows(self, count: int = 100):
         url = (
@@ -33,22 +34,42 @@ class FineWebEduStreamer:
             with urllib.request.urlopen(req, timeout=15) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 rows = [item["row"]["text"] for item in data.get("rows", [])]
-                self.current_offset += len(rows)
+                if not rows:
+                    # Genuine end of rows reached: wrap around
+                    self.current_offset = 0
+                else:
+                    self.current_offset += len(rows)
+                self._consecutive_failures = 0
                 return rows
+        except urllib.error.HTTPError as e:
+            if e.code == 404 or e.code == 400:
+                # Genuine end-of-split bounds reached
+                self.current_offset = 0
+                self._consecutive_failures = 0
+                return []
+            self._consecutive_failures += 1
+            return []
         except Exception as e:
-            # Wrap around on connection timeout or EOF
-            self.current_offset = 0
+            # Do NOT reset current_offset on transient network timeout or connection reset
+            self._consecutive_failures += 1
             return []
 
     def get_batch(self):
         target_tokens = self.batch_size * self.seq_len
+        retries = 0
+        max_retries = 10
         while len(self.token_queue) < target_tokens:
             rows = self._fetch_next_rows(count=100)
             if not rows:
-                # If network fetch temporarily failed or wrapped around, retry or sleep briefly
+                retries += 1
+                if self._consecutive_failures >= max_retries or retries >= max_retries:
+                    raise RuntimeError(
+                        f"FineWebEduStreamer failed after {max_retries} consecutive fetch attempts at offset {self.current_offset}"
+                    )
                 import time
                 time.sleep(0.5)
                 continue
+            retries = 0
             for text in rows:
                 if not text.strip():
                     continue

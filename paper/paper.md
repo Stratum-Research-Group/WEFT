@@ -13,10 +13,10 @@ Modern transformer-based Large Language Models (LLMs) are fundamentally constrai
 In this work, we introduce **WEFT** (**W**indowed **E**xponentially-decayed **F**actorized **T**ensor Attention), a dual-path sequence architecture that replaces dense pairwise attention with a local sliding-window softmax operator coupled with a continuous, multi-head exponentially-decayed low-rank tensor recurrence. The recurrent updates are executed entirely within on-chip GPU SRAM tiles, bypassing the materialization of intermediate state trajectories in global memory. Furthermore, we extend the tensor uncrossing factorization from sequence history to neural network parameters via **Associative Memory Weights (AMW)**, replacing static dense feed-forward networks (MLP) with a fast, rank-factorized associative memory lookup.
 
 Empirical validation on NVIDIA GPU hardware demonstrates:
-1. **Computational Scaling:** Strict $O(N)$ linear time complexity, delivering a **430.7x speedup over PyTorch FlashAttention (SDPA) at sequence length $N = 524{,}288$**, with linear streaming benchmarks processing **13.25 Million tokens/second in ~520 MB VRAM** (extrapolating to 1-billion tokens in under 1.3 minutes).
+1. **Computational Scaling:** Strict $O(N)$ linear time complexity, delivering a **430.7x speedup over PyTorch FlashAttention (SDPA) at sequence length $N = 524{,}288$**, with linear streaming benchmarks executing a continuous **1-Billion Token unbroken hardware run across 15,259 chunks in 72.26s at 13.84 Million tokens/second in 648.3 MB peak VRAM** (prior extrapolation: 75.48s at 13.25M tok/s).
 2. **Constant-Memory Decoding:** Replaces expanding multi-gigabyte KV-caches with a bounded local window KV cache plus a constant **16 KB to 128 KB recurrent state per layer**, ensuring strict $O(1)$ memory consumption and flat step latencies across indefinite token generation.
 3. **Retrieval Fidelity:** Resolves the "memory drowning" failure mode of un-gated linear models via learnable per-channel decay rates ($\gamma = \sigma(\text{decay\_logits})$), recovering syntax and grammatical structure.
-4. **Parameter-Efficient Feed-Forward Execution (AMW):** Replaces static dense feed-forward blocks with an input-dependent low-rank associative memory dictionary, cutting layer parameter overhead by **5.2x** (from 8.65M to 1.67M weights) while delivering a **1.52x–1.63x end-to-end training throughput acceleration** and **3.1x–4.1x feed-forward latency reduction** with comparable held-out loss (7.99 vs. 8.05 on FineWeb-Edu).
+4. **Parameter-Efficient Feed-Forward Execution (AMW):** Replaces static dense feed-forward blocks with an input-dependent low-rank associative memory dictionary with dense softmax readout over all memory slots ($O(DR + MR + MD + D^2)$ per-token compute), cutting layer parameter overhead by **5.2x** (from 8.65M to 1.67M weights) while delivering a **1.50x–1.63x end-to-end training throughput acceleration** and **3.1x–4.1x feed-forward latency reduction** with comparable held-out loss (8.46 vs. 8.51 on held-out FineWeb-Edu, $\Delta = 0.052$).
 5. **Democratized Training:** Integrates matrix-orthogonalized Muon optimization, reducing optimizer memory overhead from 16 bytes/parameter down to 2 bytes/parameter, enabling billion-scale model training on consumer hardware.
 
 ---
@@ -124,11 +124,12 @@ We evaluate forward pass compute scaling against standard PyTorch FlashAttention
 | 262,144 | 3,130.00 ms (3.13 s) | **128.44 ms** | **24.4x** | Linear advantage |
 | **524,288** | 24,730.00 ms (24.73 s) | **57.42 ms** | **430.7x** | **Dominant Linear** |
 
-### 4.2 Streaming Throughput and Extrapolation Test
+### 4.2 Streaming Throughput and Actual 1-Billion Token Hardware Execution
 To evaluate streaming stability and memory consumption over long horizons, WEFT was benchmarked using continuous sequential streaming of chunks:
-* **Measured Linear Processing Rate:** **13.25 Million tokens / second**
-* **Extrapolated 1-Billion Token Scaling:** **75.48 seconds (1.26 minutes)**
-* **Peak GPU VRAM:** **~520 MB (Constant)**
+* **Measured Linear Processing Rate (Continuous Run):** **13,839,492 tokens / second**
+* **Actual 1-Billion Token Execution (15,259 chunks $\times$ 65,536 tokens = 1,000,013,824 tokens):** **72.26 seconds (1.20 minutes)**
+* **Prior Extrapolated Microbenchmark Baseline:** 75.48 seconds (1.26 minutes)
+* **Peak GPU VRAM:** **648.31 MB (Strictly Constant)**
 
 ### 4.3 Autoregressive Generation Memory Footprint
 Standard KV-cache allocation was measured against WEFT's recurrent cache during continuous autoregressive token decoding. The recurrent state per layer is strictly constant (65,536 bytes at $D=1024, R=32$ in FP16), and the local sliding-window KV buffer is bounded by $W=128$, keeping total layer decode memory under ~1.1 MB:
@@ -147,16 +148,16 @@ We evaluated associative recall by placing needle keys at extreme context depths
 * **With Learnable Exponential Decay ($\gamma = \sigma(\text{decay\_logits})$):** WEFT achieved **100% exact retrieval** of needles placed 16,373 tokens back, matching dense Transformer language modeling perplexity (**1.64 vs. 1.62 loss** on TinyShakespeare).
 
 ### 4.5 Associative Memory Weights (AMW) vs. Dense MLP
-We benchmarked the AMW uncrossed memory layer against standard dense SwiGLU/MLP layers on FineWeb-Edu pretraining over identical batches and held-out evaluation splits (Seed = 42):
+We benchmarked the AMW uncrossed memory layer against standard dense SwiGLU/MLP layers on FineWeb-Edu pretraining over identical batches and strictly isolated held-out evaluation splits (Seed = 42). The AMW layer evaluates a dense softmax readout over all $M$ memory slots coupled with a dense gating projection ($O(DR + MR + MD + D^2)$ per-token compute):
 
 | Metric | Standard Dense MLP | WEFT-AMW | Advantage |
 |:---|:---:|:---:|:---:|
 | Feed-Forward Parameters | 8,650,752 (17.3 MB) | **1,674,240 (3.3 MB)** | **5.2x fewer parameters** |
 | Forward Latency ($N=1024$) | 0.87 ms | **0.21 ms** | **4.1x faster** |
 | Forward Latency ($N=16384$) | 14.70 ms | **4.73 ms** | **3.1x faster** |
-| Training Throughput (FineWeb) | 10,835 tok/s | **16,482 tok/s** | **1.52x faster training** |
-| Held-Out Evaluation Loss | 7.9944 | **8.0575** | **$\Delta = 0.063$ (Near Parity)** |
-| Held-Out Perplexity | 2,964.36 | **3,157.42** | Comparable generalization |
+| Training Throughput (FineWeb) | 10,758 tok/s | **16,130 tok/s** | **1.50x faster training** |
+| Held-Out Evaluation Loss | 8.4613 | **8.5133** | **$\Delta = 0.0520$ (Near Parity)** |
+| Held-Out Perplexity | 4,728.23 | **4,980.68** | Comparable generalization |
 
 ---
 

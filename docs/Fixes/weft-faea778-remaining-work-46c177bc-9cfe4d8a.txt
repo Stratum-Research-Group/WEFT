@@ -1,0 +1,245 @@
+WEFT REMAINING WORK - REVIEW ROUND @ faea778 (HEAD 098812a)
+=============================================================
+Repo:    https://github.com/Stratum-Research-Group/WEFT
+HEAD at final fetch: 098812af7a3bd100aae506a78b348c9a3a448cb5
+  (verified .gitignore-only chore, 3 lines added; no code or docs touched)
+All code, tests and docs reviewed at:
+  faea778a2a3b3a04ac96dd4f7afbbcb2bb6492e3 (2026-11-18 22:01 +0200)
+Previous assessed commit:
+  32bc1dfc2c9e34f4c4ade511ade2486ec180f963 (weft-amw-claims-assessment-9bd45e64.txt)
+
+Method and evidence limits:
+- Read-only source inspection at faea778 plus a local CPU test run
+  (torch 2.14.1+cpu, pytest 9.2.0, Python 3.10).
+- No GPU here. All GPU timings, throughputs and training losses are
+  author-reported and were NOT independently reproduced.
+- CI job logs were not individually inspected. The failure cause below was
+  reproduced locally on a GPU-less environment; see item 1 for exact scope.
+
+MEASURED LOCAL TEST TOTALS @ faea778 (pytest tests/, CPU):
+  24 collected: 16 passed, 4 skipped, 4 errors.
+  Skips are environment-gated (FSDP multi-rank, fused_bwd CUDA-only
+  precisions). The 4 errors are all in tests/test_serving_server.py; see
+  item 1. These are the actual measured totals, distinct from the projected
+  post-fix totals in item 1.
+
+
+=============================================================
+PART 1 - PRIOR FINDINGS: STATUS
+=============================================================
+
+FIXED 1. Billion-token extrapolation (with verification limits).
+  benchmarks/run_actual_1_billion_stream.py now implements a real full-count
+  continuous loop: 15,259 chunks x 65,536 positions = exactly 1,000,013,824
+  positions, with the running recurrent state carried across chunks.
+  The author reports a measured run of 72.26s at 13,839,492 tok/s and
+  648.3 MB peak VRAM (README, docs/BENCHMARK_1_BILLION_TOKENS.md); this GPU
+  execution was not independently verified here. The old script
+  (benchmarks/benchmark_billion_tokens.py) is now explicitly labeled as a
+  20-repetition extrapolation microbenchmark.
+  Caveats to keep in wording: this is a single prototype streaming operator
+  with fixed random weights, reusing one synthetic 65,536-token chunk every
+  iteration. It is a valid throughput/memory stress test of the operator,
+  not a full language model processing a real billion-token corpus.
+
+FIXED 2. Memory accounting.
+  paper/paper.md now says "bounded local window KV cache plus a constant
+  16-128 KB recurrent state per layer" (abstract item 2), and section 4.3
+  states the 65,536-byte recurrent state plus a bounded W=128 window KV,
+  total under ~1.1 MB per layer. The earlier "65 KB is the whole story"
+  framing is gone.
+
+PARTIALLY ADDRESSED 3. Held-out AMW comparison.
+  benchmarks/benchmark_amw_rigorous.py now has the right design intent:
+  identical prefetched batches, fixed seed 42, validation batches taken from
+  stream offset 5000, and held-out val loss/perplexity reported. Paper 4.5
+  now cites held-out numbers (7.9944 vs 8.0575, delta 0.063) instead of a
+  training-batch "zero loss penalty" claim.
+  But split isolation is not yet guaranteed, so treat the held-out numbers
+  as approximate until repaired (actionable fix in item 6c):
+  a) Validation uses the same streamer and the same get_batch() path.
+     Leftover tokens from training-range rows remain in token_queue after
+     the last training batch, so the first validation batch can contain
+     leftover training-row tokens.
+  b) If a fetch raises during validation prefetch, _fetch_next_rows resets
+     the offset to 0 and validation silently continues on training-range
+     rows (same code path as item 6a). Normal-path disjointness holds only
+     when no fetch exception occurs.
+  c) Disjoint row offsets do not establish content deduplication:
+     FineWeb-Edu rows can repeat content across offsets.
+  Measured normal-path facts: 50 training steps x batch 4 x seq 128 =
+  25,600 tokens, covered by the first ~36 rows (checked against the live
+  FineWeb-Edu rows API, first fetch of 100 rows at offset 0-100);
+  validation prefetch starts at offset 5000.
+  Remaining caveat: 50 steps, ~25.6k tokens, one seed. "Near parity" at
+  this scale is suggestive, not established.
+
+FIXED 4. Needle recall success criterion (with precise scope).
+  benchmarks/evaluate_benchmarks.py evaluate_needle_recall() line 62 now
+  requires success = "8472" in gen_text, replacing the previous
+  any-nonempty-output criterion. Precisely: this is substring containment of
+  one fixed passcode ("8472") within up to 4 generated tokens. Limitations:
+  it can false-positive if "8472" appears as a substring of a longer digit
+  string, and it tests one fixed passcode, not arbitrary codes. It is a real
+  improvement over the old criterion, within those limits.
+
+FIXED 5. AMW claim wording.
+  Paper abstract item 4 now describes an "input-dependent low-rank
+  associative memory dictionary", which matches what the code computes.
+
+
+=============================================================
+PART 2 - OPEN ITEMS (numbered, paste-ready)
+=============================================================
+
+1. TEST SUITE FAILS ON GPU-LESS ENVIRONMENTS - root cause reproduced locally.
+   File: tests/test_serving_server.py, line 10:
+       load_model("weft_shakespeare_ckpt", device="cuda")
+   The fixture hardcodes CUDA. On any machine without CUDA (including
+   GitHub's ubuntu-latest runners), all 4 serving tests error at fixture
+   setup with:
+       AssertionError: Torch not compiled with CUDA enabled
+   Reproduced locally on CPU-only torch: same 4 errors at the same fixture.
+   This is consistent with tonight's seven failed CI runs (one matrix job
+   failed, two cancelled; GitHub matrix fail-fast cancels siblings), but the
+   individual CI job logs were not inspected, so this root cause is confirmed
+   for the local failure and is the likely, not proven, cause of every
+   historical run.
+   How the CPU path was verified without editing the repo: a standalone
+   script imported weft.serving_server, called
+   load_model("weft_shakespeare_ckpt", device="cpu") directly, and exercised
+   the same four behaviors the tests assert via fastapi.testclient.TestClient:
+   /health returned 200 with status "ready", /v1/models listed
+   "weft-causal-lm", non-streaming chat completion returned non-empty
+   content, and streaming completion returned text/event-stream ending in
+   [DONE]. No source or test files were modified.
+   Suggested fix: drop the device argument, or use
+       device="cuda" if torch.cuda.is_available() else "cpu"
+   Projected totals after that fix (projection, not yet measured through
+   pytest): 24 collected, 20 passed, 4 skipped, 0 errors. Confirmation still
+   requires pushing the fix and watching a CI run.
+
+2. Paper self-contradiction on the 1B result.
+   README and docs/BENCHMARK_1_BILLION_TOKENS.md report the author's actual
+   continuous run (72.26s, 13,839,492 tok/s, 648.3 MB). But paper/paper.md
+   still says "extrapolating to 1-billion tokens in under 1.3 minutes"
+   (abstract item 1, ~line 16) and lists "Extrapolated 1-Billion Token
+   Scaling: 75.48 seconds" (section 4.2, ~line 130). The paper now
+   underclaims and disagrees with the README. Update paper.md and paper.tex
+   to cite the measured run, keeping 75.48s only as the older extrapolation.
+
+3. Speedup comparison lacks causal/backend matching (still open).
+   benchmarks/ramp_up_benchmark.py (~lines 75-84) benchmarks the SDPA
+   baseline without is_causal=True, while WEFT's production attention path
+   is causal, and the baseline's backend selection is left to PyTorch
+   defaults. The headline "430.7x speedup at N=524,288" (paper 4.1)
+   therefore comes from a comparison that is neither causal-matched nor
+   backend-recorded. The direction and size of the correction are unknown
+   until measured. Fix: rerun the baseline with is_causal=True, and force
+   or at least record which SDPA backend the baseline ran on (flash /
+   mem-efficient / math, e.g. via torch.nn.attention.sdpa_kernel), since
+   backend choice materially changes baseline latency. WEFT's recurrent
+   path runs its own kernel and does not need to share that backend. Then
+   report the measured matched-causal numbers.
+
+4. AMW computes a dense softmax over ALL memory slots plus a dense D-by-D
+   gate (standing; decide and document).
+   weft/associative_weight.py forward(): softmaxes affinities over every
+   slot and blends all values; self.gate = nn.Linear(hidden, hidden) is a
+   full dense projection. Per-token compute is O(DR + MR + MD + D^2):
+   encoder projection DR, affinities MR, value blend MD, gate D^2. The 5.2x
+   parameter reduction is real; the "selective retrieval" intuition is not
+   what the code computes, and the 3.1x-4.1x latency figures are
+   author-measured only. If dense-soft readout is the intended design, one
+   sentence in the paper stating the read is dense over slots with this cost
+   closes the item.
+
+5. "100% exact retrieval up to 16,384 tokens" is a trained probe, not
+   zero-shot LM recall.
+   benchmarks/benchmark_associative_recall.py train_and_eval() trains a
+   fresh probe for 100-120 epochs to ~0.0000 loss on the tested key/value
+   bindings at each sequence length. This shows a trained probe can pass the
+   finite set of trained bindings that were tested; it does not show that a
+   pretrained WEFT LM recalls arbitrary bindings zero-shot. The new
+   curriculum pipelines (examples/train_needle_mastery.py,
+   train_needle_tuning.py, train_generalized_induction.py) aim at that; the
+   open gate is exact-answer recall from a trained checkpoint on random
+   held-out passcodes at multiple depths.
+
+6. FineWebEduStreamer robustness (minor).
+   weft/dataset_fineweb.py:
+   a) _fetch_next_rows() resets current_offset = 0 on ANY exception,
+      including transient timeouts, silently recycling training rows from
+      the start with no signal.
+   b) get_batch() loops forever with 0.5s sleeps if fetches keep failing; a
+      training run hangs silently instead of erroring.
+   Fix: reset the offset only on a genuine end-of-data response, and add a
+   retry cap that raises after N consecutive failures.
+   c) ACTIONABLE - Split isolation in benchmark_amw_rigorous.py (repairs
+      Partially Addressed 3): before validation prefetch, clear or replace
+      the streamer's token_queue so no training-row tokens carry into
+      validation batches, and route validation through an exception-guarded
+      offset (or a separate streamer instance pinned at offset 5000) so a
+      transient fetch error cannot recycle training rows into the held-out
+      set. Keep the identical-batches and seed-42 design exactly as-is;
+      this repair only changes queue/offset hygiene. Re-report the held-out
+      numbers after the fix, since the current delta (0.063) may shift.
+
+7. Quality gate at scale still open (the persuasive result).
+   AMW parity evidence is 50 steps / ~25.6k tokens / one seed;
+   examples/train_weft_125m_foundation.py exists but no trained-checkpoint
+   results are reported yet. The result that would carry the paper's claims:
+   a frozen WEFT checkpoint with useful held-out perplexity AND exact-answer
+   long-context recall, at materially lower memory/time than a matched dense
+   baseline, across seeds. Until then, keep "near parity" and "resolves
+   memory drowning" scoped as demonstrated.
+
+
+=============================================================
+PART 3 - DO-NOT-TOUCH CONSTRAINTS
+=============================================================
+- Do NOT revert the held-out evaluation intent in benchmark_amw_rigorous.py
+  (identical prefetched batches for both models, seed 42, held-out
+  validation reported separately). The queue/offset repair in item 6c is
+  explicitly allowed and required: changing token_queue clearing and the
+  validation offset guard is the fix, not a revert.
+- Do NOT weaken the passcode-containment criterion in
+  evaluate_benchmarks.py back to a nonempty-output check.
+- Do NOT edit the cache/mask handling in weft/modeling_weft.py: the batch>1
+  mask broadcasting and HF generate/WeftCache fixes are guarded by 12
+  passing regression tests in tests/test_weft_hf.py. Keep them green.
+- Do NOT "fix" the single-token decode fast path (modeling_weft.py ~line
+  287, is_causal=False when s==1): it is correct, because all cached keys
+  precede the current query token at decode.
+- The 4 skips (FSDP multi-rank, fused_bwd precisions) are
+  environment-gated, not failures; leave the skip conditions as-is.
+
+=============================================================
+PART 4 - VERIFIED STATE SUMMARY
+=============================================================
+- Freshly fetched HEAD: 098812af7a3bd100aae506a78b348c9a3a448cb5
+  (.gitignore-only). All review findings are from faea778.
+- Measured local totals at faea778: 16 passed / 4 skipped / 4 errors out of
+  24; all 4 errors trace to the single hardcoded device="cuda" at
+  tests/test_serving_server.py:10 (item 1; projected 20/4/0 after the fix,
+  pending a real CI run).
+- Core library unchanged since 32bc1df except weft/dataset_fineweb.py and
+  weft/serving_server.py (tokenizer auto-load selects char vs BPE by
+  vocab_size; verified loading weft_shakespeare_ckpt on CPU with all four
+  endpoints functional).
+- Prior a3ac8fd mask/cache defects remain fixed, guarded by passing
+  regression tests.
+- AMW isolated parameter ratio previously verified: 1,674,240 vs 8,650,752
+  (~5.2x). Code unchanged this round; the ratio stands.
+- Held-out split checked against the live FineWeb-Edu rows API: training
+  consumes the first ~36 rows, validation prefetch starts at row 5000, so
+  the fetched row ranges are disjoint on the normal path. Not guaranteed:
+  leftover queue tokens can carry training-row content into the first
+  validation batch, a fetch exception during validation resets the offset
+  to training rows, and row-offset disjointness does not deduplicate
+  content (see Partially Addressed 3 and item 6c).
+- Uncrossing/LeanProofs relationship unchanged this round: meaningful
+  factorization principle, not a transferred quality theorem.
+- All GPU-reported numbers (72.26s 1B run, 430.7x speedup, AMW latencies,
+  training throughputs, held-out losses) are author-reported and not
+  independently reproduced here.

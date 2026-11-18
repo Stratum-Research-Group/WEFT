@@ -30,12 +30,15 @@ def run_rigorous_evaluation(steps: int = 50, val_steps: int = 10, seed: int = 42
     print("=========================================================================")
 
     # 1. Fetch deterministic train and validation batches
-    streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device))
     print("Fetching deterministic data stream from FineWeb-Edu...")
-    train_batches = [streamer.get_batch() for _ in range(steps)]
-    # Use offset for held-out validation
-    streamer.current_offset = 5000
-    val_batches = [streamer.get_batch() for _ in range(val_steps)]
+    train_streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device))
+    train_batches = [train_streamer.get_batch() for _ in range(steps)]
+
+    # Use isolated streamer instance pinned at offset 5000 for held-out validation
+    val_streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device))
+    val_streamer.current_offset = 5000
+    val_streamer.token_queue = []
+    val_batches = [val_streamer.get_batch() for _ in range(val_steps)]
 
     # 2. Evaluate Standard Dense Model
     torch.manual_seed(seed)

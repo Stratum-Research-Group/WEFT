@@ -75,6 +75,7 @@ class WeftConfig(PretrainedConfig):
         self.num_state_heads = num_state_heads
         self.state_rank = state_rank
         self.window_size = window_size
+        self.shifted_binding = kwargs.get("shifted_binding", False)
         self.use_amw = use_amw
         self.amw_num_slots = amw_num_slots
         self.amw_rank = amw_rank

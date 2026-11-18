@@ -205,6 +205,7 @@ class WeftAttention(nn.Module):
         self.num_state_heads = config.num_state_heads
         self.state_rank = config.state_rank
         self.state_dim = self.hidden_size // self.num_state_heads
+        self.shifted_binding = getattr(config, "shifted_binding", False)
 
         self.q_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
         self.k_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
@@ -306,6 +307,12 @@ class WeftAttention(nn.Module):
         v_p = self.proj_v(hidden_states).view(b, s, self.num_state_heads, self.state_rank)
         x_heads = hidden_states.view(b, s, self.num_state_heads, self.state_dim)
 
+        # Shifted State Binding: k_{t-1} binds with x_{t} for native induction copying
+        if self.shifted_binding and s > 1:
+            k_key = torch.cat([torch.zeros_like(k_p[:, :1]), k_p[:, :-1]], dim=1)
+        else:
+            k_key = k_p
+
         if attention_mask is not None and attention_mask.dim() == 2:
             if attention_mask.shape[-1] >= past_len + s:
                 cur_mask = attention_mask[:, past_len : past_len + s]
@@ -316,7 +323,7 @@ class WeftAttention(nn.Module):
             mask_weight = None
 
         if s == 1 and recurrent_state is not None:
-            kp_1 = k_p[:, 0, :, :].unsqueeze(-1)
+            kp_1 = k_key[:, 0, :, :].unsqueeze(-1)
             xh_1 = x_heads[:, 0, :, :].unsqueeze(-2)
             step_update = kp_1 * xh_1
             gamma_4d = gamma.view(1, self.num_state_heads, self.state_rank, 1)
@@ -359,7 +366,7 @@ class WeftAttention(nn.Module):
             try:
                 from .kernels.fused_autograd import WeftRecurrentFunction
                 global_out_heads, final_state = WeftRecurrentFunction.apply(
-                    x_heads, k_p, v_p, self.decay_logits
+                    x_heads, k_key, v_p, self.decay_logits
                 )
                 global_out = global_out_heads.view(b, s, d)
                 last_state = final_state
@@ -380,7 +387,7 @@ class WeftAttention(nn.Module):
 
             # Step-by-step recurrence with bounded intermediate memory (no full trajectory list retention)
             for t in range(s):
-                kp_t = k_p[:, t, :, :].unsqueeze(-1)
+                kp_t = k_key[:, t, :, :].unsqueeze(-1)
                 xh_t = x_heads[:, t, :, :].unsqueeze(-2)
                 step_update = kp_t * xh_t
 

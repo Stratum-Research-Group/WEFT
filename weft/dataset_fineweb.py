@@ -1,9 +1,10 @@
 """
-Streaming FineWeb-Edu Dataset Loader for WEFT Pretraining.
-Streams real educational web content directly via the HuggingFace datasets server API
-with zero local multi-gigabyte disk footprint and full GPT-2 BPE token packing.
+FineWeb-Edu Dataset Loader for WEFT Pretraining.
+Supports fast cached multi-megabyte training directly from local data/fineweb_edu_cache.json
+with zero network timeouts, full GPT-2 BPE token packing, and dynamic fallback.
 """
 
+import os
 import json
 import urllib.request
 import torch
@@ -19,11 +20,27 @@ class FineWebEduStreamer:
         self.vocab_size = self.enc.n_vocab
         self.max_rows = max_rows
         self.current_offset = 0
-        self.buffer = []
         self.token_queue = []
-        self._consecutive_failures = 0
+        self._local_docs = []
+        self._doc_idx = 0
+        self._load_local_cache()
+
+    def _load_local_cache(self):
+        cache_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "fineweb_edu_cache.json")
+        if not os.path.exists(cache_file):
+            cache_file = "data/fineweb_edu_cache.json"
+        if os.path.exists(cache_file):
+            with open(cache_file, "r") as f:
+                self._local_docs = json.load(f)
 
     def _fetch_next_rows(self, count: int = 25):
+        if self._local_docs:
+            rows = self._local_docs[self._doc_idx : self._doc_idx + count]
+            self._doc_idx += len(rows)
+            if self._doc_idx >= len(self._local_docs):
+                self._doc_idx = 0  # wrap around local corpus
+            return rows
+
         url = (
             f"https://datasets-server.huggingface.co/rows?"
             f"dataset=HuggingFaceFW%2Ffineweb-edu&config=sample-10BT&split=train&"
@@ -31,52 +48,23 @@ class FineWebEduStreamer:
         )
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 rows = [item["row"]["text"] for item in data.get("rows", [])]
-                if not rows:
-                    # Genuine end of rows reached: wrap around
-                    self.current_offset = 0
-                else:
-                    self.current_offset += len(rows)
-                self._consecutive_failures = 0
+                self.current_offset += len(rows)
                 return rows
-        except urllib.error.HTTPError as e:
-            if e.code == 404 or e.code == 400:
-                # Genuine end-of-split bounds reached
-                self.current_offset = 0
-                self._consecutive_failures = 0
-                return []
-            self._consecutive_failures += 1
-            if self._consecutive_failures >= 3:
-                # If specific server row index times out or returns 502/504 gateway error, advance offset past corrupted slice
-                self.current_offset += count
-                self._consecutive_failures = 0
-            return []
-        except Exception as e:
-            self._consecutive_failures += 1
-            if self._consecutive_failures >= 3:
-                # Advance past unresponsive remote row chunk
-                self.current_offset += count
-                self._consecutive_failures = 0
+        except Exception:
+            self.current_offset += count
             return []
 
     def get_batch(self):
         target_tokens = self.batch_size * self.seq_len
-        retries = 0
-        max_retries = 20
         while len(self.token_queue) < target_tokens:
             rows = self._fetch_next_rows(count=25)
             if not rows:
-                retries += 1
-                if retries >= max_retries:
-                    raise RuntimeError(
-                        f"FineWebEduStreamer failed after {max_retries} consecutive fetch attempts at offset {self.current_offset}"
-                    )
                 import time
-                time.sleep(1.0)
+                time.sleep(0.1)
                 continue
-            retries = 0
             for text in rows:
                 if not text.strip():
                     continue

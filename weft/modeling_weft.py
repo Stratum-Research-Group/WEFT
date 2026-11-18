@@ -529,6 +529,21 @@ class WeftPreTrainedModel(PreTrainedModel):
         elif isinstance(module, nn.Embedding):
             module.weight.data.normal_(mean=0.0, std=std)
 
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path, *model_args, **kwargs):
+        quantization = kwargs.pop("quantization", None)
+        model = super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+        if quantization == "int8":
+            from .quantization import quantize_weft_int8
+            quantize_weft_int8(model)
+        elif quantization == "fp8":
+            from .quantization import quantize_weft_fp8
+            quantize_weft_fp8(model)
+        elif quantization is not None:
+            raise ValueError(f"Unknown quantization mode: '{quantization}'. Supported modes: 'int8', 'fp8', or None.")
+        return model
+
+
 
 class WeftModel(WeftPreTrainedModel):
     def __init__(self, config: WeftConfig):

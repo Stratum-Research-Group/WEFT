@@ -50,11 +50,12 @@ def startup_event():
         load_model(model_path)
 
 
-def load_model(checkpoint_path: str, device: Optional[str] = None):
+def load_model(checkpoint_path: str, device: Optional[str] = None, quantization: Optional[str] = None):
     import os
     if device is not None:
         engine.device = device
-    engine.model = WeftForCausalLM.from_pretrained(checkpoint_path).to(engine.device)
+    quant = quantization or os.environ.get("WEFT_QUANTIZATION", None)
+    engine.model = WeftForCausalLM.from_pretrained(checkpoint_path, quantization=quant).to(engine.device)
     engine.model.eval()
     vocab_path = os.path.join(checkpoint_path, "vocab.json")
     if os.path.exists(vocab_path):

@@ -214,8 +214,10 @@ class WeftAttention(nn.Module):
         self.proj_k = nn.Linear(self.hidden_size, self.num_state_heads * self.state_rank, bias=False)
         self.proj_v = nn.Linear(self.hidden_size, self.num_state_heads * self.state_rank, bias=False)
 
-        # Learnable decay rates per state head
-        self.decay_logits = nn.Parameter(torch.ones(self.num_state_heads, self.state_rank) * 2.2)
+        # Learnable decay rates per state head initialized with geometric DAMI timescale spacing
+        self.decay_logits = nn.Parameter(torch.empty(self.num_state_heads, self.state_rank))
+        from .init_dami import init_dami_decay_logits
+        init_dami_decay_logits(self.decay_logits, min_timescale=64.0, max_timescale=65536.0)
         self.out_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
 
     def forward(

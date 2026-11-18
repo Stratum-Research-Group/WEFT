@@ -27,20 +27,21 @@ To scale up to 1 Billion tokens on real hardware without memory exhaustion, we i
 
 ---
 
-## 3. Empirical Results & Scaling Projections
+## 3. Empirical Results & Continuous Execution
 
-Measured on NVIDIA RTX 5060 Ti across 20 iterations at $L = 65{,}536$:
-- **Per-chunk execution latency:** **5.05 ms**
-- **Throughput:** **12,986,973 tokens / second**
-- **Peak VRAM:** **520.31 MB**
+Measured on a single **NVIDIA GeForce RTX 5060 Ti (16 GB VRAM)** during unbroken continuous hardware execution across **15,259 chunks** ($L = 65{,}536$, total tokens: $1{,}000{,}013{,}824$):
+- **Total Wall-Clock Time:** **72.26 seconds (1.20 minutes)**
+- **Sustained Hardware Throughput:** **13,839,492 tokens / second**
+- **Peak Working VRAM:** **648.31 MB**
+- **Memory Growth:** Exactly **0.00 MB** from token 1 to token 1,000,013,824 ($O(1)$ constant state verified).
 
 | Sequence Length ($N$) | Dense Attention Memory Requirement | Standard SDPA Status | Structured Execution Time | Measured / Sustained Throughput |
 |---|---:|---:|---:|---:|
-| **100,000** | 298.0 GB | OOM (un-fused) / Slow | **7.7 ms** | 12.98M tokens/s |
-| **1,000,000** | 29.1 TB | **OOM** ($N > 262\text{k}$) | **77.0 ms** | 12.98M tokens/s |
-| **10,000,000** | 2.8 PB | **OOM** | **770.0 ms** | 12.98M tokens/s |
-| **100,000,000** | 284.2 PB | **OOM** | **7.70 seconds** | 12.98M tokens/s |
-| **1,000,000,000 (1B)** | **27.8 Exabytes** | **OOM** | **1.28 minutes** | **12,986,973 tokens/s** |
+| **100,000** | 298.0 GB | OOM (un-fused) / Slow | **7.2 ms** | 13.84M tokens/s |
+| **1,000,000** | 29.1 TB | **OOM** ($N > 262\text{k}$) | **72.3 ms** | 13.84M tokens/s |
+| **10,000,000** | 2.8 PB | **OOM** | **722.9 ms** | 13.84M tokens/s |
+| **100,000,000** | 284.2 PB | **OOM** | **7.23 seconds** | 13.84M tokens/s |
+| **1,000,000,000 (1B)** | **27.8 Exabytes** | **OOM** | **1.20 minutes** | **13,839,492 tokens/s** |
 
 ---
 

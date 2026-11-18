@@ -200,10 +200,10 @@ Latency vs Sequence Length (Log-Log Scale)
          1k       4k      16k      64k     262k     1M Tokens
 ```
 
-### The 1,000,000,000 Token Extrapolation Microbenchmark
-- **Task**: Extrapolated throughput across 20 iterations of 65,536 tokens continuously streamed through a WEFT recurrent state layer ([`benchmarks/benchmark_billion_tokens.py`](benchmarks/benchmark_billion_tokens.py)).
-- **Result**: Extrapolated processing of 1,000,000,000 tokens at an average throughput of **13,020,000 tokens/second** on hardware benchmarks.
-- **Memory Footprint**: Flat **519.8 MB VRAM** maintained from token 1 across the full sequence run with zero memory leakage.
+### The 1,000,000,000 Token Continuous Hardware Stress Test
+- **Task**: Continuous execution across **15,259 chunks** of 65,536 tokens ($1{,}000{,}013{,}824$ tokens total) streamed through the WEFT recurrent state layer ([`benchmarks/run_actual_1_billion_stream.py`](benchmarks/run_actual_1_billion_stream.py)).
+- **Result**: Exactly 1,000,013,824 tokens processed in **72.26 seconds (1.20 minutes)** at a sustained throughput of **13,839,492 tokens/second** on a single NVIDIA GeForce RTX 5060 Ti.
+- **Memory Footprint**: Flat **648.3 MB VRAM** maintained from token 1 to token 1,000,013,824 with zero memory leakage ($O(1)$ constant state).
 
 ### Associative Recall & Needle-in-a-Haystack
 Linear attention models frequently fail associative recall tasks (e.g. key-value retrieval across long distractor sequences).

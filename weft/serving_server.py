@@ -32,6 +32,14 @@ class GlobalEngine:
 engine = GlobalEngine()
 
 
+@app.on_event("startup")
+def startup_event():
+    import os
+    model_path = os.environ.get("WEFT_MODEL_PATH")
+    if model_path and os.path.exists(model_path):
+        load_model(model_path)
+
+
 def load_model(checkpoint_path: str, device: Optional[str] = None):
     import os
     if device is not None:
@@ -42,7 +50,20 @@ def load_model(checkpoint_path: str, device: Optional[str] = None):
     if os.path.exists(vocab_path):
         engine.tokenizer = WeftCharTokenizer(vocab_file=vocab_path)
     else:
-        engine.tokenizer = WeftCharTokenizer()
+        # Check if model uses BPE (vocab_size 50257) or char tokenizer
+        if engine.model.config.vocab_size == 50257:
+            import tiktoken
+            class TiktokenWrapper:
+                def __init__(self):
+                    self.enc = tiktoken.get_encoding("gpt2")
+                    self.vocab_size = 50257
+                def encode(self, text):
+                    return self.enc.encode_ordinary(text)
+                def decode(self, tokens):
+                    return self.enc.decode(tokens)
+            engine.tokenizer = TiktokenWrapper()
+        else:
+            engine.tokenizer = WeftCharTokenizer()
     print(f"[WEFT Server] Loaded model from {checkpoint_path} on {engine.device}")
 
 

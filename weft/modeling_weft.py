@@ -359,8 +359,8 @@ class WeftAttention(nn.Module):
         use_triton = (
             hidden_states.is_cuda
             and (self.state_rank in valid_triton_ranks)
-            and recurrent_state is None
-            and mask_weight is None
+            and (mask_weight is None)
+            and (not torch.is_grad_enabled() or recurrent_state is None)
         )
         if use_triton:
             try:
@@ -373,8 +373,13 @@ class WeftAttention(nn.Module):
                     dummy_s_all = torch.empty(1, device=x_heads.device, dtype=x_heads.dtype)
                     BLOCK_D = min(64, triton.next_power_of_2(self.state_dim))
                     grid = (b, self.num_state_heads, triton.cdiv(self.state_dim, BLOCK_D))
+
+                    has_init = recurrent_state is not None
+                    init_s_arg = recurrent_state if has_init else dummy_s_all
+                    is_strides = recurrent_state.stride() if has_init else (0, 0, 0, 0)
+
                     _fused_chunk_recurrent_fwd_kernel[grid](
-                        x_heads, k_key, v_p, self.decay_logits, out_fused, final_state, dummy_s_all,
+                        x_heads, k_key, v_p, self.decay_logits, out_fused, final_state, dummy_s_all, init_s_arg,
                         x_heads.stride(0), x_heads.stride(1), x_heads.stride(2), x_heads.stride(3),
                         k_key.stride(0), k_key.stride(1), k_key.stride(2), k_key.stride(3),
                         v_p.stride(0), v_p.stride(1), v_p.stride(2), v_p.stride(3),
@@ -382,9 +387,11 @@ class WeftAttention(nn.Module):
                         out_fused.stride(0), out_fused.stride(1), out_fused.stride(2), out_fused.stride(3),
                         final_state.stride(0), final_state.stride(1), final_state.stride(2), final_state.stride(3),
                         0, 0, 0, 0, 0,
+                        is_strides[0], is_strides[1], is_strides[2], is_strides[3],
                         B=b, S=s, H=self.num_state_heads, D=self.state_dim, R=self.state_rank,
                         BLOCK_D=BLOCK_D,
                         SAVE_S_ALL=False,
+                        HAS_INIT_S=has_init,
                     )
                     global_out = out_fused.view(b, s, d)
                     last_state = final_state

@@ -20,7 +20,7 @@ import triton.language as tl
 
 @triton.jit
 def _fused_chunk_recurrent_fwd_kernel(
-    X_ptr, KP_ptr, VP_ptr, GAMMA_ptr, OUT_ptr, FINAL_S_ptr, S_ALL_ptr,
+    X_ptr, KP_ptr, VP_ptr, GAMMA_ptr, OUT_ptr, FINAL_S_ptr, S_ALL_ptr, INIT_S_ptr,
     stride_xb, stride_xs, stride_xh, stride_xd,
     stride_kpb, stride_kps, stride_kph, stride_kpr,
     stride_vpb, stride_vps, stride_vph, stride_vpr,
@@ -28,9 +28,11 @@ def _fused_chunk_recurrent_fwd_kernel(
     stride_ob, stride_os, stride_oh, stride_od,
     stride_sb, stride_sh, stride_sr, stride_sd,
     stride_sab, stride_sas, stride_sah, stride_sar, stride_sad,
+    stride_isb, stride_ish, stride_isr, stride_isd,
     B, S, H: tl.constexpr, D: tl.constexpr, R: tl.constexpr,
     BLOCK_D: tl.constexpr,
     SAVE_S_ALL: tl.constexpr,
+    HAS_INIT_S: tl.constexpr,
 ):
     pid_b = tl.program_id(0)
     pid_h = tl.program_id(1)
@@ -39,6 +41,9 @@ def _fused_chunk_recurrent_fwd_kernel(
     offs_d = pid_d * BLOCK_D + tl.arange(0, BLOCK_D)
     mask_d = offs_d < D
     offs_r = tl.arange(0, R)
+    offs_r_2d = offs_r[:, None]
+    offs_d_2d = offs_d[None, :]
+    mask_2d = mask_d[None, :]
 
     gamma_ptrs = GAMMA_ptr + pid_h * stride_gh + offs_r * stride_gr
     decay_logits = tl.load(gamma_ptrs)
@@ -46,7 +51,13 @@ def _fused_chunk_recurrent_fwd_kernel(
     gamma = 1.0 / (1.0 + tl.exp(-decay_logits_f32))
     gamma_tile = gamma[:, None]
 
-    state = tl.zeros((R, BLOCK_D), dtype=tl.float32)
+    if HAS_INIT_S:
+        init_s_base = INIT_S_ptr + pid_b * stride_isb + pid_h * stride_ish
+        init_s_ptrs = init_s_base + offs_r_2d * stride_isr + offs_d_2d * stride_isd
+        init_s = tl.load(init_s_ptrs, mask=mask_2d, other=0.0)
+        state = tl.cast(init_s, tl.float32)
+    else:
+        state = tl.zeros((R, BLOCK_D), dtype=tl.float32)
 
     b_h_x_base = X_ptr + pid_b * stride_xb + pid_h * stride_xh
     b_h_kp_base = KP_ptr + pid_b * stride_kpb + pid_h * stride_kph
@@ -230,8 +241,10 @@ class WeftRecurrentFunction(torch.autograd.Function):
         BLOCK_D = min(64, triton.next_power_of_2(d))
         grid = (b, h, triton.cdiv(d, BLOCK_D))
 
+        dummy_init_s = torch.empty(1, device=x.device, dtype=x.dtype)
+
         _fused_chunk_recurrent_fwd_kernel[grid](
-            x, k_p, v_p, decay_logits, out, final_state, s_all,
+            x, k_p, v_p, decay_logits, out, final_state, s_all, dummy_init_s,
             x.stride(0), x.stride(1), x.stride(2), x.stride(3),
             k_p.stride(0), k_p.stride(1), k_p.stride(2), k_p.stride(3),
             v_p.stride(0), v_p.stride(1), v_p.stride(2), v_p.stride(3),
@@ -239,9 +252,11 @@ class WeftRecurrentFunction(torch.autograd.Function):
             out.stride(0), out.stride(1), out.stride(2), out.stride(3),
             final_state.stride(0), final_state.stride(1), final_state.stride(2), final_state.stride(3),
             s_all.stride(0), s_all.stride(1), s_all.stride(2), s_all.stride(3), s_all.stride(4),
+            0, 0, 0, 0,
             B=b, S=s, H=h, D=d, R=r,
             BLOCK_D=BLOCK_D,
             SAVE_S_ALL=True,
+            HAS_INIT_S=False,
         )
 
         ctx.save_for_backward(x, k_p, v_p, decay_logits, s_all)

@@ -15,3 +15,6 @@ htmlcov/
 weft_bpe_ckpt/
 weft_fineweb_ckpt/
 weft_125m_foundation_ckpt/
+weft_125m_needle_ckpt/
+weft_125m_needle_master_ckpt/
+weft_125m_general_needle_ckpt/

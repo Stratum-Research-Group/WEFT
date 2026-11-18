@@ -12,3 +12,4 @@ build/
 htmlcov/
 .DS_Store
 *.log
+weft_bpe_ckpt/

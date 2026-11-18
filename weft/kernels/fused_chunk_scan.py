@@ -127,7 +127,8 @@ def fused_chunk_recurrent_forward_triton(
         state_ptr = out
         sb, sh, sr, sd = 0, 0, 0, 0
 
-    BLOCK_D = min(64, triton.next_power_of_2(d))
+    # Select block size based on hardware tuning: BLOCK_D=32 gives optimal occupancy and warp balance
+    BLOCK_D = 32 if d % 32 == 0 else min(64, triton.next_power_of_2(d))
     grid = (b, h, triton.cdiv(d, BLOCK_D))
 
     _fused_chunk_recurrent_fwd_kernel[grid](
@@ -142,6 +143,7 @@ def fused_chunk_recurrent_forward_triton(
         B=b, S=s, H=h, D=d, R=r,
         BLOCK_D=BLOCK_D,
         STORE_FINAL=return_final_state,
+        num_warps=4,
     )
 
     return out, final_state

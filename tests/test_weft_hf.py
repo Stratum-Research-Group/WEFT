@@ -163,3 +163,152 @@ if __name__ == "__main__":
     print("=================================================================")
     print("  ALL WEFT UNIT TESTS PASSED SUCCESSFULLY!")
     print("=================================================================")
+
+
+def test_weft_sliding_window_cache_equivalence():
+    """
+    Item 1 & 2 regression test:
+    Verify that full-sequence, 1-by-1 step decode, and chunked prefill+append
+    yield identical logits under the causal sliding-window attention operator.
+    Verify that the stored physical local KV cache is strictly bounded to (window_size - 1).
+    """
+    torch.manual_seed(17)
+    vocab, hidden, intermediate, layers, attention_heads, state_heads, rank, window = 31, 16, 32, 2, 2, 2, 8, 4
+    token_ids = torch.tensor([[1, 3, 5, 7, 9, 11, 13, 15, 17]])
+
+    cfg = WeftConfig(
+        vocab_size=vocab,
+        hidden_size=hidden,
+        intermediate_size=intermediate,
+        num_hidden_layers=layers,
+        num_attention_heads=attention_heads,
+        num_state_heads=state_heads,
+        state_rank=rank,
+        window_size=window,
+        use_cache=True,
+    )
+    model = WeftForCausalLM(cfg)
+    model.eval()
+
+    with torch.no_grad():
+        out_full = model(token_ids, use_cache=False).logits
+
+        # 1. 1-by-1 cached step decode
+        past = None
+        step_logits = []
+        for i in range(token_ids.shape[1]):
+            inp = token_ids[:, i:i+1]
+            out_step = model(inp, past_key_values=past, use_cache=True)
+            step_logits.append(out_step.logits)
+            past = out_step.past_key_values
+        out_step_all = torch.cat(step_logits, dim=1)
+
+        diff_step = (out_full - out_step_all).abs().max().item()
+        assert diff_step < 1e-5, f"1-by-1 step decode mismatch with full pass: {diff_step}"
+
+        # 2. Chunked prefill (3) + append (3) + append (3)
+        out1 = model(token_ids[:, :3], use_cache=True)
+        out2 = model(token_ids[:, 3:6], past_key_values=out1.past_key_values, use_cache=True)
+        out3 = model(token_ids[:, 6:], past_key_values=out2.past_key_values, use_cache=True)
+        out_chunked = torch.cat([out1.logits, out2.logits, out3.logits], dim=1)
+
+        diff_chunk = (out_full - out_chunked).abs().max().item()
+        assert diff_chunk < 1e-5, f"Chunked append mismatch with full pass: {diff_chunk}"
+
+        # Verify physical cache bounding
+        assert out3.past_key_values.layers[0].keys.shape[-2] <= (window - 1), (
+            f"Stored keys shape {out3.past_key_values.layers[0].keys.shape} exceeds bound {window - 1}"
+        )
+        assert out3.past_key_values.get_seq_length() == token_ids.shape[1], (
+            f"Expected logical seq length {token_ids.shape[1]}, got {out3.past_key_values.get_seq_length()}"
+        )
+
+
+def test_weft_attention_mask_invariance():
+    """
+    Item 3 regression test:
+    Verify that padding/attention mask correctly isolates masked positions so that
+    changing tokens in masked positions produces zero perturbation on unmasked logits.
+    """
+    torch.manual_seed(17)
+    cfg = WeftConfig(
+        vocab_size=31,
+        hidden_size=16,
+        intermediate_size=32,
+        num_hidden_layers=2,
+        num_attention_heads=2,
+        num_state_heads=2,
+        state_rank=8,
+        window_size=4,
+    )
+    model = WeftForCausalLM(cfg).eval()
+
+    tokens_a = torch.tensor([[10, 20, 5, 7]])
+    tokens_b = torch.tensor([[29, 28, 5, 7]])
+    mask = torch.tensor([[0, 0, 1, 1]])
+
+    with torch.no_grad():
+        out_a = model(tokens_a, attention_mask=mask).logits
+        out_b = model(tokens_b, attention_mask=mask).logits
+
+    diff = (out_a[:, 2:] - out_b[:, 2:]).abs().max().item()
+    assert diff == 0.0, f"Attention mask leaked across unmasked positions: diff = {diff}"
+
+
+def test_weft_beam_reorder_recurrent_state():
+    """
+    Item 4 regression test:
+    Verify that cache.reorder_cache reorders both local keys and weft_recurrent_state.
+    """
+    cfg = WeftConfig(
+        vocab_size=31,
+        hidden_size=16,
+        intermediate_size=32,
+        num_hidden_layers=2,
+        num_attention_heads=2,
+        num_state_heads=2,
+        state_rank=8,
+        window_size=4,
+    )
+    model = WeftForCausalLM(cfg).eval()
+
+    tokens = torch.tensor([[1, 2, 3], [4, 5, 6]])
+    out = model(tokens, use_cache=True)
+    past = out.past_key_values
+    beam_idx = torch.tensor([1, 0])
+
+    k_before = past.layers[0].keys.clone()
+    rec_before = past.layers[0].weft_recurrent_state.clone()
+
+    past.reorder_cache(beam_idx)
+
+    assert torch.equal(past.layers[0].keys, k_before.index_select(0, beam_idx))
+    assert torch.equal(past.layers[0].weft_recurrent_state, rec_before.index_select(0, beam_idx))
+
+
+def test_weft_use_cache_false_preserves_caller_state():
+    """
+    Item 6 regression test:
+    Passing use_cache=False with a Cache object must not mutate the cache.
+    """
+    cfg = WeftConfig(
+        vocab_size=31,
+        hidden_size=16,
+        intermediate_size=32,
+        num_hidden_layers=2,
+        num_attention_heads=2,
+        num_state_heads=2,
+        state_rank=8,
+        window_size=4,
+    )
+    model = WeftModel(cfg).eval()
+
+    tokens = torch.tensor([[1, 2, 3]])
+    _, c = model(tokens, use_cache=True)
+    initial_len = c.get_seq_length()
+    initial_keys = c.layers[0].keys.clone()
+
+    _, next_c = model(torch.tensor([[4]]), past_key_values=c, use_cache=False)
+    assert next_c is None
+    assert c.get_seq_length() == initial_len
+    assert torch.equal(c.layers[0].keys, initial_keys)

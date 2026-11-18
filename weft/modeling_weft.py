@@ -4,17 +4,18 @@ Compatible with Hugging Face transformers.PreTrainedModel
 """
 
 import math
-from typing import Optional, Tuple, Union, Any
+from typing import Optional, Tuple, Union, Any, List
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from transformers.modeling_utils import PreTrainedModel
-from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
+from transformers.modeling_outputs import CausalLMOutputWithPast
 from transformers.generation.utils import GenerationMixin
 from transformers.cache_utils import Cache, DynamicCache
 
 from .configuration_weft import WeftConfig
+from .cache import WeftCache
 
 
 class WeftRMSNorm(nn.Module):
@@ -26,9 +27,12 @@ class WeftRMSNorm(nn.Module):
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
         input_dtype = hidden_states.dtype
         hidden_states = hidden_states.to(torch.float32)
-        variance = hidden_states.pow(2).mean(-1, keepdim=True)
-        hidden_states = hidden_states * torch.rsqrt(variance + self.eps)
-        return self.weight * hidden_states.to(input_dtype)
+        # Scaled RMSNorm formulation to protect against overflow on extreme finite magnitude inputs
+        scale = hidden_states.abs().amax(dim=-1, keepdim=True).clamp_min(1.0)
+        scaled_x = hidden_states / scale
+        variance = scaled_x.pow(2).mean(-1, keepdim=True)
+        normed = scaled_x * torch.rsqrt(variance + (self.eps / (scale * scale)))
+        return (self.weight * normed).to(input_dtype)
 
 
 class WeftMLP(nn.Module):
@@ -42,10 +46,62 @@ class WeftMLP(nn.Module):
         return self.down_proj(F.silu(self.gate_proj(x)) * self.up_proj(x))
 
 
+def _build_sliding_window_mask(
+    q_len: int,
+    k_len: int,
+    past_len: int,
+    window_size: int,
+    attention_mask: Optional[torch.Tensor] = None,
+    device: torch.device = torch.device("cpu"),
+    dtype: torch.dtype = torch.float32,
+) -> torch.Tensor:
+    """
+    Constructs a causal sliding-window attention mask of shape (b, 1, q_len, k_len).
+    """
+    k_start = past_len + q_len - k_len
+    k_pos = torch.arange(k_start, past_len + q_len, device=device).unsqueeze(0)  # (1, k_len)
+    q_pos = torch.arange(past_len, past_len + q_len, device=device).unsqueeze(1)  # (q_len, 1)
+
+    causal = k_pos <= q_pos
+    window = (q_pos - k_pos) < window_size
+    valid = causal & window  # (q_len, k_len)
+
+    if attention_mask is not None:
+        if attention_mask.dim() == 2:
+            if attention_mask.shape[-1] >= past_len + q_len:
+                k_mask = attention_mask[:, k_start : past_len + q_len]
+            else:
+                k_mask = attention_mask[..., -k_len:]
+            k_valid = (k_mask > 0).unsqueeze(1)  # (b, 1, k_len)
+            valid = valid.unsqueeze(0) & k_valid  # (b, q_len, k_len)
+            mask = torch.where(
+                valid,
+                torch.tensor(0.0, dtype=dtype, device=device),
+                torch.tensor(float("-inf"), dtype=dtype, device=device),
+            ).unsqueeze(1)  # (b, 1, q_len, k_len)
+            return mask
+        elif attention_mask.dim() == 4:
+            mask = torch.where(
+                valid,
+                torch.tensor(0.0, dtype=dtype, device=device),
+                torch.tensor(float("-inf"), dtype=dtype, device=device),
+            ).unsqueeze(0).unsqueeze(0)
+            return mask + attention_mask
+        else:
+            raise ValueError(f"Unsupported attention_mask dimension: {attention_mask.dim()}")
+
+    mask = torch.where(
+        valid,
+        torch.tensor(0.0, dtype=dtype, device=device),
+        torch.tensor(float("-inf"), dtype=dtype, device=device),
+    )
+    return mask.unsqueeze(0).unsqueeze(0)  # (1, 1, q_len, k_len)
+
+
 class WeftAttention(nn.Module):
     """
     WEFT Hybrid Layer:
-      - Local Path: Sliding window multi-head causal attention
+      - Local Path: Sliding window multi-head causal attention with bounded local cache
       - Global Path: Multi-head exponentially decayed low-rank recurrent state
     """
     def __init__(self, config: WeftConfig, layer_idx: int):
@@ -56,17 +112,16 @@ class WeftAttention(nn.Module):
         self.num_heads = config.num_attention_heads
         self.head_dim = self.hidden_size // self.num_heads
         self.window_size = config.window_size
+        self.max_cached = max(1, self.window_size - 1)
 
         self.num_state_heads = config.num_state_heads
         self.state_rank = config.state_rank
         self.state_dim = self.hidden_size // self.num_state_heads
 
-        # Local projections
         self.q_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
         self.k_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
         self.v_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
 
-        # Global low-rank projections
         self.proj_k = nn.Linear(self.hidden_size, self.num_state_heads * self.state_rank, bias=False)
         self.proj_v = nn.Linear(self.hidden_size, self.num_state_heads * self.state_rank, bias=False)
 
@@ -77,8 +132,9 @@ class WeftAttention(nn.Module):
     def forward(
         self,
         hidden_states: torch.Tensor,
-        past_state: Optional[Union[Tuple, Any]] = None,
+        past_state: Optional[Union[Tuple, Cache]] = None,
         use_cache: bool = False,
+        attention_mask: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> Tuple[torch.Tensor, Optional[Any]]:
         b, s, d = hidden_states.shape
@@ -88,65 +144,74 @@ class WeftAttention(nn.Module):
         past_kv = None
         is_hf_cache = isinstance(past_state, Cache)
 
+        if is_hf_cache:
+            if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
+                layer = past_state.layers[self.layer_idx]
+                if hasattr(layer, "weft_recurrent_state"):
+                    recurrent_state = layer.weft_recurrent_state
+                past_len = layer.get_seq_length()
+            else:
+                past_len = past_state.get_seq_length(self.layer_idx) if hasattr(past_state, "get_seq_length") else 0
+        elif isinstance(past_state, tuple):
+            if len(past_state) == 2:
+                recurrent_state, past_kv = past_state
+                if past_kv is not None and isinstance(past_kv, tuple) and len(past_kv) == 3:
+                    past_k, past_v, past_len = past_kv
+                elif past_kv is not None and isinstance(past_kv, tuple) and len(past_kv) == 2:
+                    past_k, past_v = past_kv
+                    past_len = past_k.shape[-2]
+                else:
+                    past_len = 0
+            else:
+                raise ValueError(f"Expected past_state tuple of length 2 (recurrent_state, past_kv), got length {len(past_state)}")
+        else:
+            past_len = 0
+
         # 1. Local Causal Attention with sliding window KV cache
         q = self.q_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
         k = self.k_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
         v = self.v_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
 
-        if is_hf_cache:
-            k_full, v_full = past_state.update(k, v, self.layer_idx)
-            # Bound window to self.window_size
-            if k_full.shape[2] > self.window_size:
-                k_local = k_full[:, :, -self.window_size:, :]
-                v_local = v_full[:, :, -self.window_size:, :]
+        if is_hf_cache and use_cache:
+            k_local, v_local = past_state.update(k, v, self.layer_idx)
+        elif is_hf_cache and not use_cache:
+            # Read-only past usage without mutating caller cache
+            if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
+                layer = past_state.layers[self.layer_idx]
+                if layer.is_initialized and layer.keys.numel() > 0:
+                    k_local = torch.cat([layer.keys, k], dim=-2)
+                    v_local = torch.cat([layer.values, v], dim=-2)
+                else:
+                    k_local, v_local = k, v
             else:
-                k_local = k_full
-                v_local = v_full
-            # Now layer is guaranteed initialized
-            if hasattr(past_state.layers[self.layer_idx], "weft_recurrent_state"):
-                recurrent_state = past_state.layers[self.layer_idx].weft_recurrent_state
+                k_local, v_local = k, v
         elif past_kv is not None:
-            past_k, past_v = past_kv
-            k_full = torch.cat([past_k, k], dim=2)
-            v_full = torch.cat([past_v, v], dim=2)
-            if k_full.shape[2] > self.window_size:
-                k_local = k_full[:, :, -self.window_size:, :]
-                v_local = v_full[:, :, -self.window_size:, :]
-            else:
-                k_local = k_full
-                v_local = v_full
+            past_k, past_v = past_kv[:2]
+            k_local = torch.cat([past_k, k], dim=2)
+            v_local = torch.cat([past_v, v], dim=2)
         else:
-            k_full = k
-            v_full = v
             k_local = k
             v_local = v
 
-        new_kv = (k_full, v_full) if use_cache and not is_hf_cache else None
+        k_len = k_local.shape[-2]
 
-        if s == 1:
-            # Single-step token generation attending over local window
+        # Single causal sliding-window attention operator across all modes
+        if s == 1 and k_len <= self.window_size and attention_mask is None:
+            # Optimal decode fast-path: all k_len tokens precede or are current query token
             local_out = F.scaled_dot_product_attention(q, k_local, v_local, is_causal=False)
-            local_out = local_out.transpose(1, 2).contiguous().view(b, 1, d)
         else:
-            # Full sequence or chunk block-causal
-            pad_len = (self.window_size - (s % self.window_size)) % self.window_size
-            if pad_len > 0:
-                x_pad = F.pad(hidden_states, (0, 0, 0, pad_len))
-            else:
-                x_pad = hidden_states
-            tot_s = x_pad.shape[1]
-            n_win = tot_s // self.window_size
+            attn_mask = _build_sliding_window_mask(
+                q_len=s,
+                k_len=k_len,
+                past_len=past_len,
+                window_size=self.window_size,
+                attention_mask=attention_mask,
+                device=hidden_states.device,
+                dtype=q.dtype,
+            )
+            local_out = F.scaled_dot_product_attention(q, k_local, v_local, attn_mask=attn_mask)
 
-            q_b = self.q_proj(x_pad).view(b * n_win, self.window_size, self.num_heads, self.head_dim).transpose(1, 2)
-            k_b = self.k_proj(x_pad).view(b * n_win, self.window_size, self.num_heads, self.head_dim).transpose(1, 2)
-            v_b = self.v_proj(x_pad).view(b * n_win, self.window_size, self.num_heads, self.head_dim).transpose(1, 2)
-
-            local_out_b = F.scaled_dot_product_attention(q_b, k_b, v_b, is_causal=True)
-            local_out_b = local_out_b.transpose(1, 2).contiguous().view(b, tot_s, d)
-            if pad_len > 0:
-                local_out = local_out_b[:, :s, :]
-            else:
-                local_out = local_out_b
+        local_out = local_out.transpose(1, 2).contiguous().view(b, s, d)
 
         # 2. Multi-Head Gated Low-Rank Recurrence
         gamma = torch.sigmoid(self.decay_logits)
@@ -154,27 +219,56 @@ class WeftAttention(nn.Module):
         v_p = self.proj_v(hidden_states).view(b, s, self.num_state_heads, self.state_rank)
         x_heads = hidden_states.view(b, s, self.num_state_heads, self.state_dim)
 
+        if attention_mask is not None and attention_mask.dim() == 2:
+            if attention_mask.shape[-1] >= past_len + s:
+                cur_mask = attention_mask[:, past_len : past_len + s]
+            else:
+                cur_mask = attention_mask[..., -s:]
+            mask_weight = (cur_mask > 0).view(b, s, 1, 1).to(hidden_states.dtype)
+        else:
+            mask_weight = None
+
         if s == 1 and recurrent_state is not None:
             kp_1 = k_p[:, 0, :, :].unsqueeze(-1)
             xh_1 = x_heads[:, 0, :, :].unsqueeze(-2)
-            update = kp_1 * xh_1
-            new_state = gamma.view(1, self.num_state_heads, self.state_rank, 1) * recurrent_state + update
+            step_update = kp_1 * xh_1
+            gamma_4d = gamma.view(1, self.num_state_heads, self.state_rank, 1)
+
+            if mask_weight is not None:
+                m_1 = mask_weight[:, 0, :, :]
+                new_state = torch.where(m_1 > 0, gamma_4d * recurrent_state + step_update, recurrent_state)
+            else:
+                new_state = gamma_4d * recurrent_state + step_update
+
             vp_1 = v_p[:, 0, :, :].unsqueeze(-2)
             out_head = torch.matmul(vp_1, new_state).squeeze(-2)
+            if mask_weight is not None:
+                out_head = out_head * mask_weight[:, 0, :, :].squeeze(-1)
             global_out = out_head.view(b, 1, d) / (self.state_rank ** 0.5)
 
-            if is_hf_cache:
-                past_state.layers[self.layer_idx].weft_recurrent_state = new_state
+            if is_hf_cache and use_cache:
+                if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
+                    past_state.layers[self.layer_idx].weft_recurrent_state = new_state
                 next_past = past_state
             else:
-                next_past = (new_state, new_kv) if use_cache else None
+                k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
+                v_stored = v_local[:, :, -self.max_cached:, :] if v_local.shape[-2] > self.max_cached else v_local
+                next_kv = (k_stored, v_stored, past_len + 1) if use_cache else None
+                next_past = (new_state, next_kv) if use_cache else None
 
             output = self.out_proj(local_out + global_out)
             return output, next_past
 
         # Sequence training / prefilling
-        # Accelerate with fused Triton kernel when on CUDA and rank is power-of-2
-        use_triton = hidden_states.is_cuda and (self.state_rank in (8, 16, 32, 64)) and recurrent_state is None
+        # Dispatch to Triton forward kernel ONLY when gradients are not required
+        # (Preserves autograd differentiation through PyTorch recurrence during training)
+        use_triton = (
+            hidden_states.is_cuda
+            and (self.state_rank in (8, 16, 32, 64))
+            and recurrent_state is None
+            and mask_weight is None
+            and not torch.is_grad_enabled()
+        )
         if use_triton:
             try:
                 from .kernels.fused_chunk_scan import fused_chunk_recurrent_forward_triton
@@ -187,31 +281,50 @@ class WeftAttention(nn.Module):
                 use_triton = False
 
         if not use_triton:
-            states = []
             if recurrent_state is not None:
                 state = recurrent_state
             else:
-                state = torch.zeros(b, self.num_state_heads, self.state_rank, self.state_dim, device=hidden_states.device, dtype=hidden_states.dtype)
+                state = torch.zeros(
+                    b, self.num_state_heads, self.state_rank, self.state_dim,
+                    device=hidden_states.device, dtype=hidden_states.dtype
+                )
 
             gamma_t = gamma.view(1, self.num_state_heads, self.state_rank, 1)
+            global_out_steps = []
+
+            # Step-by-step recurrence with bounded intermediate memory (no full trajectory list retention)
             for t in range(s):
                 kp_t = k_p[:, t, :, :].unsqueeze(-1)
                 xh_t = x_heads[:, t, :, :].unsqueeze(-2)
                 step_update = kp_t * xh_t
-                state = gamma_t * state + step_update
-                states.append(state)
 
-            all_states = torch.stack(states, dim=1)
-            vp_expanded = v_p.unsqueeze(-2)
-            readout = torch.matmul(vp_expanded, all_states).squeeze(-2)
+                if mask_weight is not None:
+                    m_t = mask_weight[:, t, :, :]
+                    state = torch.where(m_t > 0, gamma_t * state + step_update, state)
+                else:
+                    state = gamma_t * state + step_update
+
+                vp_t = v_p[:, t, :, :].unsqueeze(-2)
+                out_head_t = torch.matmul(vp_t, state).squeeze(-2)
+                if mask_weight is not None:
+                    out_head_t = out_head_t * mask_weight[:, t, :, :].squeeze(-1)
+                global_out_steps.append(out_head_t)
+
+            readout = torch.stack(global_out_steps, dim=1)
             global_out = readout.view(b, s, d) / (self.state_rank ** 0.5)
-            last_state = states[-1]
+            last_state = state
 
-        if is_hf_cache:
-            past_state.layers[self.layer_idx].weft_recurrent_state = last_state
+        if is_hf_cache and use_cache:
+            if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
+                past_state.layers[self.layer_idx].weft_recurrent_state = last_state
             next_past = past_state
+        elif use_cache:
+            k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
+            v_stored = v_local[:, :, -self.max_cached:, :] if v_local.shape[-2] > self.max_cached else v_local
+            next_kv = (k_stored, v_stored, past_len + s)
+            next_past = (last_state, next_kv)
         else:
-            next_past = (last_state, new_kv) if use_cache else None
+            next_past = None
 
         output = self.out_proj(local_out + global_out)
         return output, next_past
@@ -230,11 +343,18 @@ class WeftDecoderLayer(nn.Module):
         hidden_states: torch.Tensor,
         past_state: Optional[Union[Tuple, Any]] = None,
         use_cache: bool = False,
+        attention_mask: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> Tuple[torch.Tensor, Optional[Any]]:
         residual = hidden_states
         hidden_states = self.input_layernorm(hidden_states)
-        hidden_states, next_state = self.self_attn(hidden_states, past_state=past_state, use_cache=use_cache, **kwargs)
+        hidden_states, next_state = self.self_attn(
+            hidden_states,
+            past_state=past_state,
+            use_cache=use_cache,
+            attention_mask=attention_mask,
+            **kwargs,
+        )
         hidden_states = residual + hidden_states
 
         residual = hidden_states
@@ -266,6 +386,7 @@ class WeftModel(WeftPreTrainedModel):
         super().__init__(config)
         self.padding_idx = config.pad_token_id
         self.vocab_size = config.vocab_size
+        self.gradient_checkpointing = False
 
         self.embed_tokens = nn.Embedding(config.vocab_size, config.hidden_size, self.padding_idx)
         self.layers = nn.ModuleList([WeftDecoderLayer(config, idx) for idx in range(config.num_hidden_layers)])
@@ -278,6 +399,7 @@ class WeftModel(WeftPreTrainedModel):
         input_ids: torch.LongTensor = None,
         past_key_values: Optional[Union[Cache, Tuple]] = None,
         use_cache: Optional[bool] = None,
+        attention_mask: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> Tuple[torch.Tensor, Optional[Any]]:
         use_cache = use_cache if use_cache is not None else self.config.use_cache
@@ -285,18 +407,52 @@ class WeftModel(WeftPreTrainedModel):
 
         is_hf_cache = isinstance(past_key_values, Cache)
         if use_cache and past_key_values is None:
-            past_key_values = DynamicCache()
+            past_key_values = WeftCache(window_size=self.config.window_size)
             is_hf_cache = True
 
         if is_hf_cache:
             for i, layer in enumerate(self.layers):
-                hidden_states, _ = layer(hidden_states, past_state=past_key_values, use_cache=True, **kwargs)
-            next_cache = past_key_values
+                if self.gradient_checkpointing and self.training:
+                    def create_custom_forward(module):
+                        def custom_forward(*inputs):
+                            return module(*inputs, use_cache=False, attention_mask=attention_mask)
+                        return custom_forward
+                    hidden_states, _ = torch.utils.checkpoint.checkpoint(
+                        create_custom_forward(layer),
+                        hidden_states,
+                        use_reentrant=False,
+                    )
+                else:
+                    hidden_states, _ = layer(
+                        hidden_states,
+                        past_state=past_key_values,
+                        use_cache=use_cache,
+                        attention_mask=attention_mask,
+                        **kwargs,
+                    )
+            next_cache = past_key_values if use_cache else None
         else:
             next_states = () if use_cache else None
             for i, layer in enumerate(self.layers):
                 layer_state = past_key_values[i] if past_key_values is not None else None
-                hidden_states, next_state = layer(hidden_states, past_state=layer_state, use_cache=use_cache, **kwargs)
+                if self.gradient_checkpointing and self.training:
+                    def create_custom_forward(module):
+                        def custom_forward(*inputs):
+                            return module(*inputs, use_cache=False, attention_mask=attention_mask)
+                        return custom_forward
+                    hidden_states, next_state = torch.utils.checkpoint.checkpoint(
+                        create_custom_forward(layer),
+                        hidden_states,
+                        use_reentrant=False,
+                    )
+                else:
+                    hidden_states, next_state = layer(
+                        hidden_states,
+                        past_state=layer_state,
+                        use_cache=use_cache,
+                        attention_mask=attention_mask,
+                        **kwargs,
+                    )
                 if use_cache:
                     next_states = next_states + (next_state,)
             next_cache = next_states
@@ -319,6 +475,7 @@ class WeftForCausalLM(WeftPreTrainedModel, GenerationMixin):
         self,
         input_ids: torch.LongTensor,
         past_key_values: Optional[Any] = None,
+        attention_mask: Optional[torch.Tensor] = None,
         **kwargs,
     ):
         # If past_key_values has seen tokens, slice input_ids to only the last token
@@ -326,14 +483,18 @@ class WeftForCausalLM(WeftPreTrainedModel, GenerationMixin):
             if isinstance(past_key_values, Cache):
                 if past_key_values.get_seq_length() > 0:
                     input_ids = input_ids[:, -1:]
-            else:
+            elif isinstance(past_key_values, tuple) and len(past_key_values) > 0:
                 input_ids = input_ids[:, -1:]
 
-        return {
+        model_inputs = {
             "input_ids": input_ids,
             "past_key_values": past_key_values,
             "use_cache": kwargs.get("use_cache", True),
         }
+        if attention_mask is not None:
+            model_inputs["attention_mask"] = attention_mask
+
+        return model_inputs
 
     def forward(
         self,
@@ -341,18 +502,21 @@ class WeftForCausalLM(WeftPreTrainedModel, GenerationMixin):
         labels: Optional[torch.LongTensor] = None,
         past_key_values: Optional[Union[Cache, Tuple]] = None,
         use_cache: Optional[bool] = None,
+        attention_mask: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> CausalLMOutputWithPast:
         hidden_states, next_states = self.model(
             input_ids=input_ids,
             past_key_values=past_key_values,
             use_cache=use_cache,
+            attention_mask=attention_mask,
             **kwargs,
         )
 
         logits = self.lm_head(hidden_states)
         loss = None
         if labels is not None:
+            # Standard causal LM shift: predict token t+1 from hidden state at token t
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
             loss = F.cross_entropy(shift_logits.view(-1, self.config.vocab_size), shift_labels.view(-1))

@@ -22,7 +22,11 @@ import torch.nn.functional as F
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # Load and tokenize TinyShakespeare (character-level for fast, self-contained training)
-with open("/home/akarta/Projects/0.WiP/Weft/tinyshakespeare.txt", "r", encoding="utf-8") as f:
+import os
+data_path = os.path.join(os.path.dirname(__file__), "..", "data", "tinyshakespeare.txt")
+if not os.path.exists(data_path):
+    data_path = "data/tinyshakespeare.txt"
+with open(data_path, "r", encoding="utf-8") as f:
     text = f.read()
 
 chars = sorted(list(set(text)))

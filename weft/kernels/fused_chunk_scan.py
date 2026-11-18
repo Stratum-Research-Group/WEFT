@@ -1,10 +1,9 @@
 """
-Fused Triton Kernel for WEFT Gated Recurrent State Scan.
-Fuses the inner state accumulation:
+Triton Fused Recurrent Forward Kernel for WEFT Gated Low-Rank Recurrence.
+Computes token-wise multi-head recurrent update:
   S_t = gamma * S_{t-1} + k_t^T x_t
-  y_t = (v_t @ S_t) / sqrt(rank)
-directly into GPU SRAM per (Batch, Head, Dim_Chunk) block,
-eliminating intermediate high-bandwidth memory round-trips.
+  y_t = (v_t @ S_t) / sqrt(r)
+Fully in SRAM without materializing the O(S * R * D) state trajectory.
 """
 
 import math
@@ -20,7 +19,7 @@ def _fused_chunk_recurrent_fwd_kernel(
     VP_ptr,      # [B, S, H, R]
     GAMMA_ptr,   # [H, R]
     OUT_ptr,     # [B, S, H, D]
-    FINAL_S_ptr, # [B, H, R, D]
+    FINAL_S_ptr, # [B, H, R, D] (safe scratch buffer if STORE_FINAL is false)
     stride_xb, stride_xs, stride_xh, stride_xd,
     stride_kpb, stride_kps, stride_kph, stride_kpr,
     stride_vpb, stride_vps, stride_vph, stride_vpr,
@@ -29,6 +28,7 @@ def _fused_chunk_recurrent_fwd_kernel(
     stride_sb, stride_sh, stride_sr, stride_sd,
     B, S, H: tl.constexpr, D: tl.constexpr, R: tl.constexpr,
     BLOCK_D: tl.constexpr,
+    STORE_FINAL: tl.constexpr,
 ):
     """
     Grid: (B, H, cdiv(D, BLOCK_D))
@@ -44,17 +44,16 @@ def _fused_chunk_recurrent_fwd_kernel(
     mask_d = offs_d < D
     offs_r = tl.arange(0, R)
 
-    # Load gamma for this head: shape [R]
+    # 1. Load decay rates: gamma = sigmoid(decay_logits) -> shape [R]
     gamma_ptrs = GAMMA_ptr + pid_h * stride_gh + offs_r * stride_gr
-    # gamma = sigmoid(decay_logits)
     decay_logits = tl.load(gamma_ptrs)
-    gamma = 1.0 / (1.0 + tl.exp(-decay_logits))  # [R]
-    gamma_tile = gamma[:, None]  # [R, 1]
+    gamma = 1.0 / (1.0 + tl.exp(-decay_logits))
+    gamma_tile = gamma[:, None]  # [R, 1] for broadcasting against [R, BLOCK_D]
 
-    # Initialize state in registers: [R, BLOCK_D]
+    # 2. Initialize running recurrent state in SRAM
     state = tl.zeros((R, BLOCK_D), dtype=tl.float32)
 
-    # Pointers base for this (b, h)
+    # Base pointers for this batch & head
     b_h_x_base = X_ptr + pid_b * stride_xb + pid_h * stride_xh
     b_h_kp_base = KP_ptr + pid_b * stride_kpb + pid_h * stride_kph
     b_h_vp_base = VP_ptr + pid_b * stride_vpb + pid_h * stride_vph
@@ -62,21 +61,22 @@ def _fused_chunk_recurrent_fwd_kernel(
 
     inv_sqrt_r = 1.0 / tl.sqrt(tl.cast(R, tl.float32))
 
-    # Sequential loop over time S
+    # Sequential scan across time steps
     for t in range(S):
-        # 1. Load x_t: shape [BLOCK_D]
+        # 3. Load x_t [BLOCK_D] and kp_t [R]
         x_ptrs = b_h_x_base + t * stride_xs + offs_d * stride_xd
-        x_t = tl.load(x_ptrs, mask=mask_d, other=0.0)  # [BLOCK_D]
+        x_t = tl.load(x_ptrs, mask=mask_d, other=0.0)
 
-        # 2. Load kp_t: shape [R]
         kp_ptrs = b_h_kp_base + t * stride_kps + offs_r * stride_kpr
         kp_t = tl.load(kp_ptrs)  # [R]
 
-        # 3. Outer product update: S_t = gamma * S_{t-1} + kp_t^T x_t
-        update = kp_t[:, None] * x_t[None, :]  # [R, BLOCK_D]
+        # 4. Rank-1 outer product update: update = kp_t[:, None] * x_t[None, :] -> [R, BLOCK_D]
+        update = kp_t[:, None] * x_t[None, :]
+
+        # Gated state update in registers: S_t = gamma * S_{t-1} + update
         state = gamma_tile * state + update
 
-        # 4. Load vp_t: shape [R]
+        # Load vp_t: [R]
         vp_ptrs = b_h_vp_base + t * stride_vps + offs_r * stride_vpr
         vp_t = tl.load(vp_ptrs)  # [R]
 
@@ -88,10 +88,9 @@ def _fused_chunk_recurrent_fwd_kernel(
         out_ptrs = b_h_out_base + t * stride_os + offs_d * stride_od
         tl.store(out_ptrs, y_t, mask=mask_d)
 
-    # Store final state if pointer provided
-    if FINAL_S_ptr is not None:
+    # Store final state only when explicitly requested
+    if STORE_FINAL:
         s_base = FINAL_S_ptr + pid_b * stride_sb + pid_h * stride_sh
-        # Store 2D slice: shape [R, BLOCK_D]
         offs_r_2d = offs_r[:, None]
         offs_d_2d = offs_d[None, :]
         mask_2d = mask_d[None, :]
@@ -114,25 +113,31 @@ def fused_chunk_recurrent_forward_triton(
     assert r in (8, 16, 32, 64), f"State rank must be a power of 2, got {r}"
 
     out = torch.empty_like(x)
-    final_state = torch.empty((b, h, r, d), device=x.device, dtype=x.dtype) if return_final_state else None
+    if return_final_state:
+        final_state = torch.empty((b, h, r, d), device=x.device, dtype=x.dtype)
+        state_ptr = final_state
+        sb, sh, sr, sd = final_state.stride(0), final_state.stride(1), final_state.stride(2), final_state.stride(3)
+    else:
+        final_state = None
+        # Provide out as dummy pointer; STORE_FINAL=False prevents writing to it
+        state_ptr = out
+        sb, sh, sr, sd = 0, 0, 0, 0
 
     BLOCK_D = min(64, triton.next_power_of_2(d))
     grid = (b, h, triton.cdiv(d, BLOCK_D))
 
     _fused_chunk_recurrent_fwd_kernel[grid](
         x, k_p, v_p, decay_logits, out,
-        final_state if final_state is not None else x,  # dummy if None
+        state_ptr,
         x.stride(0), x.stride(1), x.stride(2), x.stride(3),
         k_p.stride(0), k_p.stride(1), k_p.stride(2), k_p.stride(3),
         v_p.stride(0), v_p.stride(1), v_p.stride(2), v_p.stride(3),
         decay_logits.stride(0), decay_logits.stride(1),
         out.stride(0), out.stride(1), out.stride(2), out.stride(3),
-        final_state.stride(0) if final_state is not None else 0,
-        final_state.stride(1) if final_state is not None else 0,
-        final_state.stride(2) if final_state is not None else 0,
-        final_state.stride(3) if final_state is not None else 0,
+        sb, sh, sr, sd,
         B=b, S=s, H=h, D=d, R=r,
         BLOCK_D=BLOCK_D,
+        STORE_FINAL=return_final_state,
     )
 
     return out, final_state

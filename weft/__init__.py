@@ -1,6 +1,5 @@
 """
-WEFT: Windowed Exponentially-decayed Factorized Tensor Attention Model Package.
-Compatible with Hugging Face transformers.
+WEFT: Windowed Exponentially-decayed Factorized Tensor Attention Model
 """
 
 from .configuration_weft import WeftConfig
@@ -13,8 +12,8 @@ from .modeling_weft import (
     WeftModel,
     WeftForCausalLM,
 )
-
-__version__ = "0.1.0"
+from .cache import WeftCache, WeftCacheLayer
+from .tokenizer import WeftCharTokenizer
 
 __all__ = [
     "WeftConfig",
@@ -25,4 +24,7 @@ __all__ = [
     "WeftPreTrainedModel",
     "WeftModel",
     "WeftForCausalLM",
+    "WeftCache",
+    "WeftCacheLayer",
+    "WeftCharTokenizer",
 ]

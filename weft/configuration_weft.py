@@ -22,8 +22,8 @@ class WeftConfig(PretrainedConfig):
         rms_norm_eps: float = 1e-6,
         initializer_range: float = 0.02,
         pad_token_id: int = None,
-        bos_token_id: int = 1,
-        eos_token_id: int = 2,
+        bos_token_id: int = None,
+        eos_token_id: int = None,
         tie_word_embeddings: bool = True,
         use_cache: bool = True,
         **kwargs,
@@ -35,6 +35,25 @@ class WeftConfig(PretrainedConfig):
             tie_word_embeddings=tie_word_embeddings,
             **kwargs,
         )
+
+        # Validation of structural dimensions
+        if hidden_size <= 0:
+            raise ValueError(f"hidden_size must be positive, got {hidden_size}")
+        if num_hidden_layers <= 0:
+            raise ValueError(f"num_hidden_layers must be positive, got {num_hidden_layers}")
+        if num_attention_heads <= 0 or hidden_size % num_attention_heads != 0:
+            raise ValueError(
+                f"hidden_size ({hidden_size}) must be divisible by num_attention_heads ({num_attention_heads})"
+            )
+        if num_state_heads <= 0 or hidden_size % num_state_heads != 0:
+            raise ValueError(
+                f"hidden_size ({hidden_size}) must be divisible by num_state_heads ({num_state_heads})"
+            )
+        if state_rank <= 0:
+            raise ValueError(f"state_rank must be positive, got {state_rank}")
+        if window_size <= 0:
+            raise ValueError(f"window_size must be positive, got {window_size}")
+
         self.use_cache = use_cache
         self.vocab_size = vocab_size
         self.hidden_size = hidden_size

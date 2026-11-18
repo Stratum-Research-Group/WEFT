@@ -6,11 +6,24 @@ against:
   Reference gradients computed by PyTorch chunk scan autograd.
 """
 
+import pytest
 import torch
-from weft.kernels.chunk_scan_pt import chunk_gated_recurrent_forward_pt
-from weft.kernels.fused_autograd import WeftRecurrentFunction
+
+try:
+    import triton
+    HAS_TRITON = True
+except ImportError:
+    HAS_TRITON = False
+
+if HAS_TRITON and torch.cuda.is_available():
+    from weft.kernels.chunk_scan_pt import chunk_gated_recurrent_forward_pt
+    from weft.kernels.fused_autograd import WeftRecurrentFunction
 
 
+@pytest.mark.skipif(
+    not (HAS_TRITON and torch.cuda.is_available()),
+    reason="Triton autograd verification requires CUDA and Triton installed",
+)
 def test_autograd():
     print("=================================================================")
     print("  WEFT TRITON BACKWARD AUTOGRAD VERIFICATION")

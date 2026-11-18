@@ -1,0 +1,194 @@
+WEFT: READ-ONLY REPOSITORY REVIEW AND PASTE-READY REMAINING WORK
+18 November 2026
+Repository: https://github.com/Stratum-Research-Group/WEFT
+Final reviewed commit: bcd8199f48d27cc15841cde4265937f9a4b7e995
+Initial execution snapshot: fc5b08ccd98a640c6d657f5437caa7fa4d54550e
+
+VERDICT
+This is a real, runnable research prototype, not a production-ready language-model implementation. Its architecture is a Hugging Face causal LM with local softmax attention plus a learned exponentially decayed, low-rank recurrent path. Small CPU forward, backward, serialization, greedy-generation and quantization checks work. However, cache semantics, local attention equivalence, masks, GPU-training wiring, and several benchmark claims need work before the production gate table can be trusted.
+
+This is WEFT only. It is not a TensorSAT review, an emulator-spec review, or a verification of the separately delivered singlet experiment. The current source contains no singlet-invariant determinant feature map; its projections implement ordinary learned low-rank recurrence. That is a description of this code, not a demand to replace its architecture.
+
+EVIDENCE LABELS
+REPRODUCED: independently exercised on CPU at the pinned commit.
+STATIC: concrete source-level defect or risk; not executed on CUDA here.
+EVIDENCE GAP: the checked-in artifact does not establish the advertised result.
+VALIDATION GATE: additional validation needed, not a claimed reproduced failure.
+Items are ordered roughly by dependency and impact. They are not equally severe, and their count is not a count of independently observed production incidents.
+
+SAFE REVIEW CONDITIONS / DO NOT TOUCH
+- No source changes, fixes, pushes, training runs, large-sequence allocations, GPU runs, distributed jobs, or paid compute were performed.
+- Preserve the intended dual-path architecture while fixing its contract. Do not silently substitute a different attention operator to make tests pass.
+- Preserve the existing passing CPU behavior, checkpoint loadability, unnormalized integer swap identity, and measured quantization result.
+- Do not delete hard cases, weaken tolerances, catch failures as success, or label skipped tests passed.
+- Do not re-use speed or quality numbers across different prototype classes without an explicit operator/equivalence map.
+- Do not turn algebra checks into a claim of Lean verification of this neural model.
+- Request explicit owner approval before long runs or new compute spending. A checked-in gate table is not that approval.
+
+ACTUALLY RUN
+Environment: Python 3.10, torch 2.14.1+cpu, transformers 5.20.2, pytest 9.2.0, numpy 2.2.6, safetensors 0.8.0. Fresh isolated environment, one CPU thread for model checks. No CUDA device or Triton installed. The checkpoint records transformers 5.23.0, so the test environment is explicitly different from the author's environment.
+
+1) PYTHONPATH=. python -m pytest tests/test_weft_hf.py tests/verify_identity.py -q
+   Result: 5 passed, 1 warning. Four HF tests plus the 16-assignment integer identity test. The identity test returns an int, producing PytestReturnNotNoneWarning. Its matrix helper is not separately collected by this invocation.
+2) Python compileall over weft, benchmarks, examples and tests: passed.
+3) Independent tiny-model checks reproduced items 1-6 and the numerical/benchmark cases below. CPU backward produced finite nonzero gradients for proj_k, proj_v and decay_logits in both layers. Greedy and two-beam generate calls returned outputs, but beam-cache state reordering is semantically wrong as documented below.
+4) Bundled checkpoint loads. Running examples/quantize_weft.py on CPU reproduced FP32 16.20 MB, quantized 4.13 MB, ratio 3.93x, max logit deviation 0.1122 and cosine similarity 0.999955 on its one prompt. This is a genuine positive result, not a quality or speed certification.
+5) pip install --no-deps . fails: no setup.py or pyproject.toml. Running python tests/test_weft_hf.py from the clean checkout without PYTHONPATH fails to import weft. No source installation was performed.
+6) Full pytest collection with PYTHONPATH=. stops on the unconditional Triton import in tests/test_fused_bwd.py in this CPU-only environment. It reports four collected HF tests before the error; verify_identity.py is not a default test_*.py filename. FSDP is a main script, not a collected pytest test. Do not report a full green repository suite.
+
+NUMBERED WORK FOR THE CODING AGENT
+
+1. Make full-sequence, prefill, token decode and cached multi-token append implement ONE local-attention operator.
+   REPRODUCED. weft/modeling_weft.py:96-149, 157-173.
+   For s>1 the local path uses disjoint causal blocks and recomputes q/k/v only from the new hidden_states. For s=1 it attends the most recent W cached tokens. After a block boundary these are different operators. A multi-token cached append ignores its cached local history altogether.
+   Reproduction: manual_seed(17); vocab=31, hidden=16, intermediate=32, layers=2, attention_heads=2, state_heads=2, rank=8, window=4, eval mode. Token IDs [1,3,5,7,9,11,13,15,17]. Compare use_cache=False full logits against concatenated one-token cached logits. First four positions differ by <=2.99e-8; later positions differ by up to 0.0780830. A prefill of three then append of three differs by 0.0470010 from full logits at those positions.
+   Choose and document sliding-window or block-local semantics, then make all execution modes match. If a mode is unsupported, reject it explicitly until implemented. Test lengths W-1, W, W+1, 2W+1, non-aligned chunks, arbitrary partitions and final logits, not only recurrent states within the first window.
+
+2. Actually bound the stored local KV cache, not only the tensors used for attention.
+   REPRODUCED. weft/modeling_weft.py:96-104, 124, 287-294; README.md:58-62, 134-142, 259.
+   DynamicCache.update stores the entire history. Slicing k_local/v_local does not crop DynamicCache. With W=4, nine token steps leave keys of shape (1,2,9,8), and get_seq_length() returns 9. Persistent local KV storage and append copying therefore grow with sequence length. The tuple new_kv also uses k_full/v_full, not a bounded buffer.
+   Implement a cache that preserves both a bounded physical window and the logical token position. Verify actual cache tensor sizes and memory over many tiny steps. Do not invalidate position bookkeeping merely by cropping get_seq_length(). Recurrent-state size alone does not prove total O(1) decode storage.
+
+3. Handle padding and attention masks in BOTH paths and preserve them through generation.
+   REPRODUCED. weft/modeling_weft.py:77-83, 126-149, 151-207, 276-305, 318-336.
+   attention_mask enters unused kwargs. prepare_inputs_for_generation drops it. Padded tokens can participate in softmax and write/decay global state. In the tiny model above, changing only positions masked by [0,0,1,1] changes the last unmasked logits by 0.0597072.
+   Define how masked positions affect the recurrent clock and writes. Add left/right padded batch-versus-unpadded tests, mixed lengths, cached generation and masked-value perturbations. Reject unsupported general masks rather than silently ignoring them. A pad embedding of zero alone does not fix softmax denominators or decay semantics.
+
+4. Make recurrent state a first-class cache component with reorder, crop, repeat and serialization semantics.
+   REPRODUCED for reorder; remaining lifecycle operations are VALIDATION GATES.
+   weft/modeling_weft.py:105-107, 166-167, 210-212; tests/test_weft_hf.py:67-119.
+   State is attached as a custom attribute to a standard DynamicCache layer. On a batch of two distinct prefixes, cache.reorder_cache([1,0]) correctly swaps keys but leaves weft_recurrent_state unchanged. Beam search can therefore combine one beam's KV with another beam's recurrent history even though generate returns without an exception.
+   Add an appropriate custom cache integration and compare reorder results with independently recomputed prefixes. Test beam expansion, repeat/select, cache cloning, crop/rollback and any supported cache export. Refuse cache operations whose recurrent state cannot be reconstructed safely.
+
+5. Honor or explicitly remove tuple-cache support.
+   REPRODUCED. weft/modeling_weft.py:80, 86-89, 108-124, 170, 214; 279, 296-301.
+   recurrent_state and past_kv are initialized to None and never unpacked from a tuple. A tuple is returned by direct attention use_cache=True, then ignored when passed back. A direct-attention continuation is bit-identical to processing that token with no past at all.
+   Implement tuple parsing with shape/device checks, or reject tuples and narrow type hints/API documentation. Add a roundtrip continuation test instead of accepting silent history loss.
+
+6. Respect use_cache=False when a Cache object is supplied.
+   REPRODUCED. weft/modeling_weft.py:283-294.
+   The is_hf_cache branch calls every layer with use_cache=True regardless of the explicit flag. A cache of length two becomes length three when the caller supplies it with use_cache=False, and the same mutated cache is returned.
+   Define read-only past usage versus cache updates, honor the public contract, and test that disabling writes does not mutate caller state. Do not conceal this behavior in kwargs.
+
+7. Repair production CUDA training dispatch before calling the model GPU-trainable.
+   STATIC, CUDA UNRUN. weft/modeling_weft.py:175-187; weft/kernels/fused_chunk_scan.py:108-138.
+   For supported ranks and no recurrent past, CUDA dispatch calls a raw Triton forward wrapper that allocates empty_like outputs and fills them through a kernel launch. It is not the WeftRecurrentFunction custom autograd wrapper. Dispatch does not check training or grad-enabled state. Successful execution can silently sever the global-path gradients, including proj_k/proj_v/decay parameters. CPU fallback gradients passing does not validate this path.
+   Route grad-enabled execution through a complete differentiable implementation or intentionally force a differentiable fallback until it is ready. Assert finite, nonzero and reference-matching gradients for every global-path parameter in an actual CUDA model training step. Log kernel selection and do not hide unexpected failures behind except Exception.
+
+8. Complete the custom backward, including readout, decay and final-state derivatives.
+   STATIC, CUDA UNRUN. weft/kernels/fused_autograd.py:82-164, 203-234; tests/test_fused_bwd.py:20-48.
+   The reverse kernel writes dx and dkp only. dv_p is allocated as zero but never computed; backward returns None for both v_p and decay_logits. dfinal_state is ignored. The existing test requires gradients only for x and kp, uses out.sum(), and thus cannot catch these omissions. Its 1e-3 test is numerical tolerance, not bit accuracy.
+   Derive and implement every advertised derivative. Include random upstream output gradients, final-state-only losses, joint losses, multiple D tiles, non-contiguous inputs and FP32/FP16/BF16 tolerances. Compare against a separately coded scalar recurrence or FP64 autograd reference and run gradcheck where applicable. Do not solve item 7 by wiring in this incomplete backward unchanged.
+
+9. Fix the no-final-state forward API before exposing it as safe.
+   STATIC, CUDA UNRUN. weft/kernels/fused_chunk_scan.py:87-94, 117-134.
+   With return_final_state=False the host passes x as a dummy FINAL_S pointer and all state strides as zero. The kernel checks whether that pointer is None, but it is not None, so the final-state stores target the input pointer. Multiple state lanes can overwrite the same input location. This is an input-corruption/race risk, not a measured CUDA failure in this review.
+   Use a compile-time write-final-state flag or a safe real destination. Add a CUDA test that requests False, verifies no returned state and bitwise input immutability, including multiple D blocks and heads. Validate kernel shape/device/dtype constraints too.
+
+10. Stop materializing the whole recurrent-state trajectory in the production fallback when claiming bounded workspace.
+    STATIC allocation analysis. weft/modeling_weft.py:189-208; contrast weft/kernels/chunk_scan_pt.py:31-66.
+    The fallback retains a list of S_t states and stacks it as (B,S,H_state,R,D_state). One FP32 stack at B=1, S=32768, hidden=768, rank=16 is 1.5 GiB, before the retained state list, projections, outputs or autograd graph. This is a calculated tensor-size lower bound, not a measured peak. CPU and unsupported-rank paths can hit it; broad CUDA fallback can select it silently.
+    For inference, consume each state into output without retaining the full trajectory. For training, use a documented checkpoint/chunk/recompute policy. Measure forward and backward memory separately. A function named chunk scan is not enough unless chunking actually bounds live state intermediates.
+
+11. Fix the training demo's double target shift and checkpoint provenance.
+    REPRODUCED objective mismatch. examples/train_weft_demo.py:70-75, 81-84, 95-100; weft/modeling_weft.py:355-358.
+    get_batch already returns next-character-shifted labels, but WeftForCausalLM shifts labels again. A source [1,2,3,4] with labels [2,3,4,5] trains the first three logits against [3,4,5], not [2,3,4]. Validation repeats the same wrong objective. The older benchmark LanguageModel uses unshifted cross entropy with its pre-shifted labels and must not be changed blindly.
+    Pass labels matching the HF model's shift convention and add a deterministic loss test against hand-selected logits. The shipped checkpoint's exact training provenance is not established by its presence; mark it as affected/unverified and retrain or recover the actual training command/log before claiming next-token quality. Do not claim that this CPU review proved how the checkpoint was trained.
+
+12. Freeze and ship the character tokenizer and correct special-token semantics.
+    STATIC mapping mismatch, mapping independently calculated. examples/train_weft_demo.py:33-41, 47-58, 106-134; weft/configuration_weft.py:24-26; weft_shakespeare_ckpt/config.json and generation_config.json.
+    The vocabulary is sorted characters but no tokenizer artifact accompanies the checkpoint. In the included corpus token 1 is a space and token 2 is '!'. Default bos_token_id=1/eos_token_id=2 therefore treat ordinary characters as sequence markers. Default generation can terminate on punctuation.
+    Save the mapping with the checkpoint. Either reserve actual special tokens with an explicit compatibility/migration plan, or disable inappropriate BOS/EOS defaults for this character model. Test checkpoint-only encode/generate/decode from outside the checkout. Do not change an existing checkpoint's ID mapping in place.
+
+13. Fix or retire the numerically unstable parallel-scan prototype.
+    REPRODUCED. benchmarks/fast_parallel_scan.py:28-40, 56-77.
+    Exponentiating inverse decay across the entire sequence overflows, then combines infinities with tiny/zero scale_out. Tiny all-ones tests with B=H=R=D=1 and gamma=0.9 yield nonfinite output at S=256 in FP16 and S=2048 in FP32; the true recurrence remains near 10. Reshaping all chunks together also still materializes O(S*R*D) state tensors.
+    Use a stable chunk carry or associative formulation and compare every output and state against the scalar recurrence across decay extremes. If retained only as a failed historical experiment, label it accordingly and exclude it from speed/production claims.
+
+14. Do not benchmark the chunk prototype as if it were the exact token recurrence.
+    REPRODUCED. benchmarks/fused_chunk_gated.py:53-90.
+    Its global readout queries only the previous chunk state. It omits the current chunk's causal global contributions and uses gamma^i for the historical readout, where the update-then-read token recurrence needs gamma^(i+1). This is a different operator even before numerical tolerances.
+    Tiny isolation: D=2, heads=1, rank=1, C=2, all-ones input length four; zero all parameters, then set proj_v weights to one and output projection to identity. gamma=0.5 and k_p=1. The global first-coordinate outputs are [0,0,3,1.5]; the production token-recurrence reference is [2,3,3.5,3.75]. Local output is zero in this test.
+    Either implement the missing exact terms and test partition invariance, or explicitly name this a different delayed/chunk-level architecture and evaluate its quality separately. Do not transfer phase-4 quality claims to it.
+
+15. Repair the recall scorer and build a nontrivial retrieval task.
+    REPRODUCED scorer bug plus EVIDENCE GAPS.
+    benchmarks/benchmark_associative_recall.py:96-120, 123-149, 170-188; docs/ASSOCIATIVE_RECALL_RESULTS.md:12-17, 23-43.
+    The evaluator runs floor(200/16)=12 batches, scoring 192 examples but divides by 200. A perfect oracle returns 96.0%, so the checked-in evaluator cannot produce the documented 100% result. Its configurations also differ from the report: code randomizes keys/values, uses window256/rank32 and lengths512..4096; report describes fixed key5/value25, window32/rank16 and lengths256..16384. Code values are 51..99, unlike the report's value25.
+    Count the actual examples or handle the remainder. Publish exact run scripts and seeds. A constant target can be solved by a constant predictor; even the randomized current task contains only one value token and no competing key/value pairs, so it does not establish associative binding. Add constant/label-prior and bag-of-values controls, multiple associations, swapped bindings with the same multiset, held-out pairs, varied distances and real production WEFT evaluation. Report exact-match with confidence intervals and dataset IDs.
+
+16. Relabel the billion-token result as an extrapolation unless an actual sustained run is supplied.
+    EVIDENCE GAP visible directly in implementation.
+    benchmarks/benchmark_billion_tokens.py:98-119, 127-163; README.md:201-204; docs/BENCHMARK_1_BILLION_TOKENS.md:25-52; docs/FINAL_REPORT.md:15-19.
+    The script times twenty repetitions of one static 65,536-token input chunk (1,310,720 processed token positions), then calculates each target duration as N/tokens_per_sec. It does not execute one billion positions. It also benchmarks a different ungated, chunk-noncausal accumulator, not the current HF LM or its Triton recurrence.
+    Separate measured chunk microbenchmarks, extrapolated time, and actual sustained end-to-end runs. A real gate should include unique/deterministic stream generation, tail chunk, total processed count, finite outputs/state, numerical validation and memory/time series. Do not launch a billion-token run as part of this fix without approval. Keep author hardware numbers labeled author-reported, not independently reproduced here.
+
+17. Fix benchmark comparability, state memory accounting and raw evidence.
+    STATIC methodology issues / VALIDATION GATES.
+    benchmarks/benchmark_attention.py:87-137; benchmarks/ramp_up_benchmark.py:84-157; benchmarks/fused_chunk_gated.py:116-149; benchmarks/benchmark_triton_kernel.py:31-93; benchmarks/benchmark_streaming_generation.py:136-187; README.md:170-183; docs/FINAL_REPORT.md:25-35.
+    - Most benchmark classes are duplicates/prototypes rather than imports of WeftAttention/WeftForCausalLM. The Triton benchmark compares against the serial PyTorch recurrence, not SDPA, so it alone cannot substantiate the README's SDPA-versus-fused table.
+    - Forward-only calls must not be labeled training latency. Component latency is not full-model tokens/sec.
+    - Different operators are not exact replacements for softmax; report their quality-cost tradeoff and include matched recurrence baselines.
+    - Declare projection inclusion/exclusion. Several candidates include learned projections while the baseline starts from Q/K/V.
+    - Isolate runs or free all live tensors/models between sides. empty_cache does not free live allocations. Streaming comparison keeps both models and the standard KV cache resident when measuring WEFT; several other benchmarks retain Q/K/V/X from both sides in peak memory.
+    - Use warmups, synchronized/CUDA-event repeated timing, distributions, selected SDPA backend, hardware/software metadata, seed and exact commit. Some scripts time one cold invocation.
+    - Never turn all RuntimeError values into CUDA OOM. Never turn OOM/missing timings into infinite measured speedup; report N/A with the actual error.
+    - Distinguish a materialized N*N attention matrix from fused SDPA's working memory. The matrix-size calculation is not a lower bound on FlashAttention storage.
+    - Report total model, local KV, recurrent-state, scratch and output memory separately. In this implementation recurrent per-layer state has H_state*R*(hidden/H_state)=R*hidden elements, not a fixed 65 KB for every configuration.
+    Publish machine-readable raw logs and reproducible commands for each table row. Reconcile speed discontinuities and mixed prototype tables instead of choosing the most flattering row. None of the GPU timings were rerun here.
+
+18. Fix serving correctness and describe the runtime honestly.
+    REPRODUCED edge-case crash plus STATIC timing/feature gaps.
+    examples/serving_engine.py:22-58, 68-83; README.md:217-227.
+    max_new_tokens=0 and =1 both raise ZeroDivisionError because the latency list is empty; a token is generated even when zero is requested before that failure. For CUDA the wall-clock brackets lack explicit synchronization/events, so reported GPU latency is not a reliable completed-device measurement. Existing CPU timing is not affected by asynchronous CUDA semantics.
+    Handle 0/1 and invalid lengths, device consistency and EOS policy. Account for total prefill and decode work, batch throughput, and distributions. This is a fixed-batch loop, not continuous admission/retirement scheduling, nor a preallocated zero-allocation cache. Either implement those features and test them or remove those descriptions. Cache fixes above are prerequisites for constant-memory claims.
+
+19. Narrow the quantization claim to what is implemented and validated.
+    VERIFIED POSITIVE with EVIDENCE GAPS for broader claims.
+    examples/quantize_weft.py:15-45, 48-58, 72-98; README.md:241-249.
+    Weight storage compression and the one-prompt fidelity check reproduce exactly on CPU. The forward path dequantizes weights and executes floating-point F.linear; it does not quantize activations or run an INT8 GEMM. The module header's dynamic activation/weight wording is therefore inaccurate. It also does not benchmark latency despite that advertised scope.
+    Preserve the useful weight-only result. Name it weight-only INT8 storage with floating-point compute unless a real quantized backend is added. Test held-out loss, long/decode behavior, supported dtypes/devices, tied-weight accounting and any claimed save/reload path. Do not infer speedup from storage compression or one cosine score.
+
+20. Turn distributed/FSDP claims into an actual reproducible hardware gate.
+    STATIC, DISTRIBUTED UNRUN. tests/test_fsdp.py:22-36, 51-60, 88-101; README.md:231-237, 263.
+    Both ranks are explicitly assigned cuda:0. This does not validate separate-GPU/multi-node execution and can violate NCCL's exclusive device expectations. The script does not perform the state-dict extraction promised in its header. The CPU fallback cannot be assumed to work on all FSDP versions. Default pytest does not call main().
+    Use local-rank device mapping, cleanup in finally, deterministic data/seeds, finite/equal gradient checks, sharded save/reload and a documented launch command. Make a hardware-gated collected test or explicit separate validation command. Leave multi-GPU/multi-node status open until actual supported-device logs exist. Do not launch a distributed job in this review environment.
+
+21. Make installation, tests, dependency support and distribution reproducible.
+    REPRODUCED install/entrypoint failures; STATIC release omissions.
+    README.md:270-275, 323-355; repository root; tests/test_fused_bwd.py:9-11, 18; tests/test_fsdp.py:95-105.
+    There is no pyproject.toml/setup.py, lock/dependency manifest, CI workflow or tracked LICENSE file. The clone URL names a different repository. The quickstart serving import points to a module now inside examples. Direct advertised test execution fails to find weft in a clean environment unless the package is installed or PYTHONPATH is set. CPU collection imports Triton unconditionally; hardware tests need explicit skips. Broad dependency badges do not establish compatibility across the DynamicCache API versions used here.
+    Add build metadata and tested dependency ranges, optional GPU extras, clean-checkout CPU and hardware CI lanes, wheel/sdist smoke tests outside the checkout, proper script/module entrypoints, correct relative data paths, and the actual license/third-party corpus notices. Correct the supplied repo URL. Test commands literally as documented. Pin a supported HF version matrix rather than claiming all Transformers versions.
+
+22. Remove machine-local data and documentation paths.
+    REPRODUCIBLE STATIC portability failures.
+    benchmarks/benchmark_lm_training.py:24-26; benchmarks/benchmark_gated_attention.py:24-26; README.md:68, 86, 124, 148, 201-218, 257-264, 429-434; docs/*.md implementation links and inventories.
+    Both LM benchmark modules open an author's absolute home-directory data path at import time, despite data/tinyshakespeare.txt now being committed. Many evidence links are file:// URLs to files outside this repository, including unshipped production/kernel/FSDP reports.
+    Resolve data relative to the package/project or an explicit CLI option; avoid import-time data loading. Replace local links with tracked relative artifacts or accessible published sources. Ship the precise referenced logs/scripts, or label them unavailable. Do not treat unavailable local reports as validation.
+
+23. Correct the mathematical normalization and distinguish inspiration from proof of the model.
+    REPRODUCED algebra mismatch; EVIDENCE GAP for the advertised bridge.
+    README.md:66-86; tests/verify_identity.py:10-18, 33-38, 48-61; docs/FINAL_REPORT.md:15.
+    README defines a normalized singlet s=(|01>-|10>)/sqrt(2) but writes SWAP=I-|s><s|. With normalized s the correct expression is SWAP=I-2|s><s|. For input 01 and output10 the documented formula gives 1/2, whereas SWAP is 1. The integer test instead uses an unnormalized singlet and correctly verifies I-ss^T; that matrix has eigenvalue two, so calling it a normalized projector is inaccurate.
+    Fix the factor/normalization consistently and test both conventions and projector idempotence. The Boolean identity is not a proof of low-rank approximation quality, exact softmax equivalence, or this CUDA/HF implementation. No Lean proof artifact for WEFT is shipped. Describe the singlet link as inspiration unless an explicit derivation and code-level invariant are supplied. Keep the passing exact integer identity intact.
+    Also correct the neural operator description: the global path includes current/local tokens, not only off-diagonal old history, and proj_v readout is signed, unlike the positive key feature map. The code implements an additive learned hybrid, not an exact decomposition of arbitrary softmax attention.
+
+24. Add honest quality, numerical and API gates before restoring the production scorecard.
+    REPRODUCED API/numerical cases plus VALIDATION GATES.
+    weft/modeling_weft.py:20-31, 248-252; weft/configuration_weft.py:11-49; tests/test_weft_hf.py:67-119; README.md:123-142, 211-215, 253-264; docs/PHASE3_LANGUAGE_MODELING_RESULTS.md and docs/PHASE4_GATED_BREAKTHROUGH.md.
+    - supports_gradient_checkpointing=True is advertised, but gradient_checkpointing_enable() raises ValueError in the reviewed HF environment because the model has no checkpointing integration. Implement and test it, or stop advertising support.
+    - Validate positive sizes/ranks/windows and divisibility of hidden_size by both head counts; validate input/cache shapes and give explicit unsupported-input errors. max_position_embeddings is stored but not an implemented positional scheme or enforced context guarantee; document that distinction.
+    - RMSNorm correctly handles the tested FP16 constant300 input. It still maps finite FP32 constant1e20 to zero and FP64 constant1e40 to NaN because of squaring/forced float32 conversion. These are extreme-input robustness failures, not evidence of ordinary-language-model training collapse. Define supported dtypes/ranges and use a scaled formulation or explicit checks if such support is claimed.
+    - Add FP32/FP16/BF16/autocast finite-forward/backward and long-stream state checks with independent high-precision recurrence references, dtype transitions across prefill/decode, and decay values near zero/one. CUDA remains open here.
+    - Existing recurrence testing uses eight tokens with W=64 and compares recurrent states, not asserted logits across boundaries. It misses the reproduced deployment defects. Add the cases in items1-9 and mutation/serialization regressions.
+    - Evaluate the actual corrected HF production model, not only earlier single-head benchmark classes, on a fixed held-out corpus and controlled multi-seed baselines with matched token/compute budgets, model/state/parameter counts and confidence intervals. TinyShakespeare character perplexity is not general language-model parity. The FineWeb mention has no corresponding reproducible pipeline in this snapshot. Root-cause language about memory drowning requires controlled ablations; a single before/after comparison does not isolate the cause.
+    - Replace blanket PASSED entries with per-commit statuses: independently reproduced, author-reported, static-reviewed, skipped or failed. Do not restore production-ready, constant-total-memory, fully fused training, billion-token execution or general parity claims until their exact gates pass.
+
+COVERAGE MAP
+Read all substantive Python modules: configuration, exports, model/norm/MLP/attention/cache/HF generation/loss; all three kernel modules; all ten benchmark modules; all four test files; all three examples. Reviewed README, all seven current docs (plus the subsequently removed exploration document), checkpoint metadata, root tracking/installability and bundled data/token mapping. Loaded the safetensors checkpoint and reproduced its quantization prompt check. Logo assets were inventoried, not audited as software. No additional backend/service/UI is present in the tracked snapshot.
+
+WHAT REMAINS UNRUN
+Actual CUDA forward/backward, Triton numerical/race validation, CUDA autocast/dtype behavior, separate-device FSDP, multi-node runs, corrected-objective training, matched-model quality comparisons, long-context retrieval, sustained billion-token execution, real concurrent serving and all GPU speed tables. None are implied passed by this review.
+
+SOURCE AND FRESHNESS
+Primary source is the public repository above, cloned and inspected at the exact commit named at the top. All file/line references are to that snapshot; they are not guesses about another branch. Fresh remote fetch at closeout found bcd8199f48d27cc15841cde4265937f9a4b7e995. Its only change from the execution snapshot is deletion of docs/Weft 09_ai_llm_speedup_architecture.md. All model, kernel, benchmark, example, test, README and checkpoint files are byte-identical, so every finding and source line above remains applicable. The five selected tests were rerun at final HEAD. The tracked working tree is unchanged. No new source URL paths were invented. Author-supplied reports are evidence of claims, not independent confirmation of their numbers.

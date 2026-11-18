@@ -137,15 +137,18 @@ def train_and_eval(model: nn.Module, vocab_size: int, seq_len: int, needle_pos: 
     # Evaluation
     model.eval()
     correct = 0
-    total = 200
+    total_evaluated = 0
+    target_count = 200
     with torch.no_grad():
-        for _ in range(total // batch_size):
-            inputs, targets = generate_batch(batch_size, seq_len, vocab_size, needle_pos, device)
+        while total_evaluated < target_count:
+            curr_bs = min(batch_size, target_count - total_evaluated)
+            inputs, targets = generate_batch(curr_bs, seq_len, vocab_size, needle_pos, device)
             logits = model(inputs)
             preds = logits.argmax(dim=-1)
             correct += (preds == targets).sum().item()
+            total_evaluated += curr_bs
 
-    accuracy = (correct / total) * 100
+    accuracy = (correct / total_evaluated) * 100
     return accuracy
 
 

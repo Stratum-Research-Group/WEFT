@@ -339,19 +339,19 @@ print(f"Throughput:      {4 * result['tokens_per_sec']:.1f} tokens/second")
 
 ```bash
 # 1. Hugging Face compatibility and numerical equivalence
-python test_weft_hf.py
+python tests/test_weft_hf.py
 
 # 2. Triton fused backward kernel autograd
-python test_fused_bwd.py
+python tests/test_fused_bwd.py
 
 # 3. PyTorch FSDP distributed sharding
-python test_fsdp.py
+python tests/test_fsdp.py
 
 # 4. INT8 post-training quantization benchmark
-python quantize_weft.py
+python examples/quantize_weft.py
 
 # 5. Full latency and sequence ramp-up benchmark
-python ramp_up_benchmark.py
+python benchmarks/ramp_up_benchmark.py
 ```
 
 ---
@@ -369,21 +369,43 @@ python ramp_up_benchmark.py
 │       ├── fused_autograd.py       # Fused backward Triton reverse-scan autograd
 │       └── chunk_scan_pt.py        # PyTorch reference baseline
 │
-├── weft_shakespeare_ckpt/          # Verified checkpoint (safetensors + config)
-│   ├── config.json
-│   ├── generation_config.json
-│   └── model.safetensors
+├── tests/                          # Automated unit and integration test suite
+│   ├── test_weft_hf.py             # Hugging Face interface and serialization tests
+│   ├── test_fused_bwd.py           # Triton reverse-time adjoint scan autograd test
+│   ├── test_fsdp.py                # Multi-rank PyTorch FSDP sharding verification
+│   └── verify_identity.py          # Discrete singlet projection verification
 │
-├── test_weft_hf.py                 # Automated unit and serialization tests
-├── test_fused_bwd.py               # Triton backward autograd verification
-├── test_fsdp.py                    # Multi-rank PyTorch FSDP sharding verification
-├── quantize_weft.py                # INT8 Post-Training Quantization benchmark
-├── serving_engine.py               # High-throughput streaming inference engine
-├── train_weft_demo.py              # Pre-training and verification pipeline
-├── benchmark_attention.py          # O(N) vs O(N^2) scaling benchmark
-├── benchmark_billion_tokens.py     # 1-billion token streaming stress test
-├── benchmark_triton_kernel.py      # Microsecond latency benchmark suite
-└── verify_identity.py              # Discrete singlet projection verification
+├── benchmarks/                     # Hardware and empirical benchmark suite
+│   ├── benchmark_attention.py      # O(N) vs O(N^2) scaling benchmark
+│   ├── benchmark_billion_tokens.py # 1-billion token streaming stress test
+│   ├── benchmark_triton_kernel.py  # Microsecond latency benchmark suite
+│   ├── ramp_up_benchmark.py        # Extreme sequence length ramp-up (1k to 1M)
+│   ├── benchmark_associative_recall.py # Needle-in-a-haystack recall test
+│   ├── benchmark_gated_attention.py    # Gated decay ablation test
+│   └── benchmark_streaming_generation.py # O(1) continuous decode test
+│
+├── examples/                       # Production usage and pre-training examples
+│   ├── serving_engine.py           # High-throughput streaming inference engine
+│   ├── train_weft_demo.py          # Pre-training and verification pipeline
+│   └── quantize_weft.py            # INT8 Post-Training Quantization benchmark
+│
+├── data/                           # Demonstration datasets
+│   └── tinyshakespeare.txt         # Character-level text corpus
+│
+├── docs/                           # Empirical research phase reports and specs
+│   ├── FINAL_REPORT.md             # Consolidated research report
+│   ├── BENCHMARK_RESULTS.md        # Initial FlashAttention comparison
+│   ├── BENCHMARK_1_BILLION_TOKENS.md # 1-billion token streaming report
+│   └── PHASE4_GATED_BREAKTHROUGH.md  # Exponential gating breakthrough
+│
+├── assets/                         # Visual assets, diagrams, and logos
+│   ├── logo.png
+│   └── logo.svg
+│
+└── weft_shakespeare_ckpt/          # Verified checkpoint (safetensors + config)
+    ├── config.json
+    ├── generation_config.json
+    └── model.safetensors
 ```
 
 ---

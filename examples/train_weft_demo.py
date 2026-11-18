@@ -24,7 +24,10 @@ def run_pretraining_demo():
     print(f"Device: {device} ({torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'})")
 
     # 1. Dataset & Character Tokenizer
-    with open("tinyshakespeare.txt", "r", encoding="utf-8") as f:
+    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "tinyshakespeare.txt")
+    if not os.path.exists(data_path):
+        data_path = "data/tinyshakespeare.txt"
+    with open(data_path, "r", encoding="utf-8") as f:
         text = f.read()
 
     chars = sorted(list(set(text)))

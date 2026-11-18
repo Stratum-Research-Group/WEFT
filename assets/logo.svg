@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1376" height="768" viewBox="0 0 1376 768">
+  <defs>
+    <style>
+      .bg { fill: #eaeaea; }
+      .divider { stroke: #000000; stroke-width: 8; stroke-linecap: square; }
+      .emblem { stroke: #000000; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .emblem-fill { fill: #000000; stroke: none; }
+      .title { font-family: "Liberation Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 114px; font-weight: bold; fill: #000000; letter-spacing: -1.5px; }
+      .stratum { font-family: "Liberation Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 78px; font-weight: bold; fill: #000000; letter-spacing: -1.5px; }
+    </style>
+  </defs>
+
+  <!-- Clean Minimalist Canvas -->
+  <rect width="1376" height="768" class="bg"/>
+
+  <!-- Left Emblem Mark -->
+  <g class="emblem">
+
+    <!-- Loom Outer Frame / Tension Posts -->
+    <rect x="180" y="210" width="340" height="350" rx="6" stroke-width="8"/>
+    
+    <!-- Vertical Warp Threads (Inputs / Sequence Dimension) -->
+    <line x1="240" y1="210" x2="240" y2="560" stroke-width="6"/>
+    <line x1="295" y1="210" x2="295" y2="560" stroke-width="6"/>
+    <line x1="350" y1="210" x2="350" y2="560" stroke-width="6"/>
+    <line x1="405" y1="210" x2="405" y2="560" stroke-width="6"/>
+    <line x1="460" y1="210" x2="460" y2="560" stroke-width="6"/>
+    
+    <!-- Horizontal Weft Shuttles & Woven Interlacing with Alternating Bridges -->
+    <line x1="180" y1="270" x2="520" y2="270" stroke-width="7"/>
+    <line x1="180" y1="335" x2="520" y2="335" stroke-width="7"/>
+    <line x1="180" y1="400" x2="520" y2="400" stroke-width="7"/>
+    <line x1="180" y1="465" x2="520" y2="465" stroke-width="7"/>
+    <line x1="180" y1="525" x2="520" y2="525" stroke-width="7"/>
+
+    <!-- Tensor Intersect Knots / Fusion Points -->
+    <circle cx="240" cy="270" r="10" class="emblem-fill"/>
+    <circle cx="350" cy="270" r="10" class="emblem-fill"/>
+    <circle cx="460" cy="270" r="10" class="emblem-fill"/>
+    <circle cx="295" cy="335" r="10" class="emblem-fill"/>
+    <circle cx="405" cy="335" r="10" class="emblem-fill"/>
+    <circle cx="240" cy="400" r="10" class="emblem-fill"/>
+    <circle cx="350" cy="400" r="10" class="emblem-fill"/>
+    <circle cx="460" cy="400" r="10" class="emblem-fill"/>
+    <circle cx="295" cy="465" r="10" class="emblem-fill"/>
+    <circle cx="405" cy="465" r="10" class="emblem-fill"/>
+    <circle cx="350" cy="525" r="10" class="emblem-fill"/>
+
+  </g>
+
+  <!-- Central Vertical Divider -->
+  <line x1="632" y1="185" x2="632" y2="582" class="divider"/>
+
+  <!-- Typographic Identity Stack -->
+  <text x="688" y="322" class="title">Weft</text>
+  <text x="688" y="416" class="stratum">Stratum</text>
+  <text x="688" y="492" class="stratum">Research</text>
+  <text x="688" y="568" class="stratum">Group</text>
+</svg>

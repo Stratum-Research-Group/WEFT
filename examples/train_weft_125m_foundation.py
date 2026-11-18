@@ -69,6 +69,7 @@ def train_125m_foundation(
         use_amw=True,
         amw_num_slots=512,
         amw_rank=64,
+        shifted_binding=True,
     )
 
     model = WeftForCausalLM(config).to(device)

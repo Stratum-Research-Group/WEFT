@@ -207,9 +207,18 @@ class WeftAttention(nn.Module):
         self.state_dim = self.hidden_size // self.num_state_heads
         self.shifted_binding = getattr(config, "shifted_binding", False)
 
+        self.use_mla = getattr(config, "use_mla", False)
+        self.mla_latent_dim = getattr(config, "mla_latent_dim", 128)
+
         self.q_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
-        self.k_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
-        self.v_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
+        if self.use_mla:
+            # Multi-Head Latent Attention (MLA) low-rank KV compression
+            self.kv_down_proj = nn.Linear(self.hidden_size, self.mla_latent_dim, bias=False)
+            self.k_up_proj = nn.Linear(self.mla_latent_dim, self.hidden_size, bias=False)
+            self.v_up_proj = nn.Linear(self.mla_latent_dim, self.hidden_size, bias=False)
+        else:
+            self.k_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
+            self.v_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
 
         self.proj_k = nn.Linear(self.hidden_size, self.num_state_heads * self.state_rank, bias=False)
         self.proj_v = nn.Linear(self.hidden_size, self.num_state_heads * self.state_rank, bias=False)
@@ -260,8 +269,13 @@ class WeftAttention(nn.Module):
 
         # 1. Local Causal Attention with sliding window KV cache
         q = self.q_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
-        k = self.k_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
-        v = self.v_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+        if self.use_mla:
+            c_kv = self.kv_down_proj(hidden_states)  # (b, s, mla_latent_dim)
+            k = self.k_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+            v = self.v_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+        else:
+            k = self.k_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+            v = self.v_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
 
         if is_hf_cache and use_cache:
             k_local, v_local = past_state.update(k, v, self.layer_idx)

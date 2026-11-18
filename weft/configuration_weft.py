@@ -30,6 +30,8 @@ class WeftConfig(PretrainedConfig):
         use_amw: bool = False,
         amw_num_slots: int = 256,
         amw_rank: int = 64,
+        use_mla: bool = False,
+        mla_latent_dim: int = 128,
         max_position_embeddings: int = 32768,
         rms_norm_eps: float = 1e-6,
         initializer_range: float = 0.02,
@@ -63,6 +65,8 @@ class WeftConfig(PretrainedConfig):
             )
         if state_rank <= 0:
             raise ValueError(f"state_rank must be positive, got {state_rank}")
+        if use_mla and mla_latent_dim <= 0:
+            raise ValueError(f"mla_latent_dim must be positive when use_mla=True, got {mla_latent_dim}")
         if window_size <= 0:
             raise ValueError(f"window_size must be positive, got {window_size}")
 
@@ -79,6 +83,8 @@ class WeftConfig(PretrainedConfig):
         self.use_amw = use_amw
         self.amw_num_slots = amw_num_slots
         self.amw_rank = amw_rank
+        self.use_mla = use_mla
+        self.mla_latent_dim = mla_latent_dim
         self.max_position_embeddings = max_position_embeddings
         self.rms_norm_eps = rms_norm_eps
         self.initializer_range = initializer_range

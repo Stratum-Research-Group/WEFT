@@ -1,12 +1,9 @@
 """
-Phase 5: Fused Chunk-Linear Recurrence (Lightning Attention / RetNet style)
-Never materializes the (B, S, Rank, D) tensor in global VRAM!
-
-Instead:
-For chunks of size C (e.g. C = 256):
-  1. Intra-chunk attention is computed as: Q_c @ (decay_mask * (K_c^T @ V_c))
-  2. Inter-chunk state S is maintained as a compact running matrix of size (B, Rank, D),
-     requiring only: 1 * 32 * 1024 * 2 bytes = 65 Kilobytes!
+[CHUNK-PROTOTYPE / DELAYED GLOBAL READOUT VARIANT]
+Phase 5: Fused Chunk-Linear Recurrence (Lightning Attention / RetNet style prototype)
+NOTE: This prototype uses a delayed chunk-level global readout where tokens in chunk c
+query state from chunk c-1 rather than the exact causal intra-chunk token recurrence
+used in WeftAttention. It is evaluated as a separate chunk-level architectural exploration.
 """
 
 import time

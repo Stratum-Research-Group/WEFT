@@ -1,21 +1,13 @@
 """
-Streaming Block-plus-Low-Rank Benchmark up to 1,000,000,000 (1 Billion) tokens.
+[THROUGHPUT EXTRAPOLATION BENCHMARK]
+Streaming Block-plus-Low-Rank Benchmark (Extrapolation to 1,000,000,000 Tokens).
 
-Why streaming?
-At N = 1,000,000,000 tokens with d_model = 1024 (FP16):
-- A single tensor of activations requires:
-    1,000,000,000 * 1024 * 2 bytes = 2,048,000,000,000 bytes ≈ 1.91 TB (Terabytes) of RAM!
-- Storing full Q, K, V, and Output simultaneously requires > 7.6 TB of RAM.
-- A full dense N x N attention matrix would require:
-    10^18 elements * 2 bytes = 2 Exabytes!
-
-Therefore, evaluating N = 1,000,000,000 requires streaming/chunked processing:
-- The streaming block-plus-low-rank architecture processes tokens in bounded chunks
-  (e.g., chunk_size = 65,536), maintaining:
-    1. A local window state (O(window_size * d_model))
-    2. A running global low-rank accumulator (O(rank * d_model))
-- This allows evaluating throughput (tokens/sec) and verifying linear-time scaling
-  up to arbitrary lengths without exceeding GPU VRAM.
+NOTE ON BENCHMARK METHODOLOGY:
+This script measures steady-state chunk processing throughput across 20 repetitions of a
+65,536-token chunk (1,310,720 tokens total processed) to calculate and extrapolate the
+total wall-clock time required to process 1 billion tokens. It is an extrapolated throughput
+microbenchmark on a prototype streaming accumulator, not a 7-hour continuous 1-billion-token
+hardware execution run.
 """
 
 import time

@@ -1,7 +1,10 @@
 """
-Phase 5: Fused Triton / Parallel Associative Scan Kernel for Gated Linear Attention
-Eliminates Python sequential loop overhead and fuses the state recurrence
-into an ultra-fast hardware kernel.
+[EXPERIMENTAL / RETIRED PROTOTYPE]
+Phase 5: Fused Triton / Parallel Associative Scan Prototype for Gated Linear Attention
+NOTE: This un-chunked global log-space scan is retained as an experimental reference.
+It is numerically unstable for large sequence lengths (overflows in exp(-log_cum_decay))
+and is excluded from production and speed benchmarks in favor of chunk_scan_pt and
+fused_chunk_scan.
 """
 
 import time

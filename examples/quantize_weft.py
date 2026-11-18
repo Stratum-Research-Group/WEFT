@@ -1,9 +1,9 @@
 """
-WEFT Post-Training Quantization (PTQ) & Calibration Engine.
+WEFT Post-Training Quantization (PTQ) & Compression Engine.
 Implements:
-1. Symmetric INT8 dynamic activation and weight quantization for linear layers.
-2. Quantized forward pass maintaining full-precision for the recurrent state.
-3. Memory compression and latency benchmark: FP32 vs INT8.
+1. Symmetric INT8 weight-only storage quantization for linear layers (floating-point F.linear compute).
+2. Weight storage compression from 16.20 MB down to 4.13 MB (~3.93x storage reduction).
+3. Precision verification maintaining >0.9999 cosine similarity against FP32 unquantized checkpoint.
 """
 
 import time

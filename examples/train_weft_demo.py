@@ -69,10 +69,11 @@ def run_pretraining_demo():
 
     def get_batch(split="train"):
         d = train_data if split == "train" else val_data
-        ix = torch.randint(len(d) - seq_len - 1, (batch_size,))
+        ix = torch.randint(len(d) - seq_len, (batch_size,))
+        # For standard causal LM with internal shift (shift_logits = logits[:-1], shift_labels = labels[1:]):
+        # Pass identical sequence x for input_ids and labels (target tokens at each position t align with input token at t)
         x = torch.stack([d[i : i + seq_len] for i in ix]).to(device)
-        y = torch.stack([d[i + 1 : i + seq_len + 1] for i in ix]).to(device)
-        return x, y
+        return x, x.clone()
 
     # 4. Training Loop
     print("\nStarting pre-training loop...")

@@ -250,6 +250,7 @@ class WeftAttention(nn.Module):
 
         # Unpack or fetch past state
         recurrent_state = None
+        titans_fast_state = None
         past_kv = None
         is_hf_cache = isinstance(past_state, Cache)
 
@@ -258,6 +259,8 @@ class WeftAttention(nn.Module):
                 layer = past_state.layers[self.layer_idx]
                 if hasattr(layer, "weft_recurrent_state"):
                     recurrent_state = layer.weft_recurrent_state
+                if hasattr(layer, "weft_titans_state"):
+                    titans_fast_state = layer.weft_titans_state
                 past_len = layer.get_seq_length()
             else:
                 past_len = past_state.get_seq_length(self.layer_idx) if hasattr(past_state, "get_seq_length") else 0
@@ -271,8 +274,17 @@ class WeftAttention(nn.Module):
                     past_len = past_k.shape[-2]
                 else:
                     past_len = 0
+            elif len(past_state) == 3:
+                recurrent_state, past_kv, titans_fast_state = past_state
+                if past_kv is not None and isinstance(past_kv, tuple) and len(past_kv) == 3:
+                    past_k, past_v, past_len = past_kv
+                elif past_kv is not None and isinstance(past_kv, tuple) and len(past_kv) == 2:
+                    past_k, past_v = past_kv
+                    past_len = past_k.shape[-2]
+                else:
+                    past_len = 0
             else:
-                raise ValueError(f"Expected past_state tuple of length 2 (recurrent_state, past_kv), got length {len(past_state)}")
+                raise ValueError(f"Expected past_state tuple of length 2 or 3, got length {len(past_state)}")
         else:
             past_len = 0
 
@@ -464,21 +476,23 @@ class WeftAttention(nn.Module):
             global_out = readout.view(b, s, d) / (self.state_rank ** 0.5)
             last_state = state
 
+        next_titans_state = titans_fast_state
+        if self.use_titans:
+            titans_out, next_titans_state = self.titans_mem(hidden_states, fast_state=titans_fast_state)
+            global_out = global_out + titans_out
+
         if is_hf_cache and use_cache:
             if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
                 past_state.layers[self.layer_idx].weft_recurrent_state = last_state
+                past_state.layers[self.layer_idx].weft_titans_state = next_titans_state
             next_past = past_state
         elif use_cache:
             k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
             v_stored = v_local[:, :, -self.max_cached:, :] if v_local.shape[-2] > self.max_cached else v_local
             next_kv = (k_stored, v_stored, past_len + s)
-            next_past = (last_state, next_kv)
+            next_past = (last_state, next_kv, next_titans_state)
         else:
             next_past = None
-
-        if self.use_titans:
-            titans_out, _ = self.titans_mem(hidden_states)
-            global_out = global_out + titans_out
 
         output = self.out_proj(local_out + global_out)
         return output, next_past
@@ -487,6 +501,7 @@ class WeftAttention(nn.Module):
 class WeftDecoderLayer(nn.Module):
     def __init__(self, config: WeftConfig, layer_idx: int):
         super().__init__()
+        self.layer_idx = layer_idx
         self.input_layernorm = WeftRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
         self.self_attn = WeftAttention(config, layer_idx)
         self.post_attention_layernorm = WeftRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
@@ -529,7 +544,16 @@ class WeftDecoderLayer(nn.Module):
 
         residual = hidden_states
         hidden_states = self.post_attention_layernorm(hidden_states)
-        hidden_states = self.mlp(hidden_states)
+        is_hf_cache = isinstance(past_state, Cache)
+        if hasattr(self.mlp, "use_associative_routing") and is_hf_cache and use_cache:
+            layer_cache = past_state.layers[self.layer_idx] if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx else None
+            r_state = getattr(layer_cache, "weft_router_state", None) if layer_cache is not None else None
+            mlp_out, next_r_state = self.mlp(hidden_states, router_state=r_state, return_state=True)
+            if layer_cache is not None:
+                layer_cache.weft_router_state = next_r_state
+            hidden_states = mlp_out
+        else:
+            hidden_states = self.mlp(hidden_states)
         hidden_states = residual + hidden_states
 
         return hidden_states, next_state

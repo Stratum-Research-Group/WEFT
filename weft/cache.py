@@ -25,6 +25,8 @@ class WeftCacheLayer(DynamicLayer):
         self.max_cached = max(1, window_size - 1)
         self.cumulative_length = 0
         self.weft_recurrent_state: Optional[torch.Tensor] = None
+        self.weft_router_state: Optional[torch.Tensor] = None
+        self.weft_titans_state: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
 
     def update(
         self,
@@ -63,10 +65,20 @@ class WeftCacheLayer(DynamicLayer):
 
     def reorder_cache(self, beam_idx: torch.LongTensor) -> None:
         super().reorder_cache(beam_idx)
+        b_dev = beam_idx.device
         if self.weft_recurrent_state is not None:
             self.weft_recurrent_state = self.weft_recurrent_state.index_select(
                 0, beam_idx.to(self.weft_recurrent_state.device)
             )
+        if self.weft_router_state is not None:
+            self.weft_router_state = self.weft_router_state.index_select(
+                0, beam_idx.to(self.weft_router_state.device)
+            )
+        if self.weft_titans_state is not None:
+            W1, m1 = self.weft_titans_state
+            W1 = W1.index_select(0, beam_idx.to(W1.device))
+            m1 = m1.index_select(0, beam_idx.to(m1.device))
+            self.weft_titans_state = (W1, m1)
 
 
 class WeftCache(DynamicCache):

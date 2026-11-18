@@ -347,20 +347,18 @@ class WeftAttention(nn.Module):
             return output, next_past
 
         # Sequence training / prefilling
-        # Dispatch to Triton forward kernel ONLY when gradients are not required
-        # (Preserves autograd differentiation through PyTorch recurrence during training)
+        # Dispatch to Triton autograd kernel when supported (exact analytical backward during training)
         use_triton = (
             hidden_states.is_cuda
             and (self.state_rank in (8, 16, 32, 64))
             and recurrent_state is None
             and mask_weight is None
-            and not torch.is_grad_enabled()
         )
         if use_triton:
             try:
-                from .kernels.fused_chunk_scan import fused_chunk_recurrent_forward_triton
-                global_out_heads, final_state = fused_chunk_recurrent_forward_triton(
-                    x_heads, k_p, v_p, self.decay_logits, return_final_state=True
+                from .kernels.fused_autograd import WeftRecurrentFunction
+                global_out_heads, final_state = WeftRecurrentFunction.apply(
+                    x_heads, k_p, v_p, self.decay_logits
                 )
                 global_out = global_out_heads.view(b, s, d)
                 last_state = final_state

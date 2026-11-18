@@ -27,6 +27,9 @@ class WeftConfig(PretrainedConfig):
         num_state_heads: int = 4,
         state_rank: int = 16,
         window_size: int = 128,
+        use_amw: bool = False,
+        amw_num_slots: int = 256,
+        amw_rank: int = 64,
         max_position_embeddings: int = 32768,
         rms_norm_eps: float = 1e-6,
         initializer_range: float = 0.02,
@@ -72,6 +75,9 @@ class WeftConfig(PretrainedConfig):
         self.num_state_heads = num_state_heads
         self.state_rank = state_rank
         self.window_size = window_size
+        self.use_amw = use_amw
+        self.amw_num_slots = amw_num_slots
+        self.amw_rank = amw_rank
         self.max_position_embeddings = max_position_embeddings
         self.rms_norm_eps = rms_norm_eps
         self.initializer_range = initializer_range

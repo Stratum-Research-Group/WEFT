@@ -422,7 +422,15 @@ class WeftDecoderLayer(nn.Module):
         self.input_layernorm = WeftRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
         self.self_attn = WeftAttention(config, layer_idx)
         self.post_attention_layernorm = WeftRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
-        self.mlp = WeftMLP(config)
+        if getattr(config, "use_amw", False):
+            from .associative_weight import WeftAssociativeWeight
+            self.mlp = WeftAssociativeWeight(
+                hidden_size=config.hidden_size,
+                num_memory_slots=getattr(config, "amw_num_slots", 256),
+                rank=getattr(config, "amw_rank", 64),
+            )
+        else:
+            self.mlp = WeftMLP(config)
 
     def forward(
         self,

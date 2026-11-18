@@ -13,3 +13,4 @@ htmlcov/
 .DS_Store
 *.log
 weft_bpe_ckpt/
+weft_fineweb_ckpt/

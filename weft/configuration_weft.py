@@ -32,6 +32,11 @@ class WeftConfig(PretrainedConfig):
         amw_rank: int = 64,
         use_mla: bool = False,
         mla_latent_dim: int = 128,
+        use_moe: bool = False,
+        moe_num_routed_experts: int = 8,
+        moe_top_k: int = 2,
+        use_titans: bool = False,
+        titans_mem_dim: int = 64,
         max_position_embeddings: int = 32768,
         rms_norm_eps: float = 1e-6,
         initializer_range: float = 0.02,
@@ -85,6 +90,11 @@ class WeftConfig(PretrainedConfig):
         self.amw_rank = amw_rank
         self.use_mla = use_mla
         self.mla_latent_dim = mla_latent_dim
+        self.use_moe = use_moe
+        self.moe_num_routed_experts = moe_num_routed_experts
+        self.moe_top_k = moe_top_k
+        self.use_titans = use_titans
+        self.titans_mem_dim = titans_mem_dim
         self.max_position_embeddings = max_position_embeddings
         self.rms_norm_eps = rms_norm_eps
         self.initializer_range = initializer_range

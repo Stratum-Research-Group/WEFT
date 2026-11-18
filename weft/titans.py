@@ -1,0 +1,107 @@
+"""
+Titans Surprise-Gated Test-Time Fast Weights for WEFT.
+Adapted from AETHER-1 (Specification v1.1.0).
+
+Maintains an adaptive test-time fast weight matrix W_fast:
+  1. Retrieves associations: y = q @ W_fast^T
+  2. Measures prediction surprise: error = k @ W_fast^T - v
+  3. Updates fast weights via online gradient descent:
+     W_{t} = (1 - gamma) * W_{t-1} - theta * (error^T @ k)
+"""
+
+from typing import Optional, Tuple
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class TitansSurpriseMemory(nn.Module):
+    """
+    Online associative neural memory with surprise-gated plastic fast weights.
+    """
+    def __init__(
+        self,
+        d_model: int,
+        d_mem: int = 64,
+        theta_max: float = 0.1,
+        gamma_max: float = 0.01,
+        chunk_size: int = 64,
+    ):
+        super().__init__()
+        self.d_model = d_model
+        self.d_mem = d_mem
+        self.theta_max = theta_max
+        self.gamma_max = gamma_max
+        self.chunk_size = chunk_size
+
+        self.proj_q = nn.Linear(d_model, d_mem, bias=False)
+        self.proj_k = nn.Linear(d_model, d_mem, bias=False)
+        self.proj_v = nn.Linear(d_model, d_mem, bias=False)
+        self.proj_out = nn.Linear(d_mem, d_model, bias=False)
+
+        # Gate projections: [theta (learning rate), eta (momentum), gamma (decay)]
+        self.gate_proj = nn.Linear(d_model, 2 + d_mem)
+
+        # Base prior weights
+        self.W1_init = nn.Parameter(torch.randn(d_mem, d_mem) * (d_mem ** -0.5))
+
+    def init_fast_state(self, batch_size: int, device: Optional[torch.device] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+        dev = device if device is not None else self.W1_init.device
+        W1 = self.W1_init.to(dev).unsqueeze(0).expand(batch_size, -1, -1).clone()
+        m1 = torch.zeros_like(W1)
+        return (W1, m1)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        fast_state: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        chunk_size: Optional[int] = None,
+    ) -> Tuple[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
+        B, T, _ = x.shape
+        C = self.chunk_size if chunk_size is None else chunk_size
+
+        q = F.normalize(self.proj_q(x), dim=-1)
+        k = F.normalize(self.proj_k(x), dim=-1)
+        v = self.proj_v(x)
+
+        gates = torch.sigmoid(self.gate_proj(x))
+        theta_all = gates[..., 0] * self.theta_max
+        eta_all = gates[..., 1]
+        gamma_all = gates[..., 2:] * self.gamma_max
+
+        if fast_state is None:
+            fast_state = self.init_fast_state(B, device=x.device)
+
+        W1, m1 = fast_state
+        outputs = []
+
+        for t_start in range(0, T, C):
+            t_end = min(t_start + C, T)
+            c_len = t_end - t_start
+
+            q_c = q[:, t_start:t_end, :]
+            k_c = k[:, t_start:t_end, :]
+            v_c = v[:, t_start:t_end, :]
+
+            theta_c = theta_all[:, t_start:t_end].unsqueeze(-1)
+            eta_c = eta_all[:, t_start:t_end].mean(dim=1).view(B, 1, 1)
+            gamma_c = gamma_all[:, t_start:t_end, :].mean(dim=1).unsqueeze(-1)
+
+            # 1. Retrieval
+            retrieved = torch.bmm(q_c, W1.transpose(1, 2))
+            outputs.append(retrieved)
+
+            # 2. Prediction surprise
+            pred_v = torch.bmm(k_c, W1.transpose(1, 2))
+            error = pred_v - v_c
+            scaled_error = error * theta_c
+            grad_W1 = torch.bmm(scaled_error.transpose(1, 2), k_c)
+
+            # 3. Plastic fast weight update
+            scale = 1.0 / float(c_len)
+            m1 = eta_c * m1 - grad_W1 * scale
+            W1 = (1.0 - gamma_c) * W1 + m1
+
+        fast_state = (W1, m1)
+        mem_out = torch.cat(outputs, dim=1)
+        return self.proj_out(mem_out), fast_state

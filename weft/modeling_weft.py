@@ -227,6 +227,15 @@ class WeftAttention(nn.Module):
         self.decay_logits = nn.Parameter(torch.empty(self.num_state_heads, self.state_rank))
         from .init_dami import init_dami_decay_logits
         init_dami_decay_logits(self.decay_logits, min_timescale=64.0, max_timescale=65536.0)
+
+        # Titans surprise-gated fast weights
+        self.use_titans = getattr(config, "use_titans", False)
+        if self.use_titans:
+            from .titans import TitansSurpriseMemory
+            self.titans_mem = TitansSurpriseMemory(
+                d_model=self.hidden_size,
+                d_mem=getattr(config, "titans_mem_dim", 64),
+            )
         self.out_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
 
     def forward(
@@ -467,6 +476,10 @@ class WeftAttention(nn.Module):
         else:
             next_past = None
 
+        if self.use_titans:
+            titans_out, _ = self.titans_mem(hidden_states)
+            global_out = global_out + titans_out
+
         output = self.out_proj(local_out + global_out)
         return output, next_past
 
@@ -483,6 +496,14 @@ class WeftDecoderLayer(nn.Module):
                 hidden_size=config.hidden_size,
                 num_memory_slots=getattr(config, "amw_num_slots", 256),
                 rank=getattr(config, "amw_rank", 64),
+            )
+        elif getattr(config, "use_moe", False):
+            from .moe import WeftDeepSeekMoE
+            self.mlp = WeftDeepSeekMoE(
+                d_model=config.hidden_size,
+                intermediate_size=config.intermediate_size,
+                num_routed_experts=getattr(config, "moe_num_routed_experts", 8),
+                top_k=getattr(config, "moe_top_k", 2),
             )
         else:
             self.mlp = WeftMLP(config)

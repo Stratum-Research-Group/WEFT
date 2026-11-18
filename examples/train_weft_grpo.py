@@ -22,6 +22,7 @@ import torch.nn.functional as F
 import tiktoken
 
 from weft import WeftConfig, WeftForCausalLM
+from weft.verifier import MathRuleVerifier, CodeRuleVerifier
 
 
 # =====================================================================
@@ -32,6 +33,8 @@ class ArithmeticReasoningTask:
     Generates multi-step arithmetic reasoning problems requiring scratchpad calculation:
     Prompt: "Question: Compute ((A + B) * C) - D. Think step by step inside <think>...</think> and provide the final answer as #### [ANSWER]."
     """
+    verifier = MathRuleVerifier()
+
     @staticmethod
     def generate_problem():
         a = random.randint(2, 20)
@@ -47,32 +50,16 @@ class ArithmeticReasoningTask:
         )
         return prompt, true_answer
 
-    @staticmethod
-    def compute_reward(completion_text: str, true_answer: int) -> float:
-        reward = 0.0
+    @classmethod
+    def compute_reward(cls, completion_text: str, true_answer: int) -> float:
+        # Use deterministic RLVR MathRuleVerifier with numerical parsing and loop penalty
+        res = cls.verifier.verify_solution(
+            completion_text=completion_text,
+            ground_truth_numeric=float(true_answer),
+            tol=1e-4,
+        )
+        return res.total_reward
 
-        # Format Reward: Reward model for properly thinking and closing tags
-        has_think_open = "<think>" in completion_text
-        has_think_close = "</think>" in completion_text
-        has_hash = "####" in completion_text
-
-        if has_think_open and has_think_close:
-            reward += 0.3
-        elif has_think_open:
-            reward += 0.1
-
-        # Accuracy Reward: Parse final integer answer after ####
-        match = re.search(r"####\s*(-?\d+)", completion_text)
-        if match:
-            reward += 0.2
-            try:
-                pred = int(match.group(1))
-                if pred == true_answer:
-                    reward += 1.0  # Full correct solution reward!
-            except ValueError:
-                pass
-
-        return reward
 
 
 # =====================================================================

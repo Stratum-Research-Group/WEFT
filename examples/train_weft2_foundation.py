@@ -54,13 +54,13 @@ def train_weft2_foundation(
     streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device))
     vocab_size = streamer.vocab_size
 
-    # Configure WEFT-2 model with MLA, DAMI, Titans, and DeepSeekMoE
+    # Configure WEFT-2 model with MLA, DAMI, Titans, and DeepSeekMoE (589M Unified Foundation)
     config = WeftConfig(
         vocab_size=vocab_size,
-        hidden_size=768,
-        intermediate_size=2048,
-        num_hidden_layers=12,
-        num_attention_heads=12,
+        hidden_size=896,
+        intermediate_size=2560,
+        num_hidden_layers=16,
+        num_attention_heads=16,
         num_state_heads=4,
         state_rank=64,
         window_size=128,
@@ -68,17 +68,18 @@ def train_weft2_foundation(
         tie_word_embeddings=True,
         shifted_binding=True,
         use_mla=True,
-        mla_latent_dim=128,
+        mla_latent_dim=192,
         use_titans=True,
-        titans_mem_dim=64,
+        titans_mem_dim=96,
         use_moe=True,
-        moe_num_routed_experts=8,
+        moe_num_routed_experts=16,
         moe_top_k=2,
     )
 
     model = WeftForCausalLM(config).to(device)
+    model.gradient_checkpointing_enable()
     num_params = sum(p.numel() for p in model.parameters())
-    print(f"Architecture: 12 Layers | 768 Dim | MLA(dc=128) | Titans(64) | DeepSeekMoE(8 experts, top-2)")
+    print(f"Architecture: 16 Layers | 896 Dim | MLA(dc=192) | Titans(96) | DeepSeekMoE(16 experts, top-2)")
     print(f"Total Parameters: {num_params:,} (~{num_params/1e6:.1f}M)")
 
     # Muon optimizer

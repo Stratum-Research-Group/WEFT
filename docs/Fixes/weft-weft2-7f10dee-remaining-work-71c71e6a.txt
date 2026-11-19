@@ -1,0 +1,131 @@
+WEFT weft-2: REMAINING WORK AT 7f10dee
+Review date: 2026-11-19
+Branch: weft-2, NOT master
+Commit: 7f10dee48a69e52a99ed59f35743135c2100a0e6
+Source: https://github.com/Stratum-Research-Group/WEFT/tree/weft-2
+Commit: https://github.com/Stratum-Research-Group/WEFT/commit/7f10dee48a69e52a99ed59f35743135c2100a0e6
+Prior review: f5cfc96c944004e5f139dd85b770295b9852e87a
+
+VERDICT
+The recent fixes improve the branch, and the existing CPU suite remains green. It is not a clean implementation pass yet. The most important newly reproduced issue is that shifted_binding=True, enabled by both foundation training scripts, changes the recurrence when switching to cached generation. Earlier default-config parity results did not cover that setting. There is also a new legacy-cache regression: the decoder emits a four-element tuple that its attention layer rejects on the next call.
+
+These are implementation findings, not challenges to the underlying uncrossing identities or Lean proofs. No source files were changed. No training, GPU jobs, full benchmark suite, or foundation-weight allocations were run.
+
+EVIDENCE AND SCOPE
+- Fresh checkout at 7f10dee; remote fetched again at close and still at that commit.
+- Reviewed the delta f5cfc96 -> f7aae3c -> f61e8a4 -> 7f10dee, all core weft modules, example pipelines, tests, relevant benchmark and paper claims, and CI configuration. This was a module sweep, not a claim that every historical benchmark was exhaustively audited or executed.
+- Syntax parsed all 18 core Python files, 13 example files, 21 benchmark files and 9 test files.
+- CPU: Python 3.10, torch 2.14.1+cpu, transformers 5.20.2.
+- Full pytest: 30 collected, 26 passed, 4 skipped, 0 failures, 0 errors. Skips: one multi-GPU FSDP test and three CUDA/Triton backward cases. Two startup-hook deprecation warnings are nonblocking.
+- CPU suite completed in 6.25 seconds. Process peak RSS: 439,476 KiB, approximately 429 MiB. Tests and numerical probes used one compute thread and bounded execution; model probes had hidden size 16, one layer, vocabulary 64, plus small mocked serving logits. A 1,600 MiB address-space ceiling was used for the suite and main numerical probes. No memory exhaustion occurred.
+- GPU speed, long-context throughput, foundation training losses and checkpoint quality are not reproduced in this review.
+
+PRIOR SEVEN-ITEM DISPOSITION
+A. Titans schedule semantics: DOCUMENTED. titans.py now explicitly distinguishes chunk-mean, chunk-scaled prefill adaptation from per-token decode. Treat this as a declared design choice, not an implementation bug demanding full-forward equality. A same-schedule reference test remains an open validation gate.
+B. Dead use_scan / O(log C) claim: FIXED in the Titans interface and module description. The flag is removed. The old inline Block-Scan wording at titans.py:124 is only stale terminology, not evidence of an implemented scan.
+C. Two WEFT-2 needle scripts: PARTLY ADDRESSED. Console headings now describe persistence/probability dynamics instead of retrieval accuracy. They still do not measure recall. The deep probe does not measure the actual router distribution either; see item 9. The suite module header still claims retrieval accuracy.
+D. Legacy tuple router state: REGRESSED while being repaired. A fourth state field was added without extending attention's parser; see item 3.
+E. Full-sized MLA KV cache: UNCHANGED, optional implementation choice. The removed compression claim should stay removed. Up-projection precedes cache storage. No latent-cache rewrite is required unless that saving is an explicit goal.
+F. GRPO leftovers: PARTLY FIXED. Dead clip_eps is removed from the WEFT-2 function and sum/count now share a mask. But that mask assumes repeated EOT padding while the default pipeline does not configure stopping on EOT; see item 5. The surrogate-step comment remains imprecise.
+G. Serving character-based usage: FIXED for the current tokenizers' ordinary generated tokens. Prompt length now uses encoded IDs; completion length counts emitted nonempty token chunks. Keep counting generated IDs directly when fixing Unicode buffering or excluding special tokens, because emitted text chunks will then no longer correspond one-to-one to generated IDs.
+
+Earlier repairs are still present on inspection: decode executes Titans, CPU guards in the two new benchmark scripts, explicit missing-vocabulary error, credentials-disabled wildcard CORS, bounded consecutive fetch failures, and network-mode validation using a separate streamer. The local-cache split issue in item 8 is a separate missed mode, not a claim that the old shared-queue/network-offset defect returned.
+
+NUMBERED WORK FOR THE CODING ASSISTANT
+
+1. [HIGH] Preserve shifted-binding keys across generation and chunk boundaries.
+Where: weft/modeling_weft.py:347-351; weft/cache.py state lifecycle. Enabled in examples/train_weft2_foundation.py:69 and examples/train_weft_125m_foundation.py:72.
+Problem: for a multi-token call, the first binding key is replaced by zero and later keys are shifted. For s==1, the code instead uses the current token's key. No previous key is carried in the cache. Thus a single-token decode executes k_t outer x_t instead of the declared k_(t-1) outer x_t. A continued multi-token chunk also resets its first binding rather than using the previous chunk's last key.
+Reproduced: tiny one-layer CPU model, seed 0, five tokens [5,6,7,8,9], hidden 16, rank 4, window 4, Titans disabled. Full-vs-all-single-token maximum logit difference: 0.10221684 with shifted_binding enabled. Default unshifted control: 5.96e-8. This discrepancy is independent of Titans' chunk schedule.
+Action: define the initial-sequence boundary, carry the previous binding key through the supported cache formats, and apply it consistently to decode and chunk continuation. Include beam reorder, masking and cache lifecycle behavior. Do not turn off shifted binding just to make a test pass.
+Acceptance: full sequence versus prompt-prefill-plus-decode and multiple continued chunks agree within a stated finite tolerance with shifted_binding=True and Titans disabled. Include both foundation-style mixer choices and tests around a masked boundary.
+
+2. [HIGH IF USED FOR UNTRUSTED CODE] CodeRuleVerifier is neither a security sandbox nor a trustworthy pass/fail boundary.
+Where: weft/verifier.py:44-73.
+Problem: generated code and assertions are concatenated into the same Python script. The child inherits ordinary filesystem, environment and network access; timeout is not isolation. Captured output is unbounded. Also, success is based only on exit status, so generated code can exit successfully before assertions execute.
+Reproduced safely: a generated program that immediately raises SystemExit(0), paired with an assertion that always fails, receives total reward 1.0 and the passed-all-tests status. No filesystem/network attack or resource-exhaustion payload was run.
+Action: before using this for untrusted model-generated programs, put execution in an actual restricted worker with resource/output limits, no secrets or network, a constrained filesystem, process-tree cleanup and trusted result reporting. Keep assertions and the success protocol outside the program's authority. If this is only a trusted-code demonstration, say so clearly and do not call a subprocess a sandbox.
+Scope: the current WEFT-2 arithmetic pipeline uses MathRuleVerifier, not CodeRuleVerifier, so this does not imply its present arithmetic runs executed arbitrary code.
+
+3. [MED] Four-element legacy tuple caches fail on their next use.
+Where: weft/modeling_weft.py:267-287 versus 563-572.
+Problem: decoder now emits (recurrent, kv, titans, router). Attention accepts only lengths two and three, then raises on the decoder's own four-element output.
+Reproduced: call a tiny MoE WeftDecoderLayer with past_state=(None,None), use_cache=True. First output cache has length four. Passing that output into the next call raises ValueError reporting that length four is unsupported.
+Action: update unpacking, returned state and lifecycle tests as one change, or explicitly remove/deprecate legacy tuples. Do not label tuple-router support fixed merely because the fourth field is written.
+Scope: default WeftCache generation is not this failing path.
+
+4. [MED] DAMI's configured horizons are clipped, and low-precision decode can remove decay entirely.
+Where: weft/init_dami.py:38-50; weft/modeling_weft.py:229,342; examples/train_weft2_foundation.py:9.
+Problem A: the initializer requests tau up to 65,536, then clamps gamma to 0.9999. For tau=-1/log(gamma), this caps the initialized FP32 horizon near 10,000 and collapses the high end of the spacing.
+Reproduced: initializing a [4,64] FP32 tensor gives maximum gamma 0.9998999834 and maximum effective tau 9,997.8408; 70 of 256 entries share that maximum.
+Problem B: the PyTorch path takes sigmoid in decay_logits' dtype. With those logits converted to BF16, 179 of 256 sigmoid values round to exactly 1 in the probe. The Triton kernel computes this sigmoid in FP32, so backend/dtype semantics differ too. FP32-parameter autocast training is not the same as a checkpoint loaded directly in BF16.
+Action: choose the supported horizon range and recurrence precision deliberately. Preserve enough precision for the requested decays, test FP32/BF16 and prefill/decode behavior, and update claims if capping is intentional. Do not assume computing a precise sigmoid and immediately casting it back to BF16 solves the state-update precision issue.
+
+5. [MED] Define and enforce EOT stopping, including the first terminal token in training loss.
+Where: examples/train_weft2_grpo.py:84-94,121-130; weft/configuration_weft.py token-ID defaults; examples/train_weft2_foundation.py config; weft/serving_server.py:141-190.
+Problem: GRPO passes pad_token_id but not eos_token_id. The foundation config does not set EOS. Padding configuration does not itself make EOT a stop token. The new valid_mask=(cumsum(is_eot)<=1) therefore includes ordinary tokens after the first EOT, until a second EOT appears. Reward text is also decoded without trimming at the first terminal EOT.
+Reproduced: a tiny model with the same default EOS setting has generation_config.eos_token_id=None. Scripted generation of [EOT,3,4] continues for all three tokens and the current mask marks all three valid. This is a controlled reproduction, not a trained-model frequency estimate.
+Serving has the same missing termination contract: the manual loop always runs max_tokens. With mocked output [GPT2_EOT,42], /v1/completions returns the EOT marker followed by K and reports finish_reason=length.
+Action: configure EOS for the BPE checkpoints and rollouts, derive a mask from the first terminal position that excludes every later position while retaining the first EOT, trim reward evaluation consistently, and make serving stop/report stop versus length correctly. Keep behavior explicit for character checkpoints that have no EOS token.
+
+6. [MED] Auxiliary recurrent memories do not respect attention_mask.
+Where: weft/modeling_weft.py:380-384,480-483,555-577; weft/moe.py:101-138; weft/titans.py:86-136.
+Problem: the main recurrent path masks state updates, but no padding mask reaches Titans or the associative MoE router. Masked input positions still update their memories. For Titans, padding also shifts chunk boundaries and participates in averaged gates/gradient scaling.
+Reproduced: same 70 real tokens with and without three masked left-padding tokens, hidden 16, one layer, shifted binding disabled. MoE-only run: maximum logit difference 2.82e-6 and final router-state difference 8.85e-4. Titans-only run: maximum logit difference 1.87e-4. Values are illustrative small-model results, not a claimed production-quality effect size.
+Action: propagate validity into all recurrent components and define per-sample chunk handling for padding. Merely zeroing input embeddings is insufficient if decay and gate averaging still count invalid positions.
+Acceptance: masked token contents cannot alter valid-token outputs or future cached state; adding left padding should not change the valid-token schedule. Test the features separately and together, including a Titans chunk boundary.
+
+7. [MED] Serving corrupts multi-token UTF-8 characters.
+Where: weft/serving_server.py:155-156 and the BPE wrapper at 67-74.
+Problem: each BPE token is decoded independently to a Unicode string. GPT-2 tokens can contain only part of a UTF-8 character, so replacement characters are committed before the remaining bytes arrive. This affects non-streaming replies too because they concatenate the same chunks.
+Reproduced with real tiktoken and mocked token logits through the completions handler: the two token IDs [47249,222] decode together to one grinning-face emoji. The endpoint instead returns two replacement characters. Its usage correctly reports two generated tokens in this current case.
+Action: use incremental byte-safe decoding/buffering for streaming, or decode the complete generated-ID sequence for non-streaming. Track IDs independently of text emission for usage. Add emoji and non-Latin tests, including a character split across token boundaries.
+
+8. [MED, LOCAL-CACHE MODE] Held-out AMW validation can reuse the same cached documents as training.
+Where: benchmarks/benchmark_amw_rigorous.py:34-41; weft/dataset_fineweb.py:24-25,36-42.
+Problem: setting val_streamer.current_offset=5000 isolates the HTTP row-fetch path, but local-cache fetching ignores current_offset and starts both streamers at _doc_idx=0 over the same _local_docs. It wraps around the same corpus as well.
+Reproduced without downloading/training: two small streamer instances with identical in-memory local documents, offsets 0 and 5000, both fetch the same first document. This demonstrates the mode mismatch. It does not establish that any already-published run used local-cache mode, and no local cache file was present in this checkout.
+Action: create document-level train/validation partitions before token packing in local mode, prevent cross-split wraparound, and test disjoint document IDs/content. Keep the existing separate streamers and network-mode repair. Across-seed held-out quality evaluation remains a separate experimental gate after split correctness.
+
+9. [MED] Renamed router benchmarks still do not validate their stated measurement.
+Where: benchmarks/benchmark_associative_needle_deep.py:87-101; weft/moe.py:103-138; benchmarks/benchmark_weft2_suite.py:5,154-159.
+Problem: the deep script reads an unnormalized routing_key_proj(query) against the final cached state. Actual routing uses normalized routing_query_proj(query), reads history BEFORE the query updates it, and applies softmax to static_logits + 0.5*history_logits. The script uses a different projection, state timing and distribution. Its associative probability/static probability ratio is not the deployed router's probability change.
+The suite's persistence success line checks only layer count and output shape. It never asserts that router states exist, remain finite, advance, or preserve history. Its module header still calls the output retrieval accuracy.
+Action: instrument the actual router at the query or compare to a same-recurrence reference. For persistence, assert state presence/shape/finite values and expected update semantics. Keep probability-dynamics naming for an arbitrary random-model expert and do not call it recall. Only add retrieval claims after defining needle-to-answer ground truth and controls such as removed/swapped needles.
+Evidence: static comparison of the equations and code paths. These scripts were not executed this round because the suite allocates large models and even the deep defaults are unnecessary for this diagnosis.
+
+10. [LOW] Correct remaining implementation-cost claims and legacy objective wording.
+Where: weft/optimizers.py:43,69-71; examples/train_weft2_foundation.py:91; paper/paper.md:20,198 and paper/paper.tex:26; weft/associative_weight.py:9,43-60; examples/train_weft_grpo.py:11-12,121,195-198.
+Muon stores zeros_like(parameter), so its momentum uses the parameter dtype. Foundation training creates FP32 parameters and uses autocast, which does not make those parameters BF16. A tiny FP32 optimizer probe confirms four bytes of persistent momentum per parameter, not the unconditional two-byte claim. State-only numbers should not be compared with totals including weights, gradients or temporary matrices.
+AMW's header still states O(R*D), but its implementation performs dense all-slot key/value reads plus a D-by-D gate. With M slots, per-token work includes DR + MR + MD + D^2. This is an accounting issue, not a refutation of tensor identities or a demand to remove the gate.
+The older train_weft_grpo.py still advertises clipping and retains clip_eps while implementing a plain group-baseline policy gradient. The WEFT-2 docstring repair did not fix that separate example.
+Action: state dtype and exactly what memory is counted, give the implemented AMW costs, and either label the legacy objective honestly or mark the old example superseded. No optimizer/architecture rewrite is required solely to fix wording.
+
+11. [LOW] Legacy dataset-training warmup divides by the wrong horizon.
+Where: examples/train_weft_dataset.py:16-23.
+Problem: warmup uses max_lr*step/max_steps rather than the warmup horizon, then jumps to max_lr at warmup_steps. With defaults, step 49 is 0.098*max_lr and step 50 is 1.0*max_lr. This is not the smooth warmup the surrounding schedule suggests.
+Action: confirm whether that jump is intended. If not, use the warmup horizon and guard warmup_steps>=max_steps as the newer foundation scripts do. Add boundary tests. Static arithmetic finding; no training was run.
+
+12. [LOW / CI COVERAGE] Direct pushes to weft-2 do not match this workflow's branch filter.
+Where: .github/workflows/ci.yml:3-7.
+Problem: push and pull_request filters list only master/main. A direct weft-2 push is outside this workflow's push trigger. A PR targeting master/main can still run it; this is not a claim that GitHub ran no checks or that another workflow/service cannot cover the branch.
+Action: include weft-2 if direct branch updates should be tested, or document that validation is PR-only. Add small regressions for the above paths rather than treating the unchanged 26 passing tests as coverage of them.
+
+DO NOT TOUCH / PRESERVE
+- Underlying mathematical constructions and Lean proofs. None of these findings disproves them.
+- The now-working Titans decode update. Keep the declared chunk-prefill/per-token-decode distinction unless deliberately redesigning it; compare against a reference with the same schedule.
+- Default unshifted WEFT-1 tolerance-level parity, bounded physical KV cache, tied embeddings, state reordering and non-mutating use_cache=False behavior.
+- Prior serving vocabulary/CORS repairs and consecutive-fetch retry cap.
+- The repaired separate validation streamer in network mode. Fix local mode without restoring the old shared token queue.
+- Current foundation architecture and parameter-count convention unless intentionally changed. This review did not recount or allocate foundation weights.
+- No automatic source edits, training, GPU benchmarks or memory-risk jobs on the review machine.
+
+OPEN VALIDATION GATES
+- Add targeted tiny tests for shifted binding, tuple round trips, EOT loss masks/stopping, masked auxiliary state, Unicode serving, DAMI precision/horizons and local-cache split isolation.
+- Add a Titans same-schedule state/output reference test. Full-forward versus token-decode equality is not required across intentionally different chunk schedules.
+- Real randomized exact-answer retrieval at checkpoint level remains separate from router state/probability diagnostics.
+- AMW quality needs isolated held-out data and repeated seeds; do not substitute the memory/proxy benchmarks for that evaluation.
+- GPU/Triton forward/backward/backend/dtype parity and headline speed/VRAM figures remain unverified here. Any author runs should be tied to commit, exact script, backend, dtype and workload. The billion-position synthetic accumulator is not a billion-token full foundation-LM quality run.
+- A green bounded CPU suite is useful evidence, not proof of production readiness, learned language quality or mathematical equivalence in every supported mode.
+
+END. Twelve numbered items; items 10-12 are lower-priority accounting, legacy-example and CI work. The first implementation priority is item 1, followed by cache round-trip and EOT correctness. Item 2 must be closed before untrusted code evaluation is enabled.

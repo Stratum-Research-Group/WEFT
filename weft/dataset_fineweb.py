@@ -12,13 +12,14 @@ import tiktoken
 
 
 class FineWebEduStreamer:
-    def __init__(self, seq_len: int, batch_size: int, device: str = "cuda", max_rows: int = 5000):
+    def __init__(self, seq_len: int, batch_size: int, device: str = "cuda", max_rows: int = 5000, split: str = "train"):
         self.seq_len = seq_len
         self.batch_size = batch_size
         self.device = torch.device(device if (device == "cpu" or torch.cuda.is_available()) else "cpu")
         self.enc = tiktoken.get_encoding("gpt2")
         self.vocab_size = self.enc.n_vocab
         self.max_rows = max_rows
+        self.split = split
         self.current_offset = 0
         self.token_queue = []
         self._local_docs = []
@@ -31,7 +32,13 @@ class FineWebEduStreamer:
             cache_file = "data/fineweb_edu_cache.json"
         if os.path.exists(cache_file):
             with open(cache_file, "r") as f:
-                self._local_docs = json.load(f)
+                all_docs = json.load(f)
+            # Partition local cache into disjoint train (85%) and val (15%) splits
+            split_idx = int(len(all_docs) * 0.85)
+            if self.split == "val":
+                self._local_docs = all_docs[split_idx:]
+            else:
+                self._local_docs = all_docs[:split_idx]
 
     def _fetch_next_rows(self, count: int = 25):
         if self._local_docs:

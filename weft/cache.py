@@ -27,6 +27,7 @@ class WeftCacheLayer(DynamicLayer):
         self.weft_recurrent_state: Optional[torch.Tensor] = None
         self.weft_router_state: Optional[torch.Tensor] = None
         self.weft_titans_state: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
+        self.weft_last_k_p: Optional[torch.Tensor] = None
 
     def update(
         self,
@@ -79,6 +80,10 @@ class WeftCacheLayer(DynamicLayer):
             W1 = W1.index_select(0, beam_idx.to(W1.device))
             m1 = m1.index_select(0, beam_idx.to(m1.device))
             self.weft_titans_state = (W1, m1)
+        if self.weft_last_k_p is not None:
+            self.weft_last_k_p = self.weft_last_k_p.index_select(
+                0, beam_idx.to(self.weft_last_k_p.device)
+            )
 
 
 class WeftCache(DynamicCache):

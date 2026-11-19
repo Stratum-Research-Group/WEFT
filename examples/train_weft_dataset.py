@@ -14,9 +14,11 @@ from weft.dataset_loader import TokenPackedLoader
 
 
 def get_lr(step: int, warmup_steps: int, max_steps: int, max_lr: float, min_lr: float):
+    if warmup_steps >= max_steps:
+        warmup_steps = max(1, max_steps // 5)
     if step < warmup_steps:
-        return max_lr * step / max_steps
-    if step > max_steps:
+        return max_lr * step / warmup_steps
+    if step >= max_steps:
         return min_lr
     decay_ratio = (step - warmup_steps) / (max_steps - warmup_steps)
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))

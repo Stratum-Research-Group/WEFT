@@ -43,8 +43,9 @@ def init_dami_decay_logits(
         
         # gamma = exp(-1.0 / tau)
         gammas = torch.exp(-1.0 / timescales)
-        # Clamp to avoid numerical overflow in logit
-        gammas = torch.clamp(gammas, min=0.50, max=0.9999)
+        # Clamp to avoid numerical overflow in logit, preserving horizons up to 65,536 tokens
+        # tau = 65,536 corresponds to gamma = exp(-1/65536) approx 0.9999847
+        gammas = torch.clamp(gammas, min=0.50, max=0.99999)
         logits = torch.log(gammas / (1.0 - gammas))
         
         decay_tensor.copy_(logits.view(orig_shape))

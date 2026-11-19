@@ -251,6 +251,7 @@ class WeftAttention(nn.Module):
         # Unpack or fetch past state
         recurrent_state = None
         titans_fast_state = None
+        past_k_p = None
         past_kv = None
         is_hf_cache = isinstance(past_state, Cache)
 
@@ -261,6 +262,8 @@ class WeftAttention(nn.Module):
                     recurrent_state = layer.weft_recurrent_state
                 if hasattr(layer, "weft_titans_state"):
                     titans_fast_state = layer.weft_titans_state
+                if hasattr(layer, "weft_last_k_p"):
+                    past_k_p = layer.weft_last_k_p
                 past_len = layer.get_seq_length()
             else:
                 past_len = past_state.get_seq_length(self.layer_idx) if hasattr(past_state, "get_seq_length") else 0
@@ -283,8 +286,17 @@ class WeftAttention(nn.Module):
                     past_len = past_k.shape[-2]
                 else:
                     past_len = 0
+            elif len(past_state) == 4:
+                recurrent_state, past_kv, titans_fast_state, _ = past_state
+                if past_kv is not None and isinstance(past_kv, tuple) and len(past_kv) == 3:
+                    past_k, past_v, past_len = past_kv
+                elif past_kv is not None and isinstance(past_kv, tuple) and len(past_kv) == 2:
+                    past_k, past_v = past_kv
+                    past_len = past_k.shape[-2]
+                else:
+                    past_len = 0
             else:
-                raise ValueError(f"Expected past_state tuple of length 2 or 3, got length {len(past_state)}")
+                raise ValueError(f"Expected past_state tuple of length 2, 3, or 4, got length {len(past_state)}")
         else:
             past_len = 0
 
@@ -345,10 +357,16 @@ class WeftAttention(nn.Module):
         x_heads = hidden_states.view(b, s, self.num_state_heads, self.state_dim)
 
         # Shifted State Binding: k_{t-1} binds with x_{t} for native induction copying
-        if self.shifted_binding and s > 1:
-            k_key = torch.cat([torch.zeros_like(k_p[:, :1]), k_p[:, :-1]], dim=1)
+        if self.shifted_binding:
+            if s > 1:
+                init_k = past_k_p[:, -1:] if past_k_p is not None else torch.zeros_like(k_p[:, :1])
+                k_key = torch.cat([init_k, k_p[:, :-1]], dim=1)
+            else:
+                k_key = past_k_p if past_k_p is not None else torch.zeros_like(k_p)
         else:
             k_key = k_p
+
+        last_k_p = k_p[:, -1:] if self.shifted_binding else None
 
         if attention_mask is not None and attention_mask.dim() == 2:
             if attention_mask.shape[-1] >= past_len + s:
@@ -386,6 +404,8 @@ class WeftAttention(nn.Module):
                 if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
                     past_state.layers[self.layer_idx].weft_recurrent_state = new_state
                     past_state.layers[self.layer_idx].weft_titans_state = next_titans_state
+                    if last_k_p is not None:
+                        past_state.layers[self.layer_idx].weft_last_k_p = last_k_p
                 next_past = past_state
             else:
                 k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
@@ -491,6 +511,8 @@ class WeftAttention(nn.Module):
             if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
                 past_state.layers[self.layer_idx].weft_recurrent_state = last_state
                 past_state.layers[self.layer_idx].weft_titans_state = next_titans_state
+                if last_k_p is not None:
+                    past_state.layers[self.layer_idx].weft_last_k_p = last_k_p
             next_past = past_state
         elif use_cache:
             k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
@@ -614,7 +636,8 @@ class WeftPreTrainedModel(PreTrainedModel):
 class WeftModel(WeftPreTrainedModel):
     def __init__(self, config: WeftConfig):
         super().__init__(config)
-        self.padding_idx = config.pad_token_id
+        # Only assign padding_idx if it falls within valid vocab boundaries
+        self.padding_idx = config.pad_token_id if (config.pad_token_id is not None and config.pad_token_id < config.vocab_size) else None
         self.vocab_size = config.vocab_size
         self.gradient_checkpointing = False
 

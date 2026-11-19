@@ -153,8 +153,15 @@ def _generate_tokens_generator(prompt_text: str, max_tokens: int, temperature: f
                 next_tok = torch.argmax(logits, dim=-1, keepdim=True)
 
         token_id = next_tok[0].item()
-        token_char = engine.tokenizer.decode([token_id])
+        eos_id = getattr(engine.model.config, "eos_token_id", None)
+        if eos_id is None and hasattr(engine.tokenizer, "enc"):
+            eos_id = getattr(engine.tokenizer.enc, "eot_token", 50256)
+
+        is_stop = (token_id == eos_id)
+        token_char = "" if is_stop else engine.tokenizer.decode([token_id])
         curr_input = next_tok
+
+        finish_reason = "stop" if is_stop else (None if step < max_tokens - 1 else "length")
 
         if is_chat:
             chunk = {
@@ -166,7 +173,7 @@ def _generate_tokens_generator(prompt_text: str, max_tokens: int, temperature: f
                     {
                         "index": 0,
                         "delta": {"content": token_char},
-                        "finish_reason": None if step < max_tokens - 1 else "length",
+                        "finish_reason": finish_reason,
                     }
                 ],
             }
@@ -180,12 +187,14 @@ def _generate_tokens_generator(prompt_text: str, max_tokens: int, temperature: f
                     {
                         "text": token_char,
                         "index": 0,
-                        "finish_reason": None if step < max_tokens - 1 else "length",
+                        "finish_reason": finish_reason,
                     }
                 ],
             }
 
         yield f"data: {json.dumps(chunk)}\n\n"
+        if is_stop:
+            break
 
     yield "data: [DONE]\n\n"
 

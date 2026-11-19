@@ -31,11 +31,11 @@ def run_rigorous_evaluation(steps: int = 50, val_steps: int = 10, seed: int = 42
 
     # 1. Fetch deterministic train and validation batches
     print("Fetching deterministic data stream from FineWeb-Edu...")
-    train_streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device))
+    train_streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device), split="train")
     train_batches = [train_streamer.get_batch() for _ in range(steps)]
 
-    # Use isolated streamer instance pinned at offset 5000 for held-out validation
-    val_streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device))
+    # Use isolated streamer instance pinned at offset 5000 and split='val' for held-out validation
+    val_streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device), split="val")
     val_streamer.current_offset = 5000
     val_streamer.token_queue = []
     val_batches = [val_streamer.get_batch() for _ in range(val_steps)]

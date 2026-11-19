@@ -57,10 +57,26 @@ class CodeRuleVerifier:
                 details={"status": "syntax_error"}
             )
 
-        # 2. Subprocess execution with unit test assertions
-        full_script = f"{code}\n\n# Unit Tests\n{test_assertions}\n"
+        # 2. Subprocess execution with explicit test assertion sentinel
+        # Prevent premature exit bypass (e.g. SystemExit(0) or sys.exit(0))
+        # by wrapping execution in a test harness that reports success via stdout sentinel
+        harness = (
+            f"import sys\n\n"
+            f"# Generated candidate code executed in isolated namespace\n"
+            f"user_scope = {{}}\n"
+            f"code_str = {repr(code)}\n"
+            f"test_str = {repr(test_assertions)}\n\n"
+            f"try:\n"
+            f"    exec(code_str, user_scope)\n"
+            f"    exec(test_str, user_scope)\n"
+            f"    print('__WEFT_TEST_PASSED_SENTINEL__')\n"
+            f"except SystemExit as e:\n"
+            f"    sys.exit(1 if e.code != 0 else 2)\n"
+            f"except Exception:\n"
+            f"    sys.exit(1)\n"
+        )
         with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
-            f.write(full_script)
+            f.write(harness)
             tmp_path = f.name
 
         try:
@@ -70,7 +86,7 @@ class CodeRuleVerifier:
                 text=True,
                 timeout=self.timeout,
             )
-            passed = res.returncode == 0
+            passed = (res.returncode == 0) and ("__WEFT_TEST_PASSED_SENTINEL__" in res.stdout)
         except subprocess.TimeoutExpired:
             passed = False
             status = "timeout"

@@ -50,8 +50,9 @@ def run_deep_needle_benchmark(
     results = []
 
     for N in context_lengths:
-        torch.cuda.empty_cache()
-        torch.cuda.reset_peak_memory_stats()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats()
 
         # Needle position: 5% into the context
         needle_pos = max(64, int(N * 0.05))
@@ -69,11 +70,19 @@ def run_deep_needle_benchmark(
             if hasattr(layer.mlp, "use_associative_routing"):
                 layer.mlp.use_associative_routing = True
 
+        # Hook layer 0 input to capture actual hidden states
+        captured_inputs = {}
+        def hook_fn(m, inp, out):
+            captured_inputs["hidden"] = inp[0]
+
+        hook_handle = model.model.layers[0].mlp.register_forward_hook(hook_fn)
+
         t0 = time.time()
         with torch.no_grad():
             outputs_assoc = model(input_ids=input_ids, use_cache=True, return_dict=True)
+        hook_handle.remove()
         assoc_time_ms = (time.time() - t0) * 1000.0
-        vram_mb = torch.cuda.max_memory_allocated() / (1024 ** 2)
+        vram_mb = torch.cuda.max_memory_allocated() / (1024 ** 2) if torch.cuda.is_available() else 0.0
 
         # Inspect router state cached in past_key_values
         past = outputs_assoc.past_key_values
@@ -81,14 +90,14 @@ def run_deep_needle_benchmark(
         layer0_moe = model.model.layers[0].mlp
         target_expert = 3
 
-        # Compute query activation affinity to target expert
-        query_x = outputs_assoc.logits[:, -1, :config.hidden_size]
-        query_r = layer0_moe.routing_key_proj(query_x.unsqueeze(1))  # [1, 1, 64]
+        # Compute query activation affinity to target expert using true hidden state
+        query_h = captured_inputs["hidden"][:, -1, :]  # [1, D]
+        query_r = layer0_moe.routing_key_proj(query_h.unsqueeze(1))  # [1, 1, 64]
         retrieved_scores = torch.bmm(query_r, router_state).squeeze(1)
         assoc_prob = F.softmax(retrieved_scores, dim=-1)[0, target_expert].item()
 
         # 2. Compare against static routing (W_r @ x)
-        static_logits = layer0_moe.router(query_x)
+        static_logits = layer0_moe.router(query_h)
         static_prob = F.softmax(static_logits, dim=-1)[0, target_expert].item()
 
         print(

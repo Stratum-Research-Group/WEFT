@@ -61,6 +61,16 @@ def test_weft_titans_forward_and_decode():
 
     # Step decode
     tok = torch.tensor([[10], [20]])
+    past = out.past_key_values
+    w_before = past.layers[0].weft_titans_state[0].clone()
+    m_before = past.layers[0].weft_titans_state[1].clone()
+
     with torch.no_grad():
-        out_step = model(tok, past_key_values=out.past_key_values, use_cache=True)
+        out_step = model(tok, past_key_values=past, use_cache=True)
     assert out_step.logits.shape == (2, 1, 1000)
+
+    # Verify Titans state actually advances during decode
+    w_after = out_step.past_key_values.layers[0].weft_titans_state[0]
+    m_after = out_step.past_key_values.layers[0].weft_titans_state[1]
+    assert not torch.equal(w_before, w_after), "Titans W fast weight must update during decode"
+    assert not torch.equal(m_before, m_after), "Titans m momentum state must update during decode"

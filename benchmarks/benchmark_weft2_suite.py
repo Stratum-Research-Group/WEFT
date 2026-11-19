@@ -67,25 +67,28 @@ def benchmark_model_scaling():
         print(f"Total Parameters: {total_p:,} (~{total_p/1e6:.1f}M)")
 
         for seq_len in seq_lengths:
-            torch.cuda.empty_cache()
-            torch.cuda.reset_peak_memory_stats()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.reset_peak_memory_stats()
             x = torch.randint(0, 1000, (1, seq_len), device=device)
 
             # Warmup
             with torch.no_grad():
                 _ = model(x)
 
-            torch.cuda.synchronize()
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
             t0 = time.time()
             iters = 5 if seq_len <= 2048 else 2
             with torch.no_grad():
                 for _ in range(iters):
                     _ = model(x)
-            torch.cuda.synchronize()
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
             elapsed = (time.time() - t0) / iters
 
             tok_s = seq_len / elapsed
-            peak_vram = torch.cuda.max_memory_allocated() / (1024 ** 2)
+            peak_vram = torch.cuda.max_memory_allocated() / (1024 ** 2) if torch.cuda.is_available() else 0.0
 
             print(f"  SeqLen {seq_len:5d}: Latency = {elapsed*1000:7.2f} ms | Throughput = {tok_s:8.1f} tok/s | Peak VRAM = {peak_vram:7.1f} MB")
             results.append({
@@ -137,7 +140,8 @@ def benchmark_associative_needle_recall():
     # Query at the very end
     x[0, -1] = 42
 
-    torch.cuda.reset_peak_memory_stats()
+    if torch.cuda.is_available():
+        torch.cuda.reset_peak_memory_stats()
     with torch.no_grad():
         out = model(x, use_cache=True)
         past = out.past_key_values
@@ -152,7 +156,7 @@ def benchmark_associative_needle_recall():
     print(f"  Query Position:  Step {haystack_len}")
     print(f"  Step Decode Logits Shape: {step_out.logits.shape}")
     print(f"  Associative Router State Verified: Cached across all {len(past.layers)} layers")
-    print("  [Result]: State preserved with zero memory leak or OOM.")
+    print("  [Result]: State preserved across decode with dynamic cache threading.")
 
 
 if __name__ == "__main__":

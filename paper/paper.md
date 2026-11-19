@@ -168,14 +168,14 @@ We benchmarked the AMW uncrossed memory layer against standard dense SwiGLU/MLP 
 Following the baseline 128M model, we established the **WEFT-2** foundation architecture, scaling to 589 Million parameters ($d=896$, 16 layers, 16 MoE routed experts + 1 shared expert, top-2 active) trained under gradient checkpointing on FineWeb-Edu.
 
 WEFT-2 introduces four core architectural subsystems:
-1. **Multi-Head Latent Attention (MLA):** Compresses local sliding-window KV projections into low-rank latent vectors ($d_{\text{latent}} = 128$), reducing KV cache footprint by an additional 3.5x.
+1. **Multi-Head Latent Attention (MLA):** Compresses local sliding-window KV projections into low-rank latent vectors ($d_{\text{latent}} = 128$), reducing projection parameter count and linear attention compute overhead.
 2. **Dual-Axis Memory Initialization (DAMI):** Establishes multi-scale memory retention by initializing recurrence decay rates geometrically from short-term ($\tau = 64$ tokens) to persistent long-term ($\tau = 65{,}536$ tokens).
-3. **Titans Surprise-Gated Fast Weights with Coupled Affine Scan:** Integrates test-time neural plastic weights $W_{\text{fast}}$ driven by prediction surprise ($\text{error} = k W^T - v$). The 2x2 momentum and weight dynamics are formulated as an associative affine operator:
+3. **Titans Surprise-Gated Fast Weights with Coupled Affine Updates:** Integrates test-time neural plastic weights $W_{\text{fast}}$ driven by prediction surprise ($\text{error} = k W^T - v$). The 2x2 momentum and weight dynamics are formulated as a coupled affine operator across sequence chunks:
    $$\begin{pmatrix} m_t \\ W_t \end{pmatrix} = \begin{pmatrix} \eta_t I & 0 \\ \eta_t I & (1 - \gamma_t) I \end{pmatrix} \begin{pmatrix} m_{t-1} \\ W_{t-1} \end{pmatrix} + \begin{pmatrix} -\nabla W_t \\ -\nabla W_t \end{pmatrix}$$
-   enabling exact chunkwise parallel prefix scans during prefill.
-4. **Associative Needle-in-a-Haystack MoE Routing:** Standard single-token router projections ($W_r x_t$) fail on long-horizon needle retrieval because late query tokens lack early context. WEFT-2 equips each MoE layer with an outer-product associative router memory:
+   enabling chunk-batched plastic memory adaptation with online per-token updates during autoregressive decode.
+4. **Associative Needle-in-a-Haystack MoE Routing:** Standard single-token router projections ($W_r x_t$) lose access to early context over long horizons. WEFT-2 equips each MoE layer with an outer-product associative router memory:
    $$R_t = \gamma_{\text{router}} R_{t-1} + k_{r, t-1}^T \text{SoftAssignment}_t$$
-   When needle retrieval queries arrive at extreme distances ($N \ge 8{,}192$), router attention retrieves the historical expert assignment that originally processed the needle, achieving $> 0.92$ softmax affinity to the target specialized expert.
+   maintaining dynamic historical expert allocations across the generation cache.
 
 ### 5.1 WEFT-2 Empirical Scaling & Benchmark Results
 

@@ -7,8 +7,8 @@ using deterministic rule verifiers (MathRuleVerifier & CodeRuleVerifier).
 Demonstrates:
 1. Critic-free reward baseline across K rollout completions:
    A_i = (R_i - mean(R)) / (std(R) + 1e-4)
-2. Clipped surrogate policy gradient objective:
-   L_clip = min(r_t * A, clip(r_t, 1-eps, 1+eps) * A)
+2. Group relative policy gradient objective with length-normalized sequence log-probs:
+   L = -E[ A_i * (1/|y_i|) * sum_t log pi_theta(y_{i,t} | x, y_{i,<t}) ]
 3. Sub-linear generation footprint using WEFT-2 constant recurrent cache + Titans memory.
 """
 
@@ -96,9 +96,12 @@ def train_weft2_grpo(
 
         # 2. Evaluate deterministic rewards via MathRuleVerifier
         rewards = []
+        accurate_completions = 0
         for comp in completions:
             res = task.verifier.verify_solution(comp, float(true_ans))
             rewards.append(res.total_reward)
+            if res.accuracy_reward >= 1.0:
+                accurate_completions += 1
 
         rewards_tensor = torch.tensor(rewards, device=device, dtype=torch.float32)
 
@@ -117,8 +120,12 @@ def train_weft2_grpo(
         selected_log_probs = log_probs.gather(dim=-1, index=targets).squeeze(-1)
         seq_log_probs = selected_log_probs.sum(dim=-1)
 
-        # Objective: Advantage * log_prob
-        loss = -(advantages * seq_log_probs).mean()
+        # Normalize by completion length to prevent length bias
+        comp_lens = (gen_tokens != tokenizer.eot_token).sum(dim=-1).clamp(min=1)
+        norm_seq_log_probs = seq_log_probs / comp_lens.float()
+
+        # REINFORCE with Group Relative baseline
+        loss = -(advantages * norm_seq_log_probs).mean()
 
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
@@ -128,11 +135,11 @@ def train_weft2_grpo(
         if episode % 10 == 0 or episode == num_episodes:
             elapsed = time.time() - t0
             vram_mb = torch.cuda.max_memory_allocated() / (1024 ** 2)
-            acc = sum(1.0 for r in rewards if r > 0.0) / group_size
+            acc = accurate_completions / group_size
             print(
                 f"Episode {episode:4d}/{num_episodes} | "
                 f"Mean Reward: {mean_r.item():5.2f} | "
-                f"Group Acc: {acc * 100:4.1f}% | "
+                f"Accuracy: {acc * 100:4.1f}% | "
                 f"Loss: {loss.item():6.3f} | "
                 f"VRAM: {vram_mb:6.1f} MB | Elapsed: {elapsed:5.1f}s"
             )

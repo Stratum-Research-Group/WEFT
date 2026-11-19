@@ -377,15 +377,21 @@ class WeftAttention(nn.Module):
                 out_head = out_head * mask_weight[:, 0, :, :].view(b, 1, 1)
             global_out = out_head.view(b, 1, d) / (self.state_rank ** 0.5)
 
+            next_titans_state = titans_fast_state
+            if self.use_titans:
+                titans_out, next_titans_state = self.titans_mem(hidden_states, fast_state=titans_fast_state)
+                global_out = global_out + titans_out
+
             if is_hf_cache and use_cache:
                 if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
                     past_state.layers[self.layer_idx].weft_recurrent_state = new_state
+                    past_state.layers[self.layer_idx].weft_titans_state = next_titans_state
                 next_past = past_state
             else:
                 k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
                 v_stored = v_local[:, :, -self.max_cached:, :] if v_local.shape[-2] > self.max_cached else v_local
                 next_kv = (k_stored, v_stored, past_len + 1) if use_cache else None
-                next_past = (new_state, next_kv) if use_cache else None
+                next_past = (new_state, next_kv, next_titans_state) if use_cache else None
 
             output = self.out_proj(local_out + global_out)
             return output, next_past

@@ -2,13 +2,13 @@
 WEFT-2 Unified Foundation Model Pretraining Pipeline.
 
 Architecture:
-- Layers: 12
-- Hidden Dimension: 768
-- Attention Heads: 12 (Sliding Window W=128)
-- Local Path: Multi-Head Latent Attention (MLA) (d_c=128)
+- Layers: 16
+- Hidden Dimension: 896
+- Attention Heads: 16 (Sliding Window W=128)
+- Local Path: Multi-Head Latent Attention (MLA) (d_c=192)
 - Global Recurrence: Dual-Axis Memory Initialization (DAMI) timescales (64 to 65,536)
-- Test-Time Associative Plasticity: Titans Surprise-Gated Memory (d_mem=64)
-- FFN Mixer: DeepSeekMoE (1 shared expert + 8 routed experts, top-2 active)
+- Test-Time Associative Plasticity: Titans Surprise-Gated Memory (d_mem=96)
+- FFN Mixer: DeepSeekMoE (1 shared expert + 16 routed experts, top-2 active)
 - Optimizer: Muon (Newton-Schulz Orthogonalized Momentum) with AMP (bfloat16)
 - Dataset: FineWeb-Edu Stream (GPT-2 BPE, 50,257 vocab)
 """
@@ -82,7 +82,7 @@ def train_weft2_foundation(
     print(f"Architecture: 16 Layers | 896 Dim | MLA(dc=192) | Titans(96) | DeepSeekMoE(16 experts, top-2)")
     print(f"Total Parameters: {num_params:,} (~{num_params/1e6:.1f}M)")
 
-    # Muon optimizer
+    # Muon optimizer (Note: applied uniformly across hidden blocks and tied embeddings for consistent momentum)
     optimizer = Muon(model.parameters(), lr=max_lr, momentum=0.95, weight_decay=0.01)
 
     use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()

@@ -115,10 +115,9 @@ class WeftDeepSeekMoE(nn.Module):
                 assoc_logits = torch.matmul(q_r, r_state).view(-1, self.num_routed_experts)
                 router_logits = router_logits_static + 0.5 * assoc_logits
 
-                # Soft expert assignment for state accumulation: [B, 1, num_experts]
-                soft_assignment = F.softmax(router_logits.view(b, 1, self.num_routed_experts), dim=-1)
-                # Outer product update: k_r^T @ soft_assignment -> [B, 64, num_experts]
-                update = torch.bmm(k_r.transpose(1, 2), soft_assignment)
+                # Accumulate memory from static assignment to match prefill update dynamics
+                p_static = F.softmax(router_logits_static.view(b, 1, self.num_routed_experts), dim=-1)
+                update = torch.bmm(k_r.transpose(1, 2), p_static)
                 next_router_state = gamma_r * r_state + update
             else:
                 # Sequence prefill with associative prefix scan across sequence

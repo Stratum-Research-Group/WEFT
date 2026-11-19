@@ -27,7 +27,7 @@ app = FastAPI(title="WEFT Inference Server", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -74,7 +74,12 @@ def load_model(checkpoint_path: str, device: Optional[str] = None, quantization:
                     return self.enc.decode(tokens)
             engine.tokenizer = TiktokenWrapper()
         else:
-            engine.tokenizer = WeftCharTokenizer()
+            if not os.path.exists(vocab_path):
+                raise FileNotFoundError(
+                    f"Checkpoint at '{checkpoint_path}' does not contain 'vocab.json' "
+                    f"required for character-level tokenization (vocab_size={engine.model.config.vocab_size})."
+                )
+            engine.tokenizer = WeftCharTokenizer(vocab_file=vocab_path)
     print(f"[WEFT Server] Loaded model from {checkpoint_path} on {engine.device}")
 
 

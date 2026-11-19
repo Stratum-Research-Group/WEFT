@@ -57,14 +57,22 @@ class FineWebEduStreamer:
             self.current_offset += count
             return []
 
-    def get_batch(self):
+    def get_batch(self, max_retries: int = 20):
         target_tokens = self.batch_size * self.seq_len
+        consecutive_failures = 0
         while len(self.token_queue) < target_tokens:
             rows = self._fetch_next_rows(count=25)
             if not rows:
+                consecutive_failures += 1
+                if consecutive_failures >= max_retries:
+                    raise RuntimeError(
+                        f"FineWebEduStreamer: persistent fetch failure after {consecutive_failures} consecutive retries. "
+                        f"Check network connectivity or provide local cached files."
+                    )
                 import time
                 time.sleep(0.1)
                 continue
+            consecutive_failures = 0
             for text in rows:
                 if not text.strip():
                     continue

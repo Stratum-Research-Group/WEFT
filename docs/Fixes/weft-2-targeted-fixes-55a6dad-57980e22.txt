@@ -1,0 +1,128 @@
+WEFT-2: TARGETED IMPLEMENTATION FIXES
+Paste-ready prompt for the coding assistant
+
+Reviewed: 19 November 2026
+Repository: https://github.com/Stratum-Research-Group/WEFT
+Remote HEAD checked: 55a6dadbacbf4e2600ab6fdfbf09b88a1aa4d34f
+
+PURPOSE
+Address the implementation issues raised in the architecture comparison. Keep WEFT's own design. Do not turn it into Qwen, DeltaNet or another architecture.
+
+This is a read-only source review and proposed implementation/test plan, not a patch or a completed test report. No tests or model benchmarks were run for this TXT. PyTorch was unavailable in the review environment. The code paths below were inspected directly. Re-fetch HEAD before applying: line numbers refer to the commit above and may move.
+
+VERDICT AND ORDER
+Required: wire Titans into cached decoding and preserve its state with a defined streaming update schedule.
+Optional optimization: store latent local-attention cache entries when MLA is enabled. Expanded K/V caching is not, by itself, an incorrect attention calculation.
+
+DO NOT TOUCH
+- Preserve the singlet-factorization recurrence, its mathematical construction, decay equations, DAMI initialization, local causal window, residual layout and MoE routing.
+- Do not change the foundation model's dimensions, expert counts, vocabulary, tied embeddings or learned tensor shapes merely to implement these fixes.
+- Do not claim that these implementation findings refute the project's mathematics or Lean proofs.
+- Do not import Qwen components, retrain a large model, run a large benchmark or alter unrelated modules.
+- Preserve use_titans=False and use_mla=False behavior, existing model weight loading, and HF generation support. Version runtime cache formats separately from learned model weights.
+- Never hide a changed Titans update rule behind an unchanged configuration. Document any unavoidable behavior change and its checkpoint implications.
+
+1. REQUIRED: INCLUDE TITANS IN EVERY EXECUTION PATH AND THREAD ITS STATE
+
+Evidence:
+- weft/modeling_weft.py:350-379: the single-token path with an existing recurrent state returns before the Titans call.
+- weft/modeling_weft.py:479-481: the sequence path calls Titans without an incoming fast state and discards the returned fast state.
+- weft/titans.py:48-59,72-75,100-107: Titans supports an incoming state consisting of fast weights W1 and momentum m1, initializes it when absent, and returns an updated state.
+- weft/cache.py:22-27,64-69,83-106: the custom lifecycle currently carries the WEFT recurrent state, but has no Titans state field or lifecycle handling.
+
+Consequence:
+A prefill can use Titans, but ordinary cached single-token continuation omits its output entirely. Separate sequence calls also restart its adaptive memory. This is a model execution inconsistency, not evidence about trained model quality.
+
+Implement:
+- Make the Titans contribution part of the same local-plus-global output computation in sequence, prefill, chunked append and cached single-token paths. Avoid a return that skips enabled model components.
+- Keep distinct per-layer, per-sequence Titans fast weights and momentum. Thread them from the incoming cache into Titans and store the returned continuation state only when use_cache=True.
+- Include the streaming state required by item 2, not only W1 and m1.
+- Keep cache-free calls independent. Do not put session memory in model-global mutable attributes or learned parameters.
+- With a supplied cache and use_cache=False, read its state without modifying any tensor, counters or metadata in the caller's cache.
+- Extend beam reorder, duplication/expansion, batch selection, supported cache conversion and reset/new-session handling to every added state tensor and counter. Inspect the installed Transformers lifecycle methods rather than assuming reorder_cache is the only operation.
+- Keep the current explicit rejection of unsupported recurrent-state rollback/crop. Do not truncate only K/V while leaving Titans history unchanged.
+- For the legacy tuple path (modeling_weft.py:264-275,373-376,471-475), introduce a documented tagged/versioned representation or an explicit conversion path. Continue supporting valid old non-Titans caches. Do not silently interpret unrelated tuple positions as fast weights.
+- Reject incompatible nonempty caches clearly when the required history is missing. An empty compatible cache may initialize from the learned prior.
+
+Acceptance:
+- Instrument the Titans module: enabled cached single-token steps must execute it exactly once per layer, and its output must enter the returned attention result.
+- Confirm fast state survives continuation and is not reinitialized on each call.
+- Two independent sessions must match their isolated results; changing one session must not change the other.
+- Reorder/duplicate nonidentical batch states and compare every added state component with the expected indexed state. Include repeated beam indices, not only a two-row swap.
+- Snapshot all caller state before use_cache=False; verify byte-for-byte preservation afterward.
+
+2. REQUIRED COMPANION TO ITEM 1: DEFINE STREAMING CHUNK SEMANTICS BEFORE CLAIMING PARITY
+
+Evidence:
+- weft/titans.py:28,60-61,78-103: the default chunk size is 64. Retrieval uses the pre-chunk weights. Momentum and decay gates are averaged over that chunk; the gradient contribution is normalized by its length. A short final chunk is updated at the end of each forward call.
+
+Why carrying W1/m1 alone is insufficient:
+One 64-token call and 64 one-token calls currently create different update schedules even if fast state is retained. An arbitrary API split changes the effective algorithm. Existing cached execution also skips Titans, so it cannot serve as the intended numerical reference.
+
+Required contract for this fix:
+- Preserve the existing chunk-based retrieval and update equations rather than silently switching to per-token learning or setting chunk_size=1.
+- Anchor chunk boundaries to each sequence's logical valid-token stream, not to Python forward-call boundaries. Expose and save the chunk size in model configuration if needed, with the existing value 64 as the compatibility default.
+- Keep committed W1/m1, the current chunk position and the pending sufficient statistics needed for the same chunk update across calls. All retrievals within an open chunk use its committed start-of-chunk weights. Do not incorporate future tokens into an earlier retrieval.
+- Close an update chunk when its valid-token count reaches the configured chunk size. An ordinary prefill return is not an end-of-sequence event.
+- Define explicit finalization for a truly ended sequence if a partial final chunk must be committed. Preserve the current partial-chunk formula there. A continuation cache must retain an unfinished chunk rather than flush it merely because a call ended.
+- Document that continuation state after a partial chunk now includes pending work. On a truly finished standalone sequence, finalization can recover the previous end-of-call update semantics. Do not promise identical intermediate state representations before and after the fix.
+- Respect padding: invalid tokens must not enter memory updates, gate averages or valid-token chunk counts. Define per-row counts for unequal prompt lengths. Keep supported attention-mask semantics explicit; reject a mask form that cannot be mapped safely to update validity.
+- Keep adaptation usable under torch.no_grad()/inference mode. During training, preserve the intended gradients through the update computation. Do not detach all state indiscriminately to make inference tests pass.
+
+Acceptance:
+- First build a small, transparent reference for this specified schedule, using the existing update equations, then compare the integrated implementation against it.
+- At fixed weights in eval mode, compare full causal logits with: all tokens one at a time; prefill plus single-token continuation; and several arbitrary chunk partitions of the same sequence. Use separate fresh caches for each route.
+- Exercise valid-token lengths 1,63,64,65,129 and splits that cut across the 64-token update boundary. Small toy dimensions are sufficient.
+- Compare committed fast weights, momentum, chunk counts and pending statistics at matching logical positions. Do not compare only generated argmax tokens.
+- Change only future tokens and confirm earlier logits are unchanged. Compare padded and unpadded valid-token results under the supported mask contract.
+- Add a tiny backward test with finite, nonzero gradients to the relevant Titans projections/gates and learned prior where the chosen sequence length exercises updates. Include an update boundary so this is not only a prior-retrieval test.
+- CPU FP32 proposed gate: torch.testing.assert_close with atol=1e-5, rtol=1e-4. Report maximum error. If accumulation order requires a different tolerance, justify it from measured reference errors, not by loosening until green. Lower-precision/GPU tolerances need separate evidence.
+
+3. OPTIONAL OPTIMIZATION: CACHE THE MLA LATENT, NOT EXPANDED LOCAL K/V
+
+Evidence:
+- weft/modeling_weft.py:214-218: MLA has a shared down projection followed by separate K and V up projections.
+- weft/modeling_weft.py:281-290: the latent is expanded before the cache update.
+- weft/modeling_weft.py:293-305,373-375,472-474 and weft/cache.py:29-51: both HF and tuple paths retain expanded local K/V.
+
+Classification:
+The low-rank parameterization exists. What is missing is latent resident-cache storage. The local cache is already window-bounded, so this is a potential constant-factor storage improvement, not a change from unbounded to bounded context memory. Do not describe the current implementation as having DeepSeek-style compressed KV-cache savings.
+
+Implement only after items 1 and 2 are stable, or leave it explicitly deferred:
+- For use_mla=True, retain one copy of the bounded shared latent sequence plus logical-position metadata. Do not store identical latent data twice to satisfy a K/V interface.
+- Reconstruct the required local K/V from that latent for attention without changing projection weights, query scaling, local causal mask, global recurrence or Titans behavior.
+- Do not leave expanded tensors resident elsewhere in the cache. Avoid small tensor views that keep a much larger prefill allocation alive.
+- Keep use_mla=False on its existing expanded-cache route. Tag representations and reject incompatible nonempty runtime cache input rather than guessing the layout.
+- Preserve HF generation, beam operations, logical sequence length and read-only cache use. Verify state conversion semantics rather than silently converting latent tensors as ordinary K/V.
+- Keep optimization claims narrow: transient expanded attention operands and projection work may remain. Storing latents does not automatically improve latency or peak memory.
+
+Acceptance:
+- Compare optimized logits and local attention outputs with the original expanded implementation using identical weights/input, with Titans disabled first, then enabled under the item 2 contract.
+- Cover no cache, prefill, single-token continuation, chunked append, window rollover and beam reorder.
+- Measure actual retained storage, including backing allocations, after prefill and decode. Verify sequence-axis bounds and count one latent buffer rather than two expanded buffers. Report bytes/dtype/batch/layers/window and distinguish local cache, WEFT recurrent state, Titans state and temporary workspaces.
+- Run a small controlled memory/latency comparison only on available hardware. A smaller resident local cache is the storage gate; a latency win is not guaranteed and must not be invented.
+
+4. REQUIRED TEST/DOCUMENTATION CLOSEOUT
+
+Existing coverage that needs strengthening:
+- tests/test_moe_titans.py:42-66 checks output shapes, not Titans persistence, participation or numerical equivalence.
+- tests/test_mla.py:10-37 checks forward/decode shapes; lines 40-68 check projection gradients. These do not establish latent-cache storage or full-vs-cached parity.
+
+Deliver:
+- Regression tests for the failures above, including tests that fail on the reviewed commit for the intended reason. Do not replace existing tests with weaker assertions.
+- A short state-schema note: per-layer fields, shapes, dtype/device, logical chunk boundaries, reset behavior, padding, beam operations, tuple compatibility and unsupported rollback.
+- An explicit checkpoint note: learned tensor compatibility versus changed runtime Titans continuation behavior. No claim that an old trained checkpoint is validated under corrected generation semantics without evaluation.
+- Clear MLA wording: low-rank K/V projection is already implemented; latent resident caching is optional work until its storage gate passes.
+- A final report with commit, changed files, exact test commands, pass/fail/skip counts, numerical errors and unrun gates. Do not invent successful tests or capability/efficiency gains.
+
+Suggested scoped command once the local dependencies are available:
+python -m pytest -q tests/test_moe_titans.py tests/test_mla.py tests/test_weft_hf.py
+Run any new dedicated regression files as well. Review failures individually. Do not start a 589M training run to validate state plumbing; use tiny configurations first. GPU/Triton-specific checks may remain explicitly unrun when hardware is unavailable.
+
+SOURCE PERMALINKS
+The file/line references above are pinned to the checked commit:
+https://github.com/Stratum-Research-Group/WEFT/blob/55a6dadbacbf4e2600ab6fdfbf09b88a1aa4d34f/weft/modeling_weft.py
+https://github.com/Stratum-Research-Group/WEFT/blob/55a6dadbacbf4e2600ab6fdfbf09b88a1aa4d34f/weft/titans.py
+https://github.com/Stratum-Research-Group/WEFT/blob/55a6dadbacbf4e2600ab6fdfbf09b88a1aa4d34f/weft/cache.py
+https://github.com/Stratum-Research-Group/WEFT/blob/55a6dadbacbf4e2600ab6fdfbf09b88a1aa4d34f/tests/test_moe_titans.py
+https://github.com/Stratum-Research-Group/WEFT/blob/55a6dadbacbf4e2600ab6fdfbf09b88a1aa4d34f/tests/test_mla.py

@@ -551,13 +551,28 @@ class WeftDecoderLayer(nn.Module):
         residual = hidden_states
         hidden_states = self.post_attention_layernorm(hidden_states)
         is_hf_cache = isinstance(past_state, Cache)
-        if hasattr(self.mlp, "use_associative_routing") and is_hf_cache and use_cache:
-            layer_cache = past_state.layers[self.layer_idx] if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx else None
-            r_state = getattr(layer_cache, "weft_router_state", None) if layer_cache is not None else None
-            mlp_out, next_r_state = self.mlp(hidden_states, router_state=r_state, return_state=True)
-            if layer_cache is not None:
-                layer_cache.weft_router_state = next_r_state
-            hidden_states = mlp_out
+        is_tuple_cache = isinstance(past_state, tuple) and use_cache
+        if hasattr(self.mlp, "use_associative_routing") and use_cache:
+            if is_hf_cache:
+                layer_cache = past_state.layers[self.layer_idx] if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx else None
+                r_state = getattr(layer_cache, "weft_router_state", None) if layer_cache is not None else None
+                mlp_out, next_r_state = self.mlp(hidden_states, router_state=r_state, return_state=True)
+                if layer_cache is not None:
+                    layer_cache.weft_router_state = next_r_state
+                hidden_states = mlp_out
+            elif is_tuple_cache:
+                # Thread router state in 4th element of legacy tuple cache: (recurrent, kv, titans, router)
+                r_state = past_state[3] if len(past_state) > 3 else None
+                mlp_out, next_r_state = self.mlp(hidden_states, router_state=r_state, return_state=True)
+                if isinstance(next_state, tuple):
+                    # Expand next_state to 4-tuple
+                    rec_s = next_state[0]
+                    kv_s = next_state[1] if len(next_state) > 1 else None
+                    titans_s = next_state[2] if len(next_state) > 2 else None
+                    next_state = (rec_s, kv_s, titans_s, next_r_state)
+                hidden_states = mlp_out
+            else:
+                hidden_states = self.mlp(hidden_states)
         else:
             hidden_states = self.mlp(hidden_states)
         hidden_states = residual + hidden_states

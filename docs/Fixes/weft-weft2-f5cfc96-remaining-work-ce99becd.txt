@@ -1,0 +1,221 @@
+WEFT-2 RE-REVIEW: REMAINING WORK
+Repo: https://github.com/Stratum-Research-Group/WEFT
+Branch: weft-2 (reviewed branch, NOT master)
+HEAD at review: f5cfc96c944004e5f139dd85b770295b9852e87a ("feat(sft): add format cold-start SFT bootstrapper for WEFT-2")
+Delta since last review: eaa7c69 -> 0c94689 -> 1d2fc85 (two fix commits addressing the previous
+report) -> f5cfc96 (new SFT example script, reviewed in Part 3A). HEAD re-fetched at close.
+Review date: 2026-11-19. Local runs: CPU, torch 2.14.1+cpu, Python 3.10. No GPU on this box.
+
+=====================================================================
+PART 1: MEASURED THIS RUN
+=====================================================================
+- Full pytest suite: 30 collected, 26 passed, 4 skipped, 0 errors, 0 failures.
+  Skips are environment gates only: test_fsdp (needs 2 CUDA devices), test_fused_bwd x3
+  (needs CUDA+Triton). Same healthy shape as last round; no regressions.
+- Titans decode probe (small config, CPU): cached Titans (W, m) state now ADVANCES during
+  single-token decode (max abs delta 0.0965 over 4 steps) and Titans produces a nonzero
+  output contribution at decode (mean abs 0.0126). Last round it was bit-identical/inert.
+- Full-forward vs incremental decode parity (small config, CPU):
+    Titans OFF: max abs logit diff 4.2e-07 (parity holds, finite tolerance, not bit-exact).
+    Titans ON:  max abs logit diff 1.06e-03 (expected; see Finding 1).
+- benchmarks/benchmark_associative_needle_deep.py: runs to completion on CPU
+  (context_lengths=[2048] run here; previously crashed on unconditional CUDA calls).
+- benchmarks/benchmark_weft2_suite.py benchmark_associative_needle_recall: runs to
+  completion on CPU (previously crashed the same way).
+- Foundation config parameter count: 590,927,152 (590.9M), matching the count paper.tex
+  now states. Counting was done on the meta device (no allocation). A first attempt that
+  instantiated the full model in fp32 was OOM-killed on this box; per your standing rule
+  against memory-risk jobs, no further large allocations were attempted and the meta-device
+  count is the measurement of record.
+- GRPO's unconditional torch.cuda.max_memory_allocated() (train_weft2_grpo.py:137) was
+  exercised on this CPU-only torch: returns 0, does not raise. Verified non-issue here.
+- All GPU performance and training numbers in the paper (72.26s 1B-token run, 16.7x
+  speedup, prefill latencies, loss curves) remain author-reported. Not reproduced here;
+  no GPU available.
+
+=====================================================================
+PART 2: DISPOSITION OF PREVIOUS FINDINGS (report weft-weft2-eaa7c69)
+=====================================================================
+FIXED:
+- Titans inert at decode (was HIGH). modeling_weft.py:377-388 now runs the Titans block in
+  the s==1 fast path and writes the updated state back to the cache; the tuple path emits a
+  3-tuple carrying the Titans state. Test added (test_moe_titans.py:64-76) asserting W and m
+  advance during decode. Verified by probe above.
+- Tuple decode dropped Titans state. Fixed via 3-tuple (modeling_weft.py:278, 394).
+- Benchmark CPU crashes (both new benchmark scripts). CUDA calls now guarded; verified
+  running on CPU.
+- Deep needle used sliced LM logits as hidden state. Fixed: hooks layer-0 MoE input and
+  uses the real hidden state (benchmark_associative_needle_deep.py:73-95).
+- GRPO format reward counted as accuracy. Fixed: accuracy now counts only
+  verifier.accuracy_reward >= 1.0, which the verifier sets only on an exact answer match
+  (train_weft2_grpo.py:99-104, verifier.py:188).
+- GRPO length weighting. Sequence log-probs are now length-normalized
+  (train_weft2_grpo.py:124-127). See Finding 6 for a residual nit.
+- GRPO overclaimed "clipped surrogate". Docstring now describes the actual objective
+  (REINFORCE with group-relative baseline); no fake clipping claimed.
+- Serving missing-vocab fallback TypeError. Fixed: explicit FileNotFoundError with a clear
+  message (serving_server.py:77-82).
+- CORS wildcard-with-credentials. Fixed: allow_credentials=False (serving_server.py:30).
+- Dataset streamer infinite retry. Fixed: 20 consecutive fetch failures raise RuntimeError
+  (dataset_fineweb.py:60-75).
+- Stale pretraining docstring (12-layer/768 config text). Fixed to match the actual
+  16-layer/896/d_c=192/Titans-96/16-expert config (train_weft2_foundation.py:4-12).
+- 589M vs 590.9M label mismatch. paper.tex now states "590.9M exact parameters"; verified
+  590,927,152 at this HEAD.
+- MoE prefill-vs-decode update inconsistency. Fixed: decode now accumulates memory from the
+  static softmax assignment, matching prefill dynamics (moe.py:118-122).
+- Titans "parallel prefix scan" paper overclaim. Softened in paper.md/paper.tex to
+  "coupled affine updates" / "chunk-batched adaptation". See Finding 2 for the code-level
+  remnant.
+- MLA "3.5x KV cache footprint" claim. Removed from paper.md and paper.tex. See Finding 5
+  for the implementation reality.
+
+STILL OPEN (carried into Part 3):
+- Titans use_scan flag dead, sequential chunk loop only (Finding 2).
+- Needle benchmarks still measure no recall (Finding 3).
+- MoE router state lost on the legacy tuple cache path (Finding 4).
+- Titans decode-vs-prefill update-schedule divergence (Finding 1, reframed per the agreed
+  design gate: not a demand for full-forward equality).
+
+NOT APPLICABLE / VERIFIED NON-ISSUES THIS ROUND:
+- CPU FP16 autocast (works on this torch), aux-loss gradient flow (covered by tests).
+- torch.cuda.max_memory_allocated() under CPU-only torch returns 0 (measured).
+
+=====================================================================
+PART 3: REMAINING NUMBERED FINDINGS
+=====================================================================
+1. [MED] Titans decode applies a different update schedule than prefill.
+   Where: weft/modeling_weft.py:380-384 (decode: per-token update through titans_mem with
+   T=1) vs weft/titans.py:112-140 (prefill: chunk-batched update with chunk-mean gates and
+   1/chunk_len scaled gradient).
+   Evidence: full-forward vs incremental decode max abs logit diff 1.06e-3 with Titans on,
+   vs 4.2e-7 with Titans off (measured this run, small 2-layer config, CPU).
+   Why it matters: decode-time plasticity is now real, but generation does not reproduce
+   the prefill-time memory trajectory. This is a design decision, not automatically a bug:
+   chunk-boundary-dependent updates mean decode need not equal one full forward pass.
+   Action: decide the intended decode update semantics (per-token online vs deferred
+   chunk-flush), document the choice, and add a test comparing decode against a reference
+   that uses the SAME update schedule. Do not force bit-equality with full forward.
+
+2. [MED] Titans parallel scan still does not exist; flag and docstring still claim it.
+   Where: weft/titans.py:12-22 (docstring: "closed-form associative chunk-parallel prefix
+   scan in O(log C) parallel depth" in use_scan mode), titans.py:36/44 (use_scan parameter
+   stored), titans.py:104-140 (forward is an unconditional sequential chunk loop; use_scan
+   is never read).
+   Action: either implement the scan behind use_scan or delete the flag and correct the
+   module docstring. Paper text is already fixed; this is the code-level remnant.
+
+3. [MED] Neither needle benchmark measures recall.
+   Where: benchmarks/benchmark_weft2_suite.py:104-160 plants tokens 42/999 but only prints
+   logits shape and an unconditional success line (line 159). No assertion compares the
+   model's output to the needle.
+   benchmarks/benchmark_associative_needle_deep.py:91 picks target_expert=3 arbitrarily on
+   a random-init model and reports softmax affinity to it as "Associative Recall"
+   (lines 97-101 and the summary block). There is no ground truth linking the needle to
+   expert 3, so the percentage is not a recall measurement. Measured this run on CPU:
+   "Associative Recall: 23.4% vs Static: 18.7%" for an arbitrary expert.
+   Action: add ground truth. Options: train a small probe so a needle token reliably binds
+   to a known expert, then assert retrieval; or make it a language-modeling recall test
+   (needle key -> expected value token, assert top-1/loss at the query). Rename the metric
+   until then.
+
+4. [LOW] MoE associative router state is dropped on the legacy tuple cache path.
+   Where: weft/modeling_weft.py:554-562. Router state is read/written only when past_state
+   is an HF Cache; the tuple branch calls self.mlp(hidden_states) with no router_state, so
+   associative routing memory resets every step in tuple mode. HF Cache is the default
+   (WeftModel creates WeftCache), so impact is limited to direct tuple API users.
+   Action: thread router state through the tuple format (as was done for Titans), or
+   deprecate the tuple path explicitly.
+
+5. [LOW] MLA cache stores full up-projected K/V, not latents.
+   Where: weft/modeling_weft.py:293-296 (k/v up-projected before cache write),
+   weft/cache.py:38-57 (stores what it receives). At the foundation config this is the full
+   K/V per layer, so no cache-footprint saving is realized. The paper's 3.5x claim is
+   removed, so this is now an implementation note, not a doc mismatch.
+   Action (only if the memory saving is wanted): cache c_kv latents and up-project on read.
+
+6. [LOW] GRPO leftovers.
+   Where: examples/train_weft2_grpo.py:52 (clip_eps parameter is now dead), line 113
+   (stale "Surrogate Policy Gradient step" comment; the step is REINFORCE), lines 122-125
+   (mismatched numerator and denominator: seq_log_probs sums log-probs over ALL generated
+   positions, including padding after the terminal EOT, while the normalizer counts only
+   non-EOT tokens). The effect of this mismatch was not measured here; no direction or
+   magnitude is claimed.
+   Action: remove clip_eps, fix the comment, and align the sum with the count by masking
+   positions strictly AFTER the first terminal EOT (i.e., the padding region), while keeping
+   the first terminal EOT itself in both the sum and the count so the model still learns
+   stop-token probability. A blanket non-EOT mask would drop that terminal token from the
+   loss and is not the fix.
+
+7. [LOW] Serving usage fields report characters, not tokens.
+   Where: weft/serving_server.py:228-229 and 269-270: prompt_tokens = len(prompt_text),
+   completion_tokens = len(generated_text). These are character counts in an
+   OpenAI-compatible API.
+   Action: count actual token IDs: prompt_tokens from the encoded prompt tensor's length,
+   completion_tokens from the number of generated token IDs. Whether special tokens are
+   included should follow the declared API policy; do not re-encode the rendered output
+   text and assume it reproduces the generated IDs.
+
+=====================================================================
+PART 3A: NEW COMMIT f5cfc96 (examples/train_weft2_sft.py, 117 lines, new)
+=====================================================================
+Format cold-start SFT bootstrapper: synthetic arithmetic scratchpad pairs, 200 steps,
+prompt-masked causal LM loss, saves a warm-start checkpoint for GRPO.
+Checked and clean:
+- Prompt masking alignment: verified on the exact template that encoding prompt+completion
+  jointly keeps the prompt-alone token prefix intact (44-token prefix match, GPT-2 BPE), so
+  p_len masking is not off-by-one here. Note this property is template-dependent; if the
+  template changes so the completion does not start with a space, re-check.
+- Label shifting is standard HF behavior and the post-answer EOT token is trained, which is
+  what GRPO rollouts need for stopping.
+- Padding uses EOT in inputs and -100 in labels; VRAM print is CUDA-guarded; device falls
+  back to CPU.
+Observation, not a defect: no held-out split or early stop (200 fixed steps). Acceptable
+for a format bootstrapper; do not read quality claims into the final loss.
+No numbered findings from this commit.
+
+=====================================================================
+PART 4: EVIDENCE SEPARATION
+=====================================================================
+Reproduced on this box (CPU, this HEAD):
+- 30 collected / 26 passed / 4 env skips / 0 errors.
+- Titans state advances at decode; nonzero Titans contribution at decode.
+- Full-vs-incremental diffs: 4.2e-7 (Titans off), 1.06e-3 (Titans on).
+- Both previously-crashing benchmark scripts now complete on CPU.
+- Param count 590,927,152 (meta device).
+- torch.cuda.max_memory_allocated() returns 0 on CPU-only torch (GRPO print is safe here).
+Static code-read findings (not executed): Findings 2, 4, 5, 6, 7, and the hollow-metric
+nature of Finding 3 (the scripts were run; the missing ground truth is a code property).
+Author-reported only, never reproduced here: all GPU numbers (72.26s 1B tokens, 16.7x,
+prefill latencies, training loss results).
+
+=====================================================================
+PART 5: DO NOT TOUCH
+=====================================================================
+- The mathematical uncrossing identities and the LeanProofs work: implementation findings
+  here do not bear on them; nothing in this list questions the maths.
+- WEFT-1 decode parity: keep full-vs-incremental agreement at ~1e-6 or better with Titans
+  disabled. Add a regression assertion if you change the decode path again.
+- Tied embeddings and the verified 590,927,152-parameter foundation config; if the config
+  changes, update paper.tex's "590.9M exact" in the same commit.
+- The new decode-time Titans update itself (Finding 1 is about schedule semantics, not
+  about reverting the fix).
+- dataset_fineweb.py retry-cap semantics (raise after 20 consecutive failures); only tune
+  the cap or add backoff if needed.
+- Test suite must remain at least 26 passed / 4 environment skips / 0 errors on CPU.
+
+=====================================================================
+PART 6: OPEN GATES (unchanged unless noted)
+=====================================================================
+- GPU reproduction of all headline numbers (72.26s 1B-token run, 16.7x at 524k, prefills,
+  loss curves). Still author-reported; cross-compare on your PC as usual.
+- Finding 1's design decision (decode update schedule) gates any claim of generation-time
+  test-time plasticity behaving like training-time plasticity.
+- A real recall metric inside those two benchmark scripts (Finding 3) gates any
+  needle-in-haystack claim made from benchmark output; this gate is scoped to those
+  scripts' evidence only, not to other repo evidence.
+- Held-out AMW quality evaluation across seeds (perplexity/loss parity on isolated
+  held-out data) remains open as an evaluation gate; the earlier streamer split-isolation
+  defect was repaired and this gate does not imply otherwise. Separate from that, the
+  checkpoint-level randomized exact-recall quality gate (trained-probe binding) from
+  earlier rounds also remains open. Neither was re-run here.

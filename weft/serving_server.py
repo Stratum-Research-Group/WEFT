@@ -206,11 +206,16 @@ async def chat_completions(req: ChatCompletionRequest):
 
     # Non-streaming
     generated_text = ""
+    prompt_tokens = len(engine.tokenizer.encode(prompt_text))
+    completion_tokens = 0
     for chunk_str in _generate_tokens_generator(prompt_text, req.max_tokens, req.temperature, req_id, is_chat=True):
         if chunk_str.strip() in ("", "data: [DONE]"):
             continue
         data = json.loads(chunk_str.replace("data: ", ""))
-        generated_text += data["choices"][0]["delta"].get("content", "")
+        content = data["choices"][0]["delta"].get("content", "")
+        generated_text += content
+        if content:
+            completion_tokens += 1
 
     return {
         "id": req_id,
@@ -225,9 +230,9 @@ async def chat_completions(req: ChatCompletionRequest):
             }
         ],
         "usage": {
-            "prompt_tokens": len(prompt_text),
-            "completion_tokens": len(generated_text),
-            "total_tokens": len(prompt_text) + len(generated_text),
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": prompt_tokens + completion_tokens,
         },
     }
 
@@ -247,11 +252,16 @@ async def completions(req: CompletionRequest):
         )
 
     generated_text = ""
+    prompt_tokens = len(engine.tokenizer.encode(prompt_text))
+    completion_tokens = 0
     for chunk_str in _generate_tokens_generator(prompt_text, req.max_tokens, req.temperature, req_id, is_chat=False):
         if chunk_str.strip() in ("", "data: [DONE]"):
             continue
         data = json.loads(chunk_str.replace("data: ", ""))
-        generated_text += data["choices"][0].get("text", "")
+        txt = data["choices"][0].get("text", "")
+        generated_text += txt
+        if txt:
+            completion_tokens += 1
 
     return {
         "id": req_id,
@@ -266,9 +276,9 @@ async def completions(req: CompletionRequest):
             }
         ],
         "usage": {
-            "prompt_tokens": len(prompt_text),
-            "completion_tokens": len(generated_text),
-            "total_tokens": len(prompt_text) + len(generated_text),
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": prompt_tokens + completion_tokens,
         },
     }
 

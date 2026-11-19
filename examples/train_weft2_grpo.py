@@ -49,7 +49,6 @@ def train_weft2_grpo(
     group_size: int = 4,
     max_gen_tokens: int = 96,
     lr: float = 1e-5,
-    clip_eps: float = 0.2,
     device: str = "cuda",
 ):
     print("=" * 80)
@@ -118,10 +117,16 @@ def train_weft2_grpo(
         # Token-level log probabilities
         targets = gen_tokens.unsqueeze(-1)
         selected_log_probs = log_probs.gather(dim=-1, index=targets).squeeze(-1)
-        seq_log_probs = selected_log_probs.sum(dim=-1)
 
-        # Normalize by completion length to prevent length bias
-        comp_lens = (gen_tokens != tokenizer.eot_token).sum(dim=-1).clamp(min=1)
+        # Mask positions strictly after the first terminal EOT while including the terminal EOT itself
+        is_eot = (gen_tokens == tokenizer.eot_token)
+        # Cumulative sum of EOT: 0 before EOT, 1 at first EOT, >1 for subsequent padding
+        eot_cumsum = torch.cumsum(is_eot.long(), dim=-1)
+        valid_mask = (eot_cumsum <= 1)
+
+        masked_log_probs = selected_log_probs * valid_mask.float()
+        seq_log_probs = masked_log_probs.sum(dim=-1)
+        comp_lens = valid_mask.sum(dim=-1).clamp(min=1)
         norm_seq_log_probs = seq_log_probs / comp_lens.float()
 
         # REINFORCE with Group Relative baseline

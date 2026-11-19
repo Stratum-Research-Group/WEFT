@@ -1,6 +1,6 @@
 """
 Titans Surprise-Gated Test-Time Fast Weights for WEFT.
-Adapted from AETHER-1 (Specification v1.1.0) and upgraded with Associative Block-Scan.
+Adapted from AETHER-1 (Specification v1.1.0).
 
 Maintains an adaptive test-time fast weight matrix W_fast:
   1. Retrieves associations: y = q @ W_fast^T
@@ -9,10 +9,10 @@ Maintains an adaptive test-time fast weight matrix W_fast:
      m_{t} = eta * m_{t-1} - grad_W
      W_{t} = (1 - gamma) * W_{t-1} + m_{t}
 
-In parallel prefill mode (use_scan=True), this 2x2 coupled recurrence:
-   [m_t]   [   eta_t * I                0       ] [m_{t-1}]   [ -grad_W_t ]
-   [W_t] = [   eta_t * I       (1 - gamma_t) * I ] [W_{t-1}] + [ -grad_W_t ]
-is computed in closed-form associative chunk-parallel prefix scan in O(log C) parallel depth.
+During sequence prefill, the 2x2 coupled recurrence is evaluated via chunk-batched
+coupled affine transitions with chunk-mean gates and 1/chunk_len gradient scaling.
+During autoregressive generation (s == 1), online per-token adaptation updates
+the fast weights dynamically across each decode step.
 """
 
 from typing import Optional, Tuple
@@ -24,7 +24,7 @@ import torch.nn.functional as F
 class TitansSurpriseMemory(nn.Module):
     """
     Online associative neural memory with surprise-gated plastic fast weights.
-    Supports both chunkwise step updates and associative block prefix scan.
+    Evaluates chunk-batched affine updates during prefill and per-token adaptation at decode.
     """
     def __init__(
         self,
@@ -33,7 +33,6 @@ class TitansSurpriseMemory(nn.Module):
         theta_max: float = 0.1,
         gamma_max: float = 0.01,
         chunk_size: int = 64,
-        use_scan: bool = True,
     ):
         super().__init__()
         self.d_model = d_model
@@ -41,7 +40,6 @@ class TitansSurpriseMemory(nn.Module):
         self.theta_max = theta_max
         self.gamma_max = gamma_max
         self.chunk_size = chunk_size
-        self.use_scan = use_scan
 
         self.proj_q = nn.Linear(d_model, d_mem, bias=False)
         self.proj_k = nn.Linear(d_model, d_mem, bias=False)

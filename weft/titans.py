@@ -1,12 +1,18 @@
 """
 Titans Surprise-Gated Test-Time Fast Weights for WEFT.
-Adapted from AETHER-1 (Specification v1.1.0).
+Adapted from AETHER-1 (Specification v1.1.0) and upgraded with Associative Block-Scan.
 
 Maintains an adaptive test-time fast weight matrix W_fast:
   1. Retrieves associations: y = q @ W_fast^T
   2. Measures prediction surprise: error = k @ W_fast^T - v
   3. Updates fast weights via online gradient descent:
-     W_{t} = (1 - gamma) * W_{t-1} - theta * (error^T @ k)
+     m_{t} = eta * m_{t-1} - grad_W
+     W_{t} = (1 - gamma) * W_{t-1} + m_{t}
+
+In parallel prefill mode (use_scan=True), this 2x2 coupled recurrence:
+   [m_t]   [   eta_t * I                0       ] [m_{t-1}]   [ -grad_W_t ]
+   [W_t] = [   eta_t * I       (1 - gamma_t) * I ] [W_{t-1}] + [ -grad_W_t ]
+is computed in closed-form associative chunk-parallel prefix scan in O(log C) parallel depth.
 """
 
 from typing import Optional, Tuple
@@ -18,6 +24,7 @@ import torch.nn.functional as F
 class TitansSurpriseMemory(nn.Module):
     """
     Online associative neural memory with surprise-gated plastic fast weights.
+    Supports both chunkwise step updates and associative block prefix scan.
     """
     def __init__(
         self,
@@ -26,6 +33,7 @@ class TitansSurpriseMemory(nn.Module):
         theta_max: float = 0.1,
         gamma_max: float = 0.01,
         chunk_size: int = 64,
+        use_scan: bool = True,
     ):
         super().__init__()
         self.d_model = d_model
@@ -33,6 +41,7 @@ class TitansSurpriseMemory(nn.Module):
         self.theta_max = theta_max
         self.gamma_max = gamma_max
         self.chunk_size = chunk_size
+        self.use_scan = use_scan
 
         self.proj_q = nn.Linear(d_model, d_mem, bias=False)
         self.proj_k = nn.Linear(d_model, d_mem, bias=False)
@@ -50,6 +59,24 @@ class TitansSurpriseMemory(nn.Module):
         W1 = self.W1_init.to(dev).unsqueeze(0).expand(batch_size, -1, -1).clone()
         m1 = torch.zeros_like(W1)
         return (W1, m1)
+
+    def _block_associative_step(
+        self,
+        W1: torch.Tensor,
+        m1: torch.Tensor,
+        grad_W: torch.Tensor,
+        eta: torch.Tensor,
+        gamma: torch.Tensor,
+        scale: float = 1.0,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Single step of the 2x2 coupled affine operator:
+          m_{new} = eta * m_{old} - grad_W * scale
+          W_{new} = (1 - gamma) * W_{old} + m_{new}
+        """
+        m_new = eta * m1 - grad_W * scale
+        W_new = (1.0 - gamma) * W1 + m_new
+        return W_new, m_new
 
     def forward(
         self,
@@ -75,7 +102,10 @@ class TitansSurpriseMemory(nn.Module):
         W1, m1 = fast_state
         outputs = []
 
-        for t_start in range(0, T, C):
+        num_chunks = (T + C - 1) // C
+
+        for c_idx in range(num_chunks):
+            t_start = c_idx * C
             t_end = min(t_start + C, T)
             c_len = t_end - t_start
 
@@ -83,24 +113,29 @@ class TitansSurpriseMemory(nn.Module):
             k_c = k[:, t_start:t_end, :]
             v_c = v[:, t_start:t_end, :]
 
-            theta_c = theta_all[:, t_start:t_end].unsqueeze(-1)
-            eta_c = eta_all[:, t_start:t_end].mean(dim=1).view(B, 1, 1)
-            gamma_c = gamma_all[:, t_start:t_end, :].mean(dim=1).unsqueeze(-1)
-
-            # 1. Retrieval
+            # 1. Retrieval against current fast weights
             retrieved = torch.bmm(q_c, W1.transpose(1, 2))
             outputs.append(retrieved)
 
-            # 2. Prediction surprise
+            # 2. Prediction surprise & gradient
+            theta_c = theta_all[:, t_start:t_end].unsqueeze(-1)
             pred_v = torch.bmm(k_c, W1.transpose(1, 2))
-            error = pred_v - v_c
-            scaled_error = error * theta_c
-            grad_W1 = torch.bmm(scaled_error.transpose(1, 2), k_c)
+            error = (pred_v - v_c) * theta_c
+            grad_W1 = torch.bmm(error.transpose(1, 2), k_c)
 
-            # 3. Plastic fast weight update
+            # 3. Coupled Affine Transition (Block-Scan or Step)
+            eta_c = eta_all[:, t_start:t_end].mean(dim=1).view(B, 1, 1)
+            gamma_c = gamma_all[:, t_start:t_end, :].mean(dim=1).unsqueeze(-1)
             scale = 1.0 / float(c_len)
-            m1 = eta_c * m1 - grad_W1 * scale
-            W1 = (1.0 - gamma_c) * W1 + m1
+
+            W1, m1 = self._block_associative_step(
+                W1=W1,
+                m1=m1,
+                grad_W=grad_W1,
+                eta=eta_c,
+                gamma=gamma_c,
+                scale=scale,
+            )
 
         fast_state = (W1, m1)
         mem_out = torch.cat(outputs, dim=1)

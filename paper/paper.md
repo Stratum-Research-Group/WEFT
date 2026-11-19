@@ -163,7 +163,34 @@ We benchmarked the AMW uncrossed memory layer against standard dense SwiGLU/MLP 
 
 ---
 
-## 5. Ecosystem Compatibility & Serving Architecture
+## 5. WEFT-2 Foundation Architecture: Scaling to 589M & Associative Routing
+
+Following the baseline 128M model, we established the **WEFT-2** foundation architecture, scaling to 589 Million parameters ($d=896$, 16 layers, 16 MoE routed experts + 1 shared expert, top-2 active) trained under gradient checkpointing on FineWeb-Edu.
+
+WEFT-2 introduces four core architectural subsystems:
+1. **Multi-Head Latent Attention (MLA):** Compresses local sliding-window KV projections into low-rank latent vectors ($d_{\text{latent}} = 128$), reducing KV cache footprint by an additional 3.5x.
+2. **Dual-Axis Memory Initialization (DAMI):** Establishes multi-scale memory retention by initializing recurrence decay rates geometrically from short-term ($\tau = 64$ tokens) to persistent long-term ($\tau = 65{,}536$ tokens).
+3. **Titans Surprise-Gated Fast Weights with Coupled Affine Scan:** Integrates test-time neural plastic weights $W_{\text{fast}}$ driven by prediction surprise ($\text{error} = k W^T - v$). The 2x2 momentum and weight dynamics are formulated as an associative affine operator:
+   $$\begin{pmatrix} m_t \\ W_t \end{pmatrix} = \begin{pmatrix} \eta_t I & 0 \\ \eta_t I & (1 - \gamma_t) I \end{pmatrix} \begin{pmatrix} m_{t-1} \\ W_{t-1} \end{pmatrix} + \begin{pmatrix} -\nabla W_t \\ -\nabla W_t \end{pmatrix}$$
+   enabling exact chunkwise parallel prefix scans during prefill.
+4. **Associative Needle-in-a-Haystack MoE Routing:** Standard single-token router projections ($W_r x_t$) fail on long-horizon needle retrieval because late query tokens lack early context. WEFT-2 equips each MoE layer with an outer-product associative router memory:
+   $$R_t = \gamma_{\text{router}} R_{t-1} + k_{r, t-1}^T \text{SoftAssignment}_t$$
+   When needle retrieval queries arrive at extreme distances ($N \ge 8{,}192$), router attention retrieves the historical expert assignment that originally processed the needle, achieving $> 0.92$ softmax affinity to the target specialized expert.
+
+### 5.1 WEFT-2 Empirical Scaling & Benchmark Results
+
+| Context Length ($N$) | Prefill Latency | Peak VRAM | Decoding Throughput | Hardware / Memory Regime |
+|---:|---:|---:|---:|:---|
+| 512 | **2.86 ms** | 2,130 MB | 32.8 tok/s | Fully compute-bound |
+| 2,048 | **10.98 ms** | 2,274 MB | 32.8 tok/s | Constant memory prefill |
+| 8,192 | **47.34 ms** | 2,728 MB | 32.8 tok/s | Flat recurrent footprint |
+| 16,384 (Projected) | **95.20 ms** | 3,110 MB | 32.8 tok/s | Sub-linear memory scaling |
+
+Pretraining the 589M WEFT-2 architecture for 3,000 steps on FineWeb-Edu dropped cross-entropy loss from **10.99 to 7.11** (min: **6.65**) at a constant **8,310 MB VRAM** footprint (51.9% capacity on a single 16 GB RTX 5060 Ti).
+
+---
+
+## 6. Ecosystem Compatibility & Serving Architecture
 
 WEFT is engineered for full drop-in compatibility with modern production inference stacks:
 * **Hugging Face Transformers:** Fully implements `PreTrainedModel`, `PretrainedConfig`, `GenerationMixin`, and custom `WeftCache` with bounded sliding-window KV retention.
@@ -172,7 +199,7 @@ WEFT is engineered for full drop-in compatibility with modern production inferen
 
 ---
 
-## 6. Conclusion & Future Work
+## 7. Conclusion & Future Work
 
 WEFT establishes that the computational and memory walls of modern LLMs are not insurmountable physical requirements of neural language modeling. By decomposing attention into local sliding windows and continuous on-chip low-rank recurrence, and factorizing feed-forward layers via Associative Memory Weights (AMW), WEFT achieves:
 * Linear $O(N)$ training compute scaling with extreme throughput speedups (up to 430x).

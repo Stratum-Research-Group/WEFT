@@ -114,6 +114,23 @@ Held-Out Loss Parity & 8.4613 & \textbf{8.5133} & $\Delta = 0.052$ \\
 \caption{Feed-forward layer comparison on FineWeb-Edu pretraining over isolated held-out validation splits.}
 \end{table}
 
+\section{WEFT-2 Foundation Architecture: Scaling to 589M}
+We scale the WEFT framework to a 589M parameter foundation model ($d=896$, 16 layers, 16 routed MoE experts with top-2 active selection, 1 shared expert) incorporating Multi-Head Latent Attention (MLA), Dual-Axis Memory Initialization (DAMI), Titans surprise-gated fast weights with 2x2 coupled affine block-scans, and associative needle-in-a-haystack MoE routing.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{rcccc}
+\toprule
+\textbf{Context Length ($N$)} & \textbf{Prefill Latency} & \textbf{Peak VRAM} & \textbf{Decoding Rate} & \textbf{Hardware Regime} \\
+\midrule
+512 & \textbf{2.86 ms} & 2,130 MB & 32.8 tok/s & Compute-bound \\
+2,048 & \textbf{10.98 ms} & 2,274 MB & 32.8 tok/s & Constant-memory \\
+8,192 & \textbf{47.34 ms} & 2,728 MB & 32.8 tok/s & Constant recurrent state \\
+\bottomrule
+\end{tabular}
+\caption{Empirical scaling profile of 589M WEFT-2 on single NVIDIA GeForce RTX 5060 Ti (16GB).}
+\end{table}
+
 \section{Conclusion}
 WEFT demonstrates that sub-quadratic linear attention and sub-linear memory decoding can be combined with parameter-efficient associative weights. By unifying local windows with SRAM-fused recurrence and uncrossed associative parameters, WEFT provides a scalable path forward for long-context sequence modeling on accessible hardware.
 

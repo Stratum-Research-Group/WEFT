@@ -74,3 +74,34 @@ def test_weft_titans_forward_and_decode():
     m_after = out_step.past_key_values.layers[0].weft_titans_state[1]
     assert not torch.equal(w_before, w_after), "Titans W fast weight must update during decode"
     assert not torch.equal(m_before, m_after), "Titans m momentum state must update during decode"
+
+
+def test_titans_same_schedule_exact_parity():
+    """
+    Validation Gate: When chunk_size=1 (identical schedule), full-sequence Titans
+    forward and token-by-token decode must match to floating-point machine precision.
+    """
+    from weft.titans import TitansSurpriseMemory
+
+    titans = TitansSurpriseMemory(d_model=32, d_mem=16, chunk_size=1)
+    titans.eval()
+
+    torch.manual_seed(42)
+    x = torch.randn(2, 6, 32)
+
+    with torch.no_grad():
+        out_seq, (W_seq, m_seq) = titans(x)
+
+    with torch.no_grad():
+        state = None
+        step_outs = []
+        for t in range(6):
+            xt = x[:, t : t + 1, :]
+            ot, state = titans(xt, fast_state=state)
+            step_outs.append(ot)
+        out_steps = torch.cat(step_outs, dim=1)
+        W_steps, m_steps = state
+
+    assert (out_seq - out_steps).abs().max().item() < 1e-6
+    assert (W_seq - W_steps).abs().max().item() < 1e-6
+    assert (m_seq - m_steps).abs().max().item() < 1e-6

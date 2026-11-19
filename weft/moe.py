@@ -148,15 +148,24 @@ class WeftDeepSeekMoE(nn.Module):
 
         # 3. Vectorized execution across routed experts
         out_routed = torch.zeros_like(x_flat)
-        for exp_idx, expert in enumerate(self.routed_experts):
-            mask = (topk_indices == exp_idx)
-            if not mask.any():
-                continue
-            token_indices, k_slot = torch.where(mask)
-            weights = topk_weights[token_indices, k_slot].unsqueeze(-1)
-            expert_in = x_flat[token_indices]
-            expert_out = expert(expert_in)
-            out_routed.index_add_(0, token_indices, weights * expert_out)
+        is_capturing = torch.cuda.is_current_stream_capturing() if torch.cuda.is_available() else False
+
+        if is_capturing or (not self.training and x_flat.shape[0] <= 16):
+            # Static graph-safe execution without CPU synchronization (mask.any() or dynamic where)
+            for exp_idx, expert in enumerate(self.routed_experts):
+                w = torch.where(topk_indices == exp_idx, topk_weights, torch.zeros_like(topk_weights)).sum(dim=-1, keepdim=True)
+                expert_out = expert(x_flat)
+                out_routed = out_routed + w * expert_out
+        else:
+            for exp_idx, expert in enumerate(self.routed_experts):
+                mask = (topk_indices == exp_idx)
+                if not mask.any():
+                    continue
+                token_indices, k_slot = torch.where(mask)
+                weights = topk_weights[token_indices, k_slot].unsqueeze(-1)
+                expert_in = x_flat[token_indices]
+                expert_out = expert(expert_in)
+                out_routed.index_add_(0, token_indices, weights * expert_out)
 
         out_flat = out_shared + out_routed
 

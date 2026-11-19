@@ -75,23 +75,56 @@ def train_weft2_grpo(
     print("\nBeginning GRPO Policy Optimization...\n")
     t0 = time.time()
 
+    def sample_top_p(logits, temperature=0.8, top_p=0.9):
+        logits = logits / temperature
+        probs = F.softmax(logits, dim=-1, dtype=torch.float32)
+        sorted_probs, sorted_indices = torch.sort(probs, descending=True, dim=-1)
+        cumsum = torch.cumsum(sorted_probs, dim=-1)
+        mask = cumsum - sorted_probs > top_p
+        sorted_probs = torch.where(mask, torch.zeros_like(sorted_probs), sorted_probs)
+        sorted_probs = sorted_probs / sorted_probs.sum(dim=-1, keepdim=True).clamp(min=1e-6)
+        next_token_sorted = torch.multinomial(sorted_probs, num_samples=1)
+        return sorted_indices.gather(dim=-1, index=next_token_sorted)
+
     for episode in range(1, num_episodes + 1):
         prompt, true_ans = task.generate_problem()
         prompt_tokens = tokenizer.encode(prompt)
         prompt_tensor = torch.tensor([prompt_tokens], device=device).expand(group_size, -1)
 
-        # 1. Rollout K completions using model.generate
+        # 1. Rollout K completions using accelerated recurrent decode with CUDA Graph replay
+        model.eval()
         with torch.no_grad():
-            gen_out = model.generate(
-                prompt_tensor,
-                max_new_tokens=max_gen_tokens,
-                do_sample=True,
-                temperature=0.8,
-                top_p=0.9,
-                pad_token_id=tokenizer.eot_token,
-            )
+            # Prefill full prompt
+            prefill_out = model(prompt_tensor, use_cache=True)
+            past_key_values = prefill_out.past_key_values
+            next_token = sample_top_p(prefill_out.logits[:, -1, :], temperature=0.8, top_p=0.9)
 
-        gen_tokens = gen_out[:, prompt_tensor.shape[1] :]
+            static_input = next_token.clone()
+
+            # Warmup
+            s = torch.cuda.Stream()
+            s.wait_stream(torch.cuda.current_stream())
+            with torch.cuda.stream(s):
+                for _ in range(3):
+                    out_step = model(static_input, past_key_values=past_key_values, use_cache=True)
+            torch.cuda.current_stream().wait_stream(s)
+
+            # Capture single-token recurrent decode step in CUDA Graph
+            g = torch.cuda.CUDAGraph()
+            with torch.cuda.graph(g):
+                out_step = model(static_input, past_key_values=past_key_values, use_cache=True)
+
+            gen_list = [next_token]
+            for _ in range(max_gen_tokens - 1):
+                g.replay()
+                next_token = sample_top_p(out_step.logits[:, -1, :], temperature=0.8, top_p=0.9)
+                static_input.copy_(next_token)
+                gen_list.append(next_token)
+
+            gen_tokens = torch.cat(gen_list, dim=-1).clone().detach()
+            gen_out = torch.cat([prompt_tensor, gen_tokens], dim=-1).clone().detach()
+
+        model.train()
         completions = [tokenizer.decode(t.tolist()) for t in gen_tokens]
 
         # 2. Evaluate deterministic rewards via MathRuleVerifier

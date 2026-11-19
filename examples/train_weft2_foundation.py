@@ -42,41 +42,47 @@ def train_weft2_foundation(
     max_lr: float = 0.02,
     min_lr: float = 0.002,
     save_dir: str = "weft2_foundation_ckpt",
+    resume_from_checkpoint: str = None,
+    start_step: int = 0,
 ):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("=" * 80)
     print("  WEFT-2 UNIFIED FOUNDATION PRETRAINING PIPELINE")
     print(f"  Device: {device} ({torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'})")
-    print(f"  Steps: {steps} | Batch: {batch_size} | SeqLen: {seq_len} | Precision: bfloat16")
+    print(f"  Steps: {start_step + 1} -> {start_step + steps} | Batch: {batch_size} | SeqLen: {seq_len} | Precision: bfloat16")
     print("=" * 80)
 
     # Initialize FineWeb-Edu streamer
     streamer = FineWebEduStreamer(seq_len=seq_len, batch_size=batch_size, device=str(device))
     vocab_size = streamer.vocab_size
 
-    # Configure WEFT-2 model with MLA, DAMI, Titans, and DeepSeekMoE (589M Unified Foundation)
-    config = WeftConfig(
-        vocab_size=vocab_size,
-        hidden_size=896,
-        intermediate_size=2560,
-        num_hidden_layers=16,
-        num_attention_heads=16,
-        num_state_heads=4,
-        state_rank=64,
-        window_size=128,
-        max_position_embeddings=4096,
-        tie_word_embeddings=True,
-        shifted_binding=True,
-        use_mla=True,
-        mla_latent_dim=192,
-        use_titans=True,
-        titans_mem_dim=96,
-        use_moe=True,
-        moe_num_routed_experts=16,
-        moe_top_k=2,
-    )
+    if resume_from_checkpoint and os.path.exists(resume_from_checkpoint):
+        print(f"Loading existing WEFT-2 model checkpoint from {resume_from_checkpoint}...")
+        model = WeftForCausalLM.from_pretrained(resume_from_checkpoint).to(device)
+    else:
+        # Configure WEFT-2 model with MLA, DAMI, Titans, and DeepSeekMoE (589M Unified Foundation)
+        config = WeftConfig(
+            vocab_size=vocab_size,
+            hidden_size=896,
+            intermediate_size=2560,
+            num_hidden_layers=16,
+            num_attention_heads=16,
+            num_state_heads=4,
+            state_rank=64,
+            window_size=128,
+            max_position_embeddings=4096,
+            tie_word_embeddings=True,
+            shifted_binding=True,
+            use_mla=True,
+            mla_latent_dim=192,
+            use_titans=True,
+            titans_mem_dim=96,
+            use_moe=True,
+            moe_num_routed_experts=16,
+            moe_top_k=2,
+        )
+        model = WeftForCausalLM(config).to(device)
 
-    model = WeftForCausalLM(config).to(device)
     model.gradient_checkpointing_enable()
     num_params = sum(p.numel() for p in model.parameters())
     print(f"Architecture: 16 Layers | 896 Dim | MLA(dc=192) | Titans(96) | DeepSeekMoE(16 experts, top-2)")
@@ -89,12 +95,14 @@ def train_weft2_foundation(
     amp_dtype = torch.bfloat16 if use_bf16 else torch.float16
 
     print(f"Optimizer: Muon (~2 bytes/param state overhead)")
-    print(f"Beginning clean ground-up pretraining run...\n")
+    print(f"Beginning pretraining run from step {start_step + 1} to {start_step + steps}...\n")
 
     t0 = time.time()
-    for step in range(1, steps + 1):
+    total_target_steps = start_step + steps
+    for step_idx in range(1, steps + 1):
+        global_step = start_step + step_idx
         model.train()
-        current_lr = get_lr(step, warmup_steps=100, max_steps=steps, max_lr=max_lr, min_lr=min_lr)
+        current_lr = get_lr(global_step, warmup_steps=100, max_steps=total_target_steps, max_lr=max_lr, min_lr=min_lr)
         for param_group in optimizer.param_groups:
             param_group["lr"] = current_lr
 
@@ -116,35 +124,43 @@ def train_weft2_foundation(
         grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
 
-        if step % 20 == 0 or step == steps:
+        if global_step % 20 == 0 or step_idx == steps:
             elapsed = time.time() - t0
-            tok_s = (step * batch_size * seq_len) / elapsed
+            tok_s = (step_idx * batch_size * seq_len) / elapsed
             vram_mb = torch.cuda.max_memory_allocated() / (1024 ** 2) if torch.cuda.is_available() else 0.0
             print(
-                f"Step {step:5d}/{steps} | LR: {current_lr:.2e} | "
+                f"Step {global_step:5d}/{total_target_steps} | LR: {current_lr:.2e} | "
                 f"Loss: {loss.item():.4f} | Aux: {aux_loss.item() if isinstance(aux_loss, torch.Tensor) else aux_loss:.3f} | "
                 f"Grad: {grad_norm.item():.2f} | VRAM: {vram_mb:.1f} MB | {tok_s:.1f} tok/s"
             )
 
-        if step % 1000 == 0 or step == steps:
+        if global_step % 1000 == 0 or step_idx == steps:
             os.makedirs(save_dir, exist_ok=True)
             model.save_pretrained(save_dir)
-            print(f"  [Checkpoint] Saved WEFT-2 model to {save_dir}/ at step {step}")
+            print(f"  [Checkpoint] Saved WEFT-2 model to {save_dir}/ at step {global_step}")
 
     print(f"\nPretraining finished. Final WEFT-2 checkpoint saved to ./{save_dir}/")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--steps", type=int, default=10000)
-    parser.add_argument("--batch-size", type=int, default=4)
+    parser.add_argument("--steps", type=int, default=3000, help="Number of training steps to run in this invocation")
+    parser.add_argument("--start-step", type=int, default=3000, help="Starting global step offset for LR schedule and logging")
+    parser.add_argument("--batch-size", type=int, default=32, help="Empirically optimized batch size for RTX 5060 Ti")
     parser.add_argument("--seq-len", type=int, default=128)
+    parser.add_argument("--max-lr", type=float, default=0.02)
+    parser.add_argument("--min-lr", type=float, default=0.002)
     parser.add_argument("--save-dir", type=str, default="weft2_foundation_ckpt")
+    parser.add_argument("--resume", type=str, default="weft2_foundation_ckpt", help="Path to checkpoint directory to resume from")
     args = parser.parse_args()
 
     train_weft2_foundation(
         steps=args.steps,
+        start_step=args.start_step,
         batch_size=args.batch_size,
         seq_len=args.seq_len,
+        max_lr=args.max_lr,
+        min_lr=args.min_lr,
         save_dir=args.save_dir,
+        resume_from_checkpoint=args.resume,
     )

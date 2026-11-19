@@ -45,7 +45,8 @@ class ArithmeticReasoningTask:
 
 def train_weft2_grpo(
     model_path: str = "weft2_sft_ckpt",
-    num_episodes: int = 100,
+    save_path: str = "weft2_grpo_aligned_ckpt",
+    num_episodes: int = 300,
     group_size: int = 4,
     max_gen_tokens: int = 96,
     lr: float = 1e-5,
@@ -139,7 +140,7 @@ def train_weft2_grpo(
 
         if episode % 10 == 0 or episode == num_episodes:
             elapsed = time.time() - t0
-            vram_mb = torch.cuda.max_memory_allocated() / (1024 ** 2)
+            vram_mb = torch.cuda.max_memory_allocated() / (1024 ** 2) if torch.cuda.is_available() else 0.0
             acc = accurate_completions / group_size
             print(
                 f"Episode {episode:4d}/{num_episodes} | "
@@ -149,8 +150,21 @@ def train_weft2_grpo(
                 f"VRAM: {vram_mb:6.1f} MB | Elapsed: {elapsed:5.1f}s"
             )
 
-    print("\nGRPO training episode complete.")
+        # Checkpoint saving every 50 episodes or on completion
+        if episode % 50 == 0 or episode == num_episodes:
+            os.makedirs(save_path, exist_ok=True)
+            model.save_pretrained(save_path)
+            print(f"  [Checkpoint] Saved GRPO policy model to {save_path}/ at episode {episode}")
+
+    print(f"\nGRPO training episode complete. Final aligned model saved to {save_path}/")
 
 
 if __name__ == "__main__":
-    train_weft2_grpo(num_episodes=50)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--episodes", type=int, default=300)
+    parser.add_argument("--group-size", type=int, default=4)
+    parser.add_argument("--save-path", type=str, default="weft2_grpo_aligned_ckpt")
+    args = parser.parse_args()
+
+    train_weft2_grpo(num_episodes=args.episodes, group_size=args.group_size, save_path=args.save_path)

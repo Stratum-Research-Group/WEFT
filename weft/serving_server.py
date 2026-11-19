@@ -72,6 +72,8 @@ def load_model(checkpoint_path: str, device: Optional[str] = None, quantization:
                     return self.enc.encode_ordinary(text)
                 def decode(self, tokens):
                     return self.enc.decode(tokens)
+                def decode_single_token_bytes(self, token_id):
+                    return self.enc.decode_single_token_bytes(token_id)
             engine.tokenizer = TiktokenWrapper()
         else:
             if not os.path.exists(vocab_path):
@@ -139,6 +141,7 @@ def _generate_tokens_generator(prompt_text: str, max_tokens: int, temperature: f
     past_key_values = None
     curr_input = tokens
     created = int(time.time())
+    byte_buffer = bytearray()
 
     for step in range(max_tokens):
         with torch.no_grad():
@@ -158,7 +161,20 @@ def _generate_tokens_generator(prompt_text: str, max_tokens: int, temperature: f
             eos_id = getattr(engine.tokenizer.enc, "eot_token", 50256)
 
         is_stop = (token_id == eos_id)
-        token_char = "" if is_stop else engine.tokenizer.decode([token_id])
+        
+        # Byte-safe UTF-8 incremental decode to handle multi-token characters cleanly
+        token_char = ""
+        if not is_stop:
+            if hasattr(engine.tokenizer, "decode_single_token_bytes"):
+                byte_buffer.extend(engine.tokenizer.decode_single_token_bytes(token_id))
+                try:
+                    token_char = byte_buffer.decode("utf-8")
+                    byte_buffer.clear()
+                except UnicodeDecodeError:
+                    token_char = ""
+            else:
+                token_char = engine.tokenizer.decode([token_id])
+
         curr_input = next_tok
 
         finish_reason = "stop" if is_stop else (None if step < max_tokens - 1 else "length")
@@ -217,14 +233,17 @@ async def chat_completions(req: ChatCompletionRequest):
     generated_text = ""
     prompt_tokens = len(engine.tokenizer.encode(prompt_text))
     completion_tokens = 0
+    final_finish_reason = "length"
     for chunk_str in _generate_tokens_generator(prompt_text, req.max_tokens, req.temperature, req_id, is_chat=True):
         if chunk_str.strip() in ("", "data: [DONE]"):
             continue
         data = json.loads(chunk_str.replace("data: ", ""))
-        content = data["choices"][0]["delta"].get("content", "")
+        choice = data["choices"][0]
+        content = choice["delta"].get("content", "")
         generated_text += content
-        if content:
-            completion_tokens += 1
+        completion_tokens += 1
+        if choice.get("finish_reason") is not None:
+            final_finish_reason = choice["finish_reason"]
 
     return {
         "id": req_id,
@@ -235,7 +254,7 @@ async def chat_completions(req: ChatCompletionRequest):
             {
                 "index": 0,
                 "message": {"role": "assistant", "content": generated_text},
-                "finish_reason": "length",
+                "finish_reason": final_finish_reason,
             }
         ],
         "usage": {
@@ -263,14 +282,17 @@ async def completions(req: CompletionRequest):
     generated_text = ""
     prompt_tokens = len(engine.tokenizer.encode(prompt_text))
     completion_tokens = 0
+    final_finish_reason = "length"
     for chunk_str in _generate_tokens_generator(prompt_text, req.max_tokens, req.temperature, req_id, is_chat=False):
         if chunk_str.strip() in ("", "data: [DONE]"):
             continue
         data = json.loads(chunk_str.replace("data: ", ""))
-        txt = data["choices"][0].get("text", "")
+        choice = data["choices"][0]
+        txt = choice.get("text", "")
         generated_text += txt
-        if txt:
-            completion_tokens += 1
+        completion_tokens += 1
+        if choice.get("finish_reason") is not None:
+            final_finish_reason = choice["finish_reason"]
 
     return {
         "id": req_id,
@@ -281,7 +303,7 @@ async def completions(req: CompletionRequest):
             {
                 "text": generated_text,
                 "index": 0,
-                "finish_reason": "length",
+                "finish_reason": final_finish_reason,
             }
         ],
         "usage": {

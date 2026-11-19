@@ -105,7 +105,7 @@ def benchmark_model_scaling():
 def benchmark_associative_needle_recall():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("\n" + "=" * 80)
-    print("  2. ASSOCIATIVE NEEDLE-IN-A-HAYSTACK ROUTING VERIFICATION")
+    print("  2. ASSOCIATIVE NEEDLE-IN-A-HAYSTACK CACHE STATE PERSISTENCE")
     print("=" * 80)
 
     cfg = WeftConfig(
@@ -156,7 +156,7 @@ def benchmark_associative_needle_recall():
     print(f"  Query Position:  Step {haystack_len}")
     print(f"  Step Decode Logits Shape: {step_out.logits.shape}")
     print(f"  Associative Router State Verified: Cached across all {len(past.layers)} layers")
-    print("  [Result]: State preserved across decode with dynamic cache threading.")
+    print("  [Result]: Cache state dynamically tracked across sequence prefill and step decode.")
 
 
 if __name__ == "__main__":

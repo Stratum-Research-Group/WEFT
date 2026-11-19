@@ -1,13 +1,13 @@
 """
-Deep Multi-Needle Associative Recall Benchmark for WEFT-2.
+Deep Multi-Needle Associative Router State Persistence Benchmark for WEFT-2.
 
-Evaluates MoE routing precision across deep contexts (N = 2,048, 4,096, 8,192, 16,384)
+Evaluates MoE router state maintenance across deep contexts (N = 2,048, 4,096, 8,192, 16,384)
 comparing:
   1. Standard Static Single-Token Routing: W_r @ x_t
   2. WEFT-2 Associative Historical Routing: R_t = gamma * R_{t-1} + k_{r, t-1}^T * SoftAssignment_t
 
-Measures target expert activation affinity at the extreme end of the sequence
-when answering questions about needles planted early in the sequence.
+Measures target expert probability dynamics at the extreme end of the sequence
+when tracking needle tokens planted early in the sequence.
 """
 
 import time
@@ -104,8 +104,8 @@ def run_deep_needle_benchmark(
             f"Context N = {N:6d} | Needle at {needle_pos:5d} (dist={query_pos - needle_pos:5d}) | "
             f"Prefill: {assoc_time_ms:6.2f} ms | VRAM: {vram_mb:6.1f} MB | "
             f"Static Router Target Prob: {static_prob * 100:5.1f}% | "
-            f"Associative Router Target Prob: {assoc_prob * 100:5.1f}% | "
-            f"Advantage: {assoc_prob / max(1e-4, static_prob):5.1f}x"
+            f"Associative Memory Target Prob: {assoc_prob * 100:5.1f}% | "
+            f"Ratio: {assoc_prob / max(1e-4, static_prob):5.1f}x"
         )
 
         results.append({
@@ -118,9 +118,9 @@ def run_deep_needle_benchmark(
         })
 
     print("=" * 80)
-    print("  DEEP RETRIEVAL SUMMARY")
+    print("  DEEP ROUTER STATE DYNAMICS SUMMARY")
     for r in results:
-        print(f"  Distance {r['dist']:5d} tokens -> Associative Recall: {r['assoc_prob']*100:.1f}% vs Static: {r['static_prob']*100:.1f}%")
+        print(f"  Distance {r['dist']:5d} tokens -> Associative Memory Prob: {r['assoc_prob']*100:.1f}% vs Static Router: {r['static_prob']*100:.1f}%")
     print("=" * 80)
 
 

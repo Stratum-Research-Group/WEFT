@@ -44,7 +44,7 @@ class ArithmeticReasoningTask:
 
 
 def train_weft2_grpo(
-    model_path: str = "weft2_foundation_ckpt",
+    model_path: str = "weft2_sft_ckpt",
     num_episodes: int = 100,
     group_size: int = 4,
     max_gen_tokens: int = 96,

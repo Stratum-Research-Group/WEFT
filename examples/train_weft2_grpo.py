@@ -97,8 +97,8 @@ def train_weft2_grpo(
         # 2. Evaluate deterministic rewards via MathRuleVerifier
         rewards = []
         for comp in completions:
-            res = task.verifier.verify_solution(comp, str(true_ans))
-            rewards.append(res.reward)
+            res = task.verifier.verify_solution(comp, float(true_ans))
+            rewards.append(res.total_reward)
 
         rewards_tensor = torch.tensor(rewards, device=device, dtype=torch.float32)
 

@@ -114,4 +114,19 @@ def train_weft2_sft(
 
 
 if __name__ == "__main__":
-    train_weft2_sft(steps=200)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--steps", type=int, default=200)
+    parser.add_argument("--batch-size", type=int, default=16, help="Optimized batch size for RTX 5060 Ti")
+    parser.add_argument("--model-path", type=str, default="weft2_foundation_ckpt")
+    parser.add_argument("--save-path", type=str, default="weft2_sft_ckpt")
+    parser.add_argument("--lr", type=float, default=5e-5)
+    args = parser.parse_args()
+
+    train_weft2_sft(
+        model_path=args.model_path,
+        save_path=args.save_path,
+        steps=args.steps,
+        batch_size=args.batch_size,
+        lr=args.lr,
+    )

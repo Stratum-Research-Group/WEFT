@@ -49,6 +49,11 @@ jobs:
         run: |
           latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
 
+      - name: Compile Paper 5 (Formal Lean 4 Proofs)
+        working-directory: papers/5_formal_lean4_verification
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
       - name: Upload Main Paper PDF Artifact
         uses: actions/upload-artifact@v4
         with:

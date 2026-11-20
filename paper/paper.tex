@@ -157,6 +157,13 @@ Pretraining the 589M WEFT-2 architecture for 20,000 steps ($\sim 72.6$ Million t
 \subsection{Key-Value Associative Needle Calibration \& Induction Circuits}
 Evaluating uncalibrated foundation representations against synthetic key-value associative needle benchmarks revealed that unsupervised language pretraining alone achieves near-zero probability for arbitrary alphanumeric key-value copying ($9.37 \times 10^{-5}\%$ target probability on length 1,024). Calibrating the shifted state binding and Titans memory via progressive curriculum tuning ($N \in [512, 1024, 2048, 4096]$) amplified target passcode token probabilities by over \textbf{37,000x to 289,000x} (surging from $0.00001\%$ to $2.89\%$ on 512 tokens and $1.86\%$ on 1,024 tokens), activating the underlying in-context associative induction circuit while driving extended sequence cross-entropy loss from 52.6 down to 32.1 on 4,096 tokens.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.98\linewidth]{figures/needle_recall_heatmap.pdf}
+\caption{Needle-in-a-haystack depth-vs-context retrieval probability heatmap comparing uncalibrated foundation representations (left) against the calibrated WEFT-2 model with coupled Titans neural memory and shifted-binding recurrence (right) across sequence lengths $N \in [1024, 8192]$ and needle depths $10\%\text{--}90\%$.}
+\label{fig:needle_heatmap}
+\end{figure}
+
 \subsection{Post-Training Quantization (PTQ) \& Fused SRAM GEMM Decoding}
 To enable edge serving on memory-constrained GPUs without degrading numerical precision, WEFT-2 introduces native per-channel INT8 Post-Training Quantization (PTQ):
 \begin{itemize}

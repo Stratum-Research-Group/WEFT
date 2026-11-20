@@ -98,9 +98,22 @@ def benchmark_quantization(checkpoint_dir: str = "weft_shakespeare_ckpt"):
     print(f"Logits Cosine Similarity: {cosine_sim:.6f} (>0.99 target)")
     assert cosine_sim > 0.99, "INT8 quantization caused excessive fidelity loss"
     print("--> [PASS] INT8 quantized model maintains fidelity with linear weight compression.")
+    return int8_model
 
 
 if __name__ == "__main__":
-    import sys
-    ckpt = sys.argv[1] if len(sys.argv) > 1 else "weft_shakespeare_ckpt"
-    benchmark_quantization(ckpt)
+    import argparse
+    import os
+
+    parser = argparse.ArgumentParser(description="WEFT Post-Training INT8 Quantization")
+    parser.add_argument("model_path", nargs="?", default="weft_shakespeare_ckpt", help="Path to input checkpoint")
+    parser.add_argument("--save-dir", type=str, default=None, help="Directory to save quantized state_dict and config")
+    args = parser.parse_args()
+
+    q_model = benchmark_quantization(args.model_path)
+    if args.save_dir:
+        os.makedirs(args.save_dir, exist_ok=True)
+        torch.save(q_model.state_dict(), os.path.join(args.save_dir, "quantized_model.pt"))
+        if hasattr(q_model, "config"):
+            q_model.config.save_pretrained(args.save_dir)
+        print(f"--> Saved quantized model to {args.save_dir}")

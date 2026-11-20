@@ -28,6 +28,34 @@ jobs:
         run: |
           uv sync --extra dev
 
-      - name: Run test suite
+      - name: Run full test suite
         run: |
           uv run pytest tests/ -v
+
+      - name: Verify Frontier Scaling Specs (1.5B to 32B on meta device)
+        run: |
+          uv run python -c "
+          from weft.scaling_specs import WEFT_SCALE_REGISTRY, get_model_params
+          for tier, spec in WEFT_SCALE_REGISTRY.items():
+              cfg = spec.to_config()
+              total, active = get_model_params(cfg)
+              print(f'{tier}: total={total/1e9:.2f}B, active={active/1e9:.2f}B')
+          "
+
+      - name: Verify GGUF Universal Exporter
+        run: |
+          uv run python -c "
+          from weft.configuration_weft import WeftConfig
+          from weft.modeling_weft import WeftForCausalLM
+          from weft.export_gguf import convert_weft_to_gguf_manifest
+          import tempfile, os
+          cfg = WeftConfig(vocab_size=1000, hidden_size=128, num_attention_heads=2, num_state_heads=2, state_rank=8, num_hidden_layers=2)
+          model = WeftForCausalLM(cfg)
+          with tempfile.TemporaryDirectory() as tmpdir:
+              model.save_pretrained(tmpdir)
+              manifest_path = os.path.join(tmpdir, 'model.gguf.json')
+              manifest = convert_weft_to_gguf_manifest(tmpdir, manifest_path)
+              assert manifest['format'] == 'GGUF-v3'
+              assert manifest['total_parameters'] > 0
+          print('CI GGUF exporter check passed!')
+          "

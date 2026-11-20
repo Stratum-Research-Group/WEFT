@@ -35,10 +35,12 @@ app.add_middleware(
 # Global engine state
 class GlobalEngine:
     model: Optional[WeftForCausalLM] = None
-    tokenizer: Optional[WeftCharTokenizer] = None
+    tokenizer: Optional[Any] = None
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     model_name: str = "weft-causal-lm"
     paged_manager: Optional[Any] = None
+    ternary_draft_engine: Optional[Any] = None
+    speculative_enabled: bool = False
 
 engine = GlobalEngine()
 
@@ -100,6 +102,29 @@ def load_model(checkpoint_path: str, device: Optional[str] = None, quantization:
                     f"required for character-level tokenization (vocab_size={engine.model.config.vocab_size})."
                 )
             engine.tokenizer = WeftCharTokenizer(vocab_file=vocab_path)
+    ternary_draft_path = os.environ.get(
+        "WEFT_TERNARY_DRAFT_PATH",
+        "/run/media/akarta/AI/checkpoints/deep_distill/student_ternary_bitweft.pt",
+    )
+    if os.path.exists(ternary_draft_path):
+        try:
+            from scripts.benchmark_ternary_speculation import load_ternary_weights_into_model
+            draft_cfg = WeftConfig(
+                vocab_size=getattr(engine.model.config, "vocab_size", 262144),
+                hidden_size=256,
+                intermediate_size=512,
+                num_hidden_layers=7,
+                num_attention_heads=8,
+                max_position_embeddings=128,
+            )
+            draft_model = WeftForCausalLM(draft_cfg)
+            load_ternary_weights_into_model(draft_model, ternary_draft_path)
+            engine.ternary_draft_engine = draft_model.to(engine.device).eval()
+            engine.speculative_enabled = True
+            print(f"[WEFT Server] Loaded BitNet b1.58 Ternary SULA Draft Engine from {ternary_draft_path}")
+        except Exception as e:
+            print(f"[WEFT Server] Speculative draft engine deferred: {e}")
+
     print(f"[WEFT Server] Loaded model from {checkpoint_path} on {engine.device}")
 
 
@@ -130,6 +155,7 @@ def health():
     return {
         "status": "ready" if engine.model is not None else "unloaded",
         "device": engine.device,
+        "speculative_draft_engine": "ternary_sula" if engine.speculative_enabled else "disabled",
         "paged_cache": paged_info,
     }
 

@@ -1,0 +1,36 @@
+name: Paper Build
+
+on:
+  push:
+    paths:
+      - 'paper/**'
+      - '.github/workflows/paper.yml'
+    branches:
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-paper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science latexmk
+
+      - name: Compile LaTeX Paper
+        working-directory: paper
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
+      - name: Upload Paper PDF Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weft-paper
+          path: paper/paper.pdf
+          if-no-files-found: error

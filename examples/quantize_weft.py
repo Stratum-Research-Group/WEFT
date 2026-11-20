@@ -41,8 +41,9 @@ class QuantizedLinear(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Dequantize weight on the fly or use int8 gemm
-        w_dequant = self.weight_int8.to(x.dtype) * self.scale
-        return torch.nn.functional.linear(x, w_dequant, self.bias)
+        w_dequant = (self.weight_int8.to(x.dtype) * self.scale.to(x.dtype))
+        bias = self.bias.to(x.dtype) if self.bias is not None else None
+        return torch.nn.functional.linear(x, w_dequant, bias)
 
 
 def quantize_weft_model(model: nn.Module) -> nn.Module:
@@ -58,45 +59,48 @@ def quantize_weft_model(model: nn.Module) -> nn.Module:
     return model
 
 
-def benchmark_quantization():
+def benchmark_quantization(checkpoint_dir: str = "weft_shakespeare_ckpt"):
     print("=================================================================")
     print("  WEFT POST-TRAINING INT8 QUANTIZATION BENCHMARK")
+    print(f"  Target: {checkpoint_dir}")
     print("=================================================================")
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    checkpoint_dir = "weft_shakespeare_ckpt"
 
-    print(f"Loading base FP32 model from {checkpoint_dir}...")
-    fp32_model = WeftForCausalLM.from_pretrained(checkpoint_dir).to(device)
-    fp32_model.eval()
+    dtype = torch.bfloat16 if torch.cuda.is_available() and "weft2" in checkpoint_dir else torch.float32
+    print(f"Loading base model from {checkpoint_dir}...")
+    base_model = WeftForCausalLM.from_pretrained(checkpoint_dir, torch_dtype=dtype).to(device)
+    base_model.eval()
 
     # Calculate model sizes in bytes
-    fp32_bytes = sum(p.numel() * p.element_size() for p in fp32_model.parameters())
+    base_bytes = sum(p.numel() * p.element_size() for p in base_model.parameters())
 
     # Create INT8 quantized clone
-    int8_model = WeftForCausalLM.from_pretrained(checkpoint_dir).to(device)
+    int8_model = WeftForCausalLM.from_pretrained(checkpoint_dir, torch_dtype=dtype).to(device)
     quantize_weft_model(int8_model)
     int8_model.eval()
 
     int8_bytes = sum(b.numel() * b.element_size() for b in int8_model.buffers()) + sum(p.numel() * p.element_size() for p in int8_model.parameters())
 
-    print(f"FP32 Model Memory: {fp32_bytes / 1e6:.2f} MB")
-    print(f"INT8 Model Memory: {int8_bytes / 1e6:.2f} MB")
-    print(f"Compression Ratio: {fp32_bytes / int8_bytes:.2f}x reduction")
+    print(f"Base Model Memory: {base_bytes / (1024**2):.2f} MB")
+    print(f"INT8 Model Memory: {int8_bytes / (1024**2):.2f} MB")
+    print(f"Compression Ratio: {base_bytes / int8_bytes:.2f}x reduction")
 
     # Evaluate numerical divergence on prompt
     input_ids = torch.tensor([[10, 24, 45, 12, 19, 32, 5]], device=device)
     with torch.no_grad():
-        fp32_logits = fp32_model(input_ids).logits
+        base_logits = base_model(input_ids).logits
         int8_logits = int8_model(input_ids).logits
 
-    logits_diff = torch.max(torch.abs(fp32_logits - int8_logits)).item()
-    cosine_sim = torch.nn.functional.cosine_similarity(fp32_logits.flatten(), int8_logits.flatten(), dim=0).item()
+    logits_diff = torch.max(torch.abs(base_logits - int8_logits)).item()
+    cosine_sim = torch.nn.functional.cosine_similarity(base_logits.flatten().float(), int8_logits.flatten().float(), dim=0).item()
 
     print(f"Max Logits Deviation: {logits_diff:.4f}")
-    print(f"Logits Cosine Similarity: {cosine_sim:.6f} (>0.999 target)")
+    print(f"Logits Cosine Similarity: {cosine_sim:.6f} (>0.99 target)")
     assert cosine_sim > 0.99, "INT8 quantization caused excessive fidelity loss"
-    print("--> [PASS] INT8 quantized model maintains fidelity with 3.8x+ linear weight compression.")
+    print("--> [PASS] INT8 quantized model maintains fidelity with linear weight compression.")
 
 
 if __name__ == "__main__":
-    benchmark_quantization()
+    import sys
+    ckpt = sys.argv[1] if len(sys.argv) > 1 else "weft_shakespeare_ckpt"
+    benchmark_quantization(ckpt)

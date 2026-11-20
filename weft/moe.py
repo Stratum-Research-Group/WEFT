@@ -120,22 +120,42 @@ class WeftDeepSeekMoE(nn.Module):
                 update = torch.bmm(k_r.transpose(1, 2), p_static)
                 next_router_state = gamma_r * r_state + update
             else:
-                # Sequence prefill with associative prefix scan across sequence
-                # We compute associative historical bias for each token
-                assoc_logits_list = []
-                curr_state = r_state
-                for t in range(s):
-                    q_t = q_r[:, t : t + 1, :]
-                    a_log = torch.matmul(q_t, curr_state).squeeze(1) # [B, num_experts]
-                    assoc_logits_list.append(a_log)
-                    k_t = k_r[:, t : t + 1, :]
-                    # Use static router prediction for update to break sequential latency
-                    p_static = F.softmax(router_logits_static.view(b, s, -1)[:, t : t + 1, :], dim=-1)
-                    update_t = torch.bmm(k_t.transpose(1, 2), p_static)
-                    curr_state = gamma_r * curr_state + update_t
-                next_router_state = curr_state
-                assoc_logits = torch.stack(assoc_logits_list, dim=1).view(-1, self.num_routed_experts)
+                # Vectorized chunked associative prefix scan across sequence (O(1) kernel launches)
+                t_idx = torch.arange(s, device=x.device, dtype=torch.float32)
+                p_static_all = F.softmax(router_logits_static.view(b, s, self.num_routed_experts), dim=-1)
+
+                # 1. State initialization contribution: q_r[:, t] @ (gamma^t * r_state)
+                pow_gamma = torch.pow(gamma_r, t_idx).view(1, s, 1)
+                assoc_init = torch.matmul(q_r * pow_gamma.to(q_r.dtype), r_state)
+
+                # 2. In-sequence pairwise historical contribution:
+                # For long sequences, evaluate in chunks of 1024 tokens to bound transient VRAM
+                chunk_size = 1024
+                assoc_updates = []
+                for c_start in range(0, s, chunk_size):
+                    c_end = min(c_start + chunk_size, s)
+                    q_c = q_r[:, c_start:c_end, :]
+                    dots_c = torch.bmm(q_c, k_r[:, :c_end, :].transpose(1, 2))
+                    c_pos = t_idx[c_start:c_end].unsqueeze(1)
+                    k_pos = t_idx[:c_end].unsqueeze(0)
+                    diff = c_pos - k_pos - 1
+                    valid_mask = diff >= 0
+                    decay_mat = torch.where(valid_mask, torch.pow(gamma_r, diff), torch.zeros_like(diff))
+                    M_c = dots_c * decay_mat.to(q_r.dtype)
+                    assoc_c = torch.bmm(M_c, p_static_all[:, :c_end, :])
+                    assoc_updates.append(assoc_c)
+
+                assoc_update = torch.cat(assoc_updates, dim=1) if len(assoc_updates) > 1 else assoc_updates[0]
+                assoc_logits = (assoc_init + assoc_update).view(-1, self.num_routed_experts)
                 router_logits = router_logits_static + 0.5 * assoc_logits
+
+                # 3. Final state transition for subsequent decode:
+                # S_final = gamma^s * r_state + sum_{j=0}^{s-1} gamma^{s - 1 - j} (k_r[j]^T * p[j])
+                gamma_s = torch.pow(gamma_r, s).view(1, 1, 1).to(q_r.dtype)
+                decay_final = torch.pow(gamma_r, s - 1 - t_idx).view(1, s, 1).to(q_r.dtype)
+                k_weighted = k_r * decay_final
+                final_update = torch.bmm(k_weighted.transpose(1, 2), p_static_all)
+                next_router_state = r_state * gamma_s + final_update
         else:
             router_logits = router_logits_static
 

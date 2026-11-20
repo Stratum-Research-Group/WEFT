@@ -305,12 +305,21 @@ class WeftAttention(nn.Module):
         if self.use_mla:
             c_kv = self.kv_down_proj(hidden_states)  # (b, s, mla_latent_dim)
             if is_hf_cache and use_cache and hasattr(past_state, "layers") and isinstance(past_state, WeftCache):
-                # Ensure layer is initialized in cache
+                if past_len == 0:
+                    # Prefill: project full prompt sequence directly without truncating to sliding window
+                    k_local = self.k_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+                    v_local = self.v_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+                else:
+                    # Single-token or incremental decode: reconstruct from resident latent window + current token
+                    layer = past_state.layers[self.layer_idx]
+                    if getattr(layer, "weft_mla_latent", None) is not None:
+                        c_all = torch.cat([layer.weft_mla_latent, c_kv], dim=1)
+                    else:
+                        c_all = c_kv
+                    k_local = self.k_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
+                    v_local = self.v_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
+                # Store compressed resident latent into cache
                 past_state.update(c_kv, c_kv, self.layer_idx, mla_latent=c_kv)
-                layer = past_state.layers[self.layer_idx]
-                c_all = layer.weft_mla_latent
-                k_local = self.k_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
-                v_local = self.v_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
             elif is_hf_cache and not use_cache and hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
                 layer = past_state.layers[self.layer_idx]
                 if getattr(layer, "weft_mla_latent", None) is not None:

@@ -58,6 +58,32 @@ REAL_WORLD_BENCHMARK_TASKS = [
             "models/parser.py": "def parse_payload(data):\n    meta = data.get('meta') or {}\n    return data['user']['id'], meta.get('timestamp', 0)\n",
         },
     },
+    {
+        "id": "SWE-TASK-004",
+        "title": "Circular Dependency & Dynamic Plugin Registry Resolution",
+        "files": {
+            "plugins/registry.py": "from handlers import DefaultHandler\nclass PluginRegistry:\n    def __init__(self):\n        self.handler = DefaultHandler()\n    def execute(self, val):\n        return self.handler.process(val)\n",
+            "plugins/handlers.py": "from registry import PluginRegistry\nclass DefaultHandler:\n    def process(self, val):\n        return val * 2\n",
+            "tests/test_plugins.py": "import sys\nsys.path.insert(0, 'plugins')\nfrom registry import PluginRegistry\nreg = PluginRegistry()\nassert reg.execute(21) == 42\n",
+        },
+        "test_cmd": "python3 tests/test_plugins.py",
+        "patch": {
+            "plugins/handlers.py": "class DefaultHandler:\n    def process(self, val):\n        return val * 2\n",
+        },
+    },
+    {
+        "id": "SWE-TASK-005",
+        "title": "Async Task Timeout & Resource Cleanup Leak",
+        "files": {
+            "infra/pool.py": "class ConnectionPool:\n    def __init__(self):\n        self.active = 0\n    def acquire(self):\n        self.active += 1\n    def release(self):\n        self.active -= 1\n",
+            "infra/worker.py": "from pool import ConnectionPool\ndef process_job(pool, fail=False):\n    pool.acquire()\n    if fail:\n        raise RuntimeError('Job failed')\n    pool.release()\n",
+            "tests/test_worker.py": "import sys\nsys.path.insert(0, 'infra')\nfrom pool import ConnectionPool\nfrom worker import process_job\np = ConnectionPool()\ntry:\n    process_job(p, fail=True)\nexcept RuntimeError:\n    pass\nassert p.active == 0, f'Leaked connection: active={p.active}'\n",
+        },
+        "test_cmd": "python3 tests/test_worker.py",
+        "patch": {
+            "infra/worker.py": "from pool import ConnectionPool\ndef process_job(pool, fail=False):\n    pool.acquire()\n    try:\n        if fail:\n            raise RuntimeError('Job failed')\n    finally:\n        pool.release()\n",
+        },
+    },
 ]
 
 

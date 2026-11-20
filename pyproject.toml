@@ -49,3 +49,8 @@ include = ["weft*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py", "verify_*.py"]
+
+[dependency-groups]
+dev = [
+    "matplotlib>=3.10.9",
+]

@@ -10,7 +10,7 @@ Implements:
 import json
 import time
 import uuid
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -38,6 +38,7 @@ class GlobalEngine:
     tokenizer: Optional[WeftCharTokenizer] = None
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     model_name: str = "weft-causal-lm"
+    paged_manager: Optional[Any] = None
 
 engine = GlobalEngine()
 
@@ -57,6 +58,23 @@ def load_model(checkpoint_path: str, device: Optional[str] = None, quantization:
     quant = quantization or os.environ.get("WEFT_QUANTIZATION", None)
     engine.model = WeftForCausalLM.from_pretrained(checkpoint_path, quantization=quant).to(engine.device)
     engine.model.eval()
+
+    # Initialize Paged Cache Manager for continuous serving
+    try:
+        from weft.paged_cache import PagedWeftServingEngine
+        latent_dim = getattr(engine.model.config, "mla_latent_dim", 192)
+        num_layers = getattr(engine.model.config, "num_hidden_layers", 16)
+        engine.paged_manager = PagedWeftServingEngine(
+            num_layers=num_layers,
+            block_size=16,
+            max_blocks=2048,
+            latent_dim=latent_dim,
+            device=engine.device,
+        )
+        print(f"[WEFT Server] Initialized PagedWeftServingEngine (2048 blocks, d_latent={latent_dim})")
+    except Exception as e:
+        print(f"[WEFT Server] Note: Paged cache initialization deferred: {e}")
+
     vocab_path = os.path.join(checkpoint_path, "vocab.json")
     if os.path.exists(vocab_path):
         engine.tokenizer = WeftCharTokenizer(vocab_file=vocab_path)
@@ -108,7 +126,12 @@ class CompletionRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ready" if engine.model is not None else "unloaded", "device": engine.device}
+    paged_info = engine.paged_manager.stats() if engine.paged_manager is not None else None
+    return {
+        "status": "ready" if engine.model is not None else "unloaded",
+        "device": engine.device,
+        "paged_cache": paged_info,
+    }
 
 
 @app.get("/v1/models")

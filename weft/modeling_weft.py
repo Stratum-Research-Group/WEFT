@@ -717,10 +717,17 @@ class WeftModel(WeftPreTrainedModel):
         past_key_values: Optional[Union[Cache, Tuple]] = None,
         use_cache: Optional[bool] = None,
         attention_mask: Optional[torch.Tensor] = None,
+        output_hidden_states: Optional[bool] = None,
         **kwargs,
-    ) -> Tuple[torch.Tensor, Optional[Any]]:
+    ) -> Tuple[torch.Tensor, Optional[Any], Optional[Tuple[torch.Tensor, ...]]]:
         use_cache = use_cache if use_cache is not None else self.config.use_cache
+        output_hidden_states = (
+            output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+        )
         hidden_states = self.embed_tokens(input_ids)
+        all_hidden_states = () if output_hidden_states else None
+        if output_hidden_states:
+            all_hidden_states = all_hidden_states + (hidden_states,)
 
         is_hf_cache = isinstance(past_key_values, Cache)
         if is_hf_cache and not isinstance(past_key_values, WeftCache):
@@ -749,6 +756,8 @@ class WeftModel(WeftPreTrainedModel):
                         attention_mask=attention_mask,
                         **kwargs,
                     )
+                if output_hidden_states:
+                    all_hidden_states = all_hidden_states + (hidden_states,)
             next_cache = past_key_values if use_cache else None
         else:
             next_states = () if use_cache else None
@@ -774,9 +783,14 @@ class WeftModel(WeftPreTrainedModel):
                     )
                 if use_cache:
                     next_states = next_states + (next_state,)
+                if output_hidden_states:
+                    all_hidden_states = all_hidden_states + (hidden_states,)
             next_cache = next_states
 
         hidden_states = self.norm(hidden_states)
+        if output_hidden_states:
+            all_hidden_states = all_hidden_states + (hidden_states,)
+            return hidden_states, next_cache, all_hidden_states
         return hidden_states, next_cache
 
 
@@ -840,15 +854,22 @@ class WeftForCausalLM(WeftPreTrainedModel, GenerationMixin):
         past_key_values: Optional[Union[Cache, Tuple]] = None,
         use_cache: Optional[bool] = None,
         attention_mask: Optional[torch.Tensor] = None,
+        output_hidden_states: Optional[bool] = None,
         **kwargs,
     ) -> CausalLMOutputWithPast:
-        hidden_states, next_states = self.model(
+        model_outputs = self.model(
             input_ids=input_ids,
             past_key_values=past_key_values,
             use_cache=use_cache,
             attention_mask=attention_mask,
+            output_hidden_states=output_hidden_states,
             **kwargs,
         )
+        if output_hidden_states:
+            hidden_states, next_states, all_hidden_states = model_outputs
+        else:
+            hidden_states, next_states = model_outputs
+            all_hidden_states = None
 
         logits = self.lm_head(hidden_states)
         loss = None
@@ -862,4 +883,5 @@ class WeftForCausalLM(WeftPreTrainedModel, GenerationMixin):
             loss=loss,
             logits=logits,
             past_key_values=next_states,
+            hidden_states=all_hidden_states,
         )

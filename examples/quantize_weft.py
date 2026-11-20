@@ -40,9 +40,17 @@ class QuantizedLinear(nn.Module):
         return ql.to(float_linear.weight.device)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # Dequantize weight on the fly or use int8 gemm
-        w_dequant = (self.weight_int8.to(x.dtype) * self.scale.to(x.dtype))
         bias = self.bias.to(x.dtype) if self.bias is not None else None
+        if x.is_cuda and x.dtype == torch.bfloat16:
+            try:
+                from weft.kernels.fused_int8_gemm import fused_int8_linear
+                scale_vec = self.scale.squeeze()
+                if scale_vec.ndim == 0:
+                    scale_vec = scale_vec.repeat(self.out_features)
+                return fused_int8_linear(x, self.weight_int8, scale_vec, bias)
+            except Exception:
+                pass
+        w_dequant = (self.weight_int8.to(x.dtype) * self.scale.to(x.dtype))
         return torch.nn.functional.linear(x, w_dequant, bias)
 
 

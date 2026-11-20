@@ -304,32 +304,53 @@ class WeftAttention(nn.Module):
         q = self.q_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
         if self.use_mla:
             c_kv = self.kv_down_proj(hidden_states)  # (b, s, mla_latent_dim)
-            k = self.k_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
-            v = self.v_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+            if is_hf_cache and use_cache and hasattr(past_state, "layers") and isinstance(past_state, WeftCache):
+                # Ensure layer is initialized in cache
+                past_state.update(c_kv, c_kv, self.layer_idx, mla_latent=c_kv)
+                layer = past_state.layers[self.layer_idx]
+                c_all = layer.weft_mla_latent
+                k_local = self.k_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
+                v_local = self.v_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
+            elif is_hf_cache and not use_cache and hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
+                layer = past_state.layers[self.layer_idx]
+                if getattr(layer, "weft_mla_latent", None) is not None:
+                    c_all = torch.cat([layer.weft_mla_latent, c_kv], dim=1)
+                else:
+                    c_all = c_kv
+                k_local = self.k_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
+                v_local = self.v_up_proj(c_all).view(b, c_all.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
+            else:
+                k = self.k_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+                v = self.v_up_proj(c_kv).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
+                if is_hf_cache and use_cache:
+                    k_local, v_local = past_state.update(k, v, self.layer_idx)
+                elif past_kv is not None:
+                    past_k, past_v = past_kv[:2]
+                    k_local = torch.cat([past_k, k], dim=2)
+                    v_local = torch.cat([past_v, v], dim=2)
+                else:
+                    k_local, v_local = k, v
         else:
             k = self.k_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
             v = self.v_proj(hidden_states).view(b, s, self.num_heads, self.head_dim).transpose(1, 2)
-
-        if is_hf_cache and use_cache:
-            k_local, v_local = past_state.update(k, v, self.layer_idx)
-        elif is_hf_cache and not use_cache:
-            # Read-only past usage without mutating caller cache
-            if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
-                layer = past_state.layers[self.layer_idx]
-                if layer.is_initialized and layer.keys.numel() > 0:
-                    k_local = torch.cat([layer.keys, k], dim=-2)
-                    v_local = torch.cat([layer.values, v], dim=-2)
+            if is_hf_cache and use_cache:
+                k_local, v_local = past_state.update(k, v, self.layer_idx)
+            elif is_hf_cache and not use_cache:
+                if hasattr(past_state, "layers") and len(past_state.layers) > self.layer_idx:
+                    layer = past_state.layers[self.layer_idx]
+                    if layer.is_initialized and layer.keys.numel() > 0:
+                        k_local = torch.cat([layer.keys, k], dim=-2)
+                        v_local = torch.cat([layer.values, v], dim=-2)
+                    else:
+                        k_local, v_local = k, v
                 else:
                     k_local, v_local = k, v
+            elif past_kv is not None:
+                past_k, past_v = past_kv[:2]
+                k_local = torch.cat([past_k, k], dim=2)
+                v_local = torch.cat([past_v, v], dim=2)
             else:
                 k_local, v_local = k, v
-        elif past_kv is not None:
-            past_k, past_v = past_kv[:2]
-            k_local = torch.cat([past_k, k], dim=2)
-            v_local = torch.cat([past_v, v], dim=2)
-        else:
-            k_local = k
-            v_local = v
 
         k_len = k_local.shape[-2]
 

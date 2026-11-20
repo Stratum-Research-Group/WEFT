@@ -28,18 +28,38 @@ class WeftCacheLayer(DynamicLayer):
         self.weft_router_state: Optional[torch.Tensor] = None
         self.weft_titans_state: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
         self.weft_last_k_p: Optional[torch.Tensor] = None
+        self.weft_mla_latent: Optional[torch.Tensor] = None
 
     def update(
         self,
         key_states: torch.Tensor,
         value_states: torch.Tensor,
         *args,
+        mla_latent: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if not self.is_initialized:
             self.lazy_initialization(key_states, value_states)
 
         self.cumulative_length += key_states.shape[-2]
+
+        if mla_latent is not None:
+            # Latent resident caching mode: store compressed c_kv (b, s, mla_latent_dim)
+            if self.weft_mla_latent is None:
+                full_latent = mla_latent
+            else:
+                full_latent = torch.cat([self.weft_mla_latent, mla_latent], dim=1)
+
+            if full_latent.shape[1] > self.max_cached:
+                self.weft_mla_latent = full_latent[:, -self.max_cached:, :].contiguous()
+            else:
+                self.weft_mla_latent = full_latent
+
+            # Keep keys/values empty to free VRAM overhead
+            self.keys = torch.empty(0, device=key_states.device)
+            self.values = torch.empty(0, device=value_states.device)
+            return key_states, value_states
+
         full_keys = torch.cat([self.keys, key_states], dim=-2)
         full_values = torch.cat([self.values, value_states], dim=-2)
 
@@ -83,6 +103,10 @@ class WeftCacheLayer(DynamicLayer):
         if self.weft_last_k_p is not None:
             self.weft_last_k_p = self.weft_last_k_p.index_select(
                 0, beam_idx.to(self.weft_last_k_p.device)
+            )
+        if self.weft_mla_latent is not None:
+            self.weft_mla_latent = self.weft_mla_latent.index_select(
+                0, beam_idx.to(self.weft_mla_latent.device)
             )
 
 

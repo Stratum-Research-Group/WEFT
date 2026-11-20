@@ -125,5 +125,9 @@ def run_multi_needle_benchmark(
 
 
 if __name__ == "__main__":
-    from typing import Any
-    run_multi_needle_benchmark()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--checkpoint", type=str, default="checkpoints/weft2_foundation_5k")
+    parser.add_argument("--lengths", type=int, nargs="+", default=[4096, 8192, 16384])
+    args = parser.parse_args()
+    run_multi_needle_benchmark(checkpoint_dir=args.checkpoint, context_lengths=args.lengths)

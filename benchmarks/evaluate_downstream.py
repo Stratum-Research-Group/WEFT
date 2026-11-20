@@ -152,4 +152,8 @@ def evaluate_downstream_suite(
 
 
 if __name__ == "__main__":
-    evaluate_downstream_suite()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--checkpoint", type=str, default="weft2_release_v2_ckpt")
+    args = parser.parse_args()
+    evaluate_downstream_suite(checkpoint_dir=args.checkpoint)

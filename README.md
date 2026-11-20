@@ -304,10 +304,10 @@ pip install -e .
 
 ```python
 import torch
-from weft import Weft2Config, Weft2ForCausalLM
+from weft import WeftConfig, WeftForCausalLM
 
 # Load unified instruct checkpoint (589M MoE + Titans + MLA)
-model = Weft2ForCausalLM.from_pretrained("./weft2_unified_instruct_ckpt").to(torch.bfloat16).cuda()
+model = WeftForCausalLM.from_pretrained("./weft2_unified_instruct_ckpt").to(torch.bfloat16).cuda()
 model.eval()
 
 # Autoregressive generation with compressed resident KV cache
@@ -325,29 +325,30 @@ print("Generated Tokens:", generated)
 ### Custom Architecture Instantiation
 
 ```python
-from weft import Weft2Config, Weft2ForCausalLM
+from weft import WeftConfig, WeftForCausalLM
 
 # Instantiate WEFT-2: 589M MoE + Titans Memory + Multi-Head Latent Attention
-config = Weft2Config(
-    vocab_size=32000,
+config = WeftConfig(
+    vocab_size=50257,
     hidden_size=896,
-    intermediate_size=2048,
+    intermediate_size=2560,
     num_hidden_layers=16,
-    num_attention_heads=14,
+    num_attention_heads=16,
     num_state_heads=4,
-    state_rank=32,
+    state_rank=64,
     window_size=128,
-    max_position_embeddings=32768,
-    num_routed_experts=16,
-    num_shared_experts=1,
-    num_active_experts=2,
-    moe_intermediate_size=512,
-    q_lora_rank=256,
-    kv_lora_rank=192,
-    use_titans_memory=True,
+    max_position_embeddings=4096,
+    use_moe=True,
+    moe_num_routed_experts=16,
+    moe_top_k=2,
+    use_titans=True,
+    titans_mem_dim=96,
+    use_mla=True,
+    mla_latent_dim=192,
+    shifted_binding=True,
 )
 
-model = Weft2ForCausalLM(config).to(torch.bfloat16).cuda()
+model = WeftForCausalLM(config).to(torch.bfloat16).cuda()
 num_params = sum(p.numel() for p in model.parameters())
 print(f"Instantiated WEFT-2 Model with {num_params:,} parameters.")
 ```

@@ -239,9 +239,10 @@ Trained on character/byte sequences from real language corpora (TinyShakespeare,
 - **Raw Linear Attention (CumSum)**: Validation Loss: **2.83**, Validation Perplexity: **17.01** (Memory Drowning failure mode)
 - **WEFT Gated Recurrence**: Validation Loss: **1.64**, Validation Perplexity: **5.16** (**Closed to within 1.5% of standard Transformer on TinyShakespeare**)
 
-### High-Concurrency Serving Decode Latencies
-Evaluated using the continuous decoding engine ([`examples/serving_engine.py`](examples/serving_engine.py)) generating 128 tokens from 32-token prompts:
+### High-Concurrency Serving Decode Latencies & Paged Memory Benchmarks
+Evaluated using the continuous decoding engine ([`examples/serving_engine.py`](examples/serving_engine.py)) and the high-concurrency paged serving benchmark ([`benchmarks/benchmark_serving_concurrency.py`](benchmarks/benchmark_serving_concurrency.py)) on **NVIDIA GeForce RTX 5060 Ti**:
 
+#### 1. In-Process Batch Decode Scaling:
 | Batch Size | Prefill Latency | Decode Latency (per token) | Throughput |
 | :---: | :---: | :---: | :---: |
 | **1** | 2.76 ms | **1.958 ms** | 510.8 tok/s |
@@ -249,7 +250,15 @@ Evaluated using the continuous decoding engine ([`examples/serving_engine.py`](e
 | **8** | 2.86 ms | **1.942 ms** | 4,120.3 tok/s |
 | **16** | 6.61 ms | **2.003 ms** | **7,988.2 tok/s** |
 
-Single-step token decode latency remains virtually flat (~1.94–2.00 ms) regardless of batch size, proving the absence of memory-bandwidth degradation during decoding.
+#### 2. Live Paged Streaming Server Concurrency (Uvicorn + FastAPI + SSE):
+| Concurrent Streaming Clients | Time-to-First-Token (TTFT) | Inter-Token Latency (ITL) | Aggregate Serving Throughput | Paged Cache Memory |
+| :---: | :---: | :---: | :---: | :---: |
+| **8 Clients** | 956.03 ms | **44.58 ms** | 108.54 tok/s | 48 MB (2048 blocks) |
+| **16 Clients** | **130.55 ms** | **77.34 ms** | **199.54 tok/s** | 48 MB (2048 blocks) |
+
+#### 3. Hardware Triton Scan Autotune Profile:
+- **Forward Recurrent Scan**: `BLOCK_D=32, num_warps=4` (**$14.35\text{ ms}$ at $N=32,768$**, sustained **$4.57\text{M tok/s}$**).
+- **Backward Adjoint Scan**: `BLOCK_D=32, num_warps=2` (**$26.25\text{ ms}$ at $N=4,096$**, sustained **$0.31\text{M tok/s}$**).
 
 ---
 

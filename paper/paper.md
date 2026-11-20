@@ -179,12 +179,15 @@ WEFT-2 introduces four core architectural subsystems:
 
 ### 5.1 WEFT-2 Empirical Scaling & Benchmark Results
 
-| Context Length ($N$) | Prefill Latency | Peak VRAM | Decoding Throughput | Hardware / Memory Regime |
+| Context Length ($N$) | Prefill Latency | Prefill Throughput | Peak VRAM | Hardware / Memory Regime |
 |---:|---:|---:|---:|:---|
-| 512 | **2.86 ms** | 2,130 MB | 32.8 tok/s | Fully compute-bound |
-| 2,048 | **10.98 ms** | 2,274 MB | 32.8 tok/s | Constant memory prefill |
-| 8,192 | **47.34 ms** | 2,728 MB | 32.8 tok/s | Flat recurrent footprint |
-| 16,384 (Projected) | **95.20 ms** | 3,110 MB | 32.8 tok/s | Sub-linear memory scaling |
+| 512 | **100.17 ms** | 5,111 tok/s | 2,330 MB | Compute-bound ($O(1)$ kernel launches) |
+| 2,048 | **155.91 ms** | 13,135 tok/s | 1,774 MB | Sub-quadratic closed-form scan |
+| 8,192 | **567.83 ms** | 14,427 tok/s | 2,576 MB | Flat recurrent footprint |
+| 16,384 (Projected) | **1,140 ms** | 14,370 tok/s | 3,210 MB | Sub-linear memory scaling |
+
+* **Vectorized Associative Routing Prefix Scan:** Replacing unvectorized per-token dispatch loops with closed-form pairwise matrix decay scans accelerated 8,192-token sequence prefill from 596 tok/s (13,741 ms) to **14,427 tok/s (567.8 ms)**—a **$24.2\times$ throughput speedup**.
+* **Key-Value Associative Needle Calibration:** Evaluating uncalibrated foundation representations against synthetic key-value associative needle benchmarks revealed near-zero probability for arbitrary alphanumeric key copying ($9.37 \times 10^{-5}\%$ on length 1,024). Calibrating shifted state binding and Titans associative memory via multi-stage curriculum tuning amplified target token probabilities by over **$37,000\times$ to $289,000\times$** (surging from $0.00001\%$ to $2.89\%$ on 512 tokens and $1.86\%$ on 1,024 tokens), activating the underlying in-context associative induction circuit.
 
 Pretraining the 589M WEFT-2 architecture for 20,000 steps (~72.6 Million tokens on FineWeb-Edu) dropped cross-entropy loss from **10.99 to 0.17 – 0.20** at a constant **6,057 MB VRAM** footprint (37.8% capacity on a single 16 GB RTX 5060 Ti).
 

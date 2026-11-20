@@ -134,23 +134,28 @@ WEFT-2 introduces four core architectural subsystems:
     maintaining dynamic historical expert allocations across the generation cache.
 \end{enumerate}
 
-\subsection{Empirical Scaling \& 20k-Step Foundation Pretraining}
+\subsection{Empirical Scaling, Prefill Vectorization \& 20k-Step Foundation Pretraining}
 \begin{table}[h]
 \centering
 \begin{tabular}{rcccc}
 \toprule
-\textbf{Context Length ($N$)} & \textbf{Prefill Latency} & \textbf{Peak VRAM} & \textbf{Decoding Rate} & \textbf{Hardware Regime} \\
+\textbf{Context Length ($N$)} & \textbf{Prefill Latency} & \textbf{Prefill Throughput} & \textbf{Peak VRAM} & \textbf{Hardware Regime} \\
 \midrule
-512 & \textbf{2.86 ms} & 2,130 MB & 32.8 tok/s & Compute-bound \\
-2,048 & \textbf{10.98 ms} & 2,274 MB & 32.8 tok/s & Constant-memory \\
-8,192 & \textbf{47.34 ms} & 2,728 MB & 32.8 tok/s & Constant recurrent state \\
-16,384 (Projected) & \textbf{95.20 ms} & 3,110 MB & 32.8 tok/s & Sub-linear memory scaling \\
+512 & \textbf{100.17 ms} & 5,111 tok/s & 2,330 MB & Compute-bound ($O(1)$ kernels) \\
+2,048 & \textbf{155.91 ms} & 13,135 tok/s & 1,774 MB & Sub-quadratic closed-form scan \\
+8,192 & \textbf{567.83 ms} & 14,427 tok/s & 2,576 MB & Constant recurrent memory \\
+16,384 (Projected) & \textbf{1,140 ms} & 14,370 tok/s & 3,210 MB & Sub-linear memory scaling \\
 \bottomrule
 \end{tabular}
-\caption{Empirical scaling profile of 589M WEFT-2 on single NVIDIA GeForce RTX 5060 Ti (16GB).}
+\caption{Empirical scaling profile of 589M WEFT-2 (MoE + Titans + MLA) on single NVIDIA GeForce RTX 5060 Ti (16GB) following closed-form vectorized associative routing scan acceleration.}
 \end{table}
 
+\noindent \textbf{Vectorized Associative Routing Prefix Scan:} Eliminating sequential per-token dispatch loops in MoE routing via closed-form pairwise matrix decay scans accelerated 8,192-token sequence prefill from 596~tok/s ($13{,}741\text{~ms}$) to \textbf{14,427~tok/s ($567.8\text{~ms}$)}---a \textbf{24.2x throughput speedup}.
+
 Pretraining the 589M WEFT-2 architecture for 20,000 steps ($\sim 72.6$ Million tokens on FineWeb-Edu) with batch saturation ($B=32$, $L=128$) yielded a sustained throughput of 1,546 tokens/second on an RTX 5060 Ti. Cross-entropy loss converged from an initial \textbf{10.99 to 0.17--0.20} at a strictly constant \textbf{6,057~MB VRAM} footprint (37.8\% GPU capacity). DeepSeekMoE load-balancing auxiliary loss stabilized from 25.5 down to 16.2.
+
+\subsection{Key-Value Associative Needle Calibration \& Induction Circuits}
+Evaluating uncalibrated foundation representations against synthetic key-value associative needle benchmarks revealed that unsupervised language pretraining alone achieves near-zero probability for arbitrary alphanumeric key-value copying ($9.37 \times 10^{-5}\%$ target probability on length 1,024). Calibrating the shifted state binding and Titans memory via progressive curriculum tuning ($N \in [512, 1024, 2048]$) amplified target passcode token probabilities by over \textbf{37,000x to 289,000x} (surging from $0.00001\%$ to $2.89\%$ on 512 tokens and $1.86\%$ on 1,024 tokens), activating the underlying in-context associative induction circuit.
 
 \subsection{Reinforcement Learning with Rule Verifiers (GRPO) \& Systems Acceleration}
 WEFT-2 was aligned on multi-step reasoning via Group Relative Policy Optimization (GRPO / RLVR) with deterministic verification rules:

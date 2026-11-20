@@ -1,4 +1,4 @@
-from .singlet import SingletUncrossedAttention, SingletTransformerBlock
+from .singlet import SingletUncrossedAttention, SingletTransformerBlock, PerLayerEmbeddingAdapter
 
-__all__ = ["SingletUncrossedAttention", "SingletTransformerBlock"]
-__version__ = "0.1.0"
+__all__ = ["SingletUncrossedAttention", "SingletTransformerBlock", "PerLayerEmbeddingAdapter"]
+__version__ = "0.2.0"

@@ -134,4 +134,10 @@ def run_zero_shot_needle_benchmark(
 
 
 if __name__ == "__main__":
-    run_zero_shot_needle_benchmark(context_lengths=[1024, 2048, 4096])
+    import argparse
+    parser = argparse.ArgumentParser(description="Zero-Shot Passcode Needle Benchmark")
+    parser.add_argument("--ckpt", type=str, default="weft2_needle_calibrated_ckpt", help="Model checkpoint to evaluate")
+    parser.add_argument("--contexts", type=int, nargs="+", default=[1024, 2048, 4096], help="Context sequence lengths")
+    args = parser.parse_args()
+
+    run_zero_shot_needle_benchmark(model_path=args.ckpt, context_lengths=args.contexts)

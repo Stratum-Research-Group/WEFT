@@ -140,7 +140,8 @@ class WeftDeepSeekMoE(nn.Module):
                     k_pos = t_idx[:c_end].unsqueeze(0)
                     diff = c_pos - k_pos - 1
                     valid_mask = diff >= 0
-                    decay_mat = torch.where(valid_mask, torch.pow(gamma_r, diff), torch.zeros_like(diff))
+                    safe_diff = diff.clamp(min=0.0)
+                    decay_mat = torch.where(valid_mask, torch.pow(gamma_r, safe_diff), torch.zeros_like(diff))
                     M_c = dots_c * decay_mat.to(q_r.dtype)
                     assoc_c = torch.bmm(M_c, p_static_all[:, :c_end, :])
                     assoc_updates.append(assoc_c)

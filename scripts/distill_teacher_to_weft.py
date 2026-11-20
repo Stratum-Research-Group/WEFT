@@ -97,16 +97,43 @@ class ZeroRamTeacherProber:
         # Live safetensors lazy slice reading (Zero-RAM mmap)
         from safetensors import safe_open
         with safe_open(self.safetensors_path, framework="pt", device="cpu") as f:
-            weight_key = f"model.layers.{layer_idx}.mlp.down_proj.weight"
-            if weight_key in f.keys():
-                layer_weight = f.get_slice(weight_key)[:]
-                # Compute probed activation using slice
-                out = torch.matmul(inputs.float(), layer_weight.t().float())
-                del layer_weight
+            # 1. Resolve embedding slice for input tokens
+            if inputs.dim() == 2:
+                # inputs are token ids [B, S]
+                unique_tokens, inverse_indices = torch.unique(inputs, return_inverse=True)
+                emb_slice = f.get_slice("model.embed_tokens.weight")
+                # Load only unique token embeddings needed for this batch
+                token_embs = torch.stack([emb_slice[int(t.item())] for t in unique_tokens])
+                x = token_embs[inverse_indices].float()
+                del token_embs
+            else:
+                x = inputs.float()
+
+            # 2. Extract probed layer MLP gate/up/down projections
+            gate_key = f"model.layers.{layer_idx}.mlp.gate_proj.weight"
+            up_key = f"model.layers.{layer_idx}.mlp.up_proj.weight"
+            down_key = f"model.layers.{layer_idx}.mlp.down_proj.weight"
+
+            if gate_key in f.keys() and down_key in f.keys():
+                w_gate = f.get_slice(gate_key)[:].float()
+                w_up = f.get_slice(up_key)[:].float()
+                # Compute SwiGLU activation
+                mlp_act = F.silu(x @ w_gate.t()) * (x @ w_up.t())
+                del w_gate, w_up
+
+                w_down = f.get_slice(down_key)[:].float()
+                out = mlp_act @ w_down.t()
+                del w_down, mlp_act
+                gc.collect()
+                return out
+            elif down_key in f.keys():
+                w_down = f.get_slice(down_key)[:].float()
+                out = x @ w_down.t()
+                del w_down
                 gc.collect()
                 return out
             else:
-                raise KeyError(f"Key {weight_key} not found in safetensors index.")
+                raise KeyError(f"Key {down_key} not found in safetensors index.")
 
 
 def run_distillation_step(
@@ -130,7 +157,8 @@ def run_distillation_step(
     student_hidden = student_outputs.hidden_states[layer_to_probe + 1]  # +1 accounts for embedding layer
 
     # 2. Probe sliced teacher representation (mmap lazy slice or meta-device projection)
-    teacher_hidden = prober.probe_layer_activation(input_ids, layer_idx=layer_to_probe, mock_synthetic_probe=True)
+    mock = prober.safetensors_path is None or not os.path.exists(prober.safetensors_path)
+    teacher_hidden = prober.probe_layer_activation(input_ids, layer_idx=layer_to_probe, mock_synthetic_probe=mock)
 
     # 3. Compute distillation loss
     feature_loss = distiller(student_hidden, teacher_hidden)

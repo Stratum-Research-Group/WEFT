@@ -16,6 +16,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from weft import WeftConfig, WeftForCausalLM
 from scripts.distill_teacher_to_weft import SlicedLayerDistiller
 
@@ -38,15 +41,17 @@ class Gemma4LayerProber:
         with safe_open(self.safetensors_path, framework="pt", device="cpu") as f:
             # 1. Stream token embeddings for this batch
             unique_tokens, inverse_indices = torch.unique(token_ids, return_inverse=True)
-            emb_slice = f.get_slice("model.embed_tokens.weight")
+            emb_key = "model.language_model.embed_tokens.weight" if "model.language_model.embed_tokens.weight" in f.keys() else "model.embed_tokens.weight"
+            emb_slice = f.get_slice(emb_key)
             token_embs = torch.stack([emb_slice[int(t.item())] for t in unique_tokens])
             x = token_embs[inverse_indices].float()
             del token_embs
 
             # 2. Extract probed layer MLP weights
-            gate_key = f"model.layers.{layer_idx}.mlp.gate_proj.weight"
-            up_key = f"model.layers.{layer_idx}.mlp.up_proj.weight"
-            down_key = f"model.layers.{layer_idx}.mlp.down_proj.weight"
+            prefix = "model.language_model.layers" if f"model.language_model.layers.{layer_idx}.mlp.gate_proj.weight" in f.keys() else "model.layers"
+            gate_key = f"{prefix}.{layer_idx}.mlp.gate_proj.weight"
+            up_key = f"{prefix}.{layer_idx}.mlp.up_proj.weight"
+            down_key = f"{prefix}.{layer_idx}.mlp.down_proj.weight"
 
             w_gate = f.get_slice(gate_key)[:].float()
             w_up = f.get_slice(up_key)[:].float()

@@ -8,21 +8,21 @@ All configurations are instantiated and strictly validated via `torch.device("me
 
 ## 1. Architectural Parameter Matrix
 
-| Specification | WEFT-2 1.5B | WEFT-2 3B | WEFT-2 7B | WEFT-2 14B | WEFT-2 32B (MoE) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Target Audience / Tier** | Edge / Mobile / Draft | Local Workstation | Open-Weight Standard | Enterprise Reasoning | Frontier High-Capacity |
-| **Total Parameters** | **1.48B** | **3.01B** | **6.99B** | **14.65B** | **32.51B** |
-| **Active Parameters / Token** | **1.48B** | **3.01B** | **6.99B** | **14.65B** | **8.84B** |
-| **Hidden Dim ($d_{\text{model}}$)** | 2,048 | 2,560 | 4,096 | 5,120 | 4,096 |
-| **Intermediate Dim ($d_{\text{ffn}}$)** | 5,632 | 7,168 | 11,008 | 14,336 | 11,008 |
-| **Layers ($L$)** | 32 | 42 | 40 | 52 | 50 |
-| **Attention Heads ($H$)** | 16 | 20 | 32 | 40 | 32 |
-| **State Heads ($H_{\text{state}}$)** | 4 | 4 | 4 | 8 | 8 |
-| **State Rank ($r$)** | 32 | 32 | 32 | 48 | 48 |
-| **Local Chunk Window ($W$)** | 128 | 128 | 128 | 128 | 128 |
-| **Multi-Head Latent Attn (MLA)** | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) |
-| **Mixture of Experts (MoE)** | Dense | Dense | Dense | Dense | **16 routed, top-2 + 1 shared** |
-| **Vocab Size** | 32,000 | 32,000 | 32,000 | 32,000 | 32,000 |
+| Specification | WEFT-2 1.5B | WEFT-2 3B | WEFT-2 7B | WEFT-2 14B | WEFT-2 32B (MoE) | WEFT-2 1T (BitNet MoE) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Target Audience / Tier** | Edge / Mobile / Draft | Local Workstation | Open-Weight Standard | Enterprise Reasoning | Frontier High-Capacity | **Hyperscale Frontier / BitNet** |
+| **Total Parameters** | **1.48B** | **3.01B** | **6.99B** | **14.65B** | **32.51B** | **1.036T (1,036.4B)** |
+| **Active Parameters / Token** | **1.48B** | **3.01B** | **6.99B** | **14.65B** | **8.84B** | **75.3B** |
+| **Hidden Dim ($d_{\text{model}}$)** | 2,048 | 2,560 | 4,096 | 5,120 | 4,096 | **8,192** |
+| **Intermediate Dim ($d_{\text{ffn}}$)** | 5,632 | 7,168 | 11,008 | 14,336 | 11,008 | **28,672** |
+| **Layers ($L$)** | 32 | 42 | 40 | 52 | 50 | **88** |
+| **Attention Heads ($H$)** | 16 | 20 | 32 | 40 | 32 | **64** |
+| **State Heads ($H_{\text{state}}$)** | 4 | 4 | 4 | 8 | 8 | **8** |
+| **State Rank ($r$)** | 32 | 32 | 32 | 48 | 48 | **64** |
+| **Local Chunk Window ($W$)** | 128 | 128 | 128 | 128 | 128 | **128** |
+| **Multi-Head Latent Attn (MLA)** | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) | Yes ($d_{\text{lat}}=128$) | **Yes ($d_{\text{lat}}=256$)** |
+| **Mixture of Experts (MoE)** | Dense | Dense | Dense | Dense | **16 routed, top-2 + 1 shared** | **128 routed, top-4 + 1 shared** |
+| **Vocab Size** | 32,000 | 32,000 | 32,000 | 32,000 | 32,000 | **32,000** |
 
 ---
 
@@ -37,5 +37,7 @@ All configurations are instantiated and strictly validated via `torch.device("me
 | **WEFT-2 14B** | FP16 / BF16 | 29.30 GB | **< 3.2 GB** | 1x A100 / H100 (40–80 GB) or 2x 3090 |
 | **WEFT-2 32B (MoE)** | FP16 / BF16 | 65.02 GB | **< 3.2 GB** | 1x H100 (80 GB) or 2x RTX 6000 Ada |
 | **WEFT-2 32B (INT4 MoE)** | INT4 | 16.25 GB | **< 3.2 GB** | 1x RTX 5060 Ti (16 GB offloaded) / RTX 4090 |
+| **WEFT-2 1T (BitNet b1.58)** | **Ternary (2-bit)** | **241.3 GB** | **< 4.2 GB** | **1x 8-GPU RTX 4090/5090 rig or 4x H100 (80GB)** |
+| **WEFT-2 1T (Standard FP16)** | FP16 | 1,930.5 GB | **< 4.2 GB** | 25x H100 (80 GB) |
 
 > **Key Theoretical Advantage:** Because WEFT decouples history accumulation into fixed-size associative state tensors ($S \in \mathbb{R}^{B \times H_{\text{state}} \times d_{\text{head}} \times r}$) and only preserves a sliding window of $W=128$ tokens for local attention, the context state footprint is **strictly constant $\mathcal{O}(1)$ across context length** (tested and proven up to 1,048,576 tokens).

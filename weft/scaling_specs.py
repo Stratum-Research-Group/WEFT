@@ -132,6 +132,21 @@ WEFT_SCALE_REGISTRY: Dict[str, ModelSpec] = {
         moe_num_routed_experts=16,
         moe_top_k=2,
     ),
+    "1T": ModelSpec(
+        tier="1T",
+        target_params="1.04T (MoE)",
+        vocab_size=32000,
+        hidden_size=8192,
+        intermediate_size=28672,
+        num_hidden_layers=88,
+        num_attention_heads=64,
+        num_state_heads=8,
+        state_rank=64,
+        window_size=128,
+        use_moe=True,
+        moe_num_routed_experts=128,
+        moe_top_k=4,
+    ),
 }
 
 

@@ -54,6 +54,11 @@ jobs:
         run: |
           latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
 
+      - name: Compile Paper 6 (Asymmetric Speculation)
+        working-directory: papers/6_asymmetric_speculative_decoding
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
       - name: Upload Main Paper PDF Artifact
         uses: actions/upload-artifact@v4
         with:

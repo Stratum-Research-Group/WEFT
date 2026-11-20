@@ -155,7 +155,16 @@ WEFT-2 introduces four core architectural subsystems:
 Pretraining the 589M WEFT-2 architecture for 20,000 steps ($\sim 72.6$ Million tokens on FineWeb-Edu) with batch saturation ($B=32$, $L=128$) yielded a sustained throughput of 1,546 tokens/second on an RTX 5060 Ti. Cross-entropy loss converged from an initial \textbf{10.99 to 0.17--0.20} at a strictly constant \textbf{6,057~MB VRAM} footprint (37.8\% GPU capacity). DeepSeekMoE load-balancing auxiliary loss stabilized from 25.5 down to 16.2.
 
 \subsection{Key-Value Associative Needle Calibration \& Induction Circuits}
-Evaluating uncalibrated foundation representations against synthetic key-value associative needle benchmarks revealed that unsupervised language pretraining alone achieves near-zero probability for arbitrary alphanumeric key-value copying ($9.37 \times 10^{-5}\%$ target probability on length 1,024). Calibrating the shifted state binding and Titans memory via progressive curriculum tuning ($N \in [512, 1024, 2048]$) amplified target passcode token probabilities by over \textbf{37,000x to 289,000x} (surging from $0.00001\%$ to $2.89\%$ on 512 tokens and $1.86\%$ on 1,024 tokens), activating the underlying in-context associative induction circuit.
+Evaluating uncalibrated foundation representations against synthetic key-value associative needle benchmarks revealed that unsupervised language pretraining alone achieves near-zero probability for arbitrary alphanumeric key-value copying ($9.37 \times 10^{-5}\%$ target probability on length 1,024). Calibrating the shifted state binding and Titans memory via progressive curriculum tuning ($N \in [512, 1024, 2048, 4096]$) amplified target passcode token probabilities by over \textbf{37,000x to 289,000x} (surging from $0.00001\%$ to $2.89\%$ on 512 tokens and $1.86\%$ on 1,024 tokens), activating the underlying in-context associative induction circuit while driving extended sequence cross-entropy loss from 52.6 down to 32.1 on 4,096 tokens.
+
+\subsection{Post-Training Quantization (PTQ) \& Fused SRAM GEMM Decoding}
+To enable edge serving on memory-constrained GPUs without degrading numerical precision, WEFT-2 introduces native per-channel INT8 Post-Training Quantization (PTQ):
+\begin{itemize}
+    \item \textbf{Memory Compression:} Compresses full model parameters from \textbf{1,127.10~MB} (bfloat16) down to \textbf{649.62~MB} (INT8 weights with bfloat16 scales and biases)---an exact \textbf{1.74x memory footprint reduction}.
+    \item \textbf{Fidelity Preservation:} Across deep context evaluations, INT8 quantization achieves an exceptional logits cosine similarity of \textbf{0.999137} ($>0.99$ target) with maximum absolute logits deviation bounded at $1.0312$.
+    \item \textbf{Triton SRAM-Fused INT8 GEMM:} Loads INT8 weights directly from high-bandwidth DRAM into GPU registers and executes in-register float conversion prior to matrix-vector accumulation, halving weight read bandwidth and maintaining full equivalence ($>0.99999$ cosine similarity against cuBLAS baseline).
+    \item \textbf{Paged Latent Cache Serving:} Paired with a 16-token non-contiguous block manager for resident MLA latents ($d_{\text{latent}}=192$), serving memory per active stream is bounded to under 96~MB across 1,024 blocks, eliminating memory fragmentation under concurrent workloads.
+\end{itemize}
 
 \subsection{Reinforcement Learning with Rule Verifiers (GRPO) \& Systems Acceleration}
 WEFT-2 was aligned on multi-step reasoning via Group Relative Policy Optimization (GRPO / RLVR) with deterministic verification rules:

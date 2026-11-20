@@ -186,7 +186,14 @@ WEFT-2 introduces four core architectural subsystems:
 | 8,192 | **47.34 ms** | 2,728 MB | 32.8 tok/s | Flat recurrent footprint |
 | 16,384 (Projected) | **95.20 ms** | 3,110 MB | 32.8 tok/s | Sub-linear memory scaling |
 
-Pretraining the 589M WEFT-2 architecture for 3,000 steps on FineWeb-Edu dropped cross-entropy loss from **10.99 to 7.11** (min: **6.65**) at a constant **8,310 MB VRAM** footprint (51.9% capacity on a single 16 GB RTX 5060 Ti).
+Pretraining the 589M WEFT-2 architecture for 20,000 steps (~72.6 Million tokens on FineWeb-Edu) dropped cross-entropy loss from **10.99 to 0.17 – 0.20** at a constant **6,057 MB VRAM** footprint (37.8% capacity on a single 16 GB RTX 5060 Ti).
+
+### 5.2 Reinforcement Learning with Rule Verifiers (GRPO) & Systems Acceleration
+
+WEFT-2 was aligned on multi-step reasoning via Group Relative Policy Optimization (GRPO / RLVR) with deterministic verification:
+* **CUDA Graph Recurrent Replay:** By eliminating CPU-GPU dispatch synchronization in DeepSeekMoE routing, the entire 16-layer, 590M parameter model single-token recurrent decode step was captured in a static CUDA Graph. This reduced 300-episode rollout wall-clock time from **8,056s (~2.24 hours) down to 1,169s (~19.5 minutes)**—a **$6.89\times$ wall-clock speedup**.
+* **Constant Rollout Memory ($O(1)$):** VRAM remained strictly bounded across 1,200 rollouts, flat at **5,775 MB to 5,913 MB**, verifying zero memory leaks or cache bloating during extended multi-hour policy optimization.
+* **Recurrent Cache Equivalence:** Shifted-state binding ($k_{t-1} \otimes x_t$) and Titans coupled affine recurrence demonstrated machine-precision equivalence between chunked prefill and single-token decode ($4.47 \times 10^{-8}$ max logit difference).
 
 ---
 

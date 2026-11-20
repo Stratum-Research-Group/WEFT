@@ -408,22 +408,56 @@ class WeftAttention(nn.Module):
             mask_weight = None
 
         if s == 1 and recurrent_state is not None:
-            kp_1 = k_key[:, 0, :, :].unsqueeze(-1)
-            xh_1 = x_heads[:, 0, :, :].unsqueeze(-2)
-            step_update = kp_1 * xh_1
-            gamma_4d = gamma.view(1, self.num_state_heads, self.state_rank, 1)
-
-            if mask_weight is not None:
-                m_1 = mask_weight[:, 0:1, :, :]  # (b, 1, 1, 1)
-                new_state = torch.where(m_1 > 0, gamma_4d * recurrent_state + step_update, recurrent_state)
+            # Fast-path: Fused Triton flash-decoding kernel for CUDA single-token generation
+            use_triton_fast = (
+                hidden_states.is_cuda
+                and mask_weight is None
+                and not self.training
+                and recurrent_state.is_cuda
+            )
+            if use_triton_fast:
+                try:
+                    from weft.kernels.flash_decoding import weft_decode_step_triton
+                    x_in = x_heads[:, 0, :, :].contiguous()     # [b, num_state_heads, state_dim]
+                    kp_in = k_key[:, 0, :, :].contiguous()      # [b, num_state_heads, state_rank]
+                    vp_in = v_p[:, 0, :, :].contiguous()        # [b, num_state_heads, state_rank]
+                    dec_in = self.decay_logits                  # [num_state_heads, state_rank]
+                    
+                    y_triton, new_state = weft_decode_step_triton(
+                        x=x_in,
+                        k_p=kp_in,
+                        v_p=vp_in,
+                        decay_logits=dec_in,
+                        prev_state=recurrent_state,
+                    )
+                    global_out = y_triton.reshape(b, 1, d)
+                except Exception:
+                    # Fallback to PyTorch vectorized update
+                    kp_1 = k_key[:, 0, :, :].unsqueeze(-1)
+                    xh_1 = x_heads[:, 0, :, :].unsqueeze(-2)
+                    step_update = kp_1 * xh_1
+                    gamma_4d = gamma.view(1, self.num_state_heads, self.state_rank, 1)
+                    new_state = gamma_4d * recurrent_state + step_update
+                    vp_1 = v_p[:, 0, :, :].unsqueeze(-2)
+                    out_head = torch.matmul(vp_1, new_state).squeeze(-2)
+                    global_out = out_head.view(b, 1, d) / (self.state_rank ** 0.5)
             else:
-                new_state = gamma_4d * recurrent_state + step_update
+                kp_1 = k_key[:, 0, :, :].unsqueeze(-1)
+                xh_1 = x_heads[:, 0, :, :].unsqueeze(-2)
+                step_update = kp_1 * xh_1
+                gamma_4d = gamma.view(1, self.num_state_heads, self.state_rank, 1)
 
-            vp_1 = v_p[:, 0, :, :].unsqueeze(-2)
-            out_head = torch.matmul(vp_1, new_state).squeeze(-2)
-            if mask_weight is not None:
-                out_head = out_head * mask_weight[:, 0, :, :].view(b, 1, 1)
-            global_out = out_head.view(b, 1, d) / (self.state_rank ** 0.5)
+                if mask_weight is not None:
+                    m_1 = mask_weight[:, 0:1, :, :]  # (b, 1, 1, 1)
+                    new_state = torch.where(m_1 > 0, gamma_4d * recurrent_state + step_update, recurrent_state)
+                else:
+                    new_state = gamma_4d * recurrent_state + step_update
+
+                vp_1 = v_p[:, 0, :, :].unsqueeze(-2)
+                out_head = torch.matmul(vp_1, new_state).squeeze(-2)
+                if mask_weight is not None:
+                    out_head = out_head * mask_weight[:, 0, :, :].view(b, 1, 1)
+                global_out = out_head.view(b, 1, d) / (self.state_rank ** 0.5)
 
             next_titans_state = titans_fast_state
             if self.use_titans:

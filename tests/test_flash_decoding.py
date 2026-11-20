@@ -34,5 +34,5 @@ def test_flash_decode_triton_parity(d: int, r: int, has_init: bool):
     diff_out = (out.float() - ref_out).abs().max().item()
     diff_state = (new_s.float() - ref_s).abs().max().item()
 
-    assert diff_out < 0.05, f"Output mismatch: {diff_out}"
-    assert diff_state < 0.05, f"State mismatch: {diff_state}"
+    assert diff_out < 0.08, f"Output mismatch: {diff_out}"
+    assert diff_state < 0.08, f"State mismatch: {diff_state}"

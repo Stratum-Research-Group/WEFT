@@ -130,8 +130,11 @@ def run_frontier_pretrain(
             pg["lr"] = lr
 
         batch = streamer.get_batch()
-        input_ids = batch["input_ids"]
-        labels = batch["labels"]
+        if isinstance(batch, dict):
+            input_ids = batch["input_ids"]
+            labels = batch["labels"]
+        else:
+            input_ids, labels = batch
 
         outputs = model(input_ids=input_ids, labels=labels)
         loss = outputs.loss

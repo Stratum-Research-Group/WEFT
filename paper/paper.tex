@@ -164,6 +164,13 @@ Evaluating uncalibrated foundation representations against synthetic key-value a
 \label{fig:needle_heatmap}
 \end{figure}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.98\linewidth]{figures/pretrain_convergence.pdf}
+\caption{WEFT-2 foundation pretraining cross-entropy loss trajectory on FineWeb-Edu across 15,000 optimization steps ($7.68\text{M}$ tokens) using the Muon (Newton-Schulz) momentum optimizer, showing steady convergence from $9.18$ down to $2.92$ under constant $1,222.4\text{ MB}$ GPU VRAM.}
+\label{fig:convergence}
+\end{figure}
+
 \subsection{Post-Training Quantization (PTQ) \& Fused SRAM GEMM Decoding}
 To enable edge serving on memory-constrained GPUs without degrading numerical precision, WEFT-2 introduces native per-channel INT8 Post-Training Quantization (PTQ):
 \begin{itemize}

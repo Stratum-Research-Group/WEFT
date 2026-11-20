@@ -29,6 +29,10 @@ import torch.nn.functional as F
 from weft import WeftConfig, WeftForCausalLM
 
 
+# Default model and cache root directory prioritizing external high-capacity drive
+DEFAULT_STORAGE_ROOT = "/run/media/akarta/AI" if os.path.exists("/run/media/akarta/AI") else os.path.expanduser("~/.cache/weft")
+
+
 class SlicedLayerDistiller(nn.Module):
     """
     Distillation adapter aligning a student SULA recurrent layer with a probed teacher layer.
@@ -149,9 +153,12 @@ def main():
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--seq-len", type=int, default=64)
     parser.add_argument("--teacher-dim", type=int, default=1024)
+    parser.add_argument("--storage-root", type=str, default=DEFAULT_STORAGE_ROOT, help="Root storage directory for model weights and cache")
+    parser.add_argument("--teacher-safetensors", type=str, default=None, help="Optional path to teacher safetensors file")
     args = parser.parse_args()
 
-    print("=== Initializing Zero-RAM Sliced Teacher Distillation ===")
+    print(f"=== Initializing Zero-RAM Sliced Teacher Distillation (Storage: {args.storage_root}) ===")
+    os.makedirs(args.storage_root, exist_ok=True)
     cfg = WeftConfig(
         vocab_size=1000,
         hidden_size=256,
@@ -162,7 +169,7 @@ def main():
     )
     student = WeftForCausalLM(cfg)
     distiller = SlicedLayerDistiller(student_dim=cfg.hidden_size, teacher_dim=args.teacher_dim)
-    prober = ZeroRamTeacherProber(teacher_dim=args.teacher_dim)
+    prober = ZeroRamTeacherProber(teacher_safetensors_path=args.teacher_safetensors, teacher_dim=args.teacher_dim)
 
     optimizer = torch.optim.AdamW(list(student.parameters()) + list(distiller.parameters()), lr=1e-3)
 

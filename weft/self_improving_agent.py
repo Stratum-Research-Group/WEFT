@@ -46,14 +46,20 @@ class SelfImprovingCodeAgent:
             return {"exit_code": -1, "passed": False, "stdout": "", "stderr": str(e)}
 
     def read_file(self, rel_path: str) -> Optional[str]:
-        full_path = os.path.join(self.workspace_dir, rel_path)
-        if not os.path.exists(full_path):
+        # Path traversal guard: ensure path is within workspace_dir
+        full_path = os.path.abspath(os.path.join(self.workspace_dir, rel_path))
+        if not full_path.startswith(self.workspace_dir + os.sep) and full_path != self.workspace_dir:
+            return None
+        if not os.path.isfile(full_path):
             return None
         with open(full_path, "r", encoding="utf-8", errors="replace") as f:
             return f.read()
 
     def apply_patch(self, rel_path: str, new_content: str) -> bool:
-        full_path = os.path.join(self.workspace_dir, rel_path)
+        # Path traversal guard: ensure target is strictly inside workspace_dir
+        full_path = os.path.abspath(os.path.join(self.workspace_dir, rel_path))
+        if not full_path.startswith(self.workspace_dir + os.sep) and full_path != self.workspace_dir:
+            return False
         try:
             os.makedirs(os.path.dirname(full_path), exist_ok=True)
             with open(full_path, "w", encoding="utf-8") as f:

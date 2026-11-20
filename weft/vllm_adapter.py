@@ -103,11 +103,14 @@ class WeftVLLMWorkerAdapter:
             # Construct past_state tuple for this sequence:
             # (recurrent_state, past_kv, titans_fast_state)
             recurrent_per_layer = seq_state.recurrent_states
-            # Pass single sequence token
+            # Pass single sequence token with persistent cache state
             out = self.model(
                 input_ids=input_tensor[i : i + 1],
+                past_key_values=getattr(seq_state, "cache", None),
                 use_cache=True,
             )
+            # Retain updated cache state
+            seq_state.cache = out.past_key_values
             logits_list.append(out.logits[:, -1, :])
 
         return torch.cat(logits_list, dim=0)

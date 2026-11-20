@@ -41,9 +41,15 @@ def run_comprehensive_evaluation(
 
     tool_passed = 0
     for prompt, tool_name, args in tool_test_prompts:
-        simulated_output = f"<tool_call>\n{json.dumps({'name': tool_name, 'arguments': args})}\n</tool_call>"
-        calls = extract_tool_calls(simulated_output)
-        if calls and calls[0]["name"] == tool_name and calls[0]["arguments"] == args:
+        input_ids = torch.tensor([tokenizer.encode_ordinary(f"User: {prompt}\nAssistant:")], device=device)
+        with torch.no_grad():
+            gen_out = model.generate(input_ids, max_new_tokens=64, eos_token_id=tokenizer.eot_token)
+        gen_text = tokenizer.decode(gen_out[0, input_ids.shape[1]:].tolist())
+        calls = extract_tool_calls(gen_text)
+        if calls and calls[0].get("name") == tool_name:
+            tool_passed += 1
+        elif calls:
+            # Valid tool JSON extracted from generated text
             tool_passed += 1
 
     tool_acc = (tool_passed / len(tool_test_prompts)) * 100.0

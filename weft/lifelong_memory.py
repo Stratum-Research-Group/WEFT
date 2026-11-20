@@ -27,12 +27,16 @@ class LifelongMemoryStore:
         self.active_state: Optional[torch.Tensor] = None
 
     def get_user_state_path(self, session_id: str) -> str:
-        return os.path.join(self.memory_dir, f"{session_id}_recurrent_state.pt")
+        # Sanitize session_id to prevent directory traversal
+        safe_id = "".join(c for c in session_id if c.isalnum() or c in ("-", "_"))
+        if not safe_id:
+            safe_id = "default_session"
+        return os.path.join(self.memory_dir, f"{safe_id}_recurrent_state.pt")
 
     def load_state(self, session_id: str, device: str = "cuda") -> Optional[torch.Tensor]:
         path = self.get_user_state_path(session_id)
         if os.path.exists(path):
-            self.active_state = torch.load(path, map_location=device)
+            self.active_state = torch.load(path, map_location=device, weights_only=True)
             return self.active_state
         return None
 

@@ -49,12 +49,17 @@ def generate_with_test_time_verification(
     reflections_triggered = 0
     in_think_block = False
 
-    think_start_id = tokenizer.encode_ordinary("<think>")[-1] if "<think>" in tokenizer.encode_ordinary("<think>") else None
+    think_open_ids = tokenizer.encode_ordinary("<think>")
+    think_close_ids = tokenizer.encode_ordinary("</think>")
+
+    past_key_values = None
+    curr_input = input_ids
 
     for step in range(max_tokens):
         with torch.no_grad():
-            out = model(input_ids)
+            out = model(curr_input, past_key_values=past_key_values, use_cache=True)
             next_token_logits = out.logits[:, -1, :]
+            past_key_values = out.past_key_values
 
         entropy = verifier.calculate_entropy(next_token_logits[0])
 
@@ -64,7 +69,9 @@ def generate_with_test_time_verification(
                 # Inject a dynamic backtracking correction token sequence
                 reflection_phrase = " Wait, let me re-verify this step: "
                 refl_tokens = tokenizer.encode_ordinary(reflection_phrase)
-                input_ids = torch.cat([input_ids, torch.tensor([refl_tokens], dtype=torch.long, device=device)], dim=1)
+                refl_tensor = torch.tensor([refl_tokens], dtype=torch.long, device=device)
+                input_ids = torch.cat([input_ids, refl_tensor], dim=1)
+                curr_input = refl_tensor
                 reflections_triggered += 1
                 continue
 
@@ -75,6 +82,14 @@ def generate_with_test_time_verification(
             break
 
         input_ids = torch.cat([input_ids, next_token], dim=1)
+        curr_input = next_token
+
+        # Dynamic state tracking for reasoning block
+        recent_text = tokenizer.decode(input_ids[0, -10:].tolist())
+        if "<think>" in recent_text and not in_think_block:
+            in_think_block = True
+        elif "</think>" in recent_text and in_think_block:
+            in_think_block = False
 
     generated_text = tokenizer.decode(input_ids[0, len(tokens):].tolist())
     return generated_text, reflections_triggered

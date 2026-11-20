@@ -48,7 +48,12 @@ the discrete recurrence R_t = γ * R_{t-1} + u_t is uniformly bounded for all t 
 by the convergent geometric series sum:
     |R_t| ≤ M / (1 - γ)
 -/
-axiom geometric_series_bound (γ M : Float) (hγ : 0 < γ ∧ γ < 1) (hM : 0 ≤ M) :
-    ∀ (t : Nat), Float
+def RecurrenceSequence (γ : Float) (u : Nat → Float) : Nat → Float
+  | 0 => u 0
+  | n + 1 => γ * RecurrenceSequence γ u n + u (n + 1)
+
+axiom recurrence_geometric_bound (γ M : Float) (u : Nat → Float)
+    (hγ : 0 < γ ∧ γ < 1) (hM : 0 ≤ M) (hu : ∀ t, Float.abs (u t) ≤ M) :
+    ∀ t, Float.abs (RecurrenceSequence γ u t) ≤ M / (1 - γ)
 
 end Weft.Formal

@@ -2,6 +2,9 @@
 WEFT: Windowed Exponentially-decayed Factorized Tensor Attention Model
 """
 
+import os
+os.environ.setdefault("TRITON_DEFAULT_FP_FUSION", "1")
+
 from .configuration_weft import WeftConfig
 from .modeling_weft import (
     WeftRMSNorm,

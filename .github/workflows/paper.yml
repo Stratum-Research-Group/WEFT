@@ -59,6 +59,11 @@ jobs:
         run: |
           latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
 
+      - name: Compile Paper 7 (Zero-RAM Sliced Distillation)
+        working-directory: papers/7_zero_ram_sliced_distillation
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
       - name: Upload Main Paper PDF Artifact
         uses: actions/upload-artifact@v4
         with:

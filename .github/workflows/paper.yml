@@ -1,9 +1,10 @@
-name: Paper Build
+name: Paper Suite Build
 
 on:
   push:
     paths:
       - 'paper/**'
+      - 'papers/**'
       - '.github/workflows/paper.yml'
     branches:
       - master
@@ -12,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-paper:
+  build-papers:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -23,14 +24,39 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science latexmk
 
-      - name: Compile LaTeX Paper
+      - name: Compile Main Paper
         working-directory: paper
         run: |
           latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
 
-      - name: Upload Paper PDF Artifact
+      - name: Compile Paper 1 (Core Architecture & Lean 4)
+        working-directory: papers/1_weft_core_architecture
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
+      - name: Compile Paper 2 (BitWEFT Systems & Kernels)
+        working-directory: papers/2_bitweft_systems_kernels
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
+      - name: Compile Paper 3 (Frontier 1T Scaling)
+        working-directory: papers/3_frontier_1t_scaling
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
+      - name: Compile Paper 4 (Agentic RLVR Reasoning)
+        working-directory: papers/4_agentic_rlvr_reasoning
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error paper.tex
+
+      - name: Upload Main Paper PDF Artifact
         uses: actions/upload-artifact@v4
         with:
           name: weft-paper
           path: paper/paper.pdf
-          if-no-files-found: error
+
+      - name: Upload 4-Paper Suite PDFs Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weft-paper-suite
+          path: papers/**/paper.pdf

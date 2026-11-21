@@ -17,14 +17,18 @@ def estimate_spectral_decay(W: torch.Tensor, top_k: int = 64) -> float:
     """
     Estimates the spectral power-law decay exponent gamma: sigma_k approx C * k^(-gamma).
     Higher gamma implies fast singular value decay (lower rank needed).
+    Uses randomized low-rank projection for large matrices to guarantee O(1) memory and prevent LAPACK OOM.
     """
     W_float = W.float()
     m, n = W_float.shape
     k = min(top_k, min(m, n))
     try:
-        # SVD on float32 CPU
-        _, S, _ = torch.linalg.svd(W_float, full_matrices=False)
-        S_vals = S[:k].cpu().numpy()
+        if min(m, n) > 1024:
+            _, S, _ = torch.svd_lowrank(W_float, q=k, niter=2)
+            S_vals = S[:k].cpu().numpy()
+        else:
+            _, S, _ = torch.linalg.svd(W_float, full_matrices=False)
+            S_vals = S[:k].cpu().numpy()
         ranks = np.arange(1, k + 1)
         # Log-linear regression: log(S) = log(C) - gamma * log(k)
         log_s = np.log(np.maximum(S_vals, 1e-8))

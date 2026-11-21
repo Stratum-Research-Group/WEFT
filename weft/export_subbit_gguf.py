@@ -2,13 +2,17 @@
 WEFT to GGUF Export Bridge:
 Converts .weft binary model containers into GGUF files compatible with llama.cpp.
 Maps packed uint32 bitboards and scale vectors into custom GGUF tensor arrays.
+Includes auto-consolidation directory watcher.
 """
 
 import os
 import struct
 import json
+import glob
+import time
+import argparse
 import numpy as np
-from typing import Dict, Any
+from typing import Dict, Any, List
 from weft.format import WeftModelContainer
 
 # GGUF Constants
@@ -23,7 +27,7 @@ def export_weft_to_gguf(weft_path: str, output_gguf_path: str):
     return export_multiple_weft_to_gguf([weft_path], output_gguf_path)
 
 
-def export_multiple_weft_to_gguf(weft_paths: list[str], output_gguf_path: str):
+def export_multiple_weft_to_gguf(weft_paths: List[str], output_gguf_path: str):
     """
     Consolidates multiple sharded .weft containers into a unified GGUF binary file.
     """
@@ -34,7 +38,9 @@ def export_multiple_weft_to_gguf(weft_paths: list[str], output_gguf_path: str):
     total_tensors = sum(len(c.tensors) for c in containers) * 5
     kv_count = 2
 
-    with open(output_gguf_path, "wb") as f:
+    # Write to a temporary file first for atomic swap
+    tmp_out = output_gguf_path + ".tmp"
+    with open(tmp_out, "wb") as f:
         f.write(struct.pack("<4sIQQ", GGUF_MAGIC, GGUF_VERSION, total_tensors, kv_count))
 
         # Metadata
@@ -68,4 +74,37 @@ def export_multiple_weft_to_gguf(weft_paths: list[str], output_gguf_path: str):
                         f.write(struct.pack("<Q", len(raw_bytes)))
                         f.write(raw_bytes)
 
-    print(f"Sharded GGUF export successful: {output_gguf_path} ({os.path.getsize(output_gguf_path) / 1e6:.2f} MB).")
+    os.replace(tmp_out, output_gguf_path)
+    file_size_mb = os.path.getsize(output_gguf_path) / 1e6
+    print(f"Sharded GGUF export successful: {output_gguf_path} ({file_size_mb:.2f} MB).")
+    return output_gguf_path
+
+
+def auto_consolidate_directory(model_dir: str, output_gguf_name: str = "model_consolidated_subbit.gguf") -> str:
+    """
+    Finds all *.weft files in model_dir and creates or updates the consolidated GGUF file.
+    """
+    weft_files = sorted(glob.glob(os.path.join(model_dir, "*.weft")))
+    if not weft_files:
+        raise FileNotFoundError(f"No .weft files found in {model_dir}")
+
+    output_path = os.path.join(model_dir, output_gguf_name)
+    export_multiple_weft_to_gguf(weft_files, output_path)
+    return output_path
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Export .weft shards to consolidated GGUF binary.")
+    parser.add_argument("--model-dir", type=str, required=True, help="Directory containing .weft shards")
+    parser.add_argument("--output-gguf", type=str, default=None, help="Output GGUF path")
+    args = parser.parse_args()
+
+    if args.output_gguf:
+        weft_files = sorted(glob.glob(os.path.join(args.model_dir, "*.weft")))
+        export_multiple_weft_to_gguf(weft_files, args.output_gguf)
+    else:
+        auto_consolidate_directory(args.model_dir)
+
+
+if __name__ == "__main__":
+    main()

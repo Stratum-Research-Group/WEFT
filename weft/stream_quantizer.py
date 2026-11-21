@@ -53,6 +53,11 @@ def stream_quantize_hf_repo(
     total_t0 = time.time()
     
     for idx, shard_name in enumerate(shards):
+        weft_shard_path = os.path.join(output_dir, f"{os.path.splitext(shard_name)[0]}_subbit.weft")
+        if os.path.exists(weft_shard_path):
+            print(f"\n>>> [Shard {idx+1}/{len(shards)}] Skipping {shard_name} (Already quantized: {weft_shard_path})")
+            continue
+
         print(f"\n>>> [Shard {idx+1}/{len(shards)}] Downloading {shard_name}...")
         t_dl = time.time()
         shard_path = hf_hub_download(
@@ -64,7 +69,6 @@ def stream_quantize_hf_repo(
         dl_size_mb = os.path.getsize(shard_path) / 1e6
         print(f"Downloaded {shard_name} ({dl_size_mb:.2f} MB in {time.time() - t_dl:.1f}s)")
         
-        weft_shard_path = os.path.join(output_dir, f"{os.path.splitext(shard_name)[0]}_subbit.weft")
         container = WeftModelContainer(metadata={
             "repo_id": repo_id,
             "shard_name": shard_name,

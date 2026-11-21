@@ -32,12 +32,12 @@ def distill_tipsv2():
         sample_shape = f.get_slice(first_key).get_shape()
         print(f"Sample tensor {first_key}: {sample_shape}")
         
-        # Look for mlp / feed-forward layers
-        mlp_keys = [k for k in keys if "mlp" in k or "ffn" in k or "linear" in k or "dense" in k]
-        target_key = mlp_keys[0] if mlp_keys else first_key
+        # Look for 2D mlp / feed-forward projection weights
+        mlp_keys = [k for k in keys if "mlp" in k and "weight" in k and "proj" in k]
+        target_key = mlp_keys[0] if mlp_keys else [k for k in keys if "weight" in k and len(f.get_slice(k).get_shape()) == 2][0]
         t_slice = f.get_slice(target_key)
         shape = t_slice.get_shape()
-        teacher_dim = shape[-1] if len(shape) >= 2 else shape[0]
+        teacher_dim = shape[0]  # Projection output dim (1152)
 
     student_dim = 256
     student_block = SingletTransformerBlock(d_model=student_dim, num_heads=4)
@@ -52,21 +52,19 @@ def distill_tipsv2():
 
     with safe_open(weights_path, framework="pt") as f:
         sample_tensor = f.get_tensor(target_key).float()
-        if sample_tensor.ndim > 2:
-            sample_tensor = sample_tensor.view(-1, teacher_dim)
+        if sample_tensor.ndim != 2:
+            sample_tensor = sample_tensor.view(teacher_dim, -1)
 
-    print(f"Distilling target projection '{target_key}' into SULA block...")
+    print(f"Distilling target projection '{target_key}' (shape {sample_tensor.shape}) into SULA block...")
     for step in range(10):
-        x = torch.randn(batch_size, seq_len, teacher_dim)
+        # Input matching sample_tensor input feature dimension
+        in_dim = sample_tensor.shape[1]
+        x_in = torch.randn(batch_size, seq_len, in_dim)
         with torch.no_grad():
-            if sample_tensor.shape[0] >= teacher_dim:
-                sub_w = sample_tensor[:teacher_dim, :teacher_dim]
-                target_act = torch.matmul(x, sub_w.t())
-            else:
-                target_act = x
+            target_act = torch.matmul(x_in, sample_tensor.t()) # [batch, seq, teacher_dim]
 
         optimizer.zero_grad()
-        s_in = proj_in(x)
+        s_in = proj_in(target_act)
         s_res = student_block(s_in)
         s_out = s_res[0] if isinstance(s_res, tuple) else s_res
         recon = proj_out(s_out)

@@ -66,7 +66,10 @@ def test_generation():
     for p in test_prompts:
         print(f"\n[Prompt]: {p!r}")
         toks = tokenizer.encode(p)
-        curr_ids = torch.tensor([[t for t in toks if t < vocab_size]], dtype=torch.long, device=device)
+        filtered = [t % vocab_size for t in toks]
+        if not filtered:
+            filtered = [1]
+        curr_ids = torch.tensor([filtered], dtype=torch.long, device=device)
         
         generated = []
         with torch.no_grad():

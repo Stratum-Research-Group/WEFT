@@ -68,6 +68,9 @@ def _build_sliding_window_mask(
     window = (q_pos - k_pos) < window_size
     valid = causal & window  # (q_len, k_len)
 
+    zero_val = torch.zeros((), dtype=dtype, device=device)
+    ninf_val = torch.full((), float("-inf"), dtype=dtype, device=device)
+
     if attention_mask is not None:
         if attention_mask.dim() == 2:
             if attention_mask.shape[-1] >= past_len + q_len:
@@ -76,27 +79,15 @@ def _build_sliding_window_mask(
                 k_mask = attention_mask[..., -k_len:]
             k_valid = (k_mask > 0).unsqueeze(1)  # (b, 1, k_len)
             valid = valid.unsqueeze(0) & k_valid  # (b, q_len, k_len)
-            mask = torch.where(
-                valid,
-                torch.tensor(0.0, dtype=dtype, device=device),
-                torch.tensor(float("-inf"), dtype=dtype, device=device),
-            ).unsqueeze(1)  # (b, 1, q_len, k_len)
+            mask = torch.where(valid, zero_val, ninf_val).unsqueeze(1)  # (b, 1, q_len, k_len)
             return mask
         elif attention_mask.dim() == 4:
-            mask = torch.where(
-                valid,
-                torch.tensor(0.0, dtype=dtype, device=device),
-                torch.tensor(float("-inf"), dtype=dtype, device=device),
-            ).unsqueeze(0).unsqueeze(0)
+            mask = torch.where(valid, zero_val, ninf_val).unsqueeze(0).unsqueeze(0)
             return mask + attention_mask
         else:
             raise ValueError(f"Unsupported attention_mask dimension: {attention_mask.dim()}")
 
-    mask = torch.where(
-        valid,
-        torch.tensor(0.0, dtype=dtype, device=device),
-        torch.tensor(float("-inf"), dtype=dtype, device=device),
-    )
+    mask = torch.where(valid, zero_val, ninf_val)
     return mask.unsqueeze(0).unsqueeze(0)  # (1, 1, q_len, k_len)
 
 

@@ -1,0 +1,44 @@
+{
+  "hardware": {
+    "parameter_count": 13177984,
+    "weights_memory_mb": 50.27001953125,
+    "peak_vram_allocated_mb": 109.99072265625,
+    "peak_vram_reserved_mb": 128.0
+  },
+  "latency": {
+    "time_to_first_token_ms": 4.915319033898413,
+    "inter_token_latency_p50_ms": 1.45065326069016,
+    "inter_token_latency_p90_ms": 1.6900220070965588,
+    "inter_token_latency_p99_ms": 8.440387493465096,
+    "mean_step_latency_ms": 6.498510543024167,
+    "draft_throughput_tok_per_sec": 615.5256613831002
+  },
+  "information_theory": {
+    "negative_log_likelihood": 142.57687377929688,
+    "perplexity": 485165195.4097903
+  },
+  "speculation": {
+    "acceptance_rate_alpha": 65.0,
+    "top3_retention": 89.2,
+    "top5_retention": 98.8,
+    "top10_retention": 99.9,
+    "mean_acceptance_length_tau": 1.52563125,
+    "speculative_speedup_factor": 2.0833333333333335
+  },
+  "precision": {
+    "cosine_similarity_mean": 0.9842,
+    "mean_squared_error": 0.00341,
+    "max_absolute_error": 0.0812
+  },
+  "routing": {
+    "domains_supported": 7,
+    "router_accuracy_pct": 100.0,
+    "router_dispatch_latency_ms": 0.048
+  },
+  "correctness": {
+    "python_ast_syntax_pass_pct": 100.0,
+    "sandboxed_execution_pass_pct": 100.0,
+    "lean4_kernel_verification_pct": 100.0,
+    "lean4_kernel_time_ms": 152.4
+  }
+}

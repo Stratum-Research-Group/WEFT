@@ -11,6 +11,8 @@ from typing import List, Tuple, Dict, Any, Optional
 import torch
 import torch.nn as nn
 from weft.speculative_tree_decoder import SpeculativeTreeDecoder, SpeculativeTreeNode
+from weft.fast_tree_attention import fast_causal_tree_mask
+from weft.hierarchical_vocab import HierarchicalVocabHead
 
 class WeftVLLMTreeAdapter(nn.Module):
     def __init__(
@@ -32,12 +34,20 @@ class WeftVLLMTreeAdapter(nn.Module):
         """
         flat_tokens, tree_mask, nodes = self.tree_decoder.generate_candidate_tree(prefix_ids, teacher_embed_w)
         
+        # Optimize tree mask using native CUDA kernel when running on GPU
+        if flat_tokens.is_cuda:
+            parent_list = [node.parent_idx for node in nodes]
+            parents_tensor = torch.tensor(parent_list, dtype=torch.long, device=flat_tokens.device)
+            fast_mask = fast_causal_tree_mask(parents_tensor, len(nodes), device=str(flat_tokens.device))
+            tree_mask = fast_mask.unsqueeze(0).unsqueeze(0)
+
         return {
             "draft_token_ids": flat_tokens,           # [1, num_nodes]
             "tree_attention_mask": tree_mask,         # [1, 1, num_nodes, num_nodes]
             "tree_nodes": nodes,
             "num_candidates": flat_tokens.shape[1],
             "speculative_type": "tree_attention_speculation",
+            "kernel_acceleration": "native_cuda_fast_tree" if flat_tokens.is_cuda else "pytorch_fallback",
         }
 
     def verify_and_accept_tree(

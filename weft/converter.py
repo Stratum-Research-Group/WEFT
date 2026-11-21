@@ -60,9 +60,9 @@ def factorize_linear_layer(
         # Higher decay (gamma > 0.6) allows smaller rank; slower decay requires larger rank
         rank_mult = max(0.5, min(2.0, 0.6 / gamma))
         rank = int(round(base_rank * rank_mult / 32.0) * 32)
-        rank = max(32, min(min(m, n), rank))
+        rank = max(1, min(min(m, n), rank))
     else:
-        rank = base_rank
+        rank = min(min(m, n), base_rank)
 
     layer = WeftSubBitLinear(
         in_features=n,

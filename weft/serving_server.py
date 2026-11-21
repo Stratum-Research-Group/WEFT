@@ -41,6 +41,7 @@ class GlobalEngine:
     paged_manager: Optional[Any] = None
     ternary_draft_engine: Optional[Any] = None
     speculative_enabled: bool = False
+    tree_decoder: Optional[Any] = None
     specialized_adapters: dict = {}
 
 engine = GlobalEngine()
@@ -162,10 +163,17 @@ class CompletionRequest(BaseModel):
 @app.get("/health")
 def health():
     paged_info = engine.paged_manager.stats() if engine.paged_manager is not None else None
+    cuda_tree_mask_ready = False
+    try:
+        from weft.fast_tree_attention import fast_causal_tree_mask
+        cuda_tree_mask_ready = True
+    except Exception:
+        pass
     return {
         "status": "ready" if engine.model is not None else "unloaded",
         "device": engine.device,
         "speculative_draft_engine": "ternary_sula" if engine.speculative_enabled else "disabled",
+        "tree_decoder_kernel": "native_cuda" if cuda_tree_mask_ready else "fallback",
         "paged_cache": paged_info,
     }
 

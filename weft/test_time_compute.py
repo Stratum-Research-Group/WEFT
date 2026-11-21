@@ -12,13 +12,16 @@ import torch
 import tiktoken
 from typing import Tuple, List, Optional
 from weft import WeftForCausalLM
+from weft.lean_verifier import Lean4Verifier
 
 
-class TestTimeVerifier:
-    """Monitors token-level entropy and triggers self-correction when uncertainty spikes."""
+class AdaptiveComputeVerifier:
+    """Monitors token-level entropy and Lean 4 formal code blocks during test-time compute."""
 
-    def __init__(self, entropy_threshold: float = 3.2):
+    def __init__(self, entropy_threshold: float = 3.2, enable_lean: bool = True):
         self.entropy_threshold = entropy_threshold
+        self.enable_lean = enable_lean
+        self.lean_verifier = Lean4Verifier() if enable_lean else None
 
     def calculate_entropy(self, logits: torch.FloatTensor) -> float:
         probs = torch.softmax(logits, dim=-1)
@@ -30,6 +33,16 @@ class TestTimeVerifier:
         # Trigger reflection if entropy spikes above threshold after minimum warmup
         return step > 10 and entropy > self.entropy_threshold
 
+    def verify_formal_block(self, formal_code: str) -> Tuple[bool, List[str]]:
+        """Verifies formal math/code via Lean 4 compiler."""
+        if not self.lean_verifier or not formal_code.strip():
+            return True, []
+        res = self.lean_verifier.verify_code(formal_code)
+        return res["success"], res["errors"]
+
+# Backward-compatibility alias
+TestTimeVerifier = AdaptiveComputeVerifier
+
 
 def generate_with_test_time_verification(
     model: WeftForCausalLM,
@@ -38,10 +51,11 @@ def generate_with_test_time_verification(
     max_tokens: int = 128,
     max_reflections: int = 2,
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
+    enable_lean: bool = True,
 ) -> Tuple[str, int]:
     """Generates text with dynamic test-time self-correction in <think> reasoning blocks."""
     model.eval()
-    verifier = TestTimeVerifier(entropy_threshold=3.5)
+    verifier = AdaptiveComputeVerifier(entropy_threshold=3.5, enable_lean=enable_lean)
 
     tokens = tokenizer.encode_ordinary(prompt)
     input_ids = torch.tensor([tokens], dtype=torch.long, device=device)

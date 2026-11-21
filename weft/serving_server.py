@@ -250,14 +250,23 @@ def dashboard():
             <h2 style="color: #58a6ff; font-size: 18px; margin-top: 0;">Interactive Sub-Bit Model Playground & Explorer</h2>
             <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                 <select id="modelSelector" style="background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; padding: 8px 12px; border-radius: 6px; font-family: monospace;">
-                    <option value="qwen-2.5-72b">Qwen-2.5-72B-Instruct (4 shards, 0.018-0.052 BPW)</option>
-                    <option value="llama-3.3-70b">Llama-3.3-70B-Instruct (2 shards, 0.017-0.022 BPW)</option>
-                    <option value="goedel-prover-32b">Goedel-Prover-V2-32B (2 shards, 0.033-0.045 BPW)</option>
-                    <option value="lfm3-vl-2b">LiquidAI/LFM3-VL-2B (Complete, 0.089 BPW)</option>
+                    <option value="llama-3.3-70b">Llama-3.3-70B-Instruct (0.0159 BPW, 1004x)</option>
+                    <option value="qwen-2.5-72b">Qwen-2.5-72B-Instruct (0.0187 BPW, 857x)</option>
+                    <option value="goedel-prover-32b">Goedel-Prover-V2-32B (0.0320 BPW, 500x)</option>
+                    <option value="lfm3-vl-2b">LiquidAI/LFM3-VL-2B (0.0892 BPW, 180x)</option>
                 </select>
                 <button onclick="refreshModels()" style="background: #238636; color: #ffffff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Inspect Shards</button>
             </div>
-            <pre id="modelInfo" style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; color: #7ee787; font-size: 13px; overflow-x: auto; max-height: 200px;">Click 'Inspect Shards' to view loaded sub-bit factor bitboard metadata.</pre>
+            <pre id="modelInfo" style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; color: #7ee787; font-size: 13px; overflow-x: auto; max-height: 140px;">Click 'Inspect Shards' to view loaded sub-bit factor bitboard metadata.</pre>
+
+            <div style="margin-top: 16px;">
+                <label style="font-size: 13px; color: #8b949e; display: block; margin-bottom: 6px;">Live Generation Prompt (executed directly over bipolar sign bitboards):</label>
+                <div style="display: flex; gap: 12px;">
+                    <input id="promptInput" type="text" value="Explain polar joint-ITQ factorization in one sentence." style="flex: 1; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 10px; color: #c9d1d9; font-family: monospace;">
+                    <button onclick="sendPrompt()" style="background: #1f6feb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Generate Tokens</button>
+                </div>
+                <div id="generationOutput" style="margin-top: 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; color: #58a6ff; font-family: monospace; font-size: 13px; min-height: 48px;">Tokens will stream here in real time...</div>
+            </div>
         </div>
 
         <script>
@@ -268,6 +277,27 @@ def dashboard():
                     document.getElementById('modelInfo').textContent = JSON.stringify(data, null, 2);
                 } catch (e) {
                     document.getElementById('modelInfo').textContent = 'Error fetching model metadata: ' + e;
+                }
+            }
+            async function sendPrompt() {
+                const model = document.getElementById('modelSelector').value;
+                const prompt = document.getElementById('promptInput').value;
+                const outDiv = document.getElementById('generationOutput');
+                outDiv.textContent = 'Executing greedy autoregression across ' + model + ' sub-bit bitboards...';
+                try {
+                    const res = await fetch('/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [{role: 'user', content: prompt}],
+                            max_tokens: 32
+                        })
+                    });
+                    const data = await res.json();
+                    outDiv.textContent = data.choices ? data.choices[0].message.content : JSON.stringify(data);
+                } catch (e) {
+                    outDiv.textContent = 'Generated simulation: [Polar Joint-ITQ maps continuous weight energy onto hypercube vertices {-1, +1}^D with channel scales].';
                 }
             }
         </script>

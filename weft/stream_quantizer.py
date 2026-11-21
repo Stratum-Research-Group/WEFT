@@ -104,6 +104,16 @@ def stream_quantize_hf_repo(
             os.remove(shard_path)
             print(f"Removed temporary raw shard {shard_path} (reclaimed {dl_size_mb:.2f} MB)")
             
+        # Auto-update consolidated GGUF container
+        try:
+            from weft.export_subbit_gguf import export_multiple_weft_to_gguf
+            all_shards = sorted([os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith("_subbit.weft")])
+            if all_shards:
+                gguf_target = os.path.join(output_dir, "model_consolidated_subbit.gguf")
+                export_multiple_weft_to_gguf(all_shards, gguf_target)
+        except Exception as e_gguf:
+            print(f"Auto-GGUF consolidation skipped: {e_gguf}")
+
         gc.collect()
 
     # Clean temporary staging directory

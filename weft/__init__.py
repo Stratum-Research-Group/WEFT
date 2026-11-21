@@ -17,6 +17,7 @@ from .modeling_weft import (
 )
 from .cache import WeftCache, WeftCacheLayer
 from .tokenizer import WeftCharTokenizer
+from .format import WeftSubBitLinear, WeftModelContainer
 
 __all__ = [
     "WeftConfig",
@@ -30,4 +31,6 @@ __all__ = [
     "WeftCache",
     "WeftCacheLayer",
     "WeftCharTokenizer",
+    "WeftSubBitLinear",
+    "WeftModelContainer",
 ]

@@ -79,6 +79,8 @@ def run_fsdp_worker(rank, world_size):
 
 
 def test_fsdp():
+    if not torch.cuda.is_available():
+        pytest.skip("FSDP in PyTorch 2.6 requires a non-CPU accelerator device (CUDA). Skipping on CPU-only execution.")
     world_size = 2
     mp.spawn(run_fsdp_worker, args=(world_size,), nprocs=world_size, join=True)
 

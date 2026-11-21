@@ -245,6 +245,32 @@ def dashboard():
                 <div style="font-size: 13px; color: #8b949e; margin-top: 4px;">Lean 4 Mathlib Kernel Gate</div>
             </div>
         </div>
+
+        <div style="margin-top: 32px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px;">
+            <h2 style="color: #58a6ff; font-size: 18px; margin-top: 0;">Interactive Sub-Bit Model Playground & Explorer</h2>
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <select id="modelSelector" style="background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; padding: 8px 12px; border-radius: 6px; font-family: monospace;">
+                    <option value="qwen-2.5-72b">Qwen-2.5-72B-Instruct (4 shards, 0.018-0.052 BPW)</option>
+                    <option value="llama-3.3-70b">Llama-3.3-70B-Instruct (2 shards, 0.017-0.022 BPW)</option>
+                    <option value="goedel-prover-32b">Goedel-Prover-V2-32B (2 shards, 0.033-0.045 BPW)</option>
+                    <option value="lfm3-vl-2b">LiquidAI/LFM3-VL-2B (Complete, 0.089 BPW)</option>
+                </select>
+                <button onclick="refreshModels()" style="background: #238636; color: #ffffff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Inspect Shards</button>
+            </div>
+            <pre id="modelInfo" style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; color: #7ee787; font-size: 13px; overflow-x: auto; max-height: 200px;">Click 'Inspect Shards' to view loaded sub-bit factor bitboard metadata.</pre>
+        </div>
+
+        <script>
+            async function refreshModels() {
+                try {
+                    const res = await fetch('/v1/subbit/models');
+                    const data = await res.json();
+                    document.getElementById('modelInfo').textContent = JSON.stringify(data, null, 2);
+                } catch (e) {
+                    document.getElementById('modelInfo').textContent = 'Error fetching model metadata: ' + e;
+                }
+            }
+        </script>
     </body>
     </html>
     """

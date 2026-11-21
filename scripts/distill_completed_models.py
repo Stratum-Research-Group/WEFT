@@ -100,11 +100,12 @@ def distill_gemma4_26b_top8_moe():
     for step in range(10):
         x = torch.randn(batch_size, seq_len, 2816)
         with torch.no_grad():
-            teacher_moe_act = prober.forward_layer_moe(layer_idx=0, hidden_states=x)
+            teacher_moe_act = prober.probe_sparse_moe_layer(x, layer_idx=0)
             
         optimizer.zero_grad()
         s_in = proj_in(x)
-        s_out = student_block(s_in)
+        s_res = student_block(s_in)
+        s_out = s_res[0] if isinstance(s_res, tuple) else s_res
         s_recon = proj_out(s_out)
         
         loss = loss_fn(s_recon, teacher_moe_act)

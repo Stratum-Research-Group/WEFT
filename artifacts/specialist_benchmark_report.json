@@ -1,0 +1,70 @@
+{
+  "mean_speedup": 2.61,
+  "mean_draft_latency_ms": 7.18,
+  "hardware": "NVIDIA GeForce RTX 5060 Ti",
+  "results": [
+    {
+      "target_domain": "functiongemma",
+      "routed_domain": "medgemma",
+      "route_time_us": 599259.0,
+      "draft_latency_ms": 34.37,
+      "acceptance_alpha": 0.82,
+      "speedup_multiplier": 1.0,
+      "entropy_gate_status": "SPECULATIVE"
+    },
+    {
+      "target_domain": "codegemma",
+      "routed_domain": "gemmascope",
+      "route_time_us": 2304.89,
+      "draft_latency_ms": 2.92,
+      "acceptance_alpha": 0.82,
+      "speedup_multiplier": 2.73,
+      "entropy_gate_status": "SPECULATIVE"
+    },
+    {
+      "target_domain": "medgemma",
+      "routed_domain": "functiongemma",
+      "route_time_us": 1203.96,
+      "draft_latency_ms": 2.61,
+      "acceptance_alpha": 0.82,
+      "speedup_multiplier": 2.9,
+      "entropy_gate_status": "SPECULATIVE"
+    },
+    {
+      "target_domain": "alphagenome",
+      "routed_domain": "medgemma",
+      "route_time_us": 1194.13,
+      "draft_latency_ms": 2.59,
+      "acceptance_alpha": 0.82,
+      "speedup_multiplier": 2.91,
+      "entropy_gate_status": "SPECULATIVE"
+    },
+    {
+      "target_domain": "gemmascope",
+      "routed_domain": "functiongemma",
+      "route_time_us": 1196.42,
+      "draft_latency_ms": 2.61,
+      "acceptance_alpha": 0.82,
+      "speedup_multiplier": 2.9,
+      "entropy_gate_status": "SPECULATIVE"
+    },
+    {
+      "target_domain": "tipsv2",
+      "routed_domain": "alphagenome",
+      "route_time_us": 1171.95,
+      "draft_latency_ms": 2.57,
+      "acceptance_alpha": 0.82,
+      "speedup_multiplier": 2.92,
+      "entropy_gate_status": "SPECULATIVE"
+    },
+    {
+      "target_domain": "t5gemma",
+      "routed_domain": "medgemma",
+      "route_time_us": 1179.28,
+      "draft_latency_ms": 2.57,
+      "acceptance_alpha": 0.82,
+      "speedup_multiplier": 2.92,
+      "entropy_gate_status": "SPECULATIVE"
+    }
+  ]
+}

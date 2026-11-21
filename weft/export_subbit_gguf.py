@@ -26,9 +26,9 @@ def export_weft_to_gguf(weft_path: str, output_gguf_path: str):
     print(f"Exporting {weft_path} to GGUF format at {output_gguf_path}...")
 
     # Build GGUF header
-    # magic(4s), version(I), tensor_count(Q), metadata_kv_count(Q)
+    # 2 standard metadata KV pairs: general.architecture, general.quantization_version
+    kv_count = 2
     tensor_count = len(container.tensors) * 5  # u, v, h, l, g per layer
-    kv_count = len(container.metadata) + 2
 
     with open(output_gguf_path, "wb") as f:
         f.write(struct.pack("<4sIQQ", GGUF_MAGIC, GGUF_VERSION, tensor_count, kv_count))

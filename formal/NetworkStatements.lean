@@ -1,17 +1,11 @@
-"""
+/-!
+# WEFT Formal Mathematical Grounding: Network Statements in Lean 4
+
 Formal Mathematical Proofs and Theorems for WEFT.
 Definitions and theorems in Lean 4 formalizing:
 1. Singlet Uncrossing Identity (SWAP = I - s s^T).
 2. Associative Memory Decay and State Boundedness.
 3. Closed-Form Scan Convergence.
-"""
-
-/-!
-# WEFT Formal Mathematical Grounding: Network Statements in Lean 4
-
-This file formalizes the mathematical invariants underlying:
-1. The discrete Boolean singlet uncrossing identity for permutation crossing removal.
-2. The asymptotic stability and boundedness of the exponentially-decayed associative router scan.
 -/
 
 namespace Weft.Formal

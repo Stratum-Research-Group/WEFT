@@ -41,6 +41,7 @@ class GlobalEngine:
     paged_manager: Optional[Any] = None
     ternary_draft_engine: Optional[Any] = None
     speculative_enabled: bool = False
+    specialized_adapters: dict = {}
 
 engine = GlobalEngine()
 
@@ -125,6 +126,15 @@ def load_model(checkpoint_path: str, device: Optional[str] = None, quantization:
         except Exception as e:
             print(f"[WEFT Server] Speculative draft engine deferred: {e}")
 
+    # Discover and register specialized distilled adapter checkpoints
+    spec_dir = "/run/media/akarta/AI/checkpoints/specialized_distill"
+    if os.path.exists(spec_dir):
+        for fname in os.listdir(spec_dir):
+            if fname.endswith(".pt"):
+                adapter_name = fname.replace(".pt", "").replace("_student_distilled", "").replace("_student_tool_head", "")
+                engine.specialized_adapters[adapter_name] = os.path.join(spec_dir, fname)
+        print(f"[WEFT Server] Registered {len(engine.specialized_adapters)} specialized adapters: {list(engine.specialized_adapters.keys())}")
+
     print(f"[WEFT Server] Loaded model from {checkpoint_path} on {engine.device}")
 
 
@@ -162,16 +172,24 @@ def health():
 
 @app.get("/v1/models")
 def list_models():
+    models = [
+        {
+            "id": engine.model_name,
+            "object": "model",
+            "created": int(time.time()),
+            "owned_by": "weft",
+        }
+    ]
+    for adapter_name in engine.specialized_adapters.keys():
+        models.append({
+            "id": f"weft-{adapter_name}",
+            "object": "model",
+            "created": int(time.time()),
+            "owned_by": "weft-specialized",
+        })
     return {
         "object": "list",
-        "data": [
-            {
-                "id": engine.model_name,
-                "object": "model",
-                "created": int(time.time()),
-                "owned_by": "weft",
-            }
-        ],
+        "data": models,
     }
 
 

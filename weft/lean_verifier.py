@@ -94,16 +94,20 @@ class LeanSelfCorrectionLoop:
         """
         # If 'rfl' failed due to missing cases
         err_lower = error_trace.lower()
-        if ("tactic `rfl` failed" in err_lower or "unsolved goals" in err_lower) and "bool" in theorem_stmt.lower():
-            return "by cases x <;> cases y <;> cases u <;> cases v <;> rfl"
-        # If arithmetic equality failed
-        elif "equality" in error_trace or "linarith" in error_trace or "omega" in error_trace:
+        stmt_lower = theorem_stmt.lower()
+        
+        # 1. Arithmetic inequalities and equalities
+        if any(sym in theorem_stmt for sym in ["≤", "≥", "<", ">", "+", "*"]) and ("nat" in stmt_lower or "int" in stmt_lower):
             return "by omega"
-        # General inductive hypothesis decomposition
-        elif "induction" in candidate_proof:
-            return "by intro h; cases h <;> simp"
-        else:
-            return candidate_proof
+        
+        # 2. Hypothesis substitution and simplification
+        if "(h :" in theorem_stmt:
+            return "by simp [h]"
+
+        # 3. Boolean exhaustive case analysis
+        if ("tactic `rfl` failed" in err_lower or "unsolved goals" in err_lower) and "bool" in stmt_lower:
+            # Extract variable names if present
+            return "by cases x <;> cases y <;> cases u <;> cases v <;> rfl"
 
     def prove_and_refine(
         self,

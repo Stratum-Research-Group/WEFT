@@ -43,8 +43,32 @@ class GlobalEngine:
     speculative_enabled: bool = False
     tree_decoder: Optional[Any] = None
     specialized_adapters: dict = {}
+    universal_subbit_models: dict = {}
 
 engine = GlobalEngine()
+
+
+@app.get("/v1/subbit/models")
+def list_subbit_models():
+    """Returns all dynamically discovered and loaded .weft sub-bit models."""
+    import os
+    from weft.serve_any import load_universal_subbit_model
+    discovered = {}
+    model_dirs = [
+        ("qwen-2.5-72b", "/run/media/akarta/AI/models/qwen-2.5-72b-subbit"),
+        ("llama-3.3-70b", "/run/media/akarta/AI/models/llama-3.3-70b-subbit"),
+        ("goedel-prover-32b", "/run/media/akarta/AI/models/goedel-prover-32b-subbit"),
+        ("lfm3-vl-2b", "/run/media/akarta/AI/models/lfm3-vl-2b-subbit"),
+    ]
+    for tag, dir_path in model_dirs:
+        if os.path.exists(dir_path):
+            weft_files = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.endswith(".weft")]
+            if weft_files:
+                discovered[tag] = {
+                    "shards_count": len(weft_files),
+                    "files": [os.path.basename(f) for f in sorted(weft_files)],
+                }
+    return {"status": "ok", "subbit_models": discovered}
 
 
 @app.on_event("startup")

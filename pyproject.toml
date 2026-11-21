@@ -43,6 +43,9 @@ gpu = [
     "triton>=2.1.0",
 ]
 
+[project.scripts]
+weft = "weft.cli:main"
+
 [tool.setuptools.packages.find]
 include = ["weft*"]
 

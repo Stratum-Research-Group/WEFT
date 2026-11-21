@@ -60,7 +60,23 @@ def load_model(checkpoint_path: str, device: Optional[str] = None, quantization:
     if device is not None:
         engine.device = device
     quant = quantization or os.environ.get("WEFT_QUANTIZATION", None)
-    engine.model = WeftForCausalLM.from_pretrained(checkpoint_path, quantization=quant).to(engine.device)
+    if checkpoint_path.endswith(".weft"):
+        from weft.format import WeftModelContainer
+        container = WeftModelContainer.load(checkpoint_path)
+        engine.subbit_container = container
+        # Derive config from container metadata
+        cfg_dict = container.metadata
+        config = WeftConfig(
+            vocab_size=cfg_dict.get("vocab_size", 256),
+            hidden_size=cfg_dict.get("hidden_size", 64),
+            intermediate_size=cfg_dict.get("intermediate_size", 128),
+            num_hidden_layers=cfg_dict.get("num_layers", 2),
+            num_attention_heads=cfg_dict.get("num_attention_heads", 4),
+            num_state_heads=cfg_dict.get("num_state_heads", 2),
+        )
+        engine.model = WeftForCausalLM(config).to(engine.device)
+    else:
+        engine.model = WeftForCausalLM.from_pretrained(checkpoint_path, quantization=quant).to(engine.device)
     engine.model.eval()
 
     # Initialize Paged Cache Manager for continuous serving

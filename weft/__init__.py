@@ -18,6 +18,7 @@ from .modeling_weft import (
 from .cache import WeftCache, WeftCacheLayer
 from .tokenizer import WeftCharTokenizer
 from .format import WeftSubBitLinear, WeftModelContainer
+from .converter import factorize_linear_layer, convert_model_to_weft, estimate_spectral_decay
 
 __all__ = [
     "WeftConfig",
@@ -33,4 +34,7 @@ __all__ = [
     "WeftCharTokenizer",
     "WeftSubBitLinear",
     "WeftModelContainer",
+    "factorize_linear_layer",
+    "convert_model_to_weft",
+    "estimate_spectral_decay",
 ]

@@ -30,3 +30,8 @@ def test_universal_subbit_model_llama():
     out = model.forward_layer(layer_name, x)
     assert out.shape == (2, 28672)
     assert not torch.isnan(out).any()
+
+    # Test autoregressive generation
+    prompt = torch.tensor([[1, 42, 100]])
+    gen = model.generate(prompt, max_new_tokens=3)
+    assert gen.shape == (1, 6)

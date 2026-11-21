@@ -18,54 +18,54 @@ GGUF_VERSION = 3
 
 def export_weft_to_gguf(weft_path: str, output_gguf_path: str):
     """
-    Translates a .weft model container into a standardized GGUF binary file.
+    Translates a single .weft model container into a standardized GGUF binary file.
     """
-    assert os.path.exists(weft_path), f"File not found: {weft_path}"
-    container = WeftModelContainer.load(weft_path)
+    return export_multiple_weft_to_gguf([weft_path], output_gguf_path)
 
-    print(f"Exporting {weft_path} to GGUF format at {output_gguf_path}...")
 
-    # Build GGUF header
-    # 2 standard metadata KV pairs: general.architecture, general.quantization_version
+def export_multiple_weft_to_gguf(weft_paths: list[str], output_gguf_path: str):
+    """
+    Consolidates multiple sharded .weft containers into a unified GGUF binary file.
+    """
+    containers = [WeftModelContainer.load(p) for p in weft_paths if os.path.exists(p)]
+    assert len(containers) > 0, "No valid .weft files provided."
+
+    print(f"Consolidating {len(containers)} shards into GGUF at {output_gguf_path}...")
+    total_tensors = sum(len(c.tensors) for c in containers) * 5
     kv_count = 2
-    tensor_count = len(container.tensors) * 5  # u, v, h, l, g per layer
 
     with open(output_gguf_path, "wb") as f:
-        f.write(struct.pack("<4sIQQ", GGUF_MAGIC, GGUF_VERSION, tensor_count, kv_count))
+        f.write(struct.pack("<4sIQQ", GGUF_MAGIC, GGUF_VERSION, total_tensors, kv_count))
 
-        # Write metadata KV pairs
-        # 1. Architecture
-        arch = container.metadata.get("architecture", "weft-subbit").encode("utf-8")
+        # Metadata
+        arch = container_arch.encode("utf-8") if (container_arch := containers[0].metadata.get("architecture")) else b"weft-subbit-sharded"
         f.write(struct.pack("<Q", len("general.architecture")))
         f.write(b"general.architecture")
-        f.write(struct.pack("<I", 8))  # string type
+        f.write(struct.pack("<I", 8))
         f.write(struct.pack("<Q", len(arch)))
         f.write(arch)
 
-        # 2. Quantization Type
-        qtype = b"WEFT_SUBBIT_0.23BPW"
+        qtype = b"WEFT_SUBBIT_70B_CONSOLIDATED"
         f.write(struct.pack("<Q", len("general.quantization_version")))
         f.write(b"general.quantization_version")
         f.write(struct.pack("<I", 8))
         f.write(struct.pack("<Q", len(qtype)))
         f.write(qtype)
 
-        # Write tensor descriptors and payloads
-        for name, tdata in container.tensors.items():
-            for p in range(tdata["num_paths"]):
-                for key in ["u_packed", "v_packed", "scale_h", "scale_l", "scale_g"]:
-                    arr = tdata["paths"][p][key]
-                    tname = f"{name}.p{p}.{key}".encode("utf-8")
-                    
-                    # Tensor info: name_len(Q), name, n_dims(I), dims(Q*n), type(I), offset(Q)
-                    f.write(struct.pack("<Q", len(tname)))
-                    f.write(tname)
-                    f.write(struct.pack("<I", arr.ndim))
-                    for d in arr.shape:
-                        f.write(struct.pack("<Q", d))
-                    f.write(struct.pack("<I", 0))  # FP32/Raw type code
-                    raw_bytes = arr.tobytes()
-                    f.write(struct.pack("<Q", len(raw_bytes)))
-                    f.write(raw_bytes)
+        for container in containers:
+            for name, tdata in container.tensors.items():
+                for p in range(tdata["num_paths"]):
+                    for key in ["u_packed", "v_packed", "scale_h", "scale_l", "scale_g"]:
+                        arr = tdata["paths"][p][key]
+                        tname = f"{name}.p{p}.{key}".encode("utf-8")
+                        f.write(struct.pack("<Q", len(tname)))
+                        f.write(tname)
+                        f.write(struct.pack("<I", arr.ndim))
+                        for d in arr.shape:
+                            f.write(struct.pack("<Q", d))
+                        f.write(struct.pack("<I", 0))
+                        raw_bytes = arr.tobytes()
+                        f.write(struct.pack("<Q", len(raw_bytes)))
+                        f.write(raw_bytes)
 
-    print(f"GGUF export successful: {output_gguf_path} ({os.path.getsize(output_gguf_path) / 1e6:.2f} MB).")
+    print(f"Sharded GGUF export successful: {output_gguf_path} ({os.path.getsize(output_gguf_path) / 1e6:.2f} MB).")

@@ -77,11 +77,16 @@ def factorize_linear_layer(
 
         normed = (residual / g) / h  # (m, n)
 
-        # 2. Truncated SVD
-        U, S, Vh = torch.linalg.svd(normed, full_matrices=False)
-        U_r = U[:, :rank]
-        S_r = S[:rank]
-        V_r = Vh[:rank, :].t()  # (n, rank)
+        # 2. Fast Low-Rank SVD (Randomized PCA/SVD)
+        # Using torch.svd_lowrank instead of torch.linalg.svd prevents O(m*n) Lapack buffer blowup
+        # (e.g. 152064x8192 matrices where full svd allocates >15GB and triggers systemd-oomd)
+        if min(m, n) > 2048 and rank < min(m, n) // 4:
+            U_r, S_r, V_r = torch.svd_lowrank(normed, q=rank, niter=2)
+        else:
+            U, S, Vh = torch.linalg.svd(normed, full_matrices=False)
+            U_r = U[:, :rank]
+            S_r = S[:rank]
+            V_r = Vh[:rank, :].t()  # (n, rank)
 
         # Distribute singular values
         U_hat = U_r * torch.sqrt(S_r.unsqueeze(0))

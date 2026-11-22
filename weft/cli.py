@@ -18,8 +18,55 @@ from safetensors import safe_open
 
 def inspect_model(weft_path: str):
     if not os.path.exists(weft_path):
-        print(f"Error: File not found: {weft_path}")
+        print(f"Error: Path not found: {weft_path}")
         sys.exit(1)
+
+    # Multi-shard directory support
+    if os.path.isdir(weft_path):
+        from pathlib import Path
+        shard_files = sorted(list(Path(weft_path).glob("*.weft")))
+        gguf_files = list(Path(weft_path).glob("*.gguf"))
+        if not shard_files:
+            print(f"Error: No .weft shards found in directory: {weft_path}")
+            sys.exit(1)
+
+        total_weft_bytes = sum(f.stat().st_size for f in shard_files)
+        total_layers = 0
+        total_params = 0
+        bpw_samples = []
+        model_repo = "N/A"
+
+        for sf in shard_files:
+            c = WeftModelContainer.load(str(sf))
+            if model_repo == "N/A" and "repo_id" in c.metadata:
+                model_repo = c.metadata["repo_id"]
+            total_layers += len(c.tensors)
+            for tname, tdata in c.tensors.items():
+                total_params += tdata['out_features'] * tdata['in_features']
+                layer = c.get_subbit_linear(tname)
+                bpw_samples.append(layer.bits_per_weight())
+
+        effective_bpw = (total_weft_bytes * 8.0) / max(1, total_params)
+        raw_fp16_gb = (total_params * 2.0) / (1024**3)
+        comp_ratio = (total_params * 2.0) / max(1, total_weft_bytes)
+
+        print("=" * 68)
+        print(f"  WEFT MULTI-SHARD MODEL DIRECTORY INSPECTION")
+        print("=" * 68)
+        print(f"Directory:             {os.path.abspath(weft_path)}")
+        print(f"Base Repository:       {model_repo}")
+        print(f"Total Shards:          {len(shard_files)} .weft containers")
+        print(f"Consolidated GGUF:     {gguf_files[0].name if gguf_files else 'None'}")
+        print(f"Sub-Bit Disk Footprint:{total_weft_bytes / (1024**2):.2f} MB")
+        print(f"Total Linear Layers:   {total_layers}")
+        print(f"Total Parameters:      {total_params:,} ({total_params/1e9:.2f}B)")
+        print(f"Estimated Raw FP16:    {raw_fp16_gb:.2f} GB")
+        print(f"Effective Fleet BPW:   {effective_bpw:.4f} bits/weight")
+        print(f"Compression Ratio:     {comp_ratio:.1f}x")
+        print("-" * 68)
+        print(f"Layer Bitrate Profile: Min {min(bpw_samples):.4f} | Max {max(bpw_samples):.4f} | Mean {sum(bpw_samples)/len(bpw_samples):.4f} BPW")
+        print("=" * 68)
+        return
 
     container = WeftModelContainer.load(weft_path)
     file_size_mb = os.path.getsize(weft_path) / 1e6

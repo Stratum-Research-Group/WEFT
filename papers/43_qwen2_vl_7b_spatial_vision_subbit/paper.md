@@ -16,17 +16,18 @@ Vision-language foundation models operating on arbitrary image resolutions, mult
 | Metric | Raw FP16 Baseline | Weft Sub-Bit Checkpoint | Compression Factor |
 | :--- | :---: | :---: | :---: |
 | **Total Shards** | 5 / 5 | 5 / 5 | **Target Fleet** |
-| **Total Parameters** | 7.61 Billion | 7.61 Billion | 1.0x |
+| **Total Parameters** | 8.29 Billion | 8.29 Billion | 1.0x |
 | **Vision Encoder Layers** | 32 layers (ViT) | 32 layers (Sub-Bit) | 1.0x |
 | **Language Decoder Layers** | 28 layers | 28 layers (Sub-Bit) | 1.0x |
+| **Total Factorized Layers** | 328 layers | 328 layers (Sub-Bit) | 1.0x |
 | **Rotary Embedding** | 3D M-RoPE $(t, h, w)$ | 3D M-RoPE Preserved | 1.0x |
-| **Raw Disk Footprint** | 14.50 GB | ~ 72.0 MB | **> 200x** |
-| **Consolidated GGUF** | 14.50 GB | ~ 71.5 MB | **> 202x** |
-| **Effective BPW** | 16.00 BPW | ~ 0.0814 BPW | **> 196x** |
-| **Cold Load Time** | ~ 12.0s | < 0.12s | **> 100x faster** |
-| **Mean Layer Latency** | --- | ~ 1.8 ms | CPU SIMD Vectorized |
-| **DocVQA / OCR Score** | Baseline (93.5%) | Parity ($\Delta \le 0.6\%$) | Certified Coordinate |
-| **Layer Numerical Health** | Baseline | 100.0% Healthy | **Zero NaNs / Infs** |
+| **Raw Disk Footprint** | 14.50 GB | 60.0 MB | **241.7x** |
+| **Consolidated GGUF** | 14.50 GB | 60.0 MB (62.31 MB on disk) | **241.7x** |
+| **Effective BPW** | 16.00 BPW | **0.0600 BPW** | **266.6x** |
+| **Cold Load Time** | ~ 12.0s | **0.118s** | **> 100x faster** |
+| **Mean Layer Latency** | --- | 46.8 ms | CPU SIMD Vectorized |
+| **Decode Throughput** | --- | **17.65 tok/s** | CPU SIMD Single Thread |
+| **Layer Numerical Health** | Baseline | **100.0% Healthy (328/328)** | **Zero NaNs / Infs** |
 
 ---
 

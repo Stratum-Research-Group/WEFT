@@ -17,6 +17,7 @@ from weft.lean_verifier import Lean4Verifier
 
 class AdaptiveComputeVerifier:
     """Monitors token-level entropy and Lean 4 formal code blocks during test-time compute."""
+    __test__ = False  # Prevent pytest from treating this utility class as a test suite
 
     def __init__(self, entropy_threshold: float = 3.2, enable_lean: bool = True):
         self.entropy_threshold = entropy_threshold

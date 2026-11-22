@@ -11,6 +11,7 @@ import json
 import time
 import uuid
 from typing import List, Optional, Union, Any
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse, HTMLResponse
@@ -22,7 +23,16 @@ from weft import WeftConfig, WeftForCausalLM, WeftCache
 from weft.tokenizer import WeftCharTokenizer
 
 
-app = FastAPI(title="WEFT Inference Server", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    import os
+    model_path = os.environ.get("WEFT_MODEL_PATH")
+    if model_path and os.path.exists(model_path):
+        load_model(model_path)
+    yield
+
+
+app = FastAPI(title="WEFT Inference Server", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -55,6 +65,8 @@ def list_subbit_models():
     from weft.serve_any import load_universal_subbit_model
     discovered = {}
     model_dirs = [
+        ("deepseek-coder-v2-lite", "/run/media/akarta/AI/models/deepseek-coder-v2-lite-subbit"),
+        ("mixtral-8x7b", "/run/media/akarta/AI/models/mixtral-8x7b-subbit"),
         ("qwen-2.5-72b", "/run/media/akarta/AI/models/qwen-2.5-72b-subbit"),
         ("llama-3.3-70b", "/run/media/akarta/AI/models/llama-3.3-70b-subbit"),
         ("goedel-prover-32b", "/run/media/akarta/AI/models/goedel-prover-32b-subbit"),
@@ -69,14 +81,6 @@ def list_subbit_models():
                     "files": [os.path.basename(f) for f in sorted(weft_files)],
                 }
     return {"status": "ok", "subbit_models": discovered}
-
-
-@app.on_event("startup")
-def startup_event():
-    import os
-    model_path = os.environ.get("WEFT_MODEL_PATH")
-    if model_path and os.path.exists(model_path):
-        load_model(model_path)
 
 
 def load_model(checkpoint_path: str, device: Optional[str] = None, quantization: Optional[str] = None):

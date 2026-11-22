@@ -76,6 +76,78 @@ class Lean4Verifier:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
 
+    def verify_theorem_strict(
+        self,
+        theorem_name: str,
+        code_str: str,
+        allowed_axioms: Optional[List[str]] = None,
+        timeout_seconds: int = 15,
+    ) -> Dict[str, Any]:
+        """
+        Strict mathematical comparator harness inspired by Navier-Stokes & Riemann Lean verification:
+        1. Checks that the code compiles cleanly with exit code 0.
+        2. Queries `#print axioms <theorem_name>` to verify no `sorryAx` or unauthorized axioms were used.
+        3. Fails if warnings indicate declaration uses `sorry`.
+        """
+        if allowed_axioms is None:
+            # Standard classical foundational axioms in Lean 4:
+            allowed_axioms = ["propext", "Classical.choice", "Quot.sound"]
+
+        # Append axiom check
+        augmented_code = f"{code_str}\n\n#print axioms {theorem_name}\n"
+        res = self.verify_code(augmented_code, timeout_seconds=timeout_seconds)
+
+        if not res["success"]:
+            return {
+                "verified": False,
+                "reason": "Compilation failed",
+                "details": res,
+                "axioms": [],
+            }
+
+        stdout = res["stdout"]
+        stderr = res["stderr"]
+        combined = f"{stdout}\n{stderr}"
+
+        # Check for sorry usage
+        if "declaration uses `sorry`" in combined or "sorryAx" in combined:
+            return {
+                "verified": False,
+                "reason": "Proof incomplete: uses `sorry` or `sorryAx`",
+                "details": res,
+                "axioms": ["sorryAx"],
+            }
+
+        # Parse axioms from #print axioms output
+        # Output formats:
+        # "'thm' does not depend on any axioms"
+        # "'thm' depends on axioms: [propext, Quot.sound]"
+        found_axioms = []
+        for line in combined.splitlines():
+            if f"'{theorem_name}' depends on axioms:" in line:
+                raw_list = line.split("depends on axioms:")[1].strip()
+                raw_list = raw_list.strip("[]")
+                found_axioms = [ax.strip() for ax in raw_list.split(",") if ax.strip()]
+            elif f"'{theorem_name}' does not depend on any axioms" in line:
+                found_axioms = []
+
+        unauthorized = [ax for ax in found_axioms if ax not in allowed_axioms]
+        if unauthorized:
+            return {
+                "verified": False,
+                "reason": f"Proof depends on unauthorized axioms: {unauthorized}",
+                "details": res,
+                "axioms": found_axioms,
+                "unauthorized_axioms": unauthorized,
+            }
+
+        return {
+            "verified": True,
+            "reason": "Kernel check passed with zero unauthorized axioms",
+            "details": res,
+            "axioms": found_axioms,
+        }
+
 
 class LeanSelfCorrectionLoop:
     """

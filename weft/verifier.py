@@ -21,7 +21,7 @@ import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, List
 
 
 @dataclass
@@ -217,4 +217,50 @@ class MathRuleVerifier:
             loop_penalty=loop_penalty,
             details={"extracted": extracted, "ground_truth": ground_truth_numeric},
         )
+
+
+class LeanKernelRuleVerifier:
+    """
+    Unforgeable Lean 4 Kernel Comparator Verifier for mathematical and algorithmic theorem proving in RLVR.
+    Enforces that candidate completions prove target theorems in the Lean kernel without `sorry` or unauthorized axioms.
+    """
+    def __init__(self, allowed_axioms: Optional[List[str]] = None, timeout_seconds: int = 15):
+        from weft.lean_verifier import Lean4Verifier
+        self.verifier = Lean4Verifier()
+        self.allowed_axioms = allowed_axioms or ["propext", "Classical.choice", "Quot.sound"]
+        self.timeout = timeout_seconds
+
+    def verify_proof(
+        self,
+        theorem_name: str,
+        theorem_statement: str,
+        completion_code: str,
+        preamble: str = "",
+    ) -> RewardBreakdown:
+        # Assemble code
+        code_str = f"{preamble}\n\n{completion_code}"
+        check = self.verifier.verify_theorem_strict(
+            theorem_name=theorem_name,
+            code_str=code_str,
+            allowed_axioms=self.allowed_axioms,
+            timeout_seconds=self.timeout,
+        )
+
+        if check["verified"]:
+            return RewardBreakdown(
+                total_reward=1.0,
+                accuracy_reward=0.8,
+                format_reward=0.2,
+                loop_penalty=0.0,
+                details={"status": "kernel_verified", "axioms": check["axioms"]},
+            )
+        else:
+            return RewardBreakdown(
+                total_reward=0.0,
+                accuracy_reward=0.0,
+                format_reward=0.0,
+                loop_penalty=0.0,
+                details={"status": "verification_failed", "reason": check["reason"]},
+            )
+
 

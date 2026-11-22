@@ -60,3 +60,37 @@ def X1 (x y u v : Bool) : Int :=
     assert len(history) >= 2 # Proves that iteration 1 failed and iteration 2 auto-repaired
     assert history[0]["success"] is False
     assert history[1]["success"] is True
+
+
+def test_verify_theorem_strict_with_axiom_detection():
+    verifier = Lean4Verifier()
+    # 1. Clean theorem with zero axioms
+    clean_code = """
+theorem clean_identity (x : Nat) : x + 0 = x := by
+  rfl
+"""
+    clean_res = verifier.verify_theorem_strict("clean_identity", clean_code)
+    assert clean_res["verified"] is True
+    assert clean_res["axioms"] == []
+
+    # 2. Theorem relying on sorryAx
+    sorry_code = """
+theorem sorry_identity (x : Nat) : x + 0 = x := by
+  sorry
+"""
+    sorry_res = verifier.verify_theorem_strict("sorry_identity", sorry_code)
+    assert sorry_res["verified"] is False
+    assert "sorry" in sorry_res["reason"].lower() or "sorryAx" in sorry_res["axioms"]
+
+    # 3. Theorem relying on custom unproven axiom
+    cheating_code = """
+axiom cheat_ax (x : Nat) : x + 0 = x
+
+theorem cheat_thm (x : Nat) : x + 0 = x := by
+  exact cheat_ax x
+"""
+    cheat_res = verifier.verify_theorem_strict("cheat_thm", cheating_code)
+    assert cheat_res["verified"] is False
+    assert "cheat_ax" in cheat_res["axioms"]
+    assert "unauthorized axioms" in cheat_res["reason"].lower()
+

@@ -1,6 +1,6 @@
 # Paper 31: Towards 100% Sub-Bit Coverage: Asymptotic Low-Rank Hypercube Scaling and Certified Lean 4 BPW Invariants in 70B+ Foundation Models
 
-**Authors:** Antigravity Autonomous Research Swarm  
+**Authors:** Nicholas Charles Mynhardt, Antigravity Autonomous Research Swarm
 **Date:** November 22, 2026  
 **Artifact Directory:** [papers/31_asymptotic_scaling_frontier_70b/](file:///home/akarta/Projects/0.WiP/Weft/papers/31_asymptotic_scaling_frontier_70b/)
 

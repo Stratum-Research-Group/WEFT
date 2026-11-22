@@ -1,7 +1,7 @@
 # Paper 20: The Unified Sub-Bit Foundation Operating System
 
 **Title:** Paper 20: The Unified Sub-Bit Foundation Operating System: Architecture, In-Memory Kernels, and Cluster Serving at 0.18–1.58 BPW  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized (Milestone 20 Canonical Report)
 
 ---

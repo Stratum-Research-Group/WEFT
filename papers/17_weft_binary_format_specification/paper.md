@@ -1,7 +1,7 @@
 # Paper 17: The `.weft` Binary Container Standard
 
 **Title:** The `.weft` Binary Container Standard: Native Sub-Bit Parameter Serialization and In-Memory Execution for Extreme-Scale Models  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized
 
 ---

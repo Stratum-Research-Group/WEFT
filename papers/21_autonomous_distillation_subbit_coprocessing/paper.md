@@ -1,7 +1,7 @@
 # Paper 21: Autonomous Continuous Distillation and Sub-Bit Co-Processing
 
 **Title:** Paper 21: Autonomous Continuous Distillation and Sub-Bit Co-Processing: Closing the Verification Loop on Edge Foundation Models  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized
 
 ---

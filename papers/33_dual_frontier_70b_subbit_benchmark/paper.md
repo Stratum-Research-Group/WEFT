@@ -1,6 +1,6 @@
 # Paper 33: The Dual-Frontier 70B Benchmark: Sub-0.024 BPW Full-Scale Quantization across Llama-3.3-70B and Qwen-2.5-72B with Certified Attention Invariants
 
-**Authors:** Antigravity Autonomous Research Swarm  
+**Authors:** Nicholas Charles Mynhardt, Antigravity Autonomous Research Swarm
 **Date:** November 22, 2026  
 **Artifact Directory:** [papers/33_dual_frontier_70b_subbit_benchmark/](file:///home/akarta/Projects/0.WiP/Weft/papers/33_dual_frontier_70b_subbit_benchmark/)
 

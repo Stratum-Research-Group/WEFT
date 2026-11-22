@@ -1,7 +1,7 @@
 # Paper 18: Adaptive Spectral Quantization and Sub-Bit Model Serving
 
 **Title:** Adaptive Spectral Quantization and Sub-Bit Model Serving: Scaling Foundation Models to 0.18 BPW via Joint-ITQ and Fused Bitboards  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized
 
 ---

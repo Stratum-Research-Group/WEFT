@@ -1,7 +1,7 @@
 # Paper 19: End-to-End Sub-Bit Foundation Model Serving and Scale Residual Distillation
 
 **Title:** End-to-End Sub-Bit Foundation Model Serving and Scale Residual Distillation: Compressing and Executing Multi-Billion Parameter Transformers at 0.23 BPW  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized
 
 ---

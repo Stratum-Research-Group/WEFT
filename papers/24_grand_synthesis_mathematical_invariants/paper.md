@@ -1,7 +1,7 @@
 # Paper 24: The Grand Synthesis of WEFT: Mathematical Invariants, Sub-Bit Bitboards, and Edge Co-Processing
 
 **Title:** Paper 24: The Grand Synthesis of WEFT: Mathematical Invariants, Sub-Bit Bitboards, and Edge Co-Processing  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized (Grand Charter Milestone Report)
 
 ---

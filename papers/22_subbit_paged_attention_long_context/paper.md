@@ -1,7 +1,7 @@
 # Paper 22: High-Throughput Sub-Bit PagedAttention and Long-Context Scaling
 
 **Title:** Paper 22: High-Throughput Sub-Bit PagedAttention and Long-Context Scaling: Serving 128K Context at 0.54 BPW  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized
 
 ---

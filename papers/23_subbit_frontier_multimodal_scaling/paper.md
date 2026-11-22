@@ -1,7 +1,7 @@
 # Paper 23: The Sub-Bit Frontier: Multi-Modal and Extreme-Scale Quantization (12B to 70B)
 
 **Title:** Paper 23: The Sub-Bit Frontier: Multi-Modal and Extreme-Scale Quantization from 12B to 70B Parameters  
-**Authors:** The WEFT Architectural Consortium  
+**Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized
 
 ---

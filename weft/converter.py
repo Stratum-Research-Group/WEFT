@@ -46,10 +46,13 @@ def factorize_linear_layer(
     adaptive_rank: bool = True,
     num_paths: int = 2,
     itq_iterations: int = 10,
-) -> WeftSubBitLinear:
+    certify_intervals: bool = False,
+):
     """
-    Decomposes a dense weight matrix W (m x n) into dual-path LittleBit-2 factors:
+    Factorizes a dense 2D weight matrix W into a WeftSubBitLinear module with LittleBit-2 Joint-ITQ.
+    Decomposes W (m x n) into dual-path LittleBit-2 factors:
     W_approx = sum_p diag(h_p) @ (U_b,p @ diag(l_p) @ V_b,p^T) @ diag(g_p)
+    If certify_intervals is True, validates the reconstruction error using mpmath interval arithmetic.
     """
     m, n = W.shape
     device = W.device
@@ -158,6 +161,11 @@ def factorize_linear_layer(
 
     if bias is not None:
         layer.bias.data.copy_(bias.to(torch.float16))
+
+    if certify_intervals:
+        from weft.interval_certifier import RigorousIntervalQuantizationValidator
+        cert_info = RigorousIntervalQuantizationValidator.certify_reconstruction_error(W, layer)
+        return layer, cert_info
 
     return layer
 

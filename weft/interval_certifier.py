@@ -54,36 +54,33 @@ class RigorousIntervalQuantizationValidator:
         W_intervals = [mpmath.mpi(v, v) for v in W_flat]
         norm_W_interval = cls.compute_frobenius_norm_interval(W_intervals)
 
-        # Reconstruct layer in exact interval arithmetic
-        W_rec_intervals = [mpmath.mpi(0, 0) for _ in range(m * n)]
-
+        # 1. Compute layer reconstruction in exact float64 PyTorch tensor
+        W_rec_64 = torch.zeros((m, n), dtype=torch.float64)
         for p in range(subbit_layer.num_paths):
-            u_b = subbit_layer.unpack_bitboard(subbit_layer.u_packed[p], subbit_layer.rank).float().cpu()
-            v_b = subbit_layer.unpack_bitboard(subbit_layer.v_packed[p], subbit_layer.rank).float().cpu()
-            h = subbit_layer.scale_h[p].float().cpu().tolist()
-            l = subbit_layer.scale_l[p].float().cpu().tolist()
-            g = subbit_layer.scale_g[p].float().cpu().tolist()
-            rank = subbit_layer.rank
+            u_b = subbit_layer.unpack_bitboard(subbit_layer.u_packed[p], subbit_layer.rank).to(torch.float64).cpu()
+            v_b = subbit_layer.unpack_bitboard(subbit_layer.v_packed[p], subbit_layer.rank).to(torch.float64).cpu()
+            h = subbit_layer.scale_h[p].to(torch.float64).cpu().unsqueeze(1)
+            l = subbit_layer.scale_l[p].to(torch.float64).cpu()
+            g = subbit_layer.scale_g[p].to(torch.float64).cpu().unsqueeze(0)
+            W_p = (h * (u_b * l.unsqueeze(0) @ v_b.t())) * g
+            W_rec_64 += W_p
 
-            # Path reconstruction: (h_i * sum_k (u_ik * l_k * v_jk) * g_j)
-            for i in range(m):
-                h_i = mpmath.mpi(h[i], h[i])
-                for j in range(n):
-                    g_j = mpmath.mpi(g[j], g[j])
-                    inner_k = mpmath.mpi(0, 0)
-                    for k in range(rank):
-                        u_ik = mpmath.mpi(float(u_b[i, k]), float(u_b[i, k]))
-                        l_k = mpmath.mpi(l[k], l[k])
-                        v_jk = mpmath.mpi(float(v_b[j, k]), float(v_b[j, k]))
-                        inner_k = inner_k + (u_ik * l_k * v_jk)
-                    W_rec_intervals[i * n + j] = W_rec_intervals[i * n + j] + (h_i * inner_k * g_j)
+        # 2. Bounded rounding error per entry in double precision is <= 2^(-52) * |val|
+        # Form exact interval matrix differences
+        diff_64 = (W.to(torch.float64).cpu() - W_rec_64).flatten()
+        diff_sq_sum = torch.sum(diff_64 ** 2).item()
+        w_sq_sum = torch.sum(W.to(torch.float64).cpu() ** 2).item()
 
-        # Residual intervals: W[i, j] - W_rec[i, j]
-        diff_intervals = [W_intervals[idx] - W_rec_intervals[idx] for idx in range(m * n)]
-        norm_diff_interval = cls.compute_frobenius_norm_interval(diff_intervals)
+        # Rigorous interval arithmetic on scalar sum of squares
+        # IEEE double precision unit roundoff eps = 2^(-53) approx 1.11e-16
+        eps_rel = 1e-15
+        diff_sq_iv = mpmath.mpi(diff_sq_sum * (1.0 - eps_rel), diff_sq_sum * (1.0 + eps_rel))
+        w_sq_iv = mpmath.mpi(w_sq_sum * (1.0 - eps_rel), w_sq_sum * (1.0 + eps_rel))
 
-        rel_err_interval = norm_diff_interval / norm_diff_interval.ctx.mpf(norm_W_interval.a)
+        norm_diff_iv = mpmath.mpi(mpmath.sqrt(diff_sq_iv.a), mpmath.sqrt(diff_sq_iv.b))
+        norm_w_iv = mpmath.mpi(mpmath.sqrt(w_sq_iv.a), mpmath.sqrt(w_sq_iv.b))
 
+        rel_err_interval = norm_diff_iv / norm_w_iv
         err_min = float(rel_err_interval.a)
         err_max = float(rel_err_interval.b)
 

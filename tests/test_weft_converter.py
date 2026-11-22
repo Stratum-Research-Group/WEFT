@@ -107,3 +107,20 @@ def test_factorization_reconstruction_least_squares_convergence():
     assert rel_2p < 0.70, f"2-path relW {rel_2p} unexpectedly high"
     assert rel_2p < rel_1p, f"2-path relW ({rel_2p}) must improve over 1-path ({rel_1p})"
 
+
+
+def test_factorize_linear_layer_with_interval_certification():
+    torch.manual_seed(42)
+    m, n = 32, 32
+    W = torch.randn(m, n)
+    layer, cert = factorize_linear_layer(
+        W,
+        base_rank=8,
+        adaptive_rank=False,
+        num_paths=2,
+        itq_iterations=5,
+        certify_intervals=True,
+    )
+    assert cert is not None
+    assert "rel_frobenius_interval" in cert
+    assert cert["certified_upper_bound"] > 0.0

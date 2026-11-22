@@ -25,15 +25,16 @@ Generative music foundation models synthesize high-fidelity acoustic waveforms b
 \toprule
 \textbf{Metric} & \textbf{Raw Baseline} & \textbf{Sub-Bit} & \textbf{Factor} \\
 \midrule
-Total Parameters & 590M & 590M & $1.0\times$ \\
+Total Parameters & 565.48M & 565.48M & $1.0\times$ \\
 Transformer Layers & 24 & 24 & $1.0\times$ \\
 RVQ Codebooks & 4 parallel & 4 parallel & $1.0\times$ \\
-Linear Layers & 196 & 196 & $1.0\times$ \\
-Raw Disk Footprint & 2.36 GB & $\sim$ 24.0 MB & \textbf{$>98\times$} \\
-Consolidated GGUF & 2.36 GB & $\sim$ 23.8 MB & \textbf{$>99\times$} \\
-Effective Bitrate & 16.00 BPW & 0.125 BPW & \textbf{$>125\times$} \\
-Cold Load Latency & 1.80s & $<$ 0.05s & \textbf{$>36\times$} \\
-Mean Layer Latency & --- & $\sim$ 0.12 ms & SIMD \\
+Linear Layers & 332 & 332 & $1.0\times$ \\
+Raw Disk Footprint & 2.36 GB & 16.13 MB & \textbf{$145.7\times$} \\
+Consolidated GGUF & 2.36 GB & 16.13 MB & \textbf{$145.7\times$} \\
+Effective Bitrate & 16.00 BPW & 0.2258 BPW & \textbf{$70.9\times$} \\
+Cold Load Latency & 1.80s & 0.058s & \textbf{$31\times$} \\
+Mean Layer Latency & --- & 0.358 ms & SIMD \\
+Throughput & --- & 3,184.8 tok/s & CPU SIMD \\
 Numerical Health & Baseline & 100.0\% Healthy & Zero NaN/Inf \\
 \bottomrule
 \end{tabular}

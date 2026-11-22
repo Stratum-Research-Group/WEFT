@@ -15,16 +15,17 @@ Generative music foundation models synthesize high-fidelity acoustic waveforms b
 
 | Metric | Raw FP32/FP16 Baseline | Weft Sub-Bit Checkpoint | Compression Factor |
 | :--- | :---: | :---: | :---: |
-| **Total Parameters** | 590 Million | 590 Million | 1.0x |
+| **Total Parameters** | 565.48 Million | 565.48 Million | 1.0x |
 | **Autoregressive Transformer Layers** | 24 layers | 24 layers | 1.0x |
 | **RVQ Acoustic Codebooks** | 4 parallel streams | 4 parallel streams | 1.0x |
-| **Linear Projection Layers** | 196 layers | 196 layers | 1.0x |
+| **Linear Projection Layers** | 332 layers | 332 layers | 1.0x |
 | **EnCodec Sample Rate** | 32 kHz | 32 kHz | 1.0x |
-| **Raw Disk Footprint** | 2.36 GB | ~ 24.0 MB | **> 98x** |
-| **Consolidated GGUF** | 2.36 GB | ~ 23.8 MB | **> 99x** |
-| **Effective BPW** | 16.00 BPW | ~ 0.125 BPW | **> 125x** |
-| **Cold Load Time** | ~ 1.80s | < 0.05s | **> 36x faster** |
-| **Mean Layer Latency** | --- | ~ 0.12 ms | CPU SIMD Vectorized |
+| **Raw Disk Footprint** | 2.36 GB | 16.13 MB | **145.7x** |
+| **Consolidated GGUF** | 2.36 GB | 16.13 MB | **145.7x** |
+| **Effective BPW** | 16.00 BPW | 0.2258 BPW | **70.9x** |
+| **Cold Load Time** | ~ 1.80s | 0.058s | **31x faster** |
+| **Mean Layer Latency** | --- | 0.358 ms | CPU SIMD Vectorized |
+| **Throughput** | --- | 3,184.8 tok/s | Single-Thread CPU SIMD |
 | **Layer Numerical Health** | Baseline | 100.0% Healthy | **Zero NaNs / Infs** |
 
 ---

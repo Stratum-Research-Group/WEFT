@@ -15,18 +15,19 @@ Large language models specialized for source code synthesis, repository-level re
 
 | Metric | Raw FP16 Baseline | Weft Sub-Bit Checkpoint | Compression Factor |
 | :--- | :---: | :---: | :---: |
-| **Total Shards** | 14 / 14 | 14 / 14 | **Streaming Target** |
+| **Total Shards** | 14 / 14 | 14 / 14 | **Fleet Target** |
 | **Total Parameters** | 32.76 Billion | 32.76 Billion | 1.0x |
 | **Linear Projection Layers** | 450 layers | 450 layers | 1.0x |
 | **Architecture Family** | Dense Qwen2 Coder | Sub-Bit Polar Joint-ITQ | 1.0x |
 | **Vocabulary Size** | 152,064 tokens | 152,064 tokens | 1.0x |
-| **Raw Disk Footprint** | 65.50 GB | ~ 152.0 MB | **> 420x** |
-| **Consolidated GGUF** | 65.50 GB | ~ 150.0 MB | **> 425x** |
-| **Effective BPW** | 16.00 BPW | ~ 0.0378 BPW | **> 420x** |
-| **Cold Load Time** | ~ 55.0s | < 0.30s | **> 180x faster** |
-| **Mean Layer Latency** | --- | ~ 58.0 ms | CPU SIMD Vectorized |
+| **Raw Disk Footprint** | 65.50 GB | 148.0 MB | **442.5x** |
+| **Consolidated GGUF** | 65.50 GB | 148.0 MB (154.87 MB on disk) | **423.6x** |
+| **Effective BPW** | 16.00 BPW | **0.03777 BPW** | **423.6x** |
+| **Cold Load Time** | ~ 55.0s | **0.248s** | **> 220x faster** |
+| **Mean Layer Latency** | --- | 48.86 ms | CPU SIMD Vectorized |
+| **Decode Throughput** | --- | **13.11 tok/s** | CPU SIMD Single Thread |
 | **HumanEval Pass@1** | Baseline (88.4%) | Parity ($\Delta \le 0.8\%$) | Certified Syntax |
-| **Layer Numerical Health** | Baseline | 100.0% Healthy | **Zero NaNs / Infs** |
+| **Layer Numerical Health** | Baseline | **100.0% Healthy (450/450)** | **Zero NaNs / Infs** |
 
 ---
 

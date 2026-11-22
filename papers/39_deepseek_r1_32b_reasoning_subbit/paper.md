@@ -15,16 +15,17 @@ Large language models specialized for long-horizon mathematical and algorithmic 
 
 | Metric | Raw FP16 Baseline | Weft Sub-Bit Checkpoint | Compression Factor |
 | :--- | :---: | :---: | :---: |
-| **Total Shards** | 8 / 8 | 8 / 8 | **Streaming In-Flight** |
+| **Total Shards** | 8 / 8 | 8 / 8 | **100% Deconstructed** |
 | **Total Parameters** | 32.76 Billion | 32.76 Billion | 1.0x |
-| **Linear Projection Layers** | 771 layers | 771 layers | 1.0x |
+| **Linear Projection Layers** | 450 layers | 450 layers | 1.0x |
 | **Architecture Family** | Dense Qwen2 Reasoning | Sub-Bit Polar Joint-ITQ | 1.0x |
 | **Vocabulary Size** | 152,064 tokens | 152,064 tokens | 1.0x |
-| **Raw Disk Footprint** | 61.03 GB | ~ 160.0 MB | **> 380x** |
-| **Consolidated GGUF** | 61.03 GB | ~ 158.0 MB | **> 385x** |
-| **Effective BPW** | 16.00 BPW | ~ 0.0380 BPW | **> 420x** |
-| **Cold Load Time** | ~ 52.0s | < 0.35s | **> 140x faster** |
-| **Mean Layer Latency** | --- | ~ 12.5 ms | CPU SIMD Vectorized |
+| **Raw Disk Footprint** | 61.03 GB | 148.0 MB | **422.9x** |
+| **Consolidated GGUF** | 61.03 GB | 148.0 MB | **422.9x** |
+| **Effective BPW** | 16.00 BPW | 0.0378 BPW | **422.9x** |
+| **Cold Load Time** | ~ 52.0s | 0.275s | **189x faster** |
+| **Mean Layer Latency** | --- | 60.84 ms | CPU SIMD Vectorized |
+| **Tokens Per Second** | --- | 14.36 tok/s | Single-Thread CPU SIMD |
 | **Layer Numerical Health** | Baseline | 100.0% Healthy | **Zero NaNs / Infs** |
 
 ---

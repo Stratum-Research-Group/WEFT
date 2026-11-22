@@ -17,18 +17,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: "3.12"
+          version: "latest"
 
-      - name: Install UV and Python Dependencies
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install Dependencies
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv sync
+          uv sync --extra dev
+
+      - name: Install Lean 4 toolchain via elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
       - name: Run Lean 4 Property Test Suite
         run: |
+          export PATH="$HOME/.elan/bin:$PATH"
           uv run pytest tests/test_lean_*.py
 
       - name: Verify All 38 Research Paper Artifacts

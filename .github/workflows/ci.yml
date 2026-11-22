@@ -64,3 +64,17 @@ jobs:
               assert manifest['total_parameters'] > 0
           print('CI GGUF exporter check passed!')
           "
+
+      - name: Verify Sub-Bit Model Inspection and Certificate Integrity
+        run: |
+          uv run python -c "
+          import os, json
+          cert_files = [f for f in os.listdir('checkpoints') if f.endswith('_certificate.json')] if os.path.exists('checkpoints') else []
+          for cf in cert_files:
+              with open(os.path.join('checkpoints', cf)) as f:
+                  data = json.load(f)
+              assert data.get('all_strictly_bounded_below_one', False) is True, f'Certificate {cf} failed bound!'
+              assert data.get('total_layers_certified', 0) > 0, f'Certificate {cf} has no certified layers!'
+              print(f'Verified certificate {cf}: {data[\"total_layers_certified\"]} layers, max_bound={data[\"max_certified_upper_bound\"]:.4f}')
+          print('CI Certificate Integrity checks passed!')
+          "

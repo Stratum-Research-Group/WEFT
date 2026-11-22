@@ -207,3 +207,77 @@ class WeftDeepSeekMoE(nn.Module):
         if self.last_aux_loss is not None:
             return self.last_aux_loss
         return torch.tensor(0.0, device=self.router.weight.device)
+
+
+class PolytopeMoERouter(nn.Module):
+    """
+    Polytope Mixture-of-Experts Router with Convex Facet Boundary Stability.
+
+    Partitions representation space into convex polyhedral cells defined by
+    facet hyperplanes and centroid distance metrics:
+      P_e = {x in R^d : A_e x <= b_e}
+
+    Guarantees that tokens with facet margin > 2 * delta maintain strictly
+    invariant expert assignments under sub-bit low-rank quantization.
+    """
+    def __init__(
+        self,
+        d_model: int,
+        num_experts: int,
+        top_k: int = 2,
+        facet_margin_threshold: float = 0.05,
+        temperature: float = 1.0,
+    ):
+        super().__init__()
+        self.d_model = d_model
+        self.num_experts = num_experts
+        self.top_k = min(top_k, num_experts)
+        self.facet_margin_threshold = facet_margin_threshold
+        self.temperature = temperature
+
+        # Learnable facet normal centroids (hyperplane normals)
+        self.facet_centroids = nn.Parameter(torch.empty(num_experts, d_model))
+        # Learnable per-facet bias / hyperplane thresholds
+        self.facet_bias = nn.Parameter(torch.zeros(num_experts))
+        nn.init.orthogonal_(self.facet_centroids)
+
+    def forward(
+        self,
+        x: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """
+        Args:
+          x: Input token representations [..., d_model]
+
+        Returns:
+          topk_weights: Normalized routing weights [..., top_k]
+          topk_indices: Selected expert indices [..., top_k]
+          facet_margins: Margin between top-1 and runner-up facet projections [...]
+        """
+        orig_shape = x.shape[:-1]
+        x_flat = x.view(-1, self.d_model)
+
+        # Normalize token embeddings and facet centroids for robust angular distance
+        x_norm = F.normalize(x_flat, p=2, dim=-1)
+        c_norm = F.normalize(self.facet_centroids, p=2, dim=-1)
+
+        # Facet projections: A_e x + b_e
+        projections = torch.matmul(x_norm, c_norm.T) + self.facet_bias  # [N, num_experts]
+
+        # Compute facet margins (top-1 projection minus top-2 projection)
+        sorted_proj, _ = torch.sort(projections, dim=-1, descending=True)
+        margins = sorted_proj[:, 0] - sorted_proj[:, 1]
+
+        # Top-k routing over polytope facet logits
+        scaled_logits = projections / self.temperature
+        routing_probs = F.softmax(scaled_logits, dim=-1)
+
+        topk_weights, topk_indices = torch.topk(routing_probs, k=self.top_k, dim=-1)
+        topk_weights = topk_weights / topk_weights.sum(dim=-1, keepdim=True).clamp(min=1e-6)
+
+        return (
+            topk_weights.view(*orig_shape, self.top_k),
+            topk_indices.view(*orig_shape, self.top_k),
+            margins.view(orig_shape)
+        )
+

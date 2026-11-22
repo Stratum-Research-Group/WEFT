@@ -5,13 +5,17 @@ Overlaps CPU string serialization with GPU speculative drafting and verification
 eliminating CPU-side tokenization bubbles (saving 20-30% of interactive turn latency).
 """
 
+import os
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Optional, Any
 from transformers import AutoTokenizer
 
 class AsyncTokenizerPipeline:
-    def __init__(self, tokenizer_dir: str = "/run/media/akarta/AI/models/gemma-4-E2B-it", max_workers: int = 2):
+    def __init__(self, tokenizer_dir: str = None, max_workers: int = 2):
+        if tokenizer_dir is None:
+            models_root = os.environ.get("WEFT_MODELS_ROOT", "/run/media/akarta/AI/models")
+            tokenizer_dir = os.path.join(models_root, "gemma-4-E2B-it")
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
 

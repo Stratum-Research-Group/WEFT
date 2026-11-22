@@ -1,3 +1,7 @@
+import os
+import shutil
+import pytest
+pytestmark = pytest.mark.skipif(shutil.which("lean") is None and not os.path.exists(os.path.expanduser("~/.elan/bin/lean")), reason="Lean 4 compiler not installed")
 import pytest
 from weft.lean_verifier import Lean4Verifier
 

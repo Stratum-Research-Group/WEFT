@@ -13,7 +13,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from scripts.distill_gemma4_pipeline import Gemma4LayerProber, distill_gemma4_to_weft
 
 
-GEMMA4_PATH = "/run/media/akarta/AI/models/gemma-4-E2B-it/model.safetensors"
+models_root = os.environ.get("WEFT_MODELS_ROOT", "/run/media/akarta/AI/models")
+GEMMA4_PATH = os.path.join(models_root, "gemma-4-E2B-it", "model.safetensors")
 
 
 @pytest.mark.skipif(not os.path.exists(GEMMA4_PATH), reason="Gemma 4 safetensors not found on external drive")

@@ -135,9 +135,14 @@ def factorize_linear_layer(
                     u_packed[:, w] |= (u_bits[:, col] << b)
                     v_packed[:, w] |= (v_bits[:, col] << b)
 
-        # Fit scale vector l_p via least squares
-        # Target: normed approx (B_u * l) @ B_v^T
-        l_scale = (S_r / rank).clamp_min(1e-5)
+        # Fit scale vector l_p via regularized least squares
+        # Target: minimize ||normed - B_u diag(l) B_v^T||_F^2
+        # Vectorized normal equations: G @ l = rhs, where G_ij = (B_u[:, i]^T B_u[:, j]) * (B_v[:, i]^T B_v[:, j])
+        # and rhs_i = B_u[:, i]^T @ normed @ B_v[:, i]
+        G = torch.matmul(B_u.t(), B_u) * torch.matmul(B_v.t(), B_v)  # (rank, rank)
+        rhs = torch.diag(torch.matmul(torch.matmul(B_u.t(), normed), B_v))  # (rank,)
+        reg = 1e-4 * torch.eye(rank, device=device, dtype=G.dtype)
+        l_scale = torch.linalg.solve(G + reg, rhs).clamp_min(1e-6)
 
         layer.u_packed[p].data.copy_(u_packed)
         layer.v_packed[p].data.copy_(v_packed)

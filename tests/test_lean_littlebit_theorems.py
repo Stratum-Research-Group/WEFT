@@ -1,3 +1,6 @@
+import shutil
+import pytest
+pytestmark = pytest.mark.skipif(shutil.which("lean") is None and not os.path.exists(os.path.expanduser("~/.elan/bin/lean")), reason="Lean 4 compiler not installed")
 """
 Unit tests for Lean 4 Verified LittleBit-2 Joint-ITQ Invariant Theorems.
 """

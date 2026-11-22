@@ -39,9 +39,11 @@ def benchmark_kv_cache(
     )
     alloc_time = time.perf_counter() - t0
 
-    # Theoretical dense standard KV cache (e.g. Llama-3 8192-dim float16)
-    dense_dim = 8192
-    dense_elements = num_layers * max_blocks * block_size * dense_dim * 2
+    # Comparison with standard dense KV cache at matching dtype and dimensions:
+    # In standard GQA (e.g. 8 KV heads x 128 = 1024 dim per K or V, 2048 total per layer)
+    # dense_dim represents total per-layer key+value dimension in FP16 (2 bytes per element)
+    dense_dim = 2048
+    dense_elements = num_layers * max_blocks * block_size * dense_dim
     dense_mb = (dense_elements * 2) / 1e6  # 2 bytes per float16
 
     # Actual physical memory pool of WEFT compressed latent blocks

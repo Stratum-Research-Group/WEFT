@@ -422,7 +422,11 @@ class WeftAttention(nn.Module):
                         prev_state=recurrent_state,
                     )
                     global_out = y_triton.reshape(b, 1, d)
-                except Exception:
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(
+                        f"Triton decode step kernel failed with error: {e}. Falling back to PyTorch vectorized update."
+                    )
                     # Fallback to PyTorch vectorized update
                     kp_1 = k_key[:, 0, :, :].unsqueeze(-1)
                     xh_1 = x_heads[:, 0, :, :].unsqueeze(-2)
@@ -520,7 +524,11 @@ class WeftAttention(nn.Module):
                     )
                     global_out = global_out_heads.view(b, s, d)
                     last_state = final_state
-            except Exception:
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(
+                    f"Triton fused recurrent kernel failed with error: {e}. Falling back to PyTorch sequential scan."
+                )
                 use_triton = False
 
         if not use_triton:
@@ -869,6 +877,14 @@ class WeftForCausalLM(WeftPreTrainedModel, GenerationMixin):
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
             loss = F.cross_entropy(shift_logits.view(-1, self.config.vocab_size), shift_labels.view(-1))
+
+            # Automatically aggregate auxiliary load-balancing loss from MoE layers when present
+            if getattr(self.config, "use_moe", False):
+                aux_loss = 0.0
+                for layer in self.model.layers:
+                    if hasattr(layer.mlp, "get_aux_loss"):
+                        aux_loss = aux_loss + layer.mlp.get_aux_loss()
+                loss = loss + 0.01 * aux_loss
 
         return CausalLMOutputWithPast(
             loss=loss,

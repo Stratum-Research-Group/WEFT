@@ -96,8 +96,9 @@ class Muon(Optimizer):
 class Quantized8BitAdamW(Optimizer):
     """
     Block-wise quantized 8-bit AdamW optimizer.
-    Quantizes momentum (m) and variance (v) into int8 blocks of 64 or 128 elements,
-    storing per-block float16 scale factors.
+    Quantizes momentum (m) into signed int8 and variance square root (sqrt(v)) into uint8
+    blocks of 64 or 128 elements, storing per-block float16 scale factors.
+    Storing sqrt(v) in uint8 prevents zero-collapse of small second moments across dynamic ranges.
     Cuts optimizer VRAM from 16 bytes/param to ~6 bytes/param (2.6x savings).
     """
     def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01, block_size=64):
@@ -126,11 +127,11 @@ class Quantized8BitAdamW(Optimizer):
 
                 if len(state) == 0:
                     state["step"] = 0
-                    # Store momentum and variance in INT8 with FP16 block scales
+                    # Store momentum in INT8, sqrt(variance) in UINT8 with FP16 block scales
                     state["m_int8"] = torch.zeros(p.numel(), dtype=torch.int8, device=p.device)
                     state["m_scale"] = torch.zeros(math.ceil(p.numel() / bs), dtype=torch.float16, device=p.device)
-                    state["v_int8"] = torch.zeros(p.numel(), dtype=torch.int8, device=p.device)
-                    state["v_scale"] = torch.zeros(math.ceil(p.numel() / bs), dtype=torch.float16, device=p.device)
+                    state["sqrt_v_uint8"] = torch.zeros(p.numel(), dtype=torch.uint8, device=p.device)
+                    state["sqrt_v_scale"] = torch.zeros(math.ceil(p.numel() / bs), dtype=torch.float16, device=p.device)
 
                 state["step"] += 1
                 step = state["step"]
@@ -140,30 +141,32 @@ class Quantized8BitAdamW(Optimizer):
                 g_flat = grad.view(-1).float()
 
                 # Dequantize m and v
-                m_scale = state["m_scale"].repeat_interleave(bs)[:p.numel()]
-                v_scale = state["v_scale"].repeat_interleave(bs)[:p.numel()]
-                m = (state["m_int8"].float() / 127.0) * m_scale.float()
-                v = (state["v_int8"].float() / 127.0) * v_scale.float()
+                m_scale = state["m_scale"].repeat_interleave(bs)[:p.numel()].float()
+                v_sqrt_scale = state["sqrt_v_scale"].repeat_interleave(bs)[:p.numel()].float()
+                m = (state["m_int8"].float() / 127.0) * m_scale
+                sqrt_v = (state["sqrt_v_uint8"].float() / 255.0) * v_sqrt_scale
+                v = sqrt_v ** 2
 
                 # Adam updates
                 m.mul_(beta1).add_(g_flat, alpha=1.0 - beta1)
                 v.mul_(beta2).addcmul_(g_flat, g_flat, value=1.0 - beta2)
+                sqrt_v_new = v.sqrt()
 
-                # Re-quantize to int8
+                # Re-quantize to int8 / uint8
                 m_reshaped = m.view(-1, bs) if p.numel() % bs == 0 else torch.nn.functional.pad(m, (0, bs - p.numel() % bs)).view(-1, bs)
-                v_reshaped = v.view(-1, bs) if p.numel() % bs == 0 else torch.nn.functional.pad(v, (0, bs - p.numel() % bs)).view(-1, bs)
+                sv_reshaped = sqrt_v_new.view(-1, bs) if p.numel() % bs == 0 else torch.nn.functional.pad(sqrt_v_new, (0, bs - p.numel() % bs)).view(-1, bs)
 
                 new_m_scale = m_reshaped.abs().max(dim=1).values.clamp(min=1e-8)
-                new_v_scale = v_reshaped.abs().max(dim=1).values.clamp(min=1e-8)
+                new_sv_scale = sv_reshaped.max(dim=1).values.clamp(min=1e-8)
 
                 state["m_scale"].copy_(new_m_scale.half())
-                state["v_scale"].copy_(new_v_scale.half())
+                state["sqrt_v_scale"].copy_(new_sv_scale.half())
 
                 norm_m = (m_reshaped / new_m_scale.unsqueeze(1)).clamp(-1.0, 1.0) * 127.0
-                norm_v = (v_reshaped / new_v_scale.unsqueeze(1)).clamp(0.0, 1.0) * 127.0
+                norm_sv = (sv_reshaped / new_sv_scale.unsqueeze(1)).clamp(0.0, 1.0) * 255.0
 
                 state["m_int8"].copy_(norm_m.view(-1)[:p.numel()].to(torch.int8))
-                state["v_int8"].copy_(norm_v.view(-1)[:p.numel()].to(torch.int8))
+                state["sqrt_v_uint8"].copy_(norm_sv.view(-1)[:p.numel()].to(torch.uint8))
 
                 # Compute step update with bias correction
                 bias_correction1 = 1.0 - beta1 ** step

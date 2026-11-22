@@ -20,10 +20,13 @@ from weft.lean_verifier import Lean4Verifier
 class ContinuousDistillationDaemon:
     def __init__(
         self,
-        checkpoint_dir: str = "/run/media/akarta/AI/checkpoints/aligned_head",
+        checkpoint_dir: str = None,
         lean_verifier: Optional[Lean4Verifier] = None,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
     ):
+        if checkpoint_dir is None:
+            models_root = os.environ.get("WEFT_CHECKPOINTS_ROOT", "/run/media/akarta/AI/checkpoints")
+            checkpoint_dir = os.path.join(models_root, "aligned_head")
         self.checkpoint_dir = checkpoint_dir
         self.device = device
         self.lean_verifier = lean_verifier or Lean4Verifier()

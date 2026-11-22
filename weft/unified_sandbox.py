@@ -1,8 +1,8 @@
 """
 WEFT-2 Unified Sandboxed Agent Environment (Code + Tools + System).
 
-Unifies Python script execution, tool calling, and sandboxed system command simulation
-into a single agent runtime interface.
+Unifies Python script execution, tool calling, and command execution into a single agent runtime interface.
+NOTE: This in-process executor is intended for trusted agent helper evaluation, not hostile code isolation.
 """
 
 import sys

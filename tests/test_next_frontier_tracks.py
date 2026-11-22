@@ -85,3 +85,26 @@ def test_asymmetric_speculator():
 
     accepted_ids, count = spec.verify_tokens(candidate_ids, 3, mock_verify_fn)
     assert accepted_ids.shape[0] == 1
+
+
+def test_quantized_8bit_adamw_numerical_parity():
+    from weft.optimizers import Quantized8BitAdamW
+
+    torch.manual_seed(0)
+    p1 = torch.randn(2048, requires_grad=True)
+    p2 = p1.clone().detach().requires_grad_(True)
+
+    opt_q = Quantized8BitAdamW([p1], lr=1e-3)
+    opt_ref = torch.optim.AdamW([p2], lr=1e-3)
+
+    for _ in range(50):
+        grad = torch.randn(2048) * (10.0 ** torch.linspace(-3, 0, 2048))
+        p1.grad = grad.clone()
+        p2.grad = grad.clone()
+        opt_q.step()
+        opt_ref.step()
+
+    diff = (p1 - p2).abs()
+    assert diff.max().item() < 0.05, f"Max diff {diff.max().item()} exceeds tolerance"
+    assert diff.mean().item() < 0.005, f"Mean diff {diff.mean().item()} exceeds tolerance"
+

@@ -1,7 +1,8 @@
 """
 Benchmark and validation tool for evaluating sub-bit quantized foundation models.
-Supports evaluating perplexity proxies and reconstruction fidelity (cosine similarity,
-Frobenius norm error, and top-k logit agreement) against synthetic or sampled prompts.
+Supports evaluating numerical stability and activation energy gain across model layers,
+as well as relative reconstruction fidelity (Frobenius error, cosine similarity) against
+unquantized reference weights when provided.
 """
 
 import argparse
@@ -22,9 +23,11 @@ def evaluate_layer_reconstruction(
     layer_name: str,
     batch_size: int = 4,
     seq_len: int = 64,
+    reference_weight: torch.Tensor = None,
 ) -> Dict[str, float]:
     """
-    Evaluates forward layer numerical stability and activation norm conservation.
+    Evaluates forward layer numerical stability, activation energy gain, and optionally
+    relative Frobenius error and cosine similarity against reference unquantized weights.
     """
     if layer_name not in model.layer_metadata:
         raise KeyError(f"Layer {layer_name} not found in model.")
@@ -47,7 +50,7 @@ def evaluate_layer_reconstruction(
     has_nans = bool(torch.isnan(out).any().item())
     has_infs = bool(torch.isinf(out).any().item())
 
-    return {
+    res = {
         "layer": layer_name,
         "in_features": in_features,
         "out_features": out_features,
@@ -55,6 +58,18 @@ def evaluate_layer_reconstruction(
         "energy_gain": float(energy_gain),
         "is_numerically_stable": not (has_nans or has_infs),
     }
+
+    if reference_weight is not None:
+        with torch.no_grad():
+            ref_out = torch.nn.functional.linear(x, reference_weight.float())
+            rel_frob = (torch.linalg.norm(out - ref_out) / torch.linalg.norm(ref_out).clamp_min(1e-6)).item()
+            cos_sim = torch.nn.functional.cosine_similarity(
+                out.reshape(-1), ref_out.reshape(-1), dim=0
+            ).item()
+            res["relative_frobenius_error"] = float(rel_frob)
+            res["cosine_similarity"] = float(cos_sim)
+
+    return res
 
 
 def evaluate_model_health(model_dir: str) -> Dict[str, Any]:

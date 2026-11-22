@@ -80,7 +80,7 @@ def benchmark_model_inference(
         "mean_layer_latency_ms": mean_layer_latency_ms,
         "tokens_per_second": tok_per_sec,
         "generated_token_count": int(generated_tokens.shape[1]),
-        "all_layers_healthy": True,
+        "all_layers_healthy": not (torch.isnan(sample_input).any() or torch.isinf(sample_input).any()),
     }
     return report
 

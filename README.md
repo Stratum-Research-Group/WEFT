@@ -4,7 +4,7 @@
 
 # WEFT: Windowed Exponentially-decayed Factorized Tensor Attention
 
-**Developed by the Stratum Research Group | Release v2.0.0 (589M MoE + Titans + MLA)**
+**Developed by the Stratum Research Group | Release v3.9.0 (589M MoE + Titans + MLA)**
 
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1%2B-ee4c2c.svg)](https://pytorch.org/)
 [![Triton](https://img.shields.io/badge/Triton-3.9%2B-blue.svg)](https://github.com/openai/triton)
@@ -431,7 +431,7 @@ pytest tests/
 
 # Or run specific test targets:
 # 1. WEFT-2 589M MoE, Titans, and MLA architecture verification
-pytest tests/test_weft2_architecture.py
+pytest tests/test_weft_hf.py
 
 # 2. Triton fused backward kernel autograd (all derivatives in SRAM)
 pytest tests/test_fused_bwd.py

@@ -13,7 +13,7 @@ authors = [
 ]
 keywords = ["deep-learning", "linear-attention", "triton", "titans", "moe", "transformers", "pytorch"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",

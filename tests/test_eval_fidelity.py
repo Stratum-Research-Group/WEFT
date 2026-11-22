@@ -36,6 +36,8 @@ def test_eval_layer_stability_synthetic(tmp_path):
     container.save(str(shard_path))
 
     model = UniversalSubBitModel([str(shard_path)])
-    res = evaluate_layer_reconstruction(model, "test.weight", batch_size=2, seq_len=16)
+    res = evaluate_layer_reconstruction(model, "test.weight", batch_size=2, seq_len=16, reference_weight=W)
     assert res["is_numerically_stable"] is True
     assert res["energy_gain"] > 0.0
+    assert "relative_frobenius_error" in res
+    assert res["cosine_similarity"] > 0.5

@@ -1,3 +1,7 @@
+import os
+import shutil
+import pytest
+pytestmark = pytest.mark.skipif(shutil.which("lean") is None and not os.path.exists(os.path.expanduser("~/.elan/bin/lean")), reason="Lean 4 compiler not installed")
 """
 Tests for Lean 4 Formal Verification & Recursive Self-Improvement Engine.
 """

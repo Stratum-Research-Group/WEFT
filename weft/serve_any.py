@@ -27,7 +27,7 @@ class UniversalSubBitModel(nn.Module):
     def _load_shards(self) -> None:
         for shard_path in self.shard_paths:
             if not os.path.exists(shard_path):
-                continue
+                raise FileNotFoundError(f"Sub-bit shard file not found: {shard_path}")
             container = WeftModelContainer.load(shard_path)
             for tensor_name in container.tensors.keys():
                 layer = container.get_subbit_linear(tensor_name)
@@ -116,10 +116,16 @@ class UniversalSubBitModel(nn.Module):
         for name, meta in self.layer_metadata.items():
             in_f = meta["in_features"]
             out_f = meta["out_features"]
-            r = meta["rank"]
             params = in_f * out_f
-            bits = (in_f * r) + (out_f * r) + (r * 16)
             total_params += params
+            sanitized = meta["sanitized_name"]
+            if sanitized in self.layers:
+                layer = self.layers[sanitized]
+                # bits_per_weight returns bits / params
+                bits = int(round(layer.bits_per_weight() * params))
+            else:
+                r = meta["rank"]
+                bits = (in_f * r) + (out_f * r) + (r * 16)
             total_bits += bits
         effective_bpw = (total_bits / total_params) if total_params > 0 else 0.0
         return {

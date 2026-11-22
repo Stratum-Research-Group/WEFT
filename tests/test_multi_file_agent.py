@@ -36,3 +36,21 @@ def test_multi_file_agent_workflow(tmp_path):
     assert solve_res["success"] is True
     assert solve_res["turns_used"] == 1
     assert "return a * b" in agent.read_file(lib_file)
+
+
+def test_multi_file_agent_path_traversal_guard(tmp_path):
+    repo = tmp_path / "sample_repo"
+    repo.mkdir()
+    outside_file = tmp_path / "secret.txt"
+    outside_file.write_text("secret_data")
+
+    agent = MultiFileCodebaseAgent(str(repo))
+
+    # Attempting to read outside repo must return None
+    assert agent.read_file("../secret.txt") is None
+    assert agent.read_file("/etc/passwd") is None
+
+    # Attempting to write outside repo must return False and not write
+    assert agent.write_file("../pwned.txt", "exploit") is False
+    assert not (tmp_path / "pwned.txt").exists()
+

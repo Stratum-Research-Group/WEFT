@@ -97,16 +97,22 @@ def analyze_pareto_frontier(
     rank_options: List[int] = [16, 32, 64, 128],
 ) -> Dict[str, Any]:
     """
-    Profiles the Pareto trade-off between bits-per-weight and relative reconstruction error.
+    Profiles the Pareto trade-off between bits-per-weight and relative reconstruction error
+    by factorizing the input weight matrix W across ranks and ternary configurations.
     """
+    from weft.converter import factorize_linear_layer
+
     m, n = W.shape
     x_test = torch.randn(4, 16, n)
     y_ref = x_test @ W.t().float()
 
     frontier = []
     for r in rank_options:
-        # 1. Pure sub-bit
+        # 1. Pure sub-bit factorized from W
+        subbit_layer = factorize_linear_layer(W, base_rank=r, adaptive_rank=False, num_paths=2)
         l_sub = HybridMultiBitLinear(in_features=n, out_features=m, rank=r, use_ternary_residual=False)
+        l_sub.subbit_base = subbit_layer
+
         y_pred = l_sub(x_test).float()
         err = (torch.norm(y_pred - y_ref) / torch.norm(y_ref)).item()
         frontier.append({
@@ -116,8 +122,40 @@ def analyze_pareto_frontier(
             "relative_l2_error": err,
         })
 
-        # 2. Hybrid sub-bit + ternary
+        # 2. Hybrid sub-bit + ternary residual
         l_hyb = HybridMultiBitLinear(in_features=n, out_features=m, rank=r, use_ternary_residual=True)
+        l_hyb.subbit_base = subbit_layer
+
+        # Fit ternary residual: T = quantize(W - W_subbit)
+        with torch.no_grad():
+            W_sub_approx = torch.zeros(m, n)
+            for p in range(subbit_layer.num_paths):
+                u = subbit_layer.unpack_bitboard(subbit_layer.u_packed[p], subbit_layer.rank).float()
+                v = subbit_layer.unpack_bitboard(subbit_layer.v_packed[p], subbit_layer.rank).float()
+                h = subbit_layer.scale_h[p].float().unsqueeze(1)
+                l = subbit_layer.scale_l[p].float()
+                g = subbit_layer.scale_g[p].float().unsqueeze(0)
+                W_sub_approx += (h * (u * l.unsqueeze(0) @ v.t())) * g
+
+            residual = W.float() - W_sub_approx
+            scale = residual.abs().mean().clamp_min(1e-4)
+            ternary_float = torch.round(residual / scale).clamp(-1.0, 1.0)
+            l_hyb.ternary_scale.data.copy_(scale)
+
+            # Pack into 2-bit words (00->0, 01->+1, 10->-1)
+            codes = torch.zeros(m, n, dtype=torch.int32)
+            codes[ternary_float == 1.0] = 1
+            codes[ternary_float == -1.0] = 2
+
+            words_per_row = (n + 15) // 16
+            packed = torch.zeros(m, words_per_row, dtype=torch.int32)
+            for w_idx in range(words_per_row):
+                for b_idx in range(16):
+                    c_idx = w_idx * 16 + b_idx
+                    if c_idx < n:
+                        packed[:, w_idx] |= (codes[:, c_idx] << (b_idx * 2))
+            l_hyb.ternary_packed.data.copy_(packed)
+
         y_hyb = l_hyb(x_test).float()
         err_hyb = (torch.norm(y_hyb - y_ref) / torch.norm(y_ref)).item()
         frontier.append({

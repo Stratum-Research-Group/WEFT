@@ -33,14 +33,20 @@ class MultiFileCodebaseAgent:
         return sorted(matched)
 
     def read_file(self, rel_path: str) -> Optional[str]:
-        full = os.path.join(self.repo_dir, rel_path)
+        # Path traversal guard: ensure path is strictly within repo_dir
+        full = os.path.abspath(os.path.join(self.repo_dir, rel_path))
+        if not full.startswith(self.repo_dir + os.sep) and full != self.repo_dir:
+            return None
         if not os.path.isfile(full):
             return None
         with open(full, "r", encoding="utf-8", errors="replace") as f:
             return f.read()
 
     def write_file(self, rel_path: str, content: str) -> bool:
-        full = os.path.join(self.repo_dir, rel_path)
+        # Path traversal guard: ensure path is strictly within repo_dir
+        full = os.path.abspath(os.path.join(self.repo_dir, rel_path))
+        if not full.startswith(self.repo_dir + os.sep) and full != self.repo_dir:
+            return False
         try:
             os.makedirs(os.path.dirname(full), exist_ok=True)
             with open(full, "w", encoding="utf-8") as f:

@@ -52,7 +52,7 @@ class WeftVLLMDraftPlugin(nn.Module):
         # Load weights if checkpoint exists and dimensions match
         if checkpoint_path and os.path.exists(checkpoint_path):
             try:
-                ckpt = torch.load(checkpoint_path, map_location=device)
+                ckpt = torch.load(checkpoint_path, map_location=device, weights_only=True)
                 if "student" in ckpt:
                     self.student.load_state_dict(ckpt["student"])
                 if "bridge" in ckpt:
@@ -62,8 +62,10 @@ class WeftVLLMDraftPlugin(nn.Module):
                         self.bridge_fc2.weight.data.copy_(b_sd["fc2.weight"].to(device))
                 self.eval()
             except Exception as e:
-                # If dimensions in custom initialization differ from stored checkpoint, initialize randomly
-                pass
+                import logging
+                logging.getLogger(__name__).warning(
+                    f"Failed to load draft checkpoint from {checkpoint_path}: {e}. Falling back to randomly initialized draft model."
+                )
 
     def forward_draft_step(
         self,

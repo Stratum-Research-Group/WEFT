@@ -17,6 +17,13 @@ from weft.async_tokenizer_pipeline import AsyncTokenizerPipeline
 
 @pytest.mark.anyio
 async def test_milestone_100_unified_pipeline():
+    import os
+    from pathlib import Path
+    models_root = Path(os.environ.get("WEFT_MODELS_ROOT", "/run/media/akarta/AI/models"))
+    tokenizer_dir = models_root / "gemma-4-E2B-it"
+    if not tokenizer_dir.exists():
+        pytest.skip(f"Tokenizer directory {tokenizer_dir} does not exist.")
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     
     # 1. Initialize components

@@ -1,10 +1,15 @@
+import os
+from pathlib import Path
 import pytest
 import torch
 from weft.vlm_runner import SubBitVLMRunner
 
 def test_vlm_runner_end_to_end():
-    weft_path = "/run/media/akarta/AI/models/lfm3-vl-2b-subbit/model_subbit.weft"
-    runner = SubBitVLMRunner(weft_path)
+    models_root = Path(os.environ.get("WEFT_MODELS_ROOT", "/run/media/akarta/AI/models"))
+    weft_path = models_root / "lfm3-vl-2b-subbit" / "model_subbit.weft"
+    if not weft_path.exists():
+        pytest.skip(f"Shard file {weft_path} does not exist.")
+    runner = SubBitVLMRunner(str(weft_path))
     assert runner.proj1 is not None
     assert runner.proj2 is not None
 

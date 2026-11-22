@@ -14,7 +14,8 @@ from scripts.benchmark_ternary_speculation import load_ternary_weights_into_mode
 from scripts.quantize_distilled_to_bitnet import quantize_weight_ternary
 
 
-TERNARY_CKPT = "/run/media/akarta/AI/checkpoints/deep_distill/student_ternary_bitweft.pt"
+ckpt_root = os.environ.get("WEFT_CHECKPOINTS_ROOT", "/run/media/akarta/AI/checkpoints")
+TERNARY_CKPT = os.path.join(ckpt_root, "deep_distill", "student_ternary_bitweft.pt")
 
 
 def test_quantize_weight_ternary():

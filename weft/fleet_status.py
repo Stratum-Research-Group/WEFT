@@ -5,31 +5,34 @@ sub-bit quantization streams and consolidated foundation deployments.
 
 import os
 import glob
+import json
 import time
 import argparse
 from typing import Dict, Any, List
 
 
-def inspect_fleet_status(models_root: str = "/run/media/akarta/AI/models") -> Dict[str, Any]:
+def inspect_fleet_status(models_root: str = None) -> Dict[str, Any]:
+    if models_root is None:
+        models_root = os.environ.get("WEFT_MODELS_ROOT", "/run/media/akarta/AI/models")
     models = {
         "llama-3.3-70b-subbit": {
             "name": "Llama-3.3-70B-Instruct",
-            "total_shards": 30,
+            "default_total_shards": 30,
             "raw_fp16_gb": 140.0,
         },
         "qwen-2.5-72b-subbit": {
             "name": "Qwen-2.5-72B-Instruct",
-            "total_shards": 37,
+            "default_total_shards": 37,
             "raw_fp16_gb": 145.0,
         },
         "goedel-prover-32b-subbit": {
             "name": "Goedel-Prover-V2-32B",
-            "total_shards": 8,
+            "default_total_shards": 8,
             "raw_fp16_gb": 64.0,
         },
         "lfm3-vl-2b-subbit": {
             "name": "LiquidAI/LFM3-VL-2B",
-            "total_shards": 1,
+            "default_total_shards": 1,
             "raw_fp16_gb": 3.84,
         },
     }
@@ -48,11 +51,25 @@ def inspect_fleet_status(models_root: str = "/run/media/akarta/AI/models") -> Di
         gguf_mb = sum(os.path.getsize(p) for p in gguf_files) / 1e6
 
         completed_shards = len(weft_files)
-        total_shards = meta["total_shards"]
-        pct_complete = (completed_shards / total_shards) * 100
+
+        # Dynamic shard discovery from index manifest when present
+        total_shards = meta.get("default_total_shards", max(completed_shards, 1))
+        index_file = os.path.join(model_path, "model.safetensors.index.json")
+        if os.path.exists(index_file):
+            try:
+                with open(index_file, "r") as f:
+                    idx_data = json.load(f)
+                weight_map = idx_data.get("weight_map", {})
+                discovered_shards = len(set(weight_map.values()))
+                if discovered_shards > 0:
+                    total_shards = discovered_shards
+            except Exception:
+                pass
+
+        pct_complete = (completed_shards / max(total_shards, 1)) * 100
 
         # Estimated parameters
-        ratio = completed_shards / total_shards
+        ratio = completed_shards / max(total_shards, 1)
         processed_gb = meta["raw_fp16_gb"] * ratio
         compression_ratio = (processed_gb * 1000) / max(total_weft_mb, 1e-3)
 

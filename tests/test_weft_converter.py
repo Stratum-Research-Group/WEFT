@@ -68,3 +68,42 @@ def test_convert_model_to_weft_roundtrip():
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+
+def test_factorization_reconstruction_least_squares_convergence():
+    """Verify that least-squares scale fitting achieves bounded relW and monotonically decreases error across paths."""
+    torch.manual_seed(1)
+    m, n, rank = 256, 256, 32
+    gamma = 0.8
+    U, _ = torch.linalg.qr(torch.randn(m, m))
+    V, _ = torch.linalg.qr(torch.randn(n, n))
+    k = torch.arange(1, min(m, n) + 1).float()
+    S = k ** (-gamma)
+    W = (U * S.unsqueeze(0)) @ V.t()
+
+    def get_reconstructed(layer):
+        W_rec = torch.zeros(layer.out_features, layer.in_features)
+        for p in range(layer.num_paths):
+            u = layer.unpack_bitboard(layer.u_packed[p], layer.rank).float()
+            v = layer.unpack_bitboard(layer.v_packed[p], layer.rank).float()
+            h = layer.scale_h[p].float().unsqueeze(1)
+            l = layer.scale_l[p].float()
+            g = layer.scale_g[p].float().unsqueeze(0)
+            W_rec += (h * (u * l.unsqueeze(0) @ v.t())) * g
+        return W_rec
+
+    layer_1p = factorize_linear_layer(W, base_rank=rank, adaptive_rank=False, num_paths=1, itq_iterations=10)
+    layer_2p = factorize_linear_layer(W, base_rank=rank, adaptive_rank=False, num_paths=2, itq_iterations=10)
+
+    W_rec_1p = get_reconstructed(layer_1p)
+    W_rec_2p = get_reconstructed(layer_2p)
+
+    norm_W = torch.norm(W)
+    rel_1p = (torch.norm(W - W_rec_1p) / norm_W).item()
+    rel_2p = (torch.norm(W - W_rec_2p) / norm_W).item()
+
+    # RelW must be strictly bounded below 1.0 (better than zero-output) and decrease across paths
+    assert rel_1p < 0.85, f"1-path relW {rel_1p} unexpectedly high"
+    assert rel_2p < 0.70, f"2-path relW {rel_2p} unexpectedly high"
+    assert rel_2p < rel_1p, f"2-path relW ({rel_2p}) must improve over 1-path ({rel_1p})"
+

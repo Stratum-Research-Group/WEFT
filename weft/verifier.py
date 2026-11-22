@@ -2,6 +2,12 @@
 Subprocess-Isolated Deterministic Rule & Code Execution Verifiers for WEFT RLVR.
 Adapted from AETHER-1 / RLVR engine (Specification v1.1.0).
 
+NOTE ON SECURITY & THREAT MODEL:
+This module is designed for trusted evaluation of model completions in cooperative RLVR
+training (reward signal). It is not an adversarial security sandbox. Untrusted or malicious
+code execution requires an external containerized or microVM sandbox with resource limits,
+network isolation, and read-only filesystem mounts.
+
 Performs objective, deterministic verification of student completions without teacher bias:
 1. Python Code Execution: Runs code snippets against hidden unit test assertions in a subprocess.
 2. Mathematical Proof / Numerical Extraction: Resolves \\boxed{} and #### delimiters, verifies exact parity.

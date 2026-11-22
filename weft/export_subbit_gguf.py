@@ -1,8 +1,11 @@
 """
-WEFT to GGUF Export Bridge:
-Converts .weft binary model containers into GGUF files compatible with llama.cpp.
-Maps packed uint32 bitboards and scale vectors into custom GGUF tensor arrays.
+WEFT Sub-Bit GGUF-Framed Export Container:
+Converts .weft binary model containers into a GGUF-framed binary file container.
+Maps packed uint32 bitboards and scale vectors into framed tensor arrays.
 Includes auto-consolidation directory watcher.
+
+NOTE: This writes a custom GGUF-framed serialization container for WEFT sub-bit tensors.
+Direct execution in stock llama.cpp requires custom WEFT dequantization kernels.
 """
 
 import os
@@ -35,7 +38,10 @@ def export_multiple_weft_to_gguf(weft_paths: List[str], output_gguf_path: str):
     assert len(containers) > 0, "No valid .weft files provided."
 
     print(f"Consolidating {len(containers)} shards into GGUF at {output_gguf_path}...")
-    total_tensors = sum(len(c.tensors) for c in containers) * 5
+    total_tensors = sum(
+        sum(tdata.get("num_paths", 1) * 5 for tdata in c.tensors.values())
+        for c in containers
+    )
     kv_count = 2
 
     # Write to a temporary file first for atomic swap

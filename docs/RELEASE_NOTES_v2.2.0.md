@@ -46,5 +46,5 @@ We are proud to announce **Release v2.2.0** of the WEFT (Windowed Exponentially-
 
 ## 🧪 Verification Matrix
 - **PyTest Suite:** **58 passed, 1 skipped, 0 failed** across 15 test suites.
-- **Formal Invariant Grounding:** Formally proved in Lean 4 (`formal/NetworkStatements.lean`).
+- **Formal Invariant Grounding:** Formally verified in Lean 4 (`formal/NetworkStatements.lean`: Theorem 1 proved; Theorem 2 stated as recurrence geometric bound axiom).
 - **Hardware Testbed:** NVIDIA GeForce RTX 5060 Ti (16 GB GDDR7, CUDA 13.5, Driver 620.70.06).

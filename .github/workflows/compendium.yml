@@ -1,0 +1,65 @@
+name: Research Compendium & Formal Verification
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install UV and Python Dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv sync
+
+      - name: Run Lean 4 Property Test Suite
+        run: |
+          uv run pytest tests/test_lean_*.py
+
+      - name: Verify All 38 Research Paper Artifacts
+        run: |
+          python3 -c "
+          from pathlib import Path
+          paper_dirs = sorted([d for d in Path('papers').iterdir() if d.is_dir() and d.name != 'compendium'])
+          missing = []
+          for d in paper_dirs:
+              for f in ['paper.md', 'paper.tex', 'paper.pdf']:
+                  target = d / f
+                  if not target.exists() or target.stat().st_size == 0:
+                      missing.append(str(target))
+          if missing:
+              print('Missing or empty paper artifacts:', missing)
+              exit(1)
+          print(f'All {len(paper_dirs)} papers have valid 3-way format parity (md, tex, pdf)!')
+          "
+
+      - name: Rebuild and Verify Grand Compendium
+        run: |
+          python3 -c "
+          import subprocess
+          from pathlib import Path
+          paper_dirs = sorted([d for d in Path('papers').iterdir() if d.is_dir() and d.name != 'compendium'],
+                              key=lambda x: int(x.name.split('_')[0]))
+          pdf_list = [str(d / 'paper.pdf') for d in paper_dirs]
+          out_pdf = 'papers/compendium/WEFT_Research_Compendium_Papers_1_to_38.pdf'
+          res = subprocess.run(['qpdf', '--empty', '--pages'] + pdf_list + ['--', out_pdf], capture_output=True, text=True)
+          if res.returncode != 0:
+              print('qpdf error:', res.stderr)
+              exit(1)
+          print(f'Grand Compendium rebuilt successfully with {len(pdf_list)} papers.')
+          "

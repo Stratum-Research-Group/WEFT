@@ -177,11 +177,14 @@ def convert_model_to_weft(
     base_rank: int = 64,
     adaptive_rank: bool = True,
     compress_entropy: bool = False,
-):
+    certify_intervals: bool = False,
+) -> Tuple[WeftModelContainer, Optional[Dict[str, Any]]]:
     """
     Converts a state dict of linear projections into a native .weft binary file.
+    If certify_intervals is True, compiles a comprehensive Mathematical Robustness Certificate.
     """
     container = WeftModelContainer(metadata=config)
+    certificate = {} if certify_intervals else None
 
     for key, weight in state_dict.items():
         if key.endswith(".weight") and weight.ndim == 2:
@@ -189,13 +192,40 @@ def convert_model_to_weft(
             bias_key = layer_name + ".bias"
             bias = state_dict.get(bias_key, None)
 
-            subbit_layer = factorize_linear_layer(
-                weight,
-                bias=bias,
-                base_rank=base_rank,
-                adaptive_rank=adaptive_rank,
-            )
+            if certify_intervals:
+                subbit_layer, cert_info = factorize_linear_layer(
+                    weight,
+                    bias=bias,
+                    base_rank=base_rank,
+                    adaptive_rank=adaptive_rank,
+                    certify_intervals=True,
+                )
+                certificate[layer_name] = cert_info
+            else:
+                subbit_layer = factorize_linear_layer(
+                    weight,
+                    bias=bias,
+                    base_rank=base_rank,
+                    adaptive_rank=adaptive_rank,
+                    certify_intervals=False,
+                )
             container.add_subbit_linear(layer_name, subbit_layer)
 
     container.save(output_filepath, compress_entropy=compress_entropy)
-    return container
+
+    if certify_intervals and certificate:
+        cert_path = output_filepath.rsplit(".", 1)[0] + "_certificate.json"
+        summary = {
+            "total_layers_certified": len(certificate),
+            "all_strictly_bounded_below_one": all(
+                c["is_strictly_bounded_below_one"] for c in certificate.values() if c is not None
+            ),
+            "max_certified_upper_bound": max(
+                c["certified_upper_bound"] for c in certificate.values() if c is not None
+            ) if certificate else 0.0,
+            "layers": certificate,
+        }
+        with open(cert_path, "w") as f:
+            json.dump(summary, f, indent=2)
+
+    return container, certificate if certify_intervals else None

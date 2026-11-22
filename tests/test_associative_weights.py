@@ -6,6 +6,7 @@ import torch
 import pytest
 from weft.associative_weight import WeftAssociativeWeight
 from weft.optimizers import Quantized8BitAdamW, Muon
+from weft.kernels.chunk_scan_pt import chunk_gated_recurrent_forward_pt
 
 
 def test_associative_weight_forward_backward():
@@ -55,3 +56,20 @@ def test_muon_optimizer_step():
 
     final_loss = (w ** 2).sum().item()
     assert final_loss < initial_loss, f"Loss did not decrease: {initial_loss} -> {final_loss}"
+
+
+def test_chunk_scan_lyapunov_stability_guard():
+    torch.manual_seed(42)
+    b, s, h, d, r = 2, 128, 2, 32, 8
+    x = torch.randn(b, s, h, d) * 20.0
+    k = torch.randn(b, s, h, r)
+    v = torch.randn(b, s, h, r)
+    decay = torch.zeros(h, r)
+
+    max_energy = 25.0
+    out, final_state = chunk_gated_recurrent_forward_pt(
+        x, k, v, decay, chunk_size=32, lyapunov_max_energy=max_energy
+    )
+    energy = torch.linalg.norm(final_state, dim=(-2, -1))
+    assert energy.max().item() <= max_energy + 1e-4
+    assert not torch.isnan(out).any()

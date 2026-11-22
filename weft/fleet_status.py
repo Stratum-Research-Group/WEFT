@@ -27,7 +27,7 @@ def inspect_fleet_status(models_root: str = None) -> Dict[str, Any]:
         },
         "goedel-prover-32b-subbit": {
             "name": "Goedel-Prover-V2-32B",
-            "default_total_shards": 8,
+            "default_total_shards": 14,
             "raw_fp16_gb": 64.0,
         },
         "lfm3-vl-2b-subbit": {

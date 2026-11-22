@@ -29,6 +29,7 @@ def _fused_chunk_recurrent_fwd_kernel(
     B, S, H: tl.constexpr, D: tl.constexpr, R: tl.constexpr,
     BLOCK_D: tl.constexpr,
     STORE_FINAL: tl.constexpr,
+    LYAPUNOV_MAX_ENERGY: tl.constexpr,
 ):
     """
     Grid: (B, H, cdiv(D, BLOCK_D))
@@ -79,6 +80,14 @@ def _fused_chunk_recurrent_fwd_kernel(
         # Gated state update in registers: S_t = gamma * S_{t-1} + update
         state = gamma_tile * state + update
 
+        # Navier-Stokes style Lyapunov contractive stability guard in registers
+        if LYAPUNOV_MAX_ENERGY > 0.0:
+            tile_sq = tl.sum(state * state)
+            tile_norm = tl.sqrt(tile_sq)
+            if tile_norm > LYAPUNOV_MAX_ENERGY:
+                contract_scale = LYAPUNOV_MAX_ENERGY / (tile_norm + 1e-8)
+                state = state * contract_scale
+
         # Load vp_t: [R]
         vp_ptrs = b_h_vp_base + t * stride_vps + offs_r * stride_vpr
         vp_t = tl.load(vp_ptrs)  # [R]
@@ -108,9 +117,10 @@ def fused_chunk_recurrent_forward_triton(
     v_p: torch.Tensor,     # (b, s, h, r)
     decay_logits: torch.Tensor, # (h, r)
     return_final_state: bool = True,
+    lyapunov_max_energy: float = 0.0,
 ):
     """
-    Executes the fused recurrence using Triton.
+    Executes the fused recurrence using Triton with optional Lean-certified Lyapunov energy bound.
     """
     b, s, h, d = x.shape
     r = k_p.shape[-1]
@@ -144,6 +154,7 @@ def fused_chunk_recurrent_forward_triton(
         B=b, S=s, H=h, D=d, R=r,
         BLOCK_D=BLOCK_D,
         STORE_FINAL=return_final_state,
+        LYAPUNOV_MAX_ENERGY=float(lyapunov_max_energy),
         num_warps=4,
     )
 

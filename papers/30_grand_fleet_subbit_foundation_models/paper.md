@@ -1,6 +1,6 @@
 # The Grand Fleet of Sub-Bit Foundation Models: Pushing Frontier 70B+ LLMs Below 0.02 BPW with Certified Mathematical Invariants
 
-**Antigravity Autonomous Research Team**  
+**Stratum Research Group**  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

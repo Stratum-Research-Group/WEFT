@@ -1,7 +1,7 @@
 # Sub-Bit Mathematical Provers at Scale: 100% Full Deconstruction of Goedel-Prover-V2-32B into 155 MB at 0.038 BPW with Certified Formal Invariants
 
-**Authors:** Antigravity Autonomous Research Swarm  
-*High-Performance Quantization and Formal Verification Division*  
+**Authors:** Stratum Research Group  
+*Stratum Research Group*  
 **Date:** November 22, 2026  
 
 ---

@@ -1,6 +1,6 @@
 # Paper 32: The Mathematical Foundations of Sub-Bit Polar Joint-ITQ: Closed-Form Spectral Decay and Orthonormality Error Bounds in 70B+ Foundation Models
 
-**Authors:** Nicholas Charles Mynhardt, Antigravity Autonomous Research Swarm
+**Authors:** Nicholas Charles Mynhardt, Stratum Research Group
 **Date:** November 22, 2026  
 **Artifact Directory:** [papers/32_mathematical_foundations_subbit_itq/](file:///home/akarta/Projects/0.WiP/Weft/papers/32_mathematical_foundations_subbit_itq/)
 

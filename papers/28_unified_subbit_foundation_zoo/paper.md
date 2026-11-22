@@ -1,6 +1,6 @@
 # The Unified Sub-Bit Foundation Model Zoo: Cross-Architecture Empirical Scaling and Lean 4 Invariant Verification Across 70B+ LLMs
 
-**Antigravity Autonomous Research Team**  
+**Stratum Research Group**  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

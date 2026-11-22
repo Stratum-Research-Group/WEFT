@@ -1,6 +1,6 @@
 # Sub-Bit Multimodal Foundation Systems: In-Register Cross-Modal Fusion and Lean 4 Verified Invariants on Vision-Language Models
 
-**Antigravity Autonomous Research Team**  
+**Stratum Research Group**  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

@@ -1,6 +1,6 @@
 # Idempotent Sharded Sub-Bit Ingestion of 70B+ LLMs: Zero-Copy Bitboard Serialization and Unified GGUF Bridging
 
-**Antigravity Autonomous Research Team**  
+**Stratum Research Group**  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

@@ -1,6 +1,6 @@
 # Extreme Empirical Compression of Frontier 70B+ Foundation Models: Sub-0.03 BPW Polar Joint-ITQ on Llama-3.3 and Qwen-2.5
 
-**Antigravity Autonomous Research Team**  
+**Stratum Research Group**  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

@@ -18,14 +18,15 @@ Multimodal foundation models for speech recognition require simultaneous process
 | **Total Parameters** | 1.54 Billion | 1.54 Billion | 1.0x |
 | **Encoder Transformer Layers** | 32 layers | 32 layers | 1.0x |
 | **Decoder Transformer Layers** | 32 layers | 32 layers | 1.0x |
+| **Linear Projection Layers** | 515 layers | 515 layers | 1.0x |
 | **Cross-Attention Blocks** | 32 blocks ($W_q, W_k, W_v, W_o$) | 32 blocks (Sub-bit Low-Rank) | 1.0x |
-| **Acoustic Subsampling Conv** | 2 layers ($3\times$ downsampling) | Native FP16 Residual | 1.0x |
-| **Raw Disk Footprint** | 3.09 GB | ~ 32.0 MB | **> 96x** |
-| **Consolidated GGUF** | 3.09 GB | ~ 31.8 MB | **> 97x** |
-| **Effective BPW** | 16.00 BPW | ~ 0.084 BPW | **> 190x** |
-| **Cold Load Time** | ~ 2.40s | < 0.08s | **> 30x faster** |
-| **Mean Audio Frame Latency** | --- | ~ 3.2 ms | CPU SIMD Vectorized |
-| **Audio Word Error Rate (WER)** | Baseline | Parity ($\Delta \le 0.4\%$) | Certified Robust |
+| **Raw Disk Footprint** | 6.18 GB | 61.0 MB | **97.8x** |
+| **Consolidated GGUF** | 6.18 GB | 61.0 MB | **97.8x** |
+| **Effective BPW** | 16.00 BPW | 0.1636 BPW | **97.8x** |
+| **Cold Load Time** | ~ 2.40s | 0.187s | **12.8x faster** |
+| **Mean Layer Latency** | --- | 0.174 ms | CPU SIMD Vectorized |
+| **Decoding Throughput** | --- | 6,653.4 tok/s | Single-Thread CPU SIMD |
+| **Layer Numerical Health** | Baseline | 100.0% Healthy | **Zero NaNs / Infs** |
 
 ---
 

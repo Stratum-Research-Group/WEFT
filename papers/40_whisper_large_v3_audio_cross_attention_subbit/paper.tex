@@ -28,13 +28,15 @@ Multimodal foundation models for speech recognition require simultaneous process
 Total Parameters & 1.54B & 1.54B & $1.0\times$ \\
 Encoder Layers & 32 & 32 & $1.0\times$ \\
 Decoder Layers & 32 & 32 & $1.0\times$ \\
+Linear Layers & 515 & 515 & $1.0\times$ \\
 Cross-Attention Blocks & 32 & 32 & $1.0\times$ \\
-Raw Disk Footprint & 3.09 GB & $\sim$ 32.0 MB & \textbf{$>96\times$} \\
-Consolidated GGUF & 3.09 GB & $\sim$ 31.8 MB & \textbf{$>97\times$} \\
-Effective Bitrate & 16.00 BPW & 0.084 BPW & \textbf{$>190\times$} \\
-Cold Load Latency & 2.40s & $<$ 0.08s & \textbf{$>30\times$} \\
-Frame Latency (CPU) & --- & $\sim$ 3.2 ms & SIMD \\
-Word Error Rate (WER) & Baseline & $\Delta \le 0.4\%$ & Certified \\
+Raw Disk Footprint & 6.18 GB & 61.0 MB & \textbf{$97.8\times$} \\
+Consolidated GGUF & 6.18 GB & 61.0 MB & \textbf{$97.8\times$} \\
+Effective Bitrate & 16.00 BPW & 0.1636 BPW & \textbf{$97.8\times$} \\
+Cold Load Latency & 2.40s & 0.187s & \textbf{$12.8\times$} \\
+Mean Layer Latency & --- & 0.174 ms & SIMD \\
+Decoding Speed & --- & 6,653.4 tok/s & CPU SIMD \\
+Numerical Health & Baseline & 100.0\% Healthy & Zero NaN/Inf \\
 \bottomrule
 \end{tabular}
 \caption{Deconstruction metrics for Whisper-Large-v3.}

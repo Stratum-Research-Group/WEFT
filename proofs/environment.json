@@ -1,0 +1,12 @@
+{
+  "pinned_commit": "b3db1bcb0810549cef51d7792922c8f86e963b5f",
+  "branch": "master",
+  "license": "Apache-2.0",
+  "python_version": "3.12.14",
+  "torch_version": "2.15.0+cu132",
+  "cuda_available": true,
+  "device_name": "NVIDIA GeForce RTX 5060 Ti",
+  "host_cpu": "AMD Ryzen 5 7600X 6-Core Processor (AVX-512 VPOPCNTDQ + AVX2)",
+  "total_ram_gb": 61.95,
+  "available_ram_gb": 23.48
+}

@@ -4,7 +4,7 @@
   "domain": "Analytic Number Theory",
   "conjecture_id": "F160-002",
   "rank": 1,
-  "norm_delta": 0.2431640625,
-  "created_at": 1795467660.7022774,
+  "norm_delta": 0.245849609375,
+  "created_at": 1795470005.8286526,
   "lean_verified": true
 }

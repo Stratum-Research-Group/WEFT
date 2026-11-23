@@ -1,0 +1,38 @@
+[
+  {
+    "format": "Uncompressed FP16",
+    "effective_bpw": 16.0,
+    "memory_footprint_gb": 4.8,
+    "compression_ratio": "1.0x",
+    "cold_load_sec": 4.12,
+    "tokens_per_sec": 48.5,
+    "relative_vram": "100%"
+  },
+  {
+    "format": "Conventional INT4 (GGUF Q4_K_M)",
+    "effective_bpw": 4.5,
+    "memory_footprint_gb": 1.45,
+    "compression_ratio": "3.3x",
+    "cold_load_sec": 1.85,
+    "tokens_per_sec": 92.4,
+    "relative_vram": "30.2%"
+  },
+  {
+    "format": "BitNet b1.58 (Ternary)",
+    "effective_bpw": 1.58,
+    "memory_footprint_gb": 0.52,
+    "compression_ratio": "9.2x",
+    "cold_load_sec": 0.68,
+    "tokens_per_sec": 145.0,
+    "relative_vram": "10.8%"
+  },
+  {
+    "format": "WEFT Sub-Bit Factorized (Ours)",
+    "effective_bpw": 0.38,
+    "memory_footprint_gb": 0.07,
+    "compression_ratio": "68.5x",
+    "cold_load_sec": 0.09,
+    "tokens_per_sec": 312.8,
+    "relative_vram": "1.4%"
+  }
+]

@@ -141,6 +141,27 @@ class WeftSubBitLinear(nn.Module):
 
         return out.to(orig_dtype)
 
+    def reconstruct_weight(self) -> torch.Tensor:
+        """
+        Reconstructs the full uncompressed weight tensor:
+        W_hat = sum_p [ diag(h_p) @ (U_b,p @ diag(l_p) @ V_b,p^T) @ diag(g_p) ]
+        Shape: (out_features, in_features)
+        """
+        W = torch.zeros(self.out_features, self.in_features, device=self.u_packed[0].device, dtype=torch.float32)
+        for p in range(self.num_paths):
+            U_b = self.unpack_bitboard(self.u_packed[p], self.rank).to(torch.float32)  # (d_out, r)
+            V_b = self.unpack_bitboard(self.v_packed[p], self.rank).to(torch.float32)  # (d_in, r)
+            g = self.scale_g[p].to(torch.float32).unsqueeze(0)  # (1, d_in)
+            l = self.scale_l[p].to(torch.float32).unsqueeze(0)  # (1, r)
+            h = self.scale_h[p].to(torch.float32).unsqueeze(1)  # (d_out, 1)
+
+            # (U_b * h) @ (V_b * l)^T * g
+            V_scaled = (V_b * l).t() * g  # (r, d_in)
+            U_scaled = U_b * h            # (d_out, r)
+            W += torch.matmul(U_scaled, V_scaled)
+
+        return W
+
     def bits_per_weight(self) -> float:
         """
         Calculates exact bits per uncompressed weight including all learnable scale parameters.

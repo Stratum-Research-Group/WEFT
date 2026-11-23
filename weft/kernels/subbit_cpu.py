@@ -530,6 +530,77 @@ def cpu_sliding_window_flash_attention_avx512(
     return out
 
 
+def cpu_fused_ternary_flash_attention_avx512(
+    x: torch.Tensor,
+    w_q_nz: torch.Tensor,
+    w_q_sign: torch.Tensor,
+    w_k_nz: torch.Tensor,
+    w_k_sign: torch.Tensor,
+    w_v_nz: torch.Tensor,
+    w_v_sign: torch.Tensor,
+    scales_q: torch.Tensor,
+    scales_k: torch.Tensor,
+    scales_v: torch.Tensor,
+    sm_scale: float = None
+) -> torch.Tensor:
+    """
+    Fused Sub-Bit Ternary Flash-Attention Projection Forward.
+    Projects inputs x into Q, K, V via 1.58-bit ternary bitboards and computes causal attention.
+    """
+    batch_heads, seq_len, in_features = x.shape
+    head_dim = w_q_nz.shape[0]
+
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_ternary_flash_attention_avx512"):
+        out = torch.empty(batch_heads, seq_len, head_dim, dtype=torch.float32)
+        weft_avx512.subbit_ternary_flash_attention_avx512(
+            x.contiguous(), w_q_nz.contiguous(), w_q_sign.contiguous(),
+            w_k_nz.contiguous(), w_k_sign.contiguous(),
+            w_v_nz.contiguous(), w_v_sign.contiguous(),
+            scales_q.contiguous(), scales_k.contiguous(), scales_v.contiguous(),
+            out, sm_scale
+        )
+        return out
+
+    # Reference evaluation
+    in_words = in_features // 64
+    def project_ternary(x_in, nz_p, sign_p, scales):
+        out_proj = torch.zeros(batch_heads, seq_len, head_dim, dtype=torch.float32)
+        for bh in range(batch_heads):
+            for t in range(seq_len):
+                cur_x = torch.where(x_in[bh, t] > 0.0, 1.0, -1.0)
+                for d in range(head_dim):
+                    dot = 0.0
+                    for w in range(in_words):
+                        nz = int(nz_p[d, w].item())
+                        sg = int(sign_p[d, w].item())
+                        for b in range(64):
+                            if (nz >> b) & 1:
+                                weight_val = 1.0 if (sg >> b) & 1 else -1.0
+                                dot += cur_x[w * 64 + b].item() * weight_val
+                    out_proj[bh, t, d] = dot * scales[d].item()
+        return out_proj
+
+    q = project_ternary(x, w_q_nz, w_q_sign, scales_q)
+    k = project_ternary(x, w_k_nz, w_k_sign, scales_k)
+    v = project_ternary(x, w_v_nz, w_v_sign, scales_v)
+
+    out = torch.zeros(batch_heads, seq_len, head_dim, dtype=torch.float32)
+    for bh in range(batch_heads):
+        for qi in range(seq_len):
+            q_vec = q[bh, qi:qi+1, :]
+            k_win = k[bh, :qi+1, :]
+            v_win = v[bh, :qi+1, :]
+            scores = torch.matmul(q_vec, k_win.transpose(-1, -2)) * sm_scale
+            probs = torch.softmax(scores, dim=-1)
+            out[bh, qi, :] = torch.matmul(probs, v_win).squeeze(0)
+
+    return out
+
+
+
 
 
 

@@ -727,6 +727,80 @@ def test_avx512_sliding_window_flash_attention_mathematical_soundness():
     assert diff < 1e-4, f"Sliding-Window Flash-Attention discrepancy too high: {diff}"
 
 
+def test_avx512_fused_ternary_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Fused Sub-Bit Ternary Flash-Attention Projection kernel.
+    Validates on-the-fly ternary Q/K/V projections and online softmax Flash-Attention.
+    """
+    if not hasattr(weft_avx512, "subbit_ternary_flash_attention_avx512"):
+        pytest.skip("AVX-512 Fused Ternary Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    BATCH_HEADS = 4
+    SEQ_LEN = 8
+    IN_FEATURES = 128
+    HEAD_DIM = 64
+    IN_WORDS = IN_FEATURES // 64
+
+    x = torch.randn(BATCH_HEADS, SEQ_LEN, IN_FEATURES, dtype=torch.float32)
+
+    # Packed ternary bitboards: nonzero mask & sign mask
+    w_q_nz = torch.randint(0, 2**31, (HEAD_DIM, IN_WORDS), dtype=torch.int64)
+    w_q_sign = torch.randint(0, 2**31, (HEAD_DIM, IN_WORDS), dtype=torch.int64)
+    w_k_nz = torch.randint(0, 2**31, (HEAD_DIM, IN_WORDS), dtype=torch.int64)
+    w_k_sign = torch.randint(0, 2**31, (HEAD_DIM, IN_WORDS), dtype=torch.int64)
+    w_v_nz = torch.randint(0, 2**31, (HEAD_DIM, IN_WORDS), dtype=torch.int64)
+    w_v_sign = torch.randint(0, 2**31, (HEAD_DIM, IN_WORDS), dtype=torch.int64)
+
+    scales_q = torch.rand(HEAD_DIM, dtype=torch.float32) * 0.05 + 0.01
+    scales_k = torch.rand(HEAD_DIM, dtype=torch.float32) * 0.05 + 0.01
+    scales_v = torch.rand(HEAD_DIM, dtype=torch.float32) * 0.05 + 0.01
+
+    out = torch.empty(BATCH_HEADS, SEQ_LEN, HEAD_DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (HEAD_DIM ** 0.5)
+
+    weft_avx512.subbit_ternary_flash_attention_avx512(
+        x, w_q_nz, w_q_sign, w_k_nz, w_k_sign, w_v_nz, w_v_sign,
+        scales_q, scales_k, scales_v, out, sm_scale
+    )
+
+    # Reference evaluation
+    def project_ternary(x_in, nz_p, sign_p, scales):
+        out_proj = torch.zeros(BATCH_HEADS, SEQ_LEN, HEAD_DIM, dtype=torch.float32)
+        for bh in range(BATCH_HEADS):
+            for t in range(SEQ_LEN):
+                cur_x = torch.where(x_in[bh, t] > 0.0, 1.0, -1.0)
+                for d in range(HEAD_DIM):
+                    dot = 0.0
+                    for w in range(IN_WORDS):
+                        nz = int(nz_p[d, w].item())
+                        sg = int(sign_p[d, w].item())
+                        for b in range(64):
+                            if (nz >> b) & 1:
+                                weight_val = 1.0 if (sg >> b) & 1 else -1.0
+                                dot += cur_x[w * 64 + b].item() * weight_val
+                    out_proj[bh, t, d] = dot * scales[d].item()
+        return out_proj
+
+    q_ref = project_ternary(x, w_q_nz, w_q_sign, scales_q)
+    k_ref = project_ternary(x, w_k_nz, w_k_sign, scales_k)
+    v_ref = project_ternary(x, w_v_nz, w_v_sign, scales_v)
+
+    ref_out = torch.zeros_like(out)
+    for bh in range(BATCH_HEADS):
+        for qi in range(SEQ_LEN):
+            q_vec = q_ref[bh, qi:qi+1, :]
+            k_win = k_ref[bh, :qi+1, :]
+            v_win = v_ref[bh, :qi+1, :]
+            scores = torch.matmul(q_vec, k_win.transpose(-1, -2)) * sm_scale
+            probs = torch.softmax(scores, dim=-1)
+            ref_out[bh, qi, :] = torch.matmul(probs, v_win).squeeze(0)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Fused Ternary Flash-Attention discrepancy too high: {diff}"
+
+
+
 
 
 

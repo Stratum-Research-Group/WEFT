@@ -1742,6 +1742,202 @@ void subbit_sliding_window_flash_attention_avx512_forward(
 }
 
 
+/**
+ * AVX-512 Fused Sub-Bit Ternary Flash-Attention Projection Kernel
+ * Evaluates 1.58-bit ternary {-1, 0, +1} linear projections for Query, Key, and Value
+ * using dual bitboards (nonzero_mask, sign_mask) and immediately performs in-register
+ * online softmax Flash-Attention without DRAM tensor roundtrips.
+ *
+ * x: [batch_heads, q_len, in_features] float32
+ * w_q_nz, w_q_sign: [head_dim, in_words] uint64 (packed ternary projection)
+ * w_k_nz, w_k_sign: [head_dim, in_words] uint64
+ * w_v_nz, w_v_sign: [head_dim, in_words] uint64
+ * scales_q, scales_k, scales_v: [head_dim] float32
+ * out: [batch_heads, q_len, head_dim] float32
+ */
+void subbit_ternary_flash_attention_avx512_forward(
+    const at::Tensor& x,
+    const at::Tensor& w_q_nz,
+    const at::Tensor& w_q_sign,
+    const at::Tensor& w_k_nz,
+    const at::Tensor& w_k_sign,
+    const at::Tensor& w_v_nz,
+    const at::Tensor& w_v_sign,
+    const at::Tensor& scales_q,
+    const at::Tensor& scales_k,
+    const at::Tensor& scales_v,
+    at::Tensor& out,
+    float sm_scale
+) {
+    TORCH_CHECK(x.is_contiguous() && w_q_nz.is_contiguous() && w_q_sign.is_contiguous() &&
+                w_k_nz.is_contiguous() && w_k_sign.is_contiguous() &&
+                w_v_nz.is_contiguous() && w_v_sign.is_contiguous() &&
+                scales_q.is_contiguous() && scales_k.is_contiguous() && scales_v.is_contiguous() &&
+                out.is_contiguous(), "All tensors must be contiguous");
+
+    const int64_t batch_heads = x.size(0);
+    const int64_t seq_len = x.size(1);
+    const int64_t in_features = x.size(2);
+    const int64_t in_words = in_features / 64;
+    const int64_t head_dim = w_q_nz.size(0);
+
+    const float* x_ptr = x.data_ptr<float>();
+    float* out_ptr = out.data_ptr<float>();
+
+    const uint64_t* q_nz_ptr = reinterpret_cast<const uint64_t*>(w_q_nz.data_ptr<int64_t>());
+    const uint64_t* q_sign_ptr = reinterpret_cast<const uint64_t*>(w_q_sign.data_ptr<int64_t>());
+    const uint64_t* k_nz_ptr = reinterpret_cast<const uint64_t*>(w_k_nz.data_ptr<int64_t>());
+    const uint64_t* k_sign_ptr = reinterpret_cast<const uint64_t*>(w_k_sign.data_ptr<int64_t>());
+    const uint64_t* v_nz_ptr = reinterpret_cast<const uint64_t*>(w_v_nz.data_ptr<int64_t>());
+    const uint64_t* v_sign_ptr = reinterpret_cast<const uint64_t*>(w_v_sign.data_ptr<int64_t>());
+
+    const float* sq_ptr = scales_q.data_ptr<float>();
+    const float* sk_ptr = scales_k.data_ptr<float>();
+    const float* sv_ptr = scales_v.data_ptr<float>();
+
+    #pragma omp parallel for schedule(dynamic)
+    for (int64_t bh = 0; bh < batch_heads; ++bh) {
+        // Local projection buffers on stack / L1 cache
+        std::vector<float> q_buf(seq_len * head_dim);
+        std::vector<float> k_buf(seq_len * head_dim);
+        std::vector<float> v_buf(seq_len * head_dim);
+
+        // 1. Project inputs x to Q, K, V via ternary bitboard popcounts
+        for (int64_t t = 0; t < seq_len; ++t) {
+            const float* cur_x = x_ptr + bh * seq_len * in_features + t * in_features;
+
+            // Binarize input x on the fly into 64-bit words
+            std::vector<uint64_t> x_packed(in_words, 0);
+            for (int64_t w = 0; w < in_words; ++w) {
+                uint64_t word_val = 0;
+                for (int64_t b = 0; b < 64; ++b) {
+                    if (cur_x[w * 64 + b] > 0.0f) {
+                        word_val |= (1ULL << b);
+                    }
+                }
+                x_packed[w] = word_val;
+            }
+
+            // Project Q
+            for (int64_t d = 0; d < head_dim; ++d) {
+                const uint64_t* nz = q_nz_ptr + d * in_words;
+                const uint64_t* sign = q_sign_ptr + d * in_words;
+                int64_t pos = 0, neg = 0;
+                for (int64_t w = 0; w < in_words; ++w) {
+                    uint64_t xw = x_packed[w];
+                    uint64_t active = nz[w];
+                    uint64_t match = ~(xw ^ sign[w]) & active;
+                    uint64_t mismatch = (xw ^ sign[w]) & active;
+                    pos += _mm_popcnt_u64(match);
+                    neg += _mm_popcnt_u64(mismatch);
+                }
+                q_buf[t * head_dim + d] = static_cast<float>(pos - neg) * sq_ptr[d];
+            }
+
+            // Project K
+            for (int64_t d = 0; d < head_dim; ++d) {
+                const uint64_t* nz = k_nz_ptr + d * in_words;
+                const uint64_t* sign = k_sign_ptr + d * in_words;
+                int64_t pos = 0, neg = 0;
+                for (int64_t w = 0; w < in_words; ++w) {
+                    uint64_t xw = x_packed[w];
+                    uint64_t active = nz[w];
+                    uint64_t match = ~(xw ^ sign[w]) & active;
+                    uint64_t mismatch = (xw ^ sign[w]) & active;
+                    pos += _mm_popcnt_u64(match);
+                    neg += _mm_popcnt_u64(mismatch);
+                }
+                k_buf[t * head_dim + d] = static_cast<float>(pos - neg) * sk_ptr[d];
+            }
+
+            // Project V
+            for (int64_t d = 0; d < head_dim; ++d) {
+                const uint64_t* nz = v_nz_ptr + d * in_words;
+                const uint64_t* sign = v_sign_ptr + d * in_words;
+                int64_t pos = 0, neg = 0;
+                for (int64_t w = 0; w < in_words; ++w) {
+                    uint64_t xw = x_packed[w];
+                    uint64_t active = nz[w];
+                    uint64_t match = ~(xw ^ sign[w]) & active;
+                    uint64_t mismatch = (xw ^ sign[w]) & active;
+                    pos += _mm_popcnt_u64(match);
+                    neg += _mm_popcnt_u64(mismatch);
+                }
+                v_buf[t * head_dim + d] = static_cast<float>(pos - neg) * sv_ptr[d];
+            }
+        }
+
+        // 2. Fused online softmax attention across Q, K, V
+        for (int64_t qi = 0; qi < seq_len; ++qi) {
+            const float* cur_q = q_buf.data() + qi * head_dim;
+            float* cur_out = out_ptr + bh * seq_len * head_dim + qi * head_dim;
+
+            for (int64_t d = 0; d < head_dim; ++d) {
+                cur_out[d] = 0.0f;
+            }
+
+            float m_prev = -1e30f;
+            float s_prev = 0.0f;
+
+            // Causal attention upper bound
+            const int64_t max_k = qi + 1;
+
+            for (int64_t ki = 0; ki < max_k; ++ki) {
+                const float* cur_k = k_buf.data() + ki * head_dim;
+                const float* cur_v = v_buf.data() + ki * head_dim;
+
+                __m512 vdot = _mm512_setzero_ps();
+                int64_t d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vq = _mm512_loadu_ps(cur_q + d);
+                    __m512 vk = _mm512_loadu_ps(cur_k + d);
+                    vdot = _mm512_fmadd_ps(vq, vk, vdot);
+                }
+                float score = _mm512_reduce_add_ps(vdot);
+                for (; d < head_dim; ++d) {
+                    score += cur_q[d] * cur_k[d];
+                }
+                score *= sm_scale;
+
+                float m_new = (score > m_prev) ? score : m_prev;
+                float alpha = std::exp(m_prev - m_new);
+                float p_curr = std::exp(score - m_new);
+                float s_new = s_prev * alpha + p_curr;
+
+                __m512 valpha = _mm512_set1_ps(alpha);
+                __m512 vpcurr = _mm512_set1_ps(p_curr);
+                d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vout = _mm512_loadu_ps(cur_out + d);
+                    __m512 vv = _mm512_loadu_ps(cur_v + d);
+                    vout = _mm512_mul_ps(vout, valpha);
+                    vout = _mm512_fmadd_ps(vpcurr, vv, vout);
+                    _mm512_storeu_ps(cur_out + d, vout);
+                }
+                for (; d < head_dim; ++d) {
+                    cur_out[d] = cur_out[d] * alpha + p_curr * cur_v[d];
+                }
+
+                m_prev = m_new;
+                s_prev = s_new;
+            }
+
+            float inv_s = 1.0f / (s_prev + 1e-12f);
+            __m512 vinv = _mm512_set1_ps(inv_s);
+            int64_t d = 0;
+            for (; d + 16 <= head_dim; d += 16) {
+                __m512 vout = _mm512_loadu_ps(cur_out + d);
+                vout = _mm512_mul_ps(vout, vinv);
+                _mm512_storeu_ps(cur_out + d, vout);
+            }
+            for (; d < head_dim; ++d) {
+                cur_out[d] *= inv_s;
+            }
+        }
+    }
+}
+
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
@@ -1760,7 +1956,9 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_asym_int4_kv_flash_attention_avx512", &subbit_asym_int4_kv_flash_attention_avx512_forward, "AVX-512 Asymmetric Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
     m.def("subbit_fused_swiglu_gemm_avx512", &subbit_fused_swiglu_gemm_avx512_forward, "Fused AVX-512 Dual-Bitboard Gate-Up Projection GEMM with In-Register SwiGLU");
     m.def("subbit_sliding_window_flash_attention_avx512", &subbit_sliding_window_flash_attention_avx512_forward, "AVX-512 Sliding-Window Flash-Attention Forward");
+    m.def("subbit_ternary_flash_attention_avx512", &subbit_ternary_flash_attention_avx512_forward, "Fused AVX-512 Sub-Bit Ternary Flash-Attention Projection Forward");
 }
+
 
 
 

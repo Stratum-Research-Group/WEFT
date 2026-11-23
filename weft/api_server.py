@@ -12,7 +12,8 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from weft.adapter_store import PersistentAdapterStore, PersistentAdapterMetadata
@@ -21,6 +22,22 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("weft.api_server")
 
 app = FastAPI(title="WEFT Edge Foundation API", version="3.5.0")
+
+# Enable CORS for local web interface access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+async def serve_ui():
+    ui_path = os.path.join(os.path.dirname(__file__), "web_ui.html")
+    if os.path.exists(ui_path):
+        return FileResponse(ui_path, media_type="text/html")
+    return {"message": "WEFT Edge Server Online. UI not found."}
 adapter_store = PersistentAdapterStore(store_dir="checkpoints/adapters")
 
 

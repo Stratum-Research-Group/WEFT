@@ -32,12 +32,14 @@ class PersistentAdapterMetadata:
 
 
 class PersistentAdapterStore:
-    def __init__(self, store_dir: str = "checkpoints/adapters"):
+    def __init__(self, store_dir: str = "checkpoints/adapters", max_loaded_cache: int = 16):
         self.store_dir = Path(store_dir)
         self.store_dir.mkdir(parents=True, exist_ok=True)
+        self.max_loaded_cache = max_loaded_cache
         self.loaded_adapters: Dict[str, torch.Tensor] = {}
+        self.loaded_order: List[str] = []
         self.metadata_registry: Dict[str, PersistentAdapterMetadata] = {}
-        logger.info(f"PersistentAdapterStore initialized at {self.store_dir.resolve()}.")
+        logger.info(f"PersistentAdapterStore initialized at {self.store_dir.resolve()} (LRU cache limit: {self.max_loaded_cache}).")
 
     def save_adapter(self, adapter_id: str, target_layer: str, domain: str,
                      conjecture_id: str, u: torch.Tensor, v: torch.Tensor) -> Path:
@@ -90,7 +92,16 @@ class PersistentAdapterStore:
             v = data["v"].float()
             delta_W = u @ v
 
+        # Evict oldest reconstructed dense delta to prevent unbounded RAM growth
+        if adapter_id in self.loaded_adapters:
+            self.loaded_order.remove(adapter_id)
+        elif len(self.loaded_order) >= self.max_loaded_cache:
+            oldest = self.loaded_order.pop(0)
+            self.loaded_adapters.pop(oldest, None)
+            logger.debug(f"Evicted dense adapter [{oldest}] from memory to preserve zero-leakage invariant.")
+
         self.loaded_adapters[adapter_id] = delta_W
+        self.loaded_order.append(adapter_id)
         self.metadata_registry[adapter_id] = PersistentAdapterMetadata(**meta)
         logger.info(f"Loaded persistent adapter [{adapter_id}] from disk.")
         return delta_W

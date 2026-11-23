@@ -24,8 +24,11 @@ class HierarchicalAdapterRouter:
         self.index_matrix = self._build_semantic_index()
         
     def _hash_to_embedding(self, text: str) -> np.ndarray:
-        """Deterministic pseudo-semantic hashing into unit hypersphere in R^64."""
-        rng = np.random.default_rng(abs(hash(text)) % (2**32))
+        """Deterministic, process-stable pseudo-semantic hashing into unit hypersphere in R^64 via SHA-256."""
+        import hashlib
+        h = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        stable_seed = int(h[:8], 16)
+        rng = np.random.default_rng(stable_seed)
         vec = rng.normal(0, 1.0, self.dim).astype(np.float32)
         norm = np.linalg.norm(vec)
         return vec / (norm + 1e-9)

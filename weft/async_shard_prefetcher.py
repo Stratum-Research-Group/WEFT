@@ -26,13 +26,18 @@ class AsyncDoubleBufferedShardPrefetcher:
         return (st.f_bavail * st.f_frsize) / (1024**3)
 
     def _prefetch_loop(self):
-        for idx, filename in enumerate(self.shard_filenames):
+        idx = 0
+        while idx < len(self.shard_filenames):
             if self.stop_signal.is_set():
                 break
 
+            filename = self.shard_filenames[idx]
+
+            # Enforce storage safety floor before downloading
             free_gb = self._get_free_space_gb()
             if free_gb < self.min_free_gb:
-                time.sleep(5)
+                # Do NOT advance idx; sleep and wait for consumer to unlink previous shards
+                time.sleep(2)
                 continue
 
             target_path = os.path.join(self.work_dir, filename)
@@ -48,6 +53,7 @@ class AsyncDoubleBufferedShardPrefetcher:
                 downloaded_path = target_path
 
             self.prefetch_queue.put((idx, filename, downloaded_path))
+            idx += 1
 
     def start(self):
         self.worker_thread = threading.Thread(target=self._prefetch_loop, daemon=True)

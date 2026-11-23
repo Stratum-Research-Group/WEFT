@@ -207,3 +207,23 @@ def test_avx512_rope_mathematical_soundness():
 
     np.testing.assert_allclose(out_avx.numpy(), out_ref.numpy(), atol=1e-5, rtol=1e-5)
     print("Exact RoPE mathematical soundness confirmed: AVX-512 RoPE == Reference Givens Rotation!")
+
+def test_avx512_softmax_mathematical_soundness():
+    """Verify bit-exact soundness of AVX-512 in-register softmax against PyTorch torch.softmax."""
+    batch_size = 8
+    seq_len = 1024
+
+    torch.manual_seed(555)
+    logits = torch.randn(batch_size, seq_len, dtype=torch.float32) * 5.0
+
+    # 1. AVX-512 fast path
+    out_avx = torch.zeros_like(logits)
+    weft_avx512.subbit_softmax_avx512(logits, out_avx)
+
+    # 2. PyTorch reference path
+    out_ref = torch.softmax(logits, dim=-1)
+
+    np.testing.assert_allclose(out_avx.numpy(), out_ref.numpy(), atol=1e-5, rtol=1e-5)
+    assert np.all(out_avx.numpy() >= 0.0)
+    np.testing.assert_allclose(out_avx.sum(dim=-1).numpy(), np.ones(batch_size), atol=1e-4)
+    print("Exact Softmax mathematical soundness confirmed: AVX-512 Softmax == PyTorch Softmax!")

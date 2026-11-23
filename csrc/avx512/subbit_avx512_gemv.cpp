@@ -1,6 +1,7 @@
 #include <torch/extension.h>
 #include <immintrin.h>
 #include <vector>
+#include <cmath>
 #include <cstdint>
 
 /**
@@ -347,10 +348,57 @@ void subbit_rope_avx512_forward(
     }
 }
 
+/**
+ * AVX-512 Numerically-Stable Softmax Kernel
+ */
+void subbit_softmax_avx512_forward(
+    const at::Tensor& input,   // [batch_size, seq_len] float32
+    at::Tensor& output         // [batch_size, seq_len] float32
+) {
+    TORCH_CHECK(input.is_contiguous(), "input must be contiguous");
+    TORCH_CHECK(output.is_contiguous(), "output must be contiguous");
+
+    const int64_t rows = input.size(0);
+    const int64_t cols = input.size(1);
+
+    const float* in_ptr = input.data_ptr<float>();
+    float* out_ptr = output.data_ptr<float>();
+
+    #pragma omp parallel for schedule(static)
+    for (int64_t r = 0; r < rows; ++r) {
+        const float* row_in = in_ptr + r * cols;
+        float* row_out = out_ptr + r * cols;
+
+        float max_val = row_in[0];
+        for (int64_t c = 1; c < cols; ++c) {
+            if (row_in[c] > max_val) max_val = row_in[c];
+        }
+
+        float sum_val = 0.0f;
+        for (int64_t c = 0; c < cols; ++c) {
+            float e = std::exp(row_in[c] - max_val);
+            row_out[c] = e;
+            sum_val += e;
+        }
+
+        float inv_sum = 1.0f / (sum_val + 1e-12f);
+        int64_t c = 0;
+        __m512 vinv = _mm512_set1_ps(inv_sum);
+        for (; c + 16 <= cols; c += 16) {
+            __m512 ve = _mm512_loadu_ps(row_out + c);
+            _mm512_storeu_ps(row_out + c, _mm512_mul_ps(ve, vinv));
+        }
+        for (; c < cols; ++c) {
+            row_out[c] *= inv_sum;
+        }
+    }
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
     m.def("subbit_fused_gemv_avx512", &subbit_fused_gemv_avx512_forward, "Fused AVX-512 VPOPCNTDQ + Rank-1 SVD Correction GEMV");
     m.def("subbit_ternary_gemv_avx512", &subbit_ternary_gemv_avx512_forward, "AVX-512 Masked Ternary GEMV with Hardware Popcount");
     m.def("subbit_rope_avx512", &subbit_rope_avx512_forward, "AVX-512 Vectorized Rotary Position Embedding (RoPE)");
+    m.def("subbit_softmax_avx512", &subbit_softmax_avx512_forward, "AVX-512 Numerically-Stable Vectorized Softmax");
 }

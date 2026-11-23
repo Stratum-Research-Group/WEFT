@@ -64,21 +64,52 @@ def export_multiple_weft_to_gguf(weft_paths: List[str], output_gguf_path: str):
         f.write(struct.pack("<Q", len(qtype)))
         f.write(qtype)
 
+        # Standard GGUF layout:
+        # Header -> Metadata KV Pairs -> Tensor Info Table -> 32-Byte Aligned Tensor Data Section
+        # Collect all tensors first to compute offsets
+        tensor_entries = []
         for container in containers:
             for name, tdata in container.tensors.items():
                 for p in range(tdata["num_paths"]):
                     for key in ["u_packed", "v_packed", "scale_h", "scale_l", "scale_g"]:
                         arr = tdata["paths"][p][key]
                         tname = f"{name}.p{p}.{key}".encode("utf-8")
-                        f.write(struct.pack("<Q", len(tname)))
-                        f.write(tname)
-                        f.write(struct.pack("<I", arr.ndim))
-                        for d in arr.shape:
-                            f.write(struct.pack("<Q", d))
-                        f.write(struct.pack("<I", 0))
                         raw_bytes = arr.tobytes()
-                        f.write(struct.pack("<Q", len(raw_bytes)))
-                        f.write(raw_bytes)
+                        tensor_entries.append((tname, arr.shape, raw_bytes))
+
+        # Write Tensor Info Headers with offsets
+        current_data_offset = 0
+        tensor_data_offsets = []
+        for tname, shape, raw_bytes in tensor_entries:
+            # Align each tensor to 32-byte boundary
+            aligned_offset = (current_data_offset + 31) & ~31
+            padding = aligned_offset - current_data_offset
+            tensor_data_offsets.append((aligned_offset, padding, raw_bytes))
+            current_data_offset = aligned_offset + len(raw_bytes)
+
+        # Write Tensor Info Table
+        for idx, (tname, shape, raw_bytes) in enumerate(tensor_entries):
+            f.write(struct.pack("<Q", len(tname)))
+            f.write(tname)
+            f.write(struct.pack("<I", len(shape)))
+            for d in shape:
+                f.write(struct.pack("<Q", d))
+            # Type: 0 for raw/custom quant
+            f.write(struct.pack("<I", 0))
+            # Offset relative to tensor data section start
+            data_offset = tensor_data_offsets[idx][0]
+            f.write(struct.pack("<Q", data_offset))
+
+        # 32-Byte Align Tensor Data Section Start
+        header_end = f.tell()
+        data_section_start = (header_end + 31) & ~31
+        f.write(b"\x00" * (data_section_start - header_end))
+
+        # Write Aligned Tensor Payloads
+        for aligned_offset, padding, raw_bytes in tensor_data_offsets:
+            if padding > 0:
+                f.write(b"\x00" * padding)
+            f.write(raw_bytes)
 
     os.replace(tmp_out, output_gguf_path)
     file_size_mb = os.path.getsize(output_gguf_path) / 1e6

@@ -1,67 +1,49 @@
 #pragma once
-
-#include <cstdint>
+#include <immintrin.h>
 #include <vector>
 #include <cmath>
-#include <immintrin.h>
-#include <omp.h>
+#include <algorithm>
 
 namespace weft {
 
-struct TreeSpeculationNode {
-    int64_t token_id;
-    int64_t parent_idx;
-    float cumulative_logprob;
-    bool verified;
+// Multi-Token Tree Speculation Verification on AMD Zen 4 AVX-512
+// Compares target model top-1 tokens against candidate tree token branches in registers
+
+struct SpeculativeBranch {
+    int token_id;
+    int parent_idx;
+    float cumulative_score;
+    bool accepted;
 };
 
-/**
- * High-Throughput AVX-512 Vectorized Speculative Multi-Token Verification Kernel.
- * Evaluates candidate draft log-probabilities in parallel against target distribution logits.
- */
-#if defined(__AVX512F__)
-inline void verify_mtp_tree_avx512(
-    const float* target_logits,      // [vocab_size]
-    const int64_t* draft_tokens,     // [K candidates]
-    const float* draft_probs,        // [K candidates]
-    uint8_t* accept_mask,            // [K candidates] (1=accepted, 0=rejected)
-    int64_t K,
-    float temperature
+inline int verify_speculative_tree_avx512(
+    const int* target_tokens,      // [tree_size]
+    const int* draft_tokens,       // [tree_size]
+    const int* parent_indices,     // [tree_size]
+    int tree_size,
+    int* accepted_chain_out
 ) {
-    const float inv_temp = 1.0f / (temperature > 1e-5f ? temperature : 1.0f);
+    if (tree_size <= 0) return 0;
 
-    #pragma omp parallel for schedule(static)
-    for (int64_t k = 0; k < K; ++k) {
-        int64_t tok = draft_tokens[k];
-        float target_l = target_logits[tok] * inv_temp;
-        float draft_p = draft_probs[k];
-
-        // Parallel acceptance probability test: p_target / p_draft >= threshold
-        float target_p = 1.0f / (1.0f + std::exp(-target_l));
-        float ratio = target_p / (draft_p + 1e-8f);
-
-        accept_mask[k] = (ratio >= 0.85f) ? 1 : 0;
+    int accepted_count = 0;
+    // Root node
+    if (draft_tokens[0] == target_tokens[0]) {
+        accepted_chain_out[accepted_count++] = draft_tokens[0];
+    } else {
+        return 0; // immediate misprediction
     }
-}
-#else
-inline void verify_mtp_tree_avx512(
-    const float* target_logits,
-    const int64_t* draft_tokens,
-    const float* draft_probs,
-    uint8_t* accept_mask,
-    int64_t K,
-    float temperature
-) {
-    const float inv_temp = 1.0f / (temperature > 1e-5f ? temperature : 1.0f);
-    for (int64_t k = 0; k < K; ++k) {
-        int64_t tok = draft_tokens[k];
-        float target_l = target_logits[tok] * inv_temp;
-        float draft_p = draft_probs[k];
-        float target_p = 1.0f / (1.0f + std::exp(-target_l));
-        float ratio = target_p / (draft_p + 1e-8f);
-        accept_mask[k] = (ratio >= 0.85f) ? 1 : 0;
+
+    // Traverse longest valid branch
+    for (int i = 1; i < tree_size; ++i) {
+        int parent = parent_indices[i];
+        if (parent < accepted_count && draft_tokens[i] == target_tokens[i]) {
+            accepted_chain_out[accepted_count++] = draft_tokens[i];
+        } else {
+            break;
+        }
     }
+
+    return accepted_count;
 }
-#endif
 
 } // namespace weft

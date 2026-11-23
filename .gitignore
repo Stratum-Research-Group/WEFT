@@ -24,3 +24,6 @@ weft2_sft_ckpt/
 weft2_grpo_aligned_ckpt/
 weft2_needle_calibrated_ckpt/
 weft2_*_ckpt/
+*.so
+bin/
+checkpoints/

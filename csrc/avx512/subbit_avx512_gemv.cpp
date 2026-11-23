@@ -1100,6 +1100,163 @@ void subbit_int4_kv_flash_attention_avx512_forward(
     }
 }
 
+
+/**
+ * AVX-512 Paged Int4 Sub-Byte KV-Cache Vectorized Flash-Attention Forward Kernel
+ * Resolves non-contiguous memory blocks via block-table indirect indexing while
+ * dequantizing packed 4-bit signed nibbles directly in AVX-512 vector registers.
+ * q: [batch_heads, q_len, head_dim] float32
+ * k_cache: [num_blocks, block_size, head_dim / 2] uint8 (packed signed 4-bit nibbles)
+ * v_cache: [num_blocks, block_size, head_dim / 2] uint8 (packed signed 4-bit nibbles)
+ * k_scales: [num_blocks, block_size] float32
+ * v_scales: [num_blocks, block_size] float32
+ * block_tables: [batch_heads, max_num_blocks] int32
+ * context_lens: [batch_heads] int32
+ * out: [batch_heads, q_len, head_dim] float32
+ */
+void subbit_paged_int4_kv_flash_attention_avx512_forward(
+    const at::Tensor& q,
+    const at::Tensor& k_cache,
+    const at::Tensor& v_cache,
+    const at::Tensor& k_scales,
+    const at::Tensor& v_scales,
+    const at::Tensor& block_tables,
+    const at::Tensor& context_lens,
+    at::Tensor& out,
+    float sm_scale,
+    int64_t block_size
+) {
+    TORCH_CHECK(q.is_contiguous() && k_cache.is_contiguous() && v_cache.is_contiguous() &&
+                k_scales.is_contiguous() && v_scales.is_contiguous() &&
+                block_tables.is_contiguous() && context_lens.is_contiguous() && out.is_contiguous(),
+                "All tensors must be contiguous");
+
+    const int64_t batch_heads = q.size(0);
+    const int64_t q_len = q.size(1);
+    const int64_t head_dim = q.size(2);
+    const int64_t max_blocks = block_tables.size(1);
+
+    const float* q_ptr = q.data_ptr<float>();
+    const uint8_t* k_ptr = k_cache.data_ptr<uint8_t>();
+    const uint8_t* v_ptr = v_cache.data_ptr<uint8_t>();
+    const float* ks_ptr = k_scales.data_ptr<float>();
+    const float* vs_ptr = v_scales.data_ptr<float>();
+    const int32_t* bt_ptr = block_tables.data_ptr<int32_t>();
+    const int32_t* cl_ptr = context_lens.data_ptr<int32_t>();
+    float* out_ptr = out.data_ptr<float>();
+
+    const int64_t q_stride_b = q_len * head_dim;
+    const int64_t packed_block_stride = block_size * (head_dim / 2);
+
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (int64_t bh = 0; bh < batch_heads; ++bh) {
+        for (int64_t qi = 0; qi < q_len; ++qi) {
+            const float* cur_q = q_ptr + bh * q_stride_b + qi * head_dim;
+            const int32_t* cur_bt = bt_ptr + bh * max_blocks;
+            const int32_t ctx_len = cl_ptr[bh];
+            float* cur_out = out_ptr + bh * q_stride_b + qi * head_dim;
+
+            for (int64_t d = 0; d < head_dim; ++d) {
+                cur_out[d] = 0.0f;
+            }
+
+            float m_prev = -1e30f;
+            float s_prev = 0.0f;
+
+            for (int32_t ki = 0; ki < ctx_len; ++ki) {
+                const int32_t block_idx = cur_bt[ki / block_size];
+                const int32_t block_offset = ki % block_size;
+
+                const uint8_t* cur_k = k_ptr + block_idx * packed_block_stride + block_offset * (head_dim / 2);
+                const uint8_t* cur_v = v_ptr + block_idx * packed_block_stride + block_offset * (head_dim / 2);
+                const float k_scale = ks_ptr[block_idx * block_size + block_offset];
+                const float v_scale = vs_ptr[block_idx * block_size + block_offset];
+
+                __m512 vdot = _mm512_setzero_ps();
+                int64_t d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vq = _mm512_loadu_ps(cur_q + d);
+
+                    int64_t byte_idx = d / 2;
+                    int32_t val_buf[16];
+                    for (int j = 0; j < 8; ++j) {
+                        uint8_t byte = cur_k[byte_idx + j];
+                        int8_t low = static_cast<int8_t>(byte & 0x0F);
+                        if (low >= 8) low -= 16;
+                        int8_t high = static_cast<int8_t>((byte >> 4) & 0x0F);
+                        if (high >= 8) high -= 16;
+                        val_buf[2 * j] = static_cast<int32_t>(low);
+                        val_buf[2 * j + 1] = static_cast<int32_t>(high);
+                    }
+                    __m512i k_i32 = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(val_buf));
+                    __m512 vk = _mm512_cvtepi32_ps(k_i32);
+                    vdot = _mm512_fmadd_ps(vq, vk, vdot);
+                }
+                float score = _mm512_reduce_add_ps(vdot);
+                for (; d < head_dim; ++d) {
+                    int64_t byte_idx = d / 2;
+                    uint8_t byte = cur_k[byte_idx];
+                    int8_t val = (d % 2 == 0) ? (byte & 0x0F) : ((byte >> 4) & 0x0F);
+                    if (val >= 8) val -= 16;
+                    score += cur_q[d] * static_cast<float>(val);
+                }
+                score *= (k_scale * sm_scale);
+
+                float m_new = (score > m_prev) ? score : m_prev;
+                float alpha = std::exp(m_prev - m_new);
+                float p_curr = std::exp(score - m_new);
+                float s_new = s_prev * alpha + p_curr;
+
+                __m512 valpha = _mm512_set1_ps(alpha);
+                __m512 vpcurr_scaled = _mm512_set1_ps(p_curr * v_scale);
+                d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vout = _mm512_loadu_ps(cur_out + d);
+
+                    int64_t byte_idx = d / 2;
+                    int32_t val_buf[16];
+                    for (int j = 0; j < 8; ++j) {
+                        uint8_t byte = cur_v[byte_idx + j];
+                        int8_t low = static_cast<int8_t>(byte & 0x0F);
+                        if (low >= 8) low -= 16;
+                        int8_t high = static_cast<int8_t>((byte >> 4) & 0x0F);
+                        if (high >= 8) high -= 16;
+                        val_buf[2 * j] = static_cast<int32_t>(low);
+                        val_buf[2 * j + 1] = static_cast<int32_t>(high);
+                    }
+                    __m512i v_i32 = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(val_buf));
+                    __m512 vv = _mm512_cvtepi32_ps(v_i32);
+                    vout = _mm512_mul_ps(vout, valpha);
+                    vout = _mm512_fmadd_ps(vpcurr_scaled, vv, vout);
+                    _mm512_storeu_ps(cur_out + d, vout);
+                }
+                for (; d < head_dim; ++d) {
+                    int64_t byte_idx = d / 2;
+                    uint8_t byte = cur_v[byte_idx];
+                    int8_t val = (d % 2 == 0) ? (byte & 0x0F) : ((byte >> 4) & 0x0F);
+                    if (val >= 8) val -= 16;
+                    cur_out[d] = cur_out[d] * alpha + p_curr * (static_cast<float>(val) * v_scale);
+                }
+
+                m_prev = m_new;
+                s_prev = s_new;
+            }
+
+            float inv_s = 1.0f / (s_prev + 1e-12f);
+            __m512 vinv = _mm512_set1_ps(inv_s);
+            int64_t d = 0;
+            for (; d + 16 <= head_dim; d += 16) {
+                __m512 vout = _mm512_loadu_ps(cur_out + d);
+                vout = _mm512_mul_ps(vout, vinv);
+                _mm512_storeu_ps(cur_out + d, vout);
+            }
+            for (; d < head_dim; ++d) {
+                cur_out[d] *= inv_s;
+            }
+        }
+    }
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
@@ -1113,4 +1270,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_paged_flash_attention_avx512", &subbit_paged_flash_attention_avx512_forward, "AVX-512 Paged KV-Cache Vectorized Flash-Attention Forward");
     m.def("subbit_int8_kv_flash_attention_avx512", &subbit_int8_kv_flash_attention_avx512_forward, "AVX-512 Int8 Quantized KV-Cache Flash-Attention Forward");
     m.def("subbit_int4_kv_flash_attention_avx512", &subbit_int4_kv_flash_attention_avx512_forward, "AVX-512 Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
+    m.def("subbit_paged_int4_kv_flash_attention_avx512", &subbit_paged_int4_kv_flash_attention_avx512_forward, "AVX-512 Paged Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
 }
+

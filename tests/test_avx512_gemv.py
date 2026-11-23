@@ -460,3 +460,72 @@ def test_avx512_int4_kv_flash_attention_mathematical_soundness():
     diff = (out - ref_out).abs().max().item()
     assert diff < 1e-4, f"Int4 KV Flash-Attention discrepancy too high: {diff}"
 
+
+def test_avx512_paged_int4_kv_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Paged Int4 Sub-Byte KV-Cache Flash-Attention kernel.
+    Validates block-table dynamic indexing and in-register nibble dequantization parity.
+    """
+    if not hasattr(weft_avx512, "subbit_paged_int4_kv_flash_attention_avx512"):
+        pytest.skip("AVX-512 Paged Int4 KV Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    Q_LEN = 4
+    HEAD_DIM = 64
+    BLOCK_SIZE = 16
+    NUM_BLOCKS = 16
+    CTX_LEN = 32
+
+    q = torch.randn(B, Q_LEN, HEAD_DIM, dtype=torch.float32)
+
+    # Int4 integer values in [-8, 7]
+    k_blocks_i4 = torch.randint(-8, 8, (NUM_BLOCKS, BLOCK_SIZE, HEAD_DIM), dtype=torch.int32)
+    v_blocks_i4 = torch.randint(-8, 8, (NUM_BLOCKS, BLOCK_SIZE, HEAD_DIM), dtype=torch.int32)
+
+    k_scales = torch.rand(NUM_BLOCKS, BLOCK_SIZE, dtype=torch.float32) * 0.1 + 0.01
+    v_scales = torch.rand(NUM_BLOCKS, BLOCK_SIZE, dtype=torch.float32) * 0.1 + 0.01
+
+    # Pack into uint8
+    k_cache = torch.zeros(NUM_BLOCKS, BLOCK_SIZE, HEAD_DIM // 2, dtype=torch.uint8)
+    v_cache = torch.zeros(NUM_BLOCKS, BLOCK_SIZE, HEAD_DIM // 2, dtype=torch.uint8)
+    for blk in range(NUM_BLOCKS):
+        for s in range(BLOCK_SIZE):
+            for d in range(HEAD_DIM // 2):
+                low = k_blocks_i4[blk, s, 2 * d].item() & 0x0F
+                high = k_blocks_i4[blk, s, 2 * d + 1].item() & 0x0F
+                k_cache[blk, s, d] = low | (high << 4)
+
+                v_low = v_blocks_i4[blk, s, 2 * d].item() & 0x0F
+                v_high = v_blocks_i4[blk, s, 2 * d + 1].item() & 0x0F
+                v_cache[blk, s, d] = v_low | (v_high << 4)
+
+    block_tables = torch.tensor([[0, 2, 4, 6], [1, 3, 5, 7]], dtype=torch.int32)
+    context_lens = torch.tensor([CTX_LEN, CTX_LEN], dtype=torch.int32)
+
+    out = torch.empty(B, Q_LEN, HEAD_DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (HEAD_DIM ** 0.5)
+
+    weft_avx512.subbit_paged_int4_kv_flash_attention_avx512(
+        q, k_cache, v_cache, k_scales, v_scales, block_tables, context_lens, out, sm_scale, BLOCK_SIZE
+    )
+
+    # Reference evaluation
+    ref_out = torch.empty_like(out)
+    for b in range(B):
+        k_parts = [k_blocks_i4[block_tables[b, i]] for i in range(CTX_LEN // BLOCK_SIZE)]
+        v_parts = [v_blocks_i4[block_tables[b, i]] for i in range(CTX_LEN // BLOCK_SIZE)]
+        ks_parts = [k_scales[block_tables[b, i]] for i in range(CTX_LEN // BLOCK_SIZE)]
+        vs_parts = [v_scales[block_tables[b, i]] for i in range(CTX_LEN // BLOCK_SIZE)]
+
+        k_contig = (torch.cat(k_parts, dim=0).float()) * torch.cat(ks_parts, dim=0).unsqueeze(-1)
+        v_contig = (torch.cat(v_parts, dim=0).float()) * torch.cat(vs_parts, dim=0).unsqueeze(-1)
+
+        scores = torch.matmul(q[b], k_contig.t()) * sm_scale
+        probs = torch.softmax(scores, dim=-1)
+        ref_out[b] = torch.matmul(probs, v_contig)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Paged Int4 KV Flash-Attention discrepancy too high: {diff}"
+
+

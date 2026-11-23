@@ -246,6 +246,8 @@ def cpu_int8_kv_flash_attention_avx512(
     return torch.matmul(probs, v_deq)
 
 
+
+
 def cpu_int4_kv_flash_attention_avx512(
     q: torch.Tensor,
     k_packed: torch.Tensor,
@@ -287,4 +289,66 @@ def cpu_int4_kv_flash_attention_avx512(
     scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
     probs = torch.softmax(scores, dim=-1)
     return torch.matmul(probs, v_deq)
+
+
+def cpu_paged_int4_kv_flash_attention_avx512(
+    q: torch.Tensor,
+    k_cache: torch.Tensor,
+    v_cache: torch.Tensor,
+    k_scales: torch.Tensor,
+    v_scales: torch.Tensor,
+    block_tables: torch.Tensor,
+    context_lens: torch.Tensor,
+    sm_scale: float = None,
+    block_size: int = 16
+) -> torch.Tensor:
+    """
+    Evaluates Paged Sub-Byte Int4 Quantized KV-Cache Flash-Attention via native AVX-512 vector registers.
+    """
+    head_dim = q.shape[-1]
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_paged_int4_kv_flash_attention_avx512"):
+        out = torch.empty_like(q)
+        weft_avx512.subbit_paged_int4_kv_flash_attention_avx512(
+            q.contiguous(), k_cache.contiguous(), v_cache.contiguous(),
+            k_scales.contiguous(), v_scales.contiguous(),
+            block_tables.contiguous().to(torch.int32),
+            context_lens.contiguous().to(torch.int32),
+            out, float(sm_scale), int(block_size)
+        )
+        return out
+
+    def unpack_nibbles(packed):
+        p = packed.to(torch.int32)
+        low = (p & 0x0F)
+        low = torch.where(low >= 8, low - 16, low)
+        high = ((p >> 4) & 0x0F)
+        high = torch.where(high >= 8, high - 16, high)
+        unpacked = torch.stack([low, high], dim=-1).view(*packed.shape[:-1], packed.shape[-1] * 2)
+        return unpacked.float()
+
+    B = q.shape[0]
+    out = torch.empty_like(q)
+    for b in range(B):
+        ctx_len = int(context_lens[b].item())
+        k_parts = [k_cache[block_tables[b, i]] for i in range((ctx_len + block_size - 1) // block_size)]
+        v_parts = [v_cache[block_tables[b, i]] for i in range((ctx_len + block_size - 1) // block_size)]
+        ks_parts = [k_scales[block_tables[b, i]] for i in range((ctx_len + block_size - 1) // block_size)]
+        vs_parts = [v_scales[block_tables[b, i]] for i in range((ctx_len + block_size - 1) // block_size)]
+
+        k_packed_contig = torch.cat(k_parts, dim=0)[:ctx_len]
+        v_packed_contig = torch.cat(v_parts, dim=0)[:ctx_len]
+        ks_contig = torch.cat(ks_parts, dim=0)[:ctx_len]
+        vs_contig = torch.cat(vs_parts, dim=0)[:ctx_len]
+
+        k_deq = unpack_nibbles(k_packed_contig) * ks_contig.unsqueeze(-1)
+        v_deq = unpack_nibbles(v_packed_contig) * vs_contig.unsqueeze(-1)
+
+        scores = torch.matmul(q[b], k_deq.t()) * sm_scale
+        probs = torch.softmax(scores, dim=-1)
+        out[b] = torch.matmul(probs, v_deq)
+    return out
+
 

@@ -1,0 +1,10 @@
+{
+  "adapter_id": "ADAPT-GOLDBACH-001",
+  "target_layer": "qwen2.5-math-72b.layer.20.mlp",
+  "domain": "Analytic Number Theory",
+  "conjecture_id": "GOLDBACH-PARTITION",
+  "rank": 1,
+  "norm_delta": 0.9874549508094788,
+  "created_at": 1795437984.296771,
+  "lean_verified": true
+}

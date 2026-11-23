@@ -244,3 +244,47 @@ def cpu_int8_kv_flash_attention_avx512(
     scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
     probs = torch.softmax(scores, dim=-1)
     return torch.matmul(probs, v_deq)
+
+
+def cpu_int4_kv_flash_attention_avx512(
+    q: torch.Tensor,
+    k_packed: torch.Tensor,
+    v_packed: torch.Tensor,
+    k_scales: torch.Tensor,
+    v_scales: torch.Tensor,
+    sm_scale: float = None
+) -> torch.Tensor:
+    """
+    Evaluates Int4 Sub-Byte Packed KV-Cache Flash-Attention via native AVX-512 vector registers.
+    k_packed and v_packed have shape (K_seq, head_dim // 2) as uint8 containing two 4-bit signed nibbles.
+    """
+    head_dim = q.shape[-1]
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_int4_kv_flash_attention_avx512"):
+        out = torch.empty_like(q)
+        weft_avx512.subbit_int4_kv_flash_attention_avx512(
+            q.contiguous(), k_packed.contiguous(), v_packed.contiguous(),
+            k_scales.contiguous(), v_scales.contiguous(),
+            out, float(sm_scale)
+        )
+        return out
+
+    # Standard dequantized fallback for validation
+    # Unpack low and high nibbles
+    def unpack_nibbles(packed):
+        p = packed.to(torch.int32)
+        low = (p & 0x0F)
+        low = torch.where(low >= 8, low - 16, low)
+        high = ((p >> 4) & 0x0F)
+        high = torch.where(high >= 8, high - 16, high)
+        unpacked = torch.stack([low, high], dim=-1).view(*packed.shape[:-1], packed.shape[-1] * 2)
+        return unpacked.float()
+
+    k_deq = unpack_nibbles(k_packed) * k_scales.unsqueeze(-1)
+    v_deq = unpack_nibbles(v_packed) * v_scales.unsqueeze(-1)
+    scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    return torch.matmul(probs, v_deq)
+

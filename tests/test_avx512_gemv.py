@@ -403,3 +403,60 @@ def test_avx512_int8_kv_flash_attention_mathematical_soundness():
 
     diff = (out - ref_out).abs().max().item()
     assert diff < 1e-4, f"Int8 KV Flash-Attention discrepancy too high: {diff}"
+
+
+def test_avx512_int4_kv_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Int4 Sub-Byte Packed KV-Cache Flash-Attention kernel.
+    Validates in-register nibble shifting, sign extension, float conversion, and scaling parity.
+    """
+    if not hasattr(weft_avx512, "subbit_int4_kv_flash_attention_avx512"):
+        pytest.skip("AVX-512 Int4 KV Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    Q_LEN = 4
+    KV_LEN = 32
+    DIM = 64
+
+    q = torch.randn(B, Q_LEN, DIM, dtype=torch.float32)
+    
+    # Generate integer values in range [-8, +7]
+    k_i4 = torch.randint(-8, 8, (B, KV_LEN, DIM), dtype=torch.int32)
+    v_i4 = torch.randint(-8, 8, (B, KV_LEN, DIM), dtype=torch.int32)
+
+    k_scales = torch.rand(B, KV_LEN, dtype=torch.float32) * 0.1 + 0.01
+    v_scales = torch.rand(B, KV_LEN, dtype=torch.float32) * 0.1 + 0.01
+
+    # Pack into uint8 (low nibble = dim 2k, high nibble = dim 2k+1)
+    k_packed = torch.zeros(B, KV_LEN, DIM // 2, dtype=torch.uint8)
+    v_packed = torch.zeros(B, KV_LEN, DIM // 2, dtype=torch.uint8)
+    for b in range(B):
+        for s in range(KV_LEN):
+            for d in range(DIM // 2):
+                low = k_i4[b, s, 2 * d].item() & 0x0F
+                high = k_i4[b, s, 2 * d + 1].item() & 0x0F
+                k_packed[b, s, d] = low | (high << 4)
+
+                v_low = v_i4[b, s, 2 * d].item() & 0x0F
+                v_high = v_i4[b, s, 2 * d + 1].item() & 0x0F
+                v_packed[b, s, d] = v_low | (v_high << 4)
+
+    out = torch.empty(B, Q_LEN, DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (DIM ** 0.5)
+
+    weft_avx512.subbit_int4_kv_flash_attention_avx512(
+        q, k_packed, v_packed, k_scales, v_scales, out, sm_scale
+    )
+
+    # Reference evaluation
+    k_deq = k_i4.float() * k_scales.unsqueeze(-1)
+    v_deq = v_i4.float() * v_scales.unsqueeze(-1)
+
+    scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    ref_out = torch.matmul(probs, v_deq)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Int4 KV Flash-Attention discrepancy too high: {diff}"
+

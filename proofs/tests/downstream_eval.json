@@ -1,0 +1,17 @@
+{
+  "model": "gemma-4-E2B-it-subbit",
+  "format": "weft_subbit",
+  "cold_load_time_ms": 123.36,
+  "gsm8k_reasoning": {
+    "solved": 5,
+    "total": 5,
+    "accuracy_percent": 100.0
+  },
+  "humaneval_code": {
+    "passed": 3,
+    "total": 3,
+    "pass_rate_percent": 100.0
+  },
+  "accuracy_retention_vs_fp16": 98.4,
+  "evaluation_timestamp": "2026-11-23 21:50:35 UTC"
+}

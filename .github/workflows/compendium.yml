@@ -39,7 +39,7 @@ jobs:
           export PATH="$HOME/.elan/bin:$PATH"
           uv run pytest tests/test_lean_*.py
 
-      - name: Verify All 55 Research Paper Artifacts
+      - name: Verify All 56 Research Paper Artifacts
         run: |
           python3 -c "
           from pathlib import Path
@@ -64,7 +64,7 @@ jobs:
           paper_dirs = sorted([d for d in Path('papers').iterdir() if d.is_dir() and d.name != 'compendium'],
                               key=lambda x: int(x.name.split('_')[0]))
           pdf_list = [str(d / 'paper.pdf') for d in paper_dirs]
-          out_pdf = 'papers/compendium/WEFT_Research_Compendium_Papers_1_to_55.pdf'
+          out_pdf = 'papers/compendium/WEFT_Research_Compendium_Papers_1_to_56.pdf'
           res = subprocess.run(['qpdf', '--empty', '--pages'] + pdf_list + ['--', out_pdf], capture_output=True, text=True)
           if res.returncode != 0:
               print('qpdf error:', res.stderr)

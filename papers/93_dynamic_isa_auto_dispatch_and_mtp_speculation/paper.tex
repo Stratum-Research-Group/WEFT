@@ -1,0 +1,56 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\geometry{margin=1in}
+
+\title{\textbf{Paper 93: Dynamic CPU ISA Auto-Dispatch, Vectorized MTP Tree Speculation, and Memory-Mapped Execution}}
+\author{\textbf{Nicholas Charles Mynhardt, Stratum Research Group} \\ \texttt{research@stratum.org}}
+\date{November 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present a unified runtime architecture for the WEFT foundation engine that eliminates manual build-target fragmentation across heterogeneous x86-64 hardware. By querying architectural feature flags at runtime via \texttt{CPUID}, the execution pipeline seamlessly directs matrix-vector and attention kernels to AVX-512 VPOPCNTDQ, AVX2 with hardware popcount, or scalar fallbacks without re-compilation or virtual dispatch overhead. Additionally, we introduce an AVX-512 vectorized speculative tree verification kernel for Multi-Token Prediction (MTP) architectures and an FP8 E4M3 dynamic range cache for context lengths exceeding 64k tokens. All core algebraic and monotonic properties are certified in Lean 4 without empirical or axiomatic compromises.
+\end{abstract}
+
+\section{Introduction and Peer-Review Context}
+\noindent\fbox{%
+\parbox{\textwidth}{%
+\textbf{Peer-Review Context \& Chronological Evolution:} \\
+\textit{Architectural Epoch VII: Bare-Metal AVX-512 VPOPCNTDQ \& AVX2 Silicon Acceleration (Papers 74--93).} \\
+This work synthesizes the silicon acceleration epoch into a unified, zero-overhead hardware auto-dispatch runtime. It dynamically routes execution between AVX-512 VPOPCNTDQ, AVX2 + POPCNT, and scalar routines via CPUID feature introspection, pairs it with an out-of-order speculative Multi-Token Prediction (MTP) tree verification engine, and incorporates an ultra-low latency memory-mapped binary container loader. Formally certified in Lean 4 with 0 axioms and 0 sorry placeholders.
+}%
+}
+
+\section{Dynamic CPU Feature Detection and Auto-Dispatch}
+To achieve maximum bare-metal throughput across diverse server and client tiers without deploying multiple static binaries, the execution engine queries CPU feature flags at initialization:
+\begin{itemize}
+    \item \textbf{AVX-512 Tier}: Requires \texttt{AVX512F}, \texttt{AVX512DQ}, \texttt{AVX512BW}, and \texttt{AVX512\_VPOPCNTDQ}.
+    \item \textbf{AVX2 Tier}: Requires \texttt{AVX2}, \texttt{FMA}, and hardware \texttt{POPCNT}.
+    \item \textbf{Scalar Tier}: Guaranteed portable ANSI C++20 fallback.
+\end{itemize}
+
+\section{Speculative Multi-Token Verification and FP8 Cache}
+Evaluating multiple candidate tokens per decoding step requires low latency verification. We vectorize acceptance testing across register lanes:
+\begin{equation}
+\text{Accept}(k) = \mathbb{I}\left( \frac{p_{\text{target}}(k)}{p_{\text{draft}}(k)} \ge \tau \right)
+\end{equation}
+For long contexts ($\ge 64\text{k}$ tokens), FP8 E4M3 representations maintain near-lossless attention fidelity while reducing KV memory consumption by $50\%$ relative to half precision.
+
+\section{Formal Lean 4 Certification}
+Invariants are machine-checked in \texttt{formal/real\_conjectures/DispatchMTPInvariants.lean} with 0 non-standard axioms and 0 sorry placeholders, establishing:
+\begin{itemize}
+    \item Popcount algebraic invariance across vector widths.
+    \item Monotonicity of speculative candidate acceptance.
+    \item Normalized FP8 E4M3 exponent bounds in $[-6, 7]$.
+\end{itemize}
+
+\end{document}

@@ -318,3 +318,46 @@ def test_avx512_dynamic_head_flash_attention_mathematical_soundness():
 
     diff = (out - ref).abs().max().item()
     assert diff < 1e-4, f"Dynamic-head Flash-Attention discrepancy too high: {diff}"
+
+
+def test_avx512_paged_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Paged KV-Cache Flash-Attention kernel against exact segmented reference.
+    Validates dynamic block-table indirect indexing and online value accumulation parity.
+    """
+    if not hasattr(weft_avx512, "subbit_paged_flash_attention_avx512"):
+        pytest.skip("AVX-512 Paged Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    Q_LEN = 4
+    DIM = 64
+    BLOCK_SIZE = 16
+    NUM_BLOCKS = 8
+    CTX_LEN = 32
+
+    q = torch.randn(B, Q_LEN, DIM, dtype=torch.float32)
+    k_cache = torch.randn(NUM_BLOCKS, BLOCK_SIZE, DIM, dtype=torch.float32)
+    v_cache = torch.randn(NUM_BLOCKS, BLOCK_SIZE, DIM, dtype=torch.float32)
+    block_tables = torch.tensor([[0, 2], [1, 3]], dtype=torch.int32)
+    context_lens = torch.tensor([CTX_LEN, CTX_LEN], dtype=torch.int32)
+    out = torch.empty(B, Q_LEN, DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (DIM ** 0.5)
+
+    weft_avx512.subbit_paged_flash_attention_avx512(
+        q, k_cache, v_cache, block_tables, context_lens, out, sm_scale, BLOCK_SIZE
+    )
+
+    ref_out = torch.empty_like(out)
+    for b in range(B):
+        k_parts = [k_cache[block_tables[b, i]] for i in range(CTX_LEN // BLOCK_SIZE)]
+        v_parts = [v_cache[block_tables[b, i]] for i in range(CTX_LEN // BLOCK_SIZE)]
+        k_contig = torch.cat(k_parts, dim=0)
+        v_contig = torch.cat(v_parts, dim=0)
+
+        scores = torch.matmul(q[b], k_contig.t()) * sm_scale
+        probs = torch.softmax(scores, dim=-1)
+        ref_out[b] = torch.matmul(probs, v_contig)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Paged Flash-Attention discrepancy too high: {diff}"

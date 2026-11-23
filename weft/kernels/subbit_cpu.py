@@ -171,3 +171,44 @@ def cpu_causal_flash_attention_avx512(
     mask = torch.triu(torch.full((q_len, kv_len), float('-inf'), device=q.device), diagonal=1)
     probs = torch.softmax(scores + mask, dim=-1)
     return torch.matmul(probs, v)
+
+
+def cpu_paged_flash_attention_avx512(
+    q: torch.Tensor,
+    k_cache: torch.Tensor,
+    v_cache: torch.Tensor,
+    block_tables: torch.Tensor,
+    context_lens: torch.Tensor,
+    sm_scale: float = None,
+    block_size: int = 16
+) -> torch.Tensor:
+    """
+    Evaluates Paged KV-Cache Flash-Attention via native AVX-512 vector registers.
+    """
+    head_dim = q.shape[-1]
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_paged_flash_attention_avx512"):
+        out = torch.empty_like(q)
+        weft_avx512.subbit_paged_flash_attention_avx512(
+            q.contiguous(), k_cache.contiguous(), v_cache.contiguous(),
+            block_tables.contiguous().to(torch.int32),
+            context_lens.contiguous().to(torch.int32),
+            out, float(sm_scale), int(block_size)
+        )
+        return out
+
+    # Standard segmented fallback
+    B = q.shape[0]
+    out = torch.empty_like(q)
+    for b in range(B):
+        ctx_len = int(context_lens[b].item())
+        k_parts = [k_cache[block_tables[b, i]] for i in range((ctx_len + block_size - 1) // block_size)]
+        v_parts = [v_cache[block_tables[b, i]] for i in range((ctx_len + block_size - 1) // block_size)]
+        k_contig = torch.cat(k_parts, dim=0)[:ctx_len]
+        v_contig = torch.cat(v_parts, dim=0)[:ctx_len]
+        scores = torch.matmul(q[b], k_contig.t()) * sm_scale
+        probs = torch.softmax(scores, dim=-1)
+        out[b] = torch.matmul(probs, v_contig)
+    return out

@@ -718,6 +718,119 @@ void subbit_dynamic_head_flash_attention_avx512_forward(
     }
 }
 
+
+/**
+ * AVX-512 Paged KV-Cache Vectorized Flash-Attention Forward Kernel
+ * Resolves non-contiguous memory blocks via dynamic block-table indirect indexing.
+ * Supports block_size = 16/32 tokens per paged block with direct ZMM register accumulation.
+ * q: [batch_heads, q_len, head_dim] float32
+ * k_cache: [num_blocks, block_size, head_dim] float32
+ * v_cache: [num_blocks, block_size, head_dim] float32
+ * block_tables: [batch_heads, max_num_blocks] int32
+ * context_lens: [batch_heads] int32
+ * out: [batch_heads, q_len, head_dim] float32
+ */
+void subbit_paged_flash_attention_avx512_forward(
+    const at::Tensor& q,
+    const at::Tensor& k_cache,
+    const at::Tensor& v_cache,
+    const at::Tensor& block_tables,
+    const at::Tensor& context_lens,
+    at::Tensor& out,
+    float sm_scale,
+    int64_t block_size
+) {
+    TORCH_CHECK(q.is_contiguous() && k_cache.is_contiguous() && v_cache.is_contiguous() &&
+                block_tables.is_contiguous() && context_lens.is_contiguous() && out.is_contiguous(),
+                "All tensors must be contiguous");
+
+    const int64_t batch_heads = q.size(0);
+    const int64_t q_len = q.size(1);
+    const int64_t head_dim = q.size(2);
+    const int64_t max_blocks = block_tables.size(1);
+
+    const float* q_ptr = q.data_ptr<float>();
+    const float* k_ptr = k_cache.data_ptr<float>();
+    const float* v_ptr = v_cache.data_ptr<float>();
+    const int32_t* bt_ptr = block_tables.data_ptr<int32_t>();
+    const int32_t* cl_ptr = context_lens.data_ptr<int32_t>();
+    float* out_ptr = out.data_ptr<float>();
+
+    const int64_t q_stride_b = q_len * head_dim;
+    const int64_t block_stride = block_size * head_dim;
+
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (int64_t bh = 0; bh < batch_heads; ++bh) {
+        for (int64_t qi = 0; qi < q_len; ++qi) {
+            const float* cur_q = q_ptr + bh * q_stride_b + qi * head_dim;
+            const int32_t* cur_bt = bt_ptr + bh * max_blocks;
+            const int32_t ctx_len = cl_ptr[bh];
+            float* cur_out = out_ptr + bh * q_stride_b + qi * head_dim;
+
+            for (int64_t d = 0; d < head_dim; ++d) {
+                cur_out[d] = 0.0f;
+            }
+
+            float m_prev = -1e30f;
+            float s_prev = 0.0f;
+
+            for (int32_t ki = 0; ki < ctx_len; ++ki) {
+                const int32_t block_idx = cur_bt[ki / block_size];
+                const int32_t block_offset = ki % block_size;
+                const float* cur_k = k_ptr + block_idx * block_stride + block_offset * head_dim;
+                const float* cur_v = v_ptr + block_idx * block_stride + block_offset * head_dim;
+
+                __m512 vdot = _mm512_setzero_ps();
+                int64_t d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vq = _mm512_loadu_ps(cur_q + d);
+                    __m512 vk = _mm512_loadu_ps(cur_k + d);
+                    vdot = _mm512_fmadd_ps(vq, vk, vdot);
+                }
+                float score = _mm512_reduce_add_ps(vdot);
+                for (; d < head_dim; ++d) {
+                    score += cur_q[d] * cur_k[d];
+                }
+                score *= sm_scale;
+
+                float m_new = (score > m_prev) ? score : m_prev;
+                float alpha = std::exp(m_prev - m_new);
+                float p_curr = std::exp(score - m_new);
+                float s_new = s_prev * alpha + p_curr;
+
+                __m512 valpha = _mm512_set1_ps(alpha);
+                __m512 vpcurr = _mm512_set1_ps(p_curr);
+                d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vout = _mm512_loadu_ps(cur_out + d);
+                    __m512 vv = _mm512_loadu_ps(cur_v + d);
+                    vout = _mm512_mul_ps(vout, valpha);
+                    vout = _mm512_fmadd_ps(vpcurr, vv, vout);
+                    _mm512_storeu_ps(cur_out + d, vout);
+                }
+                for (; d < head_dim; ++d) {
+                    cur_out[d] = cur_out[d] * alpha + p_curr * cur_v[d];
+                }
+
+                m_prev = m_new;
+                s_prev = s_new;
+            }
+
+            float inv_s = 1.0f / (s_prev + 1e-12f);
+            __m512 vinv = _mm512_set1_ps(inv_s);
+            int64_t d = 0;
+            for (; d + 16 <= head_dim; d += 16) {
+                __m512 vout = _mm512_loadu_ps(cur_out + d);
+                vout = _mm512_mul_ps(vout, vinv);
+                _mm512_storeu_ps(cur_out + d, vout);
+            }
+            for (; d < head_dim; ++d) {
+                cur_out[d] *= inv_s;
+            }
+        }
+    }
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
@@ -728,4 +841,5 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_flash_attention_avx512", &subbit_flash_attention_avx512_forward, "AVX-512 In-Register Tiled Flash-Attention Forward");
     m.def("subbit_causal_flash_attention_avx512", &subbit_causal_flash_attention_avx512_forward, "AVX-512 Fused Causal Block-Masked Flash-Attention Forward");
     m.def("subbit_dynamic_head_flash_attention_avx512", &subbit_dynamic_head_flash_attention_avx512_forward, "AVX-512 Masked Dynamic-Head Flash-Attention Forward");
+    m.def("subbit_paged_flash_attention_avx512", &subbit_paged_flash_attention_avx512_forward, "AVX-512 Paged KV-Cache Vectorized Flash-Attention Forward");
 }

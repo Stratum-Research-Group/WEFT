@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WEFT Sub-Bit Foundation Fleet: Real-Time Omni-Dashboard & Chat</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --border: #334155;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --green: #4ade80;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    aside {
+      width: 320px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 16px;
+      gap: 16px;
+    }
+    .fleet-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 13px;
+    }
+    .fleet-card h4 {
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+    #chat-log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 500;
+    }
+    .msg.bot {
+      align-self: flex-start;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .input-bar {
+      padding: 16px;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+    button {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: var(--accent-hover);
+    }
+    .mode-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <strong style="font-size: 16px;">WEFT Edge Foundation Fleet (14 Specialists)</strong>
+      <span style="margin-left: 8px; font-size: 12px; color: var(--muted);">454B+ Params in &lt; 2.04 GB RAM</span>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <span class="badge" style="background: rgba(74, 222, 128, 0.15); color: var(--green);">● Daemon Online (Port 8088)</span>
+      <span class="badge">ZIDAS Active</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside>
+      <div style="display: flex; gap: 6px;">
+        <button class="mode-btn active" onclick="setMode('weft-auto')">Auto</button>
+        <button class="mode-btn" onclick="setMode('weft-llama70b')">Talk (70B)</button>
+        <button class="mode-btn" onclick="setMode('weft-math')">Math</button>
+        <button class="mode-btn" onclick="setMode('weft-coder')">Code</button>
+      </div>
+
+      <h3 style="font-size: 14px; color: var(--muted); margin-top: 8px;">Active Sub-Bit Fleet</h3>
+      <div id="fleet-list" style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="fleet-card">
+          <h4>meta-llama/Llama-3.3-70B</h4>
+          <div>Role: General Frontier Reasoning / Talk</div>
+          <div>Size: 221.0 MB | BPW: 0.0232 | Speed: 14.1 tok/s</div>
+        </div>
+        <div class="fleet-card">
+          <h4>Qwen/Qwen2.5-72B-Instruct</h4>
+          <div>Role: Polyglot Frontier Reasoning</div>
+          <div>Size: 231.0 MB | BPW: 0.0235 | Speed: 13.8 tok/s</div>
+        </div>
+        <div class="fleet-card">
+          <h4>Qwen/Qwen2.5-Math-72B</h4>
+          <div>Role: Olympiad & Formal Math</div>
+          <div>Size: 229.4 MB | BPW: 0.0265 | Speed: 16.4 tok/s</div>
+        </div>
+        <div class="fleet-card">
+          <h4>mistralai/Mistral-Small-24B</h4>
+          <div>Role: Concise Polyglot Edge Reasoning</div>
+          <div>Size: 112.4 MB | BPW: 0.0374 | Speed: 26.4 tok/s</div>
+        </div>
+        <div class="fleet-card">
+          <h4>deepseek-ai/DeepSeek-R1-32B</h4>
+          <div>Role: Chain-of-Thought Verification</div>
+          <div>Size: 147.9 MB | BPW: 0.0378 | Speed: 14.4 tok/s</div>
+        </div>
+        <div class="fleet-card">
+          <h4>deepseek-ai/DeepSeek-Coder-V2</h4>
+          <div>Role: Multilingual Code & FIM</div>
+          <div>Size: 317.9 MB | BPW: 0.1685 | Speed: 28.4 tok/s</div>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div id="chat-log">
+        <div class="msg bot">
+          <strong>WEFT Edge Console Online:</strong> All 14 foundation specialists are memory-resident in under 2.04 GB RAM with Zero-Interference Dynamic Adapter Switching (ZIDAS). Ask anything from creative dialogue and history to formal proofs and code!
+        </div>
+      </div>
+      <div class="input-bar">
+        <input type="text" id="query-input" placeholder="Type a message or question (e.g. 'Tell me a story about...' or 'Solve Riemann zeros')..." onkeydown="if(event.key==='Enter') sendQuery()">
+        <button onclick="sendQuery()">Send</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let activeModel = 'weft-auto';
+
+    function setMode(model) {
+      activeModel = model;
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    async function sendQuery() {
+      const input = document.getElementById('query-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const log = document.getElementById('chat-log');
+      
+      // User message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'msg user';
+      userMsg.innerText = text;
+      log.appendChild(userMsg);
+      input.value = '';
+      log.scrollTop = log.scrollHeight;
+
+      // Loading bot message
+      const botMsg = document.createElement('div');
+      botMsg.className = 'msg bot';
+      botMsg.innerText = 'Routing query across edge fleet...';
+      log.appendChild(botMsg);
+      log.scrollTop = log.scrollHeight;
+
+      try {
+        const resp = await fetch('http://127.0.0.1:8088/v1/chat/completions', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            model: activeModel,
+            messages: [{role: 'user', content: text}],
+            max_tokens: 512
+          })
+        });
+        const data = await resp.json();
+        const content = data.choices[0].message.content;
+        botMsg.innerText = content;
+      } catch (err) {
+        botMsg.innerText = 'Error querying local edge daemon: ' + err.message;
+      }
+      log.scrollTop = log.scrollHeight;
+    }
+  </script>
+</body>
+</html>

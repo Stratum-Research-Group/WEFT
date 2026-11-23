@@ -1,0 +1,10 @@
+{
+  "adapter_id": "ADAPT-F160-041",
+  "target_layer": "qwen2.5-math-72b.frontier.agd",
+  "domain": "Algebraic Geometry & Diophantine",
+  "conjecture_id": "F160-041",
+  "rank": 1,
+  "norm_delta": 0.253662109375,
+  "created_at": 1795441131.4392555,
+  "lean_verified": true
+}

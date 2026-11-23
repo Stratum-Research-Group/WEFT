@@ -1,0 +1,10 @@
+{
+  "adapter_id": "ADAPT-F160-008",
+  "target_layer": "qwen2.5-math-72b.frontier.ant",
+  "domain": "Analytic Number Theory",
+  "conjecture_id": "F160-008",
+  "rank": 1,
+  "norm_delta": 0.248046875,
+  "created_at": 1795441131.4293694,
+  "lean_verified": true
+}

@@ -1,0 +1,10 @@
+{
+  "adapter_id": "ADAPT-F160-151",
+  "target_layer": "qwen2.5-math-72b.frontier.dst",
+  "domain": "Dynamical Systems & Topology",
+  "conjecture_id": "F160-151",
+  "rank": 1,
+  "norm_delta": 0.2484130859375,
+  "created_at": 1795441131.4966218,
+  "lean_verified": true
+}

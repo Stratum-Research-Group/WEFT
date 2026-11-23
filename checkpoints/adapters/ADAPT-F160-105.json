@@ -1,0 +1,10 @@
+{
+  "adapter_id": "ADAPT-F160-105",
+  "target_layer": "qwen2.5-math-72b.frontier.pde",
+  "domain": "Partial Differential Equations & Physics",
+  "conjecture_id": "F160-105",
+  "rank": 1,
+  "norm_delta": 0.250244140625,
+  "created_at": 1795441131.457241,
+  "lean_verified": true
+}

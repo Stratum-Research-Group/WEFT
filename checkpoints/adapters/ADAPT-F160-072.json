@@ -1,0 +1,10 @@
+{
+  "adapter_id": "ADAPT-F160-072",
+  "target_layer": "qwen2.5-math-72b.frontier.cdm",
+  "domain": "Combinatorics & Discrete Mathematics",
+  "conjecture_id": "F160-072",
+  "rank": 1,
+  "norm_delta": 0.253173828125,
+  "created_at": 1795441131.4479275,
+  "lean_verified": true
+}

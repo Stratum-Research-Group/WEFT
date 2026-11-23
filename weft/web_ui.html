@@ -197,6 +197,7 @@
       <div style="display: flex; gap: 4px; flex-wrap: wrap;">
         <button class="mode-btn active" onclick="setMode('weft-auto', this)">Auto</button>
         <button class="mode-btn" onclick="setMode('weft-llama70b', this)">Talk (70B)</button>
+        <button class="mode-btn" onclick="setMode('council', this)">Council 🏛️</button>
         <button class="mode-btn" onclick="setMode('weft-math', this)">Math</button>
         <button class="mode-btn" onclick="setMode('code', this)">Code Sandbox</button>
         <button class="mode-btn" onclick="setMode('audio', this)">Audio 🎵</button>
@@ -298,8 +299,32 @@
           const data = await resp.json();
           botMsg.innerHTML = `<strong>[Gemma-4-26B Edge Sandbox Execution (${data.execution_time_ms} ms)]</strong><br>
           <pre style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 4px; margin-top: 4px;">${data.stdout || data.stderr}</pre>`;
+        } else if (activeModel === 'council') {
+          // Council multi-agent consensus deliberation
+          const resp = await fetch('http://127.0.0.1:8088/v1/council/deliberate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ query: text })
+          });
+          const data = await resp.json();
+          botMsg.innerHTML = `
+          <div style="border-left: 3px solid var(--purple); padding-left: 10px; margin-bottom: 8px;">
+            <strong style="color: var(--purple);">🏛️ Council Deliberation Consensus (${data.total_latency_ms} ms)</strong>
+          </div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin-bottom: 6px; font-size: 13px;">
+            <strong style="color: var(--accent);">1. The Thinker [${data.stages.thinker.model}] (${data.stages.thinker.latency_ms} ms):</strong><br>
+            ${data.stages.thinker.output}
+          </div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin-bottom: 6px; font-size: 13px;">
+            <strong style="color: var(--green);">2. The Verifier [${data.stages.verifier.model}] (${data.stages.verifier.latency_ms} ms):</strong><br>
+            ${data.stages.verifier.output}
+          </div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 13px;">
+            <strong style="color: #fbbf24;">3. The Synthesizer [${data.stages.synthesizer.model}] (${data.stages.synthesizer.latency_ms} ms):</strong><br>
+            ${data.stages.synthesizer.output}
+          </div>`;
         } else if (activeModel === 'audio') {
-          // Audio synthesis
+          // Audio synthesis with genuine WAV audio player
           const resp = await fetch('http://127.0.0.1:8088/v1/audio/generate', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -308,8 +333,8 @@
           const data = await resp.json();
           botMsg.innerHTML = `<strong>[MusicGen-Small Sub-Bit (15.4 MB)]</strong><br>
           🎵 Synthesized <strong>${data.duration_s}s</strong> 32kHz audio in <strong>${data.latency_ms} ms</strong>!<br>
-          <em>Prompt:</em> "${data.prompt}" | <em>Key:</em> ${data.conditioning.key} (${data.conditioning.tempo_bpm} BPM)`;
-          playWebAudioChord();
+          <em>Prompt:</em> "${data.prompt}" | <em>Key:</em> ${data.conditioning.key} (${data.conditioning.tempo_bpm} BPM)<br>
+          <audio controls autoplay style="width: 100%; margin-top: 8px;" src="data:audio/wav;base64,${data.wav_base64}"></audio>`;
         } else {
           // Chat completions
           const resp = await fetch('http://127.0.0.1:8088/v1/chat/completions', {

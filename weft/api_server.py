@@ -216,7 +216,8 @@ async def generate_audio_endpoint(req: Request):
             "sample_rate": res["sample_rate"],
             "duration_s": res["duration_s"],
             "latency_ms": res["latency_ms"],
-            "model": res["model"]
+            "model": res["model"],
+            "wav_base64": res["wav_base64"]
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -9,13 +9,21 @@ import numpy as np
 
 # Dynamically import native AVX-512 hardware accelerator if available on host
 _AVX512_AVAILABLE = False
+weft_avx512 = None
 try:
     import weft_avx512
     _AVX512_AVAILABLE = True
 except ImportError:
     try:
-        from ... import weft_avx512
-        _AVX512_AVAILABLE = True
+        import os
+        from torch.utils.cpp_extension import load
+        build_so = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "build", "libweft_avx512.so"))
+        if os.path.exists(build_so):
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("weft_avx512", build_so)
+            weft_avx512 = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(weft_avx512)
+            _AVX512_AVAILABLE = True
     except Exception:
         _AVX512_AVAILABLE = False
 

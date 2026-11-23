@@ -1375,6 +1375,160 @@ void subbit_gqa_flash_attention_avx512_forward(
 }
 
 
+/**
+ * AVX-512 Asymmetric Int4 KV-Cache Flash-Attention Forward Kernel
+ * Stores activations as unsigned 4-bit integers [0, 15] packed dual-per-byte with
+ * per-token scale factors and per-token integer zero-points in [0, 15].
+ * Dynamically performs in-register zero-point centering: X = scale * (raw - zero_point)
+ * q: [batch_heads, q_len, head_dim] float32
+ * k_packed: [batch_heads, kv_len, head_dim / 2] uint8
+ * v_packed: [batch_heads, kv_len, head_dim / 2] uint8
+ * k_scales: [batch_heads, kv_len] float32
+ * v_scales: [batch_heads, kv_len] float32
+ * k_zeros: [batch_heads, kv_len] float32 (or int32)
+ * v_zeros: [batch_heads, kv_len] float32 (or int32)
+ * out: [batch_heads, q_len, head_dim] float32
+ */
+void subbit_asym_int4_kv_flash_attention_avx512_forward(
+    const at::Tensor& q,
+    const at::Tensor& k_packed,
+    const at::Tensor& v_packed,
+    const at::Tensor& k_scales,
+    const at::Tensor& v_scales,
+    const at::Tensor& k_zeros,
+    const at::Tensor& v_zeros,
+    at::Tensor& out,
+    float sm_scale
+) {
+    TORCH_CHECK(q.is_contiguous() && k_packed.is_contiguous() && v_packed.is_contiguous() &&
+                k_scales.is_contiguous() && v_scales.is_contiguous() &&
+                k_zeros.is_contiguous() && v_zeros.is_contiguous() && out.is_contiguous(),
+                "All tensors must be contiguous");
+
+    const int64_t batch_heads = q.size(0);
+    const int64_t q_len = q.size(1);
+    const int64_t head_dim = q.size(2);
+    const int64_t kv_len = k_packed.size(1);
+
+    const float* q_ptr = q.data_ptr<float>();
+    const uint8_t* k_ptr = k_packed.data_ptr<uint8_t>();
+    const uint8_t* v_ptr = v_packed.data_ptr<uint8_t>();
+    const float* ks_ptr = k_scales.data_ptr<float>();
+    const float* vs_ptr = v_scales.data_ptr<float>();
+    const float* kz_ptr = k_zeros.data_ptr<float>();
+    const float* vz_ptr = v_zeros.data_ptr<float>();
+    float* out_ptr = out.data_ptr<float>();
+
+    const int64_t q_stride_b = q_len * head_dim;
+    const int64_t packed_stride_b = kv_len * (head_dim / 2);
+
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (int64_t bh = 0; bh < batch_heads; ++bh) {
+        for (int64_t qi = 0; qi < q_len; ++qi) {
+            const float* cur_q = q_ptr + bh * q_stride_b + qi * head_dim;
+            const uint8_t* cur_k_base = k_ptr + bh * packed_stride_b;
+            const uint8_t* cur_v_base = v_ptr + bh * packed_stride_b;
+            const float* cur_ks = ks_ptr + bh * kv_len;
+            const float* cur_vs = vs_ptr + bh * kv_len;
+            const float* cur_kz = kz_ptr + bh * kv_len;
+            const float* cur_vz = vz_ptr + bh * kv_len;
+            float* cur_out = out_ptr + bh * q_stride_b + qi * head_dim;
+
+            for (int64_t d = 0; d < head_dim; ++d) {
+                cur_out[d] = 0.0f;
+            }
+
+            float m_prev = -1e30f;
+            float s_prev = 0.0f;
+
+            for (int64_t ki = 0; ki < kv_len; ++ki) {
+                const uint8_t* cur_k = cur_k_base + ki * (head_dim / 2);
+                const uint8_t* cur_v = cur_v_base + ki * (head_dim / 2);
+                const float k_scale = cur_ks[ki];
+                const float v_scale = cur_vs[ki];
+                const float k_zero = cur_kz[ki];
+                const float v_zero = cur_vz[ki];
+
+                __m512 vk_zero = _mm512_set1_ps(k_zero);
+                __m512 vdot = _mm512_setzero_ps();
+                int64_t d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vq = _mm512_loadu_ps(cur_q + d);
+
+                    int64_t byte_idx = d / 2;
+                    int32_t val_buf[16];
+                    for (int j = 0; j < 8; ++j) {
+                        uint8_t byte = cur_k[byte_idx + j];
+                        val_buf[2 * j] = static_cast<int32_t>(byte & 0x0F);
+                        val_buf[2 * j + 1] = static_cast<int32_t>((byte >> 4) & 0x0F);
+                    }
+                    __m512i k_i32 = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(val_buf));
+                    __m512 vk_raw = _mm512_cvtepi32_ps(k_i32);
+                    __m512 vk = _mm512_sub_ps(vk_raw, vk_zero);
+                    vdot = _mm512_fmadd_ps(vq, vk, vdot);
+                }
+                float score = _mm512_reduce_add_ps(vdot);
+                for (; d < head_dim; ++d) {
+                    int64_t byte_idx = d / 2;
+                    uint8_t byte = cur_k[byte_idx];
+                    float val = static_cast<float>((d % 2 == 0) ? (byte & 0x0F) : ((byte >> 4) & 0x0F));
+                    score += cur_q[d] * (val - k_zero);
+                }
+                score *= (k_scale * sm_scale);
+
+                float m_new = (score > m_prev) ? score : m_prev;
+                float alpha = std::exp(m_prev - m_new);
+                float p_curr = std::exp(score - m_new);
+                float s_new = s_prev * alpha + p_curr;
+
+                __m512 valpha = _mm512_set1_ps(alpha);
+                __m512 vpcurr_scaled = _mm512_set1_ps(p_curr * v_scale);
+                __m512 vv_zero = _mm512_set1_ps(v_zero);
+                d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vout = _mm512_loadu_ps(cur_out + d);
+
+                    int64_t byte_idx = d / 2;
+                    int32_t val_buf[16];
+                    for (int j = 0; j < 8; ++j) {
+                        uint8_t byte = cur_v[byte_idx + j];
+                        val_buf[2 * j] = static_cast<int32_t>(byte & 0x0F);
+                        val_buf[2 * j + 1] = static_cast<int32_t>((byte >> 4) & 0x0F);
+                    }
+                    __m512i v_i32 = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(val_buf));
+                    __m512 vv_raw = _mm512_cvtepi32_ps(v_i32);
+                    __m512 vv = _mm512_sub_ps(vv_raw, vv_zero);
+                    vout = _mm512_mul_ps(vout, valpha);
+                    vout = _mm512_fmadd_ps(vpcurr_scaled, vv, vout);
+                    _mm512_storeu_ps(cur_out + d, vout);
+                }
+                for (; d < head_dim; ++d) {
+                    int64_t byte_idx = d / 2;
+                    uint8_t byte = cur_v[byte_idx];
+                    float val = static_cast<float>((d % 2 == 0) ? (byte & 0x0F) : ((byte >> 4) & 0x0F));
+                    cur_out[d] = cur_out[d] * alpha + p_curr * ((val - v_zero) * v_scale);
+                }
+
+                m_prev = m_new;
+                s_prev = s_new;
+            }
+
+            float inv_s = 1.0f / (s_prev + 1e-12f);
+            __m512 vinv = _mm512_set1_ps(inv_s);
+            int64_t d = 0;
+            for (; d + 16 <= head_dim; d += 16) {
+                __m512 vout = _mm512_loadu_ps(cur_out + d);
+                vout = _mm512_mul_ps(vout, vinv);
+                _mm512_storeu_ps(cur_out + d, vout);
+            }
+            for (; d < head_dim; ++d) {
+                cur_out[d] *= inv_s;
+            }
+        }
+    }
+}
+
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
@@ -1390,6 +1544,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_int4_kv_flash_attention_avx512", &subbit_int4_kv_flash_attention_avx512_forward, "AVX-512 Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
     m.def("subbit_paged_int4_kv_flash_attention_avx512", &subbit_paged_int4_kv_flash_attention_avx512_forward, "AVX-512 Paged Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
     m.def("subbit_gqa_flash_attention_avx512", &subbit_gqa_flash_attention_avx512_forward, "AVX-512 Grouped-Query Attention (GQA) Flash-Attention Forward");
+    m.def("subbit_asym_int4_kv_flash_attention_avx512", &subbit_asym_int4_kv_flash_attention_avx512_forward, "AVX-512 Asymmetric Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
 }
+
 
 

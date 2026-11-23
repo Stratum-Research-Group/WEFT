@@ -395,4 +395,51 @@ def cpu_gqa_flash_attention_avx512(
     return out
 
 
+def cpu_asym_int4_kv_flash_attention_avx512(
+    q: torch.Tensor,
+    k_packed: torch.Tensor,
+    v_packed: torch.Tensor,
+    k_scales: torch.Tensor,
+    v_scales: torch.Tensor,
+    k_zeros: torch.Tensor,
+    v_zeros: torch.Tensor,
+    sm_scale: float = None
+) -> torch.Tensor:
+    """
+    Evaluates Asymmetric Sub-Byte Int4 Quantized KV-Cache Flash-Attention via native AVX-512 vector registers.
+    Activations are unsigned 4-bit integers [0, 15] packed dual-per-byte with zero-points.
+    """
+    head_dim = q.shape[-1]
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_asym_int4_kv_flash_attention_avx512"):
+        out = torch.empty_like(q)
+        weft_avx512.subbit_asym_int4_kv_flash_attention_avx512(
+            q.contiguous(), k_packed.contiguous(), v_packed.contiguous(),
+            k_scales.contiguous(), v_scales.contiguous(),
+            k_zeros.contiguous(), v_zeros.contiguous(),
+            out, float(sm_scale)
+        )
+        return out
+
+    def unpack_unsigned_nibbles(packed):
+        p = packed.to(torch.int32)
+        low = (p & 0x0F)
+        high = ((p >> 4) & 0x0F)
+        unpacked = torch.stack([low, high], dim=-1).view(*packed.shape[:-1], packed.shape[-1] * 2)
+        return unpacked.float()
+
+    k_raw = unpack_unsigned_nibbles(k_packed)
+    v_raw = unpack_unsigned_nibbles(v_packed)
+
+    k_deq = (k_raw - k_zeros.unsqueeze(-1)) * k_scales.unsqueeze(-1)
+    v_deq = (v_raw - v_zeros.unsqueeze(-1)) * v_scales.unsqueeze(-1)
+
+    scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    return torch.matmul(probs, v_deq)
+
+
+
 

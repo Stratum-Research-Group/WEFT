@@ -571,4 +571,64 @@ def test_avx512_gqa_flash_attention_mathematical_soundness():
     assert diff < 1e-4, f"GQA Flash-Attention discrepancy too high: {diff}"
 
 
+def test_avx512_asym_int4_kv_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Asymmetric Int4 KV-Cache Flash-Attention kernel.
+    Validates in-register unsigned nibble unpacking, zero-point subtraction, and scaling parity.
+    """
+    if not hasattr(weft_avx512, "subbit_asym_int4_kv_flash_attention_avx512"):
+        pytest.skip("AVX-512 Asymmetric Int4 KV Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    Q_LEN = 4
+    KV_LEN = 32
+    HEAD_DIM = 64
+
+    q = torch.randn(B, Q_LEN, HEAD_DIM, dtype=torch.float32)
+
+    # Unsigned 4-bit integers in [0, 15]
+    k_u4 = torch.randint(0, 16, (B, KV_LEN, HEAD_DIM), dtype=torch.int32)
+    v_u4 = torch.randint(0, 16, (B, KV_LEN, HEAD_DIM), dtype=torch.int32)
+
+    k_scales = torch.rand(B, KV_LEN, dtype=torch.float32) * 0.1 + 0.01
+    v_scales = torch.rand(B, KV_LEN, dtype=torch.float32) * 0.1 + 0.01
+
+    k_zeros = torch.randint(0, 16, (B, KV_LEN), dtype=torch.int32).float()
+    v_zeros = torch.randint(0, 16, (B, KV_LEN), dtype=torch.int32).float()
+
+    # Pack into uint8 (low nibble = dim 2k, high nibble = dim 2k+1)
+    k_packed = torch.zeros(B, KV_LEN, HEAD_DIM // 2, dtype=torch.uint8)
+    v_packed = torch.zeros(B, KV_LEN, HEAD_DIM // 2, dtype=torch.uint8)
+    for b in range(B):
+        for s in range(KV_LEN):
+            for d in range(HEAD_DIM // 2):
+                low = k_u4[b, s, 2 * d].item() & 0x0F
+                high = k_u4[b, s, 2 * d + 1].item() & 0x0F
+                k_packed[b, s, d] = low | (high << 4)
+
+                v_low = v_u4[b, s, 2 * d].item() & 0x0F
+                v_high = v_u4[b, s, 2 * d + 1].item() & 0x0F
+                v_packed[b, s, d] = v_low | (v_high << 4)
+
+    out = torch.empty(B, Q_LEN, HEAD_DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (HEAD_DIM ** 0.5)
+
+    weft_avx512.subbit_asym_int4_kv_flash_attention_avx512(
+        q, k_packed, v_packed, k_scales, v_scales, k_zeros, v_zeros, out, sm_scale
+    )
+
+    # Reference evaluation
+    k_deq = (k_u4.float() - k_zeros.unsqueeze(-1)) * k_scales.unsqueeze(-1)
+    v_deq = (v_u4.float() - v_zeros.unsqueeze(-1)) * v_scales.unsqueeze(-1)
+
+    scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    ref_out = torch.matmul(probs, v_deq)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Asym Int4 KV Flash-Attention discrepancy too high: {diff}"
+
+
+
 

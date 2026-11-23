@@ -1,3 +1,4 @@
+import os
 import shutil
 import pytest
 pytestmark = pytest.mark.skipif(shutil.which("lean") is None and not os.path.exists(os.path.expanduser("~/.elan/bin/lean")), reason="Lean 4 compiler not installed")
@@ -5,7 +6,6 @@ pytestmark = pytest.mark.skipif(shutil.which("lean") is None and not os.path.exi
 Unit tests for Lean 4 Verified Zipf-Optimal Vocabulary Partitioning Theorems.
 """
 import pytest
-import os
 import subprocess
 
 def test_lean4_zipf_theorems_kernel_verification():

@@ -79,9 +79,9 @@ class WeftSubBitLinear(nn.Module):
         self.scale_g = nn.ParameterList()
 
         for _ in range(num_paths):
-            # U_b: (out_features, words_per_rank) as int32/uint32
-            u = torch.randint(0, 0x7FFFFFFF, (out_features, self.words_per_rank), dtype=torch.int32)
-            v = torch.randint(0, 0x7FFFFFFF, (in_features, self.words_per_rank), dtype=torch.int32)
+            # U_b: (out_features, words_per_rank) as int32 with full 32-bit random sign bit distribution
+            u = torch.randint(-0x80000000, 0x7FFFFFFF, (out_features, self.words_per_rank), dtype=torch.int32)
+            v = torch.randint(-0x80000000, 0x7FFFFFFF, (in_features, self.words_per_rank), dtype=torch.int32)
             self.u_packed.append(nn.Parameter(u, requires_grad=False))
             self.v_packed.append(nn.Parameter(v, requires_grad=False))
 

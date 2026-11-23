@@ -181,6 +181,9 @@ class LeanSelfCorrectionLoop:
             # Extract variable names if present
             return "by cases x <;> cases y <;> cases u <;> cases v <;> rfl"
 
+        # Fallback tactic
+        return "by aesop"
+
     def prove_and_refine(
         self,
         theorem_name: str,

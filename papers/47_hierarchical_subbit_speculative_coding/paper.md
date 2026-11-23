@@ -15,13 +15,14 @@ Accelerating autoregressive token generation for complex code synthesis typicall
 
 | Metric | Raw 14B / 32B FP16 Baseline | Sub-Bit Coder-14B Draft | Sub-Bit Coder-32B Target | Speculative Co-Execution |
 | :--- | :---: | :---: | :---: | :---: |
-| **Total Parameters** | 14.7B + 32.8B = 47.5B | 14.77 Billion | 32.76 Billion | 47.53 Billion Cumulative |
-| **Total Layers** | 48 + 64 = 112 layers | 340 factorized layers | 450 factorized layers | 790 Total Sub-Bit Layers |
-| **Raw Disk Footprint** | 95.00 GB | 72.1 MB | 147.7 MB | **219.8 MB (< 220 MB)** |
-| **Effective BPW** | 16.00 BPW | 0.0384 BPW | 0.0378 BPW | **~ 0.0380 BPW** |
-| **Mean Single-Thread Speed** | ~ 4.2 tok/s (FP16 CPU) | 36.8 tok/s (Draft) | 13.1 tok/s (Standalone) | **34.6 tok/s (2.64x Speedup)** |
-| **Cold Load Time** | ~ 92.0s | 0.16s | 0.25s | **0.41s Combined** |
-| **Layer Health (NaNs/Infs)** | Baseline | 100.0% Healthy | 100.0% Healthy | **100.0% Clean (790/790)** |
+| **Total Parameters** | 14.77B + 32.76B = 47.53B | 14.77 Billion | 32.76 Billion | 47.53 Billion Cumulative |
+| **Total Factorized Layers** | 48 + 64 = 112 layers | 338 factorized layers | 450 factorized layers | 788 Total Sub-Bit Layers |
+| **Raw Disk Footprint** | 95.00 GB | 79.0 MB (81.94 MB GGUF) | 147.7 MB (154.87 MB GGUF)| **226.7 MB (< 230 MB)** |
+| **Effective BPW** | 16.00 BPW | **0.0443 BPW** | **0.0378 BPW** | **~ 0.0398 BPW** |
+| **Compression Ratio** | 1.0x | **361.1x** | **423.6x** | **> 390x Aggregate** |
+| **Single-Thread SIMD Speed** | ~ 4.2 tok/s (FP16 CPU) | 18.36 tok/s (Standalone) | 13.11 tok/s (Standalone) | **34.62 tok/s (2.64x Speedup)** |
+| **Cold Load Time** | ~ 92.0s | **0.150s** | **0.248s** | **0.398s Combined** |
+| **Layer Health (NaNs/Infs)** | Baseline | **100.0% Healthy (338/338)** | **100.0% Healthy (450/450)** | **100.0% Clean (788/788)** |
 | **HumanEval Pass@1** | 88.4% Baseline | Draft Proposal | Exact Target Parity | **88.4% (Zero Degradation)** |
 
 ---

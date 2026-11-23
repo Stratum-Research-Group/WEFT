@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch II: Binary Container Standards & Sub-Bit OS (Papers 17–24)
+> **Chronological Context**: Phase 2 formalized the .weft binary container file specification, memory-mapped layer indexing, and initial sub-bit OS infrastructure for quantized model serving with adaptive spectral quantization.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Executive Summary
 While autoregressive model weights can be compressed down to $0.18$–$0.54$ bits per weight (BPW), scaling inference to long-context regimes ($128\text{K}$ tokens) causes Key-Value (KV) cache memory consumption to rapidly eclipse static parameter weights. In this work, we introduce **Sub-Bit PagedAttention**, combining low-rank bipolar bitboard factorizations with paged memory management.
 

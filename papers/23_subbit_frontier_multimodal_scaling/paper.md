@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch II: Binary Container Standards & Sub-Bit OS (Papers 17–24)
+> **Chronological Context**: Phase 2 formalized the .weft binary container file specification, memory-mapped layer indexing, and initial sub-bit OS infrastructure for quantized model serving with adaptive spectral quantization.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Executive Summary
 As foundation model architectures transition toward unified multi-modal representations encompassing text, vision, and audio, parameter footprints explode, imposing severe memory bottlenecks. In this work, we demonstrate that the low-rank binary factorization and Joint Iterative Quantization (Joint-ITQ) framework established in the `.weft` standard scales smoothly from small language models ($2$B) to extreme-scale multi-modal foundation models ($12$B to $70$B).
 

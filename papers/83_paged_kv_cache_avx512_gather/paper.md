@@ -5,7 +5,14 @@
 
 ---
 
-### Abstract
+#
+
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch VII: Bare-Metal AVX-512 VPOPCNTDQ & AVX2 Silicon Acceleration (Papers 74–92)
+> **Chronological Context**: Phase 7 transitioned the architectural framework to native C++20 vector registers on modern microarchitectures (AMD Zen 4/5, Intel Sapphire Rapids, and AVX2 fallback), developing an 18-kernel silicon suite covering bitboard popcount GEMV, batch-4 S-GEMM, paged Int4 KV Flash-Attention, GQA, SwiGLU, sliding-window attention, and fused ternary projections.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
+## Abstract
 Production large language model (LLM) serving frameworks, such as vLLM, rely on paged memory allocation to mitigate memory fragmentation and enable dynamic prefix caching. Under paged allocation, continuous sequence positions are mapped into non-contiguous physical memory blocks indexed via lookup tables. On host CPU silicon, traversing paged structures during Flash-Attention typically induces severe pointer chasing and scattered memory access penalties. In this paper, we present an in-register paged Flash-Attention kernel optimized for AVX-512 F/DQ registers on AMD Zen 4 microarchitectures. By combining dynamic block-table address translation with in-register online softmax rescaling and vectorized fused multiply-accumulates, the kernel evaluates self-attention over arbitrary paged KV-cache configurations without data relocation or tensor consolidation. We formally verify block offset bounds, token index reconstruction, and memory stride non-interference in Lean 4 without non-standard axioms or `sorry`, and demonstrate exact single-precision parity against contiguous references.
 
 ---

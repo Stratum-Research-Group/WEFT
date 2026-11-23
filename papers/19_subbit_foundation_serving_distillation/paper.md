@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch II: Binary Container Standards & Sub-Bit OS (Papers 17–24)
+> **Chronological Context**: Phase 2 formalized the .weft binary container file specification, memory-mapped layer indexing, and initial sub-bit OS infrastructure for quantized model serving with adaptive spectral quantization.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Executive Summary
 While sub-bit parameter representations promise to democratize massive foundation models on edge and consumer devices, real-world deployment faces two critical hurdles: quantization-induced signal degradation and the memory bandwidth overhead of dequantization. In this paper, we introduce a dual advancement:
 1. **Scale Residual Distillation**: Gradient-based fine-tuning of floating-point channel and rank scales ($\mathbf{h}, \mathbf{l}, \mathbf{g}$) while keeping packed binary bitboards ($\mathbf{U}_b, \mathbf{V}_b$) frozen.

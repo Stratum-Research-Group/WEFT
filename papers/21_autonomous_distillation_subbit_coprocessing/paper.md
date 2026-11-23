@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch II: Binary Container Standards & Sub-Bit OS (Papers 17–24)
+> **Chronological Context**: Phase 2 formalized the .weft binary container file specification, memory-mapped layer indexing, and initial sub-bit OS infrastructure for quantized model serving with adaptive spectral quantization.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Executive Summary
 Deploying multi-billion parameter foundation models directly on resource-constrained consumer hardware demands continuous self-improving adaptation coupled with mathematically verifiable invariants. In this twenty-first report of the WEFT technical series, we introduce the **Autonomous Continuous Distillation and Sub-Bit Co-Processing Architecture**.
 

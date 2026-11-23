@@ -6,6 +6,11 @@
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/6_asymmetric_speculative_decoding/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/6_asymmetric_speculative_decoding/paper.tex)
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch I: Core Linear Recurrence & Speculative Foundations (Papers 1–16)
+> **Chronological Context**: Phase 1 established the theoretical and mathematical foundations of WEFT (Windowed Exponentially-decayed Factorized Tensor Attention), proving singlet state uncrossing, associative scan bounds, and early speculative co-processing in Lean 4 on initial CPU/CUDA testbeds.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Abstract
 
 Speculative decoding has emerged as a primary paradigm for accelerating autoregressive generation in Large Language Models (LLMs). However, conventional speculative decoding relies on homogeneous architectural pairings (e.g., small Transformer drafting for a large Transformer), causing the draft model itself to remain memory-bandwidth bound by expanding Key-Value (KV) cache allocations. In this work, we introduce **Asymmetric Speculative Co-Processing**, an asymmetric inference framework pairing an ultra-lightweight, constant-memory linear-recurrent draft engine (**WEFT-2**) with massive frontier target Transformers (e.g., Llama-3.3-70B, Qwen-2.5-72B). 

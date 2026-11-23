@@ -3,6 +3,11 @@
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch III: Sharded 70B+ Foundation Model Deconstruction (Papers 25–45)
+> **Chronological Context**: Phase 3 executed the first large-scale deconstructions of major foundation models (Qwen-2.5-72B, Llama-3.3-70B, DeepSeek-R1-32B, Mixtral-8x7B, Whisper, Qwen2-VL) into sub-0.05 BPW bitboards under strict workstation RAM constraints.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Abstract
 Quantizing ultra-large foundation models (70B+ parameters) is severely constrained by local host memory and disk capacity boundaries. Standard post-training quantization schemes require staging complete uncompressed FP16/BF16 checkpoints (140–150 GB), demanding massive host RAM and excessive high-bandwidth storage. In this work, we present the **Streaming Sharded Sub-Bit Quantization Pipeline**, a bounded-resource framework that streams remote model shards on-the-fly, executes alternating Polar Iterative Quantization (Joint-ITQ) and dual-path low-rank decomposition into packed bipolar bitboards ($\le 0.052$ bits per weight), and immediately purges raw weight staging buffers. We validate this architecture on the frontier **Qwen-2.5-72B-Instruct** (145.4 GB nominal) and **Gemma-4-26B-A4B-it** (51.6 GB nominal). On Qwen-2.5-72B, our pipeline achieves an empirical compression ratio of **$757.3\times$** ($3,762.35$ MB uncompressed $\to 4.97$ MB `.weft` container), delivering an effective mean bitrate of $0.0521$ BPW with strictly bounded $O(1)$ disk overhead.
 

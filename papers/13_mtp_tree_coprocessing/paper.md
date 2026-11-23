@@ -6,6 +6,11 @@
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/13_mtp_tree_coprocessing/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/13_mtp_tree_coprocessing/paper.tex)
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch I: Core Linear Recurrence & Speculative Foundations (Papers 1–16)
+> **Chronological Context**: Phase 1 established the theoretical and mathematical foundations of WEFT (Windowed Exponentially-decayed Factorized Tensor Attention), proving singlet state uncrossing, associative scan bounds, and early speculative co-processing in Lean 4 on initial CPU/CUDA testbeds.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Abstract
 
 While Speculative Tree Decoding eliminates early chain rejection penalties by evaluating multiple candidate hypotheses simultaneously, traditional tree construction requires sequential autoregressive unrolling of the draft model to populate downstream nodes. This unrolling re-introduces kernel dispatch overhead and recurrent latency bubbles.

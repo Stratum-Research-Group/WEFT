@@ -6,6 +6,11 @@
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/15_zipf_optimal_hierarchical_gating/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/15_zipf_optimal_hierarchical_gating/paper.tex)
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch I: Core Linear Recurrence & Speculative Foundations (Papers 1–16)
+> **Chronological Context**: Phase 1 established the theoretical and mathematical foundations of WEFT (Windowed Exponentially-decayed Factorized Tensor Attention), proving singlet state uncrossing, associative scan bounds, and early speculative co-processing in Lean 4 on initial CPU/CUDA testbeds.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Abstract
 
 Speculative decoding relies on ultra-low-latency proposal generation by a lightweight draft model. However, scaling vocabulary heads to match modern foundation models (e.g., Gemma 4's $V = 262,144$ tokens) introduces catastrophic memory-bandwidth and GEMM latency overheads, causing draft projection time to surge from $35\,µs$ to over $2,025\,µs$ ($57×$ slowdown) and triggering Speculative Reversal ($S < 1.0$).

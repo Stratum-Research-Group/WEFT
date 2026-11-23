@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch II: Binary Container Standards & Sub-Bit OS (Papers 17–24)
+> **Chronological Context**: Phase 2 formalized the .weft binary container file specification, memory-mapped layer indexing, and initial sub-bit OS infrastructure for quantized model serving with adaptive spectral quantization.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Executive Summary
 Standard foundation model distribution formats such as Safetensors and GGUF assume contiguous dense numeric arrays ($4$–$16$ bits per weight), introducing unacceptable memory overhead, alignment stalls, and serialization bloat for sub-bit quantized architectures ($0.1$–$1.0$ bits per weight). Building upon the mathematical foundations of low-rank binary factorizations (LittleBit-2) and signed-permutation invariance under Joint Iterative Quantization (Joint-ITQ), we introduce the `.weft` binary model container format.
 

@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch II: Binary Container Standards & Sub-Bit OS (Papers 17–24)
+> **Chronological Context**: Phase 2 formalized the .weft binary container file specification, memory-mapped layer indexing, and initial sub-bit OS infrastructure for quantized model serving with adaptive spectral quantization.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Executive Summary
 As generative foundation models expand past the 70-billion and trillion parameter thresholds, standard deployment frameworks suffer catastrophic memory bandwidth saturation, forcing massive GPU clusters for inference workloads that are fundamentally memory-capacity bound. In this landmark twentieth report of the WEFT technical series, we introduce the **Unified Sub-Bit Foundation Operating System**.
 

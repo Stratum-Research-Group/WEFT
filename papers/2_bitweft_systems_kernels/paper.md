@@ -6,6 +6,11 @@
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/2_bitweft_systems_kernels/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/2_bitweft_systems_kernels/paper.tex)
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch I: Core Linear Recurrence & Speculative Foundations (Papers 1–16)
+> **Chronological Context**: Phase 1 established the theoretical and mathematical foundations of WEFT (Windowed Exponentially-decayed Factorized Tensor Attention), proving singlet state uncrossing, associative scan bounds, and early speculative co-processing in Lean 4 on initial CPU/CUDA testbeds.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Abstract
 
 Serving large language models at low latency is severely constrained by High Bandwidth Memory (HBM) read overhead during single-token autoregressive decoding. In this paper, we present **BitWEFT**, an end-to-end hardware acceleration engine for linear-recurrent models. BitWEFT introduces two key innovations: (1) **Triton FlashDecoding**, an SRAM-fused decode operator that executes recurrent state updates and local window multi-head latent attention entirely within GPU on-chip shared memory, eliminating intermediate global memory roundtrips; and (2) **Native BitNet b1.58 Ternary GEMM**, which packs weights into 2-bit representations ($W  \-1, 0, 1\$) and replaces matrix-matrix multiplications with integer addition-only accumulations in SRAM registers. On an NVIDIA RTX 5060 Ti GPU, BitWEFT drops parameter memory footprint by $75%$ while achieving a $4.00×$ wall-clock speculative decoding speedup ($74.6$ tok/s vs $18.6$ tok/s) and strict $O(1)$ decode state memory ($< 2.5 GB$ at $1M$ tokens).

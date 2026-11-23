@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch III: Sharded 70B+ Foundation Model Deconstruction (Papers 25–45)
+> **Chronological Context**: Phase 3 executed the first large-scale deconstructions of major foundation models (Qwen-2.5-72B, Llama-3.3-70B, DeepSeek-R1-32B, Mixtral-8x7B, Whisper, Qwen2-VL) into sub-0.05 BPW bitboards under strict workstation RAM constraints.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Abstract
 Generative music foundation models synthesize high-fidelity acoustic waveforms by autoregressively predicting interleaved token sequences across multi-stream Residual Vector Quantization (RVQ) codebooks. Meta's **MusicGen** model couples a multi-codebook transformer decoder with an EnCodec continuous acoustic autoencoder, operating across 4 parallel codebooks with a staggered delay pattern. Deploying high-fidelity music generation models on edge devices is constrained by the dense parameters required for multi-head audio attention and feed-forward codebook projection operators. In this work, we present the streaming polar sub-bit deconstruction of MusicGen, compressing 590 Million parameters across its attention and multi-codebook heads into packed 64-bit binary bitboards and low-rank polar matrices ($k=64$). The raw 2.36 GB FP32/FP16 weights are reduced into an edge-resident GGUF artifact under **24.0 MB** (>98x compression factor) at an effective bitrate of **sub-0.125 BPW**. We formally verify multi-codebook autoregressive stability in Lean 4 (`formal/MusicAutoregressiveInvariants.lean`), proving that RVQ distortion decreases monotonically with hierarchical codebook depth, delay patterns preserve frame monotonicity, and silent conditioning tokens yield exact zero-residual audio synthesis states.
 

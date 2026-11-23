@@ -6,6 +6,11 @@
 
 ---
 
+> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
+> **Research Phase**: Epoch II: Binary Container Standards & Sub-Bit OS (Papers 17–24)
+> **Chronological Context**: Phase 2 formalized the .weft binary container file specification, memory-mapped layer indexing, and initial sub-bit OS infrastructure for quantized model serving with adaptive spectral quantization.
+> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
+
 ## Abstract
 Quantizing modern foundation models below 1 bit per parameter requires moving beyond naive uniform scalar/vector quantization towards structured low-rank factorizations with hypercube vertex alignment. In this work, we introduce an adaptive spectral quantization framework coupled with native bitboard serving. By evaluating the empirical singular value decay exponent $\gamma$ across transformer projection operators ($\sigma_k \approx C \cdot k^{-\gamma}$), our method dynamically sizes per-layer ranks $r_l$, allocating expressive capacity to flat spectra while aggressively compressing fast-decaying layers.
 

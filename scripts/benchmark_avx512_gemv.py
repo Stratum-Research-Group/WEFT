@@ -185,3 +185,41 @@ def benchmark_ternary_gemv():
 
 if __name__ == "__main__":
     benchmark_ternary_gemv()
+
+def benchmark_rope():
+    print("\n" + "=" * 80)
+    print("  AVX-512 VECTORIZED ROTARY POSITION EMBEDDING (RoPE) BENCHMARK")
+    print("=" * 80)
+
+    # Standard Llama-3.3-70B dimensions: 32 heads, 2048 seq_len, 128 head_dim
+    batch, heads, seq_len, head_dim = 1, 32, 2048, 128
+    half_dim = head_dim // 2
+
+    x = torch.randn(batch, heads, seq_len, head_dim, dtype=torch.float32)
+    inv_freq = 1.0 / (10000 ** (torch.arange(0, head_dim, 2).float() / head_dim))
+    t = torch.arange(seq_len, dtype=torch.float32)
+    freqs = torch.outer(t, inv_freq)
+    cos = torch.cos(freqs)
+    sin = torch.sin(freqs)
+
+    out_avx = torch.zeros_like(x)
+
+    # Warmup
+    for _ in range(5):
+        weft_avx512.subbit_rope_avx512(x, cos, sin, out_avx)
+
+    iters = 20
+    t0 = time.perf_counter()
+    for _ in range(iters):
+        weft_avx512.subbit_rope_avx512(x, cos, sin, out_avx)
+    t_rope = (time.perf_counter() - t0) / iters
+
+    total_elements = batch * heads * seq_len * head_dim
+    bandwidth_gb_s = (total_elements * 4.0 * 2.0 / t_rope) / 1e9
+
+    print(f"Context: {heads} Heads x {seq_len} Tokens x {head_dim} Dim ({total_elements:,} Elements)")
+    print(f"  AVX-512 RoPE Latency   : {t_rope * 1e6:8.2f} µs")
+    print(f"  Memory Bandwidth Rate  : {bandwidth_gb_s:8.2f} GB/s")
+
+if __name__ == "__main__":
+    benchmark_rope()

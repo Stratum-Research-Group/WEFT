@@ -1,6 +1,7 @@
 """
 High-performance CPU bitboard unpacking and popcount-accelerated GEMM for .weft sub-bit models.
 Optimized for AVX-512 VPOPCNTDQ (Zen 4 / Sapphire Rapids) with fallback to PyTorch vectorization.
+Unifies 1-bit popcount, batch-4 register-reused S-GEMM, fused rank-1 SVD, masked ternary, and RoPE.
 """
 
 import torch
@@ -35,33 +36,77 @@ def cpu_unpack_bitboards(packed: torch.Tensor, rank: int) -> torch.Tensor:
     return bipolar[:, :rank]
 
 
-def cpu_subbit_matmul(x: torch.Tensor, b_packed: torch.Tensor, rank: int, scale: float = 1.0) -> torch.Tensor:
+def cpu_subbit_matmul(
+    x: torch.Tensor,
+    b_packed: torch.Tensor,
+    rank: int,
+    scale: float = 1.0,
+    u_proj: torch.Tensor = None,
+    v_proj: torch.Tensor = None,
+    b_nonzero: torch.Tensor = None
+) -> torch.Tensor:
     """
-    Vectorized CPU forward pass: y = x @ B_unpacked^T
-    Automatically routes through native AVX-512 hardware popcount when available.
+    Unified CPU Sub-Bit Dispatcher:
+    Automatically routes across 1-bit GEMV, batch-4 GEMM, fused rank-1 SVD, or masked ternary.
     """
     orig_shape = x.shape
     x_2d = x.reshape(-1, rank)
     batch_size = x_2d.shape[0]
 
-    # Fast Path: AVX-512 Hardware VPOPCNTDQ
     if _AVX512_AVAILABLE and b_packed.dtype == torch.int64:
-        cols_u64 = rank // 64
-        # Quantize activations to signs
-        x_sign = (x_2d > 0).to(torch.int64)
+        # Mode 1: Masked Ternary GEMV
+        if b_nonzero is not None and hasattr(weft_avx512, "subbit_ternary_gemv_avx512") and batch_size == 1:
+            x_sign = (x_2d > 0).to(torch.int64)
+            out = torch.zeros(b_packed.shape[0], dtype=torch.float32, device=x.device)
+            weft_avx512.subbit_ternary_gemv_avx512(b_nonzero, b_packed, x_sign.squeeze(0), out, scale)
+            return out.view(*orig_shape[:-1], b_packed.shape[0])
 
+        # Mode 2: Fused Rank-1 SVD GEMV
+        if u_proj is not None and v_proj is not None and hasattr(weft_avx512, "subbit_fused_gemv_avx512") and batch_size == 1:
+            x_sign = (x_2d > 0).to(torch.int64)
+            v_dot_x = float(torch.dot(v_proj.float(), x_2d.squeeze(0).float()))
+            out = torch.zeros(b_packed.shape[0], dtype=torch.float32, device=x.device)
+            weft_avx512.subbit_fused_gemv_avx512(b_packed, x_sign.squeeze(0), u_proj.float(), v_dot_x, out, scale)
+            return out.view(*orig_shape[:-1], b_packed.shape[0])
+
+        # Mode 3: Batch-4 GEMM with register reuse
         if batch_size == 4 and hasattr(weft_avx512, "subbit_gemm_avx512_batch4"):
-            # Batch-4 GEMM with register reuse
+            x_sign = (x_2d > 0).to(torch.int64)
             out = torch.zeros(4, b_packed.shape[0], dtype=torch.float32, device=x.device)
             weft_avx512.subbit_gemm_avx512_batch4(b_packed, x_sign, out, scale)
             return out.view(*orig_shape[:-1], b_packed.shape[0])
-        elif batch_size == 1 and hasattr(weft_avx512, "subbit_gemv_avx512"):
-            # Single-token GEMV
+
+        # Mode 4: Standard Single-Token GEMV
+        if batch_size == 1 and hasattr(weft_avx512, "subbit_gemv_avx512"):
+            x_sign = (x_2d > 0).to(torch.int64)
             out = torch.zeros(b_packed.shape[0], dtype=torch.float32, device=x.device)
             weft_avx512.subbit_gemv_avx512(b_packed, x_sign.squeeze(0), out, scale)
             return out.view(*orig_shape[:-1], b_packed.shape[0])
 
-    # Fallback Path: Standard Vectorized Unpacking
+    # Fallback Path
     bipolar = cpu_unpack_bitboards(b_packed, rank)
     out = torch.matmul(x_2d.float(), bipolar.t()) * scale
+    if u_proj is not None and v_proj is not None:
+        out += (x_2d.float() @ v_proj.float().unsqueeze(-1)) @ u_proj.float().unsqueeze(0)
     return out.view(*orig_shape[:-1], b_packed.shape[0])
+
+
+def cpu_rope_avx512(x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> torch.Tensor:
+    """
+    Applies AVX-512 in-register RoPE rotation to input tensor x.
+    """
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_rope_avx512"):
+        out = torch.zeros_like(x)
+        weft_avx512.subbit_rope_avx512(x.contiguous(), cos.contiguous(), sin.contiguous(), out)
+        return out
+
+    # Fallback
+    d = x.shape[-1]
+    x_even = x[..., 0::2]
+    x_odd = x[..., 1::2]
+    out_even = x_even * cos - x_odd * sin
+    out_odd = x_even * sin + x_odd * cos
+    out = torch.empty_like(x)
+    out[..., 0::2] = out_even
+    out[..., 1::2] = out_odd
+    return out

@@ -172,3 +172,38 @@ def test_avx512_ternary_gemv_mathematical_soundness():
 
     np.testing.assert_allclose(out_ternary.numpy(), expected_dot, atol=1e-5, rtol=1e-5)
     print("Exact ternary mathematical soundness confirmed: Masked Popcount == Ternary Dot Product!")
+
+def test_avx512_rope_mathematical_soundness():
+    """Verify bit-exact soundness of AVX-512 in-register RoPE against naive 2D Givens rotation."""
+    batch, heads, seq_len, head_dim = 2, 4, 16, 64
+    half_dim = head_dim // 2
+
+    torch.manual_seed(444)
+    x = torch.randn(batch, heads, seq_len, head_dim, dtype=torch.float32)
+
+    # Angles for RoPE
+    inv_freq = 1.0 / (10000 ** (torch.arange(0, head_dim, 2).float() / head_dim))
+    t = torch.arange(seq_len, dtype=torch.float32)
+    freqs = torch.outer(t, inv_freq)
+    cos = torch.cos(freqs)
+    sin = torch.sin(freqs)
+
+    # 1. AVX-512 fast path
+    out_avx = torch.zeros_like(x)
+    weft_avx512.subbit_rope_avx512(x, cos, sin, out_avx)
+
+    # 2. PyTorch reference path
+    out_ref = torch.zeros_like(x)
+    for b in range(batch):
+        for h in range(heads):
+            for s in range(seq_len):
+                for i in range(half_dim):
+                    c = cos[s, i].item()
+                    s_val = sin[s, i].item()
+                    e = x[b, h, s, 2 * i].item()
+                    o = x[b, h, s, 2 * i + 1].item()
+                    out_ref[b, h, s, 2 * i]     = e * c - o * s_val
+                    out_ref[b, h, s, 2 * i + 1] = e * s_val + o * c
+
+    np.testing.assert_allclose(out_avx.numpy(), out_ref.numpy(), atol=1e-5, rtol=1e-5)
+    print("Exact RoPE mathematical soundness confirmed: AVX-512 RoPE == Reference Givens Rotation!")

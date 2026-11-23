@@ -275,9 +275,82 @@ void subbit_ternary_gemv_avx512_forward(
     }
 }
 
+/**
+ * AVX-512 Vectorized Rotary Position Embedding (RoPE) Kernel
+ */
+void subbit_rope_avx512_forward(
+    const at::Tensor& x,      // [batch, heads, seq_len, head_dim] float32
+    const at::Tensor& cos,    // [seq_len, head_dim / 2] float32
+    const at::Tensor& sin,    // [seq_len, head_dim / 2] float32
+    at::Tensor& output        // [batch, heads, seq_len, head_dim] float32
+) {
+    TORCH_CHECK(x.is_contiguous(), "x must be contiguous");
+    TORCH_CHECK(cos.is_contiguous(), "cos must be contiguous");
+    TORCH_CHECK(sin.is_contiguous(), "sin must be contiguous");
+    TORCH_CHECK(output.is_contiguous(), "output must be contiguous");
+
+    const int64_t total_vectors = x.numel() / x.size(-1);
+    const int64_t head_dim = x.size(-1);
+    const int64_t half_dim = head_dim / 2;
+
+    const float* x_ptr = x.data_ptr<float>();
+    const float* cos_ptr = cos.data_ptr<float>();
+    const float* sin_ptr = sin.data_ptr<float>();
+    float* out_ptr = output.data_ptr<float>();
+
+    const int64_t seq_len = cos.size(0);
+
+    #pragma omp parallel for schedule(static)
+    for (int64_t v = 0; v < total_vectors; ++v) {
+        int64_t pos = v % seq_len;
+        const float* c_pos = cos_ptr + pos * half_dim;
+        const float* s_pos = sin_ptr + pos * half_dim;
+        const float* x_vec = x_ptr + v * head_dim;
+        float* out_vec = out_ptr + v * head_dim;
+
+        int64_t i = 0;
+        for (; i + 16 <= half_dim; i += 16) {
+            __m512 vc = _mm512_loadu_ps(c_pos + i);
+            __m512 vs = _mm512_loadu_ps(s_pos + i);
+
+            float even_arr[16];
+            float odd_arr[16];
+            for (int k = 0; k < 16; ++k) {
+                even_arr[k] = x_vec[2 * (i + k)];
+                odd_arr[k]  = x_vec[2 * (i + k) + 1];
+            }
+            __m512 vx_even = _mm512_loadu_ps(even_arr);
+            __m512 vx_odd  = _mm512_loadu_ps(odd_arr);
+
+            __m512 vout_even = _mm512_sub_ps(_mm512_mul_ps(vx_even, vc), _mm512_mul_ps(vx_odd, vs));
+            __m512 vout_odd  = _mm512_add_ps(_mm512_mul_ps(vx_even, vs), _mm512_mul_ps(vx_odd, vc));
+
+            float res_even[16];
+            float res_odd[16];
+            _mm512_storeu_ps(res_even, vout_even);
+            _mm512_storeu_ps(res_odd, vout_odd);
+
+            for (int k = 0; k < 16; ++k) {
+                out_vec[2 * (i + k)]     = res_even[k];
+                out_vec[2 * (i + k) + 1] = res_odd[k];
+            }
+        }
+
+        for (; i < half_dim; ++i) {
+            float c = c_pos[i];
+            float s = s_pos[i];
+            float e = x_vec[2 * i];
+            float o = x_vec[2 * i + 1];
+            out_vec[2 * i]     = e * c - o * s;
+            out_vec[2 * i + 1] = e * s + o * c;
+        }
+    }
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
     m.def("subbit_fused_gemv_avx512", &subbit_fused_gemv_avx512_forward, "Fused AVX-512 VPOPCNTDQ + Rank-1 SVD Correction GEMV");
     m.def("subbit_ternary_gemv_avx512", &subbit_ternary_gemv_avx512_forward, "AVX-512 Masked Ternary GEMV with Hardware Popcount");
+    m.def("subbit_rope_avx512", &subbit_rope_avx512_forward, "AVX-512 Vectorized Rotary Position Embedding (RoPE)");
 }

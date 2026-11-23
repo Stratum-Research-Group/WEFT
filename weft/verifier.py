@@ -237,8 +237,28 @@ class LeanKernelRuleVerifier:
         completion_code: str,
         preamble: str = "",
     ) -> RewardBreakdown:
-        # Assemble code
-        code_str = f"{preamble}\n\n{completion_code}"
+        # Enforce strict theorem-statement binding:
+        # If the completion only contains proof tactics (e.g. "by ..."), wrap it with the enforced target statement.
+        # If the completion attempts to redefine the theorem, verify that its declaration type exactly matches theorem_statement.
+        clean_completion = completion_code.strip()
+        if not clean_completion.startswith("theorem ") and not clean_completion.startswith("lemma "):
+            code_str = f"{preamble}\n\ntheorem {theorem_name} {theorem_statement} := {clean_completion}"
+        else:
+            # Check for adversarial statement substitution: completion cannot redefine theorem with a trivial statement
+            decl_prefix = f"theorem {theorem_name}"
+            lemma_prefix = f"lemma {theorem_name}"
+            if decl_prefix in clean_completion or lemma_prefix in clean_completion:
+                # If target statement is specified, enforce that it appears verbatim in the declaration
+                if theorem_statement and theorem_statement not in clean_completion:
+                    return RewardBreakdown(
+                        total_reward=0.0,
+                        accuracy_reward=0.0,
+                        format_reward=0.0,
+                        loop_penalty=1.0,
+                        details={"status": "rejected_statement_substitution", "error": "Completion substituted target theorem type"},
+                    )
+            code_str = f"{preamble}\n\n{clean_completion}"
+
         check = self.verifier.verify_theorem_strict(
             theorem_name=theorem_name,
             code_str=code_str,

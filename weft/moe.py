@@ -268,8 +268,14 @@ class PolytopeMoERouter(nn.Module):
         sorted_proj, _ = torch.sort(projections, dim=-1, descending=True)
         margins = sorted_proj[:, 0] - sorted_proj[:, 1]
 
-        # Top-k routing over polytope facet logits
+        # Apply geometric facet margin guard:
+        # If margin < facet_margin_threshold, damp routing uncertainty by smoothing probability mass toward centroid
         scaled_logits = projections / self.temperature
+        if self.facet_margin_threshold > 0.0:
+            fragile_mask = (margins < self.facet_margin_threshold).unsqueeze(-1)
+            # Soften logits for tokens located near polytope decision boundary
+            scaled_logits = torch.where(fragile_mask, scaled_logits * 0.5, scaled_logits)
+
         routing_probs = F.softmax(scaled_logits, dim=-1)
 
         topk_weights, topk_indices = torch.topk(routing_probs, k=self.top_k, dim=-1)

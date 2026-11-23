@@ -25,9 +25,9 @@ def run_fineweb_eval(checkpoint_path: str = "weft_fineweb_ckpt"):
     model = WeftForCausalLM.from_pretrained(checkpoint_path).to(device)
     model.eval()
 
-    streamer = FineWebEduStreamer(seq_len=128, batch_size=4, device=str(device))
-    # Skip train rows to evaluate on held-out data
-    streamer.current_offset = 2000
+    # Explicitly request the disjoint validation split (last 15% partition)
+    streamer = FineWebEduStreamer(split="val", seq_len=128, batch_size=4, device=str(device))
+    streamer.current_offset = 0
 
     print("\n--> Step 1: Evaluating Perplexity on 20 held-out batches...")
     val_losses = []

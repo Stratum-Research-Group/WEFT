@@ -21,14 +21,19 @@ class MLAKVConfig:
 class MLALowRankKVCache:
     def __init__(self, config: MLAKVConfig = MLAKVConfig()):
         self.cfg = config
-        # Compression projection matrices: W_compress: d_model -> latent_dim
-        # Decompression projection: W_decompress: latent_dim -> (n_heads * d_head)
+        # Compression projection matrices via semi-orthogonal QR decomposition
+        # W_comp: d_model -> latent_dim with W_comp.T @ W_comp = I
+        # W_decomp: latent_dim -> d_model = W_comp.T for minimum-norm least-squares reconstruction
         rng = np.random.default_rng(42)
-        self.W_comp_k = rng.normal(0, 0.02, (self.cfg.d_model, self.cfg.latent_dim)).astype(np.float16)
-        self.W_decomp_k = rng.normal(0, 0.02, (self.cfg.latent_dim, self.cfg.d_model)).astype(np.float16)
+        H_k = rng.normal(0, 1.0, (self.cfg.d_model, self.cfg.latent_dim))
+        Q_k, _ = np.linalg.qr(H_k, mode="reduced")
+        self.W_comp_k = Q_k.astype(np.float16)
+        self.W_decomp_k = Q_k.T.astype(np.float16)
         
-        self.W_comp_v = rng.normal(0, 0.02, (self.cfg.d_model, self.cfg.latent_dim)).astype(np.float16)
-        self.W_decomp_v = rng.normal(0, 0.02, (self.cfg.latent_dim, self.cfg.d_model)).astype(np.float16)
+        H_v = rng.normal(0, 1.0, (self.cfg.d_model, self.cfg.latent_dim))
+        Q_v, _ = np.linalg.qr(H_v, mode="reduced")
+        self.W_comp_v = Q_v.astype(np.float16)
+        self.W_decomp_v = Q_v.T.astype(np.float16)
         
         # Compressed storage
         self.k_latent_cache = []

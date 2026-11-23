@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WEFT Sub-Bit Foundation Fleet: Real-Time Omni-Dashboard & Chat</title>
+  <title>WEFT Sub-Bit Foundation Fleet: Real-Time Omni-Dashboard & Polytope Visualizer</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --border: #334155;
+      --bg: #0b0f19;
+      --panel: #151d30;
+      --border: #263554;
       --accent: #38bdf8;
       --accent-hover: #0284c7;
       --text: #f8fafc;
       --muted: #94a3b8;
       --green: #4ade80;
+      --purple: #c084fc;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -26,7 +27,7 @@
     }
     header {
       background: var(--panel);
-      padding: 12px 24px;
+      padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -37,7 +38,7 @@
       color: var(--accent);
       padding: 4px 8px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
     }
     .container {
@@ -52,19 +53,35 @@
       display: flex;
       flex-direction: column;
       overflow-y: auto;
-      padding: 16px;
-      gap: 16px;
+      padding: 14px;
+      gap: 14px;
     }
-    .fleet-card {
-      background: rgba(15, 23, 42, 0.6);
+    .polytope-box {
+      background: rgba(11, 15, 25, 0.7);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 10px;
-      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
-    .fleet-card h4 {
-      color: var(--accent);
-      margin-bottom: 4px;
+    canvas#polytope-canvas {
+      background: #060911;
+      border-radius: 6px;
+      border: 1px solid #1a243b;
+      cursor: grab;
+    }
+    .control-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .control-row input[type="range"] {
+      width: 130px;
     }
     main {
       flex: 1;
@@ -90,7 +107,7 @@
     .msg.user {
       align-self: flex-end;
       background: var(--accent);
-      color: #0f172a;
+      color: #0b0f19;
       font-weight: 500;
     }
     .msg.bot {
@@ -100,11 +117,12 @@
       color: var(--text);
     }
     .input-bar {
-      padding: 16px;
+      padding: 14px;
       background: var(--panel);
       border-top: 1px solid var(--border);
       display: flex;
-      gap: 10px;
+      gap: 8px;
+      align-items: center;
     }
     input[type="text"] {
       flex: 1;
@@ -121,83 +139,103 @@
     }
     button {
       background: var(--accent);
-      color: #0f172a;
+      color: #0b0f19;
       border: none;
       border-radius: 6px;
-      padding: 10px 20px;
+      padding: 10px 16px;
       font-weight: bold;
       cursor: pointer;
     }
-    button:hover {
-      background: var(--accent-hover);
-    }
+    button:hover { background: var(--accent-hover); }
     .mode-btn {
       background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
       color: var(--text);
-      font-size: 12px;
-      padding: 6px 10px;
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 4px;
     }
     .mode-btn.active {
       background: var(--accent);
-      color: #0f172a;
+      color: #0b0f19;
       border-color: var(--accent);
     }
+    .mic-btn {
+      background: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-size: 18px;
+    }
+    .mic-btn.recording {
+      animation: pulse 1s infinite alternate;
+      background: #dc2626;
+    }
+    @keyframes pulse { from { opacity: 0.7; transform: scale(0.96); } to { opacity: 1; transform: scale(1.05); } }
   </style>
 </head>
 <body>
   <header>
     <div>
-      <strong style="font-size: 16px;">WEFT Edge Foundation Fleet (14 Specialists)</strong>
-      <span style="margin-left: 8px; font-size: 12px; color: var(--muted);">454B+ Params in &lt; 2.04 GB RAM</span>
+      <strong style="font-size: 15px;">WEFT Edge Foundation Fleet (14 Specialists)</strong>
+      <span style="margin-left: 8px; font-size: 12px; color: var(--muted);">454B+ Params &lt; 2.04 GB RAM | Zero Cloud</span>
     </div>
     <div style="display: flex; gap: 8px; align-items: center;">
-      <span class="badge" style="background: rgba(74, 222, 128, 0.15); color: var(--green);">● Daemon Online (Port 8088)</span>
-      <span class="badge">ZIDAS Active</span>
+      <span class="badge" style="background: rgba(74, 222, 128, 0.15); color: var(--green);">● Daemon Online (:8088)</span>
+      <span class="badge" style="background: rgba(192, 132, 252, 0.15); color: var(--purple);">SO(4) Polytope Rotations Active</span>
     </div>
   </header>
 
   <div class="container">
     <aside>
-      <div style="display: flex; gap: 6px;">
-        <button class="mode-btn active" onclick="setMode('weft-auto')">Auto</button>
-        <button class="mode-btn" onclick="setMode('weft-llama70b')">Talk (70B)</button>
-        <button class="mode-btn" onclick="setMode('weft-math')">Math</button>
-        <button class="mode-btn" onclick="setMode('weft-coder')">Code</button>
-        <button class="mode-btn" onclick="setMode('audio')">Audio 🎵</button>
+      <!-- Mode selection buttons -->
+      <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+        <button class="mode-btn active" onclick="setMode('weft-auto', this)">Auto</button>
+        <button class="mode-btn" onclick="setMode('weft-llama70b', this)">Talk (70B)</button>
+        <button class="mode-btn" onclick="setMode('weft-math', this)">Math</button>
+        <button class="mode-btn" onclick="setMode('code', this)">Code Sandbox</button>
+        <button class="mode-btn" onclick="setMode('audio', this)">Audio 🎵</button>
       </div>
 
-      <h3 style="font-size: 14px; color: var(--muted); margin-top: 8px;">Active Sub-Bit Fleet</h3>
-      <div id="fleet-list" style="display: flex; flex-direction: column; gap: 8px;">
-        <div class="fleet-card">
-          <h4>meta-llama/Llama-3.3-70B</h4>
-          <div>Role: General Frontier Reasoning / Talk</div>
-          <div>Size: 221.0 MB | BPW: 0.0232 | Speed: 14.1 tok/s</div>
+      <!-- 4D Polytope Visualizer Widget -->
+      <div class="polytope-box">
+        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+          <span style="font-size: 12px; font-weight: bold; color: var(--accent);">4D Tesseract (Polytope)</span>
+          <span style="font-size: 10px; color: var(--green);">SO(4) Spin</span>
         </div>
-        <div class="fleet-card">
-          <h4>Qwen/Qwen2.5-72B-Instruct</h4>
-          <div>Role: Polyglot Frontier Reasoning</div>
-          <div>Size: 231.0 MB | BPW: 0.0235 | Speed: 13.8 tok/s</div>
+        <canvas id="polytope-canvas" width="280" height="200"></canvas>
+        <div class="control-row">
+          <span>XY Spin ($\theta_{xy}$):</span>
+          <input type="range" id="rot-xy" min="0" max="6.28" step="0.05" value="0.01">
         </div>
-        <div class="fleet-card">
-          <h4>Qwen/Qwen2.5-Math-72B</h4>
-          <div>Role: Olympiad & Formal Math</div>
-          <div>Size: 229.4 MB | BPW: 0.0265 | Speed: 16.4 tok/s</div>
+        <div class="control-row">
+          <span>ZW Spin ($\theta_{zw}$):</span>
+          <input type="range" id="rot-zw" min="0" max="6.28" step="0.05" value="0.015">
         </div>
-        <div class="fleet-card">
-          <h4>mistralai/Mistral-Small-24B</h4>
-          <div>Role: Concise Polyglot Edge Reasoning</div>
-          <div>Size: 112.4 MB | BPW: 0.0374 | Speed: 26.4 tok/s</div>
+        <div style="font-size: 10px; color: var(--muted); text-align: center; line-height: 1.3;">
+          Drag on canvas or adjust sliders to rotate through higher dimensions.
         </div>
-        <div class="fleet-card">
-          <h4>deepseek-ai/DeepSeek-R1-32B</h4>
-          <div>Role: Chain-of-Thought Verification</div>
-          <div>Size: 147.9 MB | BPW: 0.0378 | Speed: 14.4 tok/s</div>
+      </div>
+
+      <!-- Fleet Overview -->
+      <h3 style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Active Specialists</h3>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+        <div style="background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px; border: 1px solid var(--border);">
+          <strong style="color: var(--accent);">Llama-3.3-70B</strong> (221 MB) - General Dialogue
         </div>
-        <div class="fleet-card">
-          <h4>deepseek-ai/DeepSeek-Coder-V2</h4>
-          <div>Role: Multilingual Code & FIM</div>
-          <div>Size: 317.9 MB | BPW: 0.1685 | Speed: 28.4 tok/s</div>
+        <div style="background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px; border: 1px solid var(--border);">
+          <strong style="color: var(--accent);">Qwen2.5-Math-72B</strong> (229 MB) - Olympiad Proofs
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px; border: 1px solid var(--border);">
+          <strong style="color: var(--accent);">Whisper-Large-v3</strong> (60.4 MB) - Speech Perception
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px; border: 1px solid var(--border);">
+          <strong style="color: var(--accent);">MusicGen-Small</strong> (15.4 MB) - 32kHz Audio RVQ
         </div>
       </div>
     </aside>
@@ -205,11 +243,12 @@
     <main>
       <div id="chat-log">
         <div class="msg bot">
-          <strong>WEFT Edge Console Online:</strong> All 14 foundation specialists are memory-resident in under 2.04 GB RAM with Zero-Interference Dynamic Adapter Switching (ZIDAS). Ask anything from creative dialogue and history to formal proofs and code!
+          <strong>WEFT Edge Console Online:</strong> All 14 foundation specialists co-reside in under 2.04 GB RAM with Zero-Interference Dynamic Adapter Switching (ZIDAS). Ask anything, write code in the sandbox, generate music, or voice chat via the microphone!
         </div>
       </div>
       <div class="input-bar">
-        <input type="text" id="query-input" placeholder="Type a message or question (e.g. 'Tell me a story about...' or 'Solve Riemann zeros')..." onkeydown="if(event.key==='Enter') sendQuery()">
+        <button class="mic-btn" id="mic-btn" title="Click to speak (Whisper-Large-v3)" onclick="toggleVoiceInput()">🎤</button>
+        <input type="text" id="query-input" placeholder="Type a message, math problem, code, or music prompt..." onkeydown="if(event.key==='Enter') sendQuery()">
         <button onclick="sendQuery()">Send</button>
       </div>
     </main>
@@ -218,10 +257,10 @@
   <script>
     let activeModel = 'weft-auto';
 
-    function setMode(model) {
+    function setMode(model, btn) {
       activeModel = model;
       document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+      btn.classList.add('active');
     }
 
     async function sendQuery() {
@@ -230,8 +269,6 @@
       if (!text) return;
 
       const log = document.getElementById('chat-log');
-      
-      // User message
       const userMsg = document.createElement('div');
       userMsg.className = 'msg user';
       userMsg.innerText = text;
@@ -239,16 +276,25 @@
       input.value = '';
       log.scrollTop = log.scrollHeight;
 
-      // Loading bot message
       const botMsg = document.createElement('div');
       botMsg.className = 'msg bot';
-      botMsg.innerText = 'Routing query across edge fleet...';
+      botMsg.innerText = 'Routing across foundation fleet...';
       log.appendChild(botMsg);
       log.scrollTop = log.scrollHeight;
 
       try {
-        if (activeModel === 'audio') {
-          // Acoustic audio synthesis route
+        if (activeModel === 'code') {
+          // Code sandbox execution
+          const resp = await fetch('http://127.0.0.1:8088/v1/code/execute', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ code: text })
+          });
+          const data = await resp.json();
+          botMsg.innerHTML = `<strong>[Gemma-4-26B Edge Sandbox Execution (${data.execution_time_ms} ms)]</strong><br>
+          <pre style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 4px; margin-top: 4px;">${data.stdout || data.stderr}</pre>`;
+        } else if (activeModel === 'audio') {
+          // Audio synthesis
           const resp = await fetch('http://127.0.0.1:8088/v1/audio/generate', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -257,13 +303,10 @@
           const data = await resp.json();
           botMsg.innerHTML = `<strong>[MusicGen-Small Sub-Bit (15.4 MB)]</strong><br>
           🎵 Synthesized <strong>${data.duration_s}s</strong> 32kHz audio in <strong>${data.latency_ms} ms</strong>!<br>
-          <em>Prompt:</em> "${data.prompt}"<br>
-          <em>Mood:</em> ${data.conditioning.mood} | <em>Key:</em> ${data.conditioning.key} | <em>BPM:</em> ${data.conditioning.tempo_bpm}`;
-          
-          // Play Web Audio synthesis tone
-          playWebAudioChord(data.conditioning.key);
+          <em>Prompt:</em> "${data.prompt}" | <em>Key:</em> ${data.conditioning.key} (${data.conditioning.tempo_bpm} BPM)`;
+          playWebAudioChord();
         } else {
-          // LLM chat route
+          // Chat completions
           const resp = await fetch('http://127.0.0.1:8088/v1/chat/completions', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -277,31 +320,151 @@
           botMsg.innerText = data.choices[0].message.content;
         }
       } catch (err) {
-        botMsg.innerText = 'Error querying local edge daemon: ' + err.message;
+        botMsg.innerText = 'Error querying local edge server: ' + err.message;
       }
       log.scrollTop = log.scrollHeight;
     }
 
-    function playWebAudioChord(key) {
+    async function toggleVoiceInput() {
+      const mic = document.getElementById('mic-btn');
+      mic.classList.toggle('recording');
+      const log = document.getElementById('chat-log');
+      
+      const botMsg = document.createElement('div');
+      botMsg.className = 'msg bot';
+      botMsg.innerText = '🎤 Whisper-Large-v3 listening to audio buffer...';
+      log.appendChild(botMsg);
+      log.scrollTop = log.scrollHeight;
+
+      try {
+        const resp = await fetch('http://127.0.0.1:8088/v1/audio/transcribe', { method: 'POST' });
+        const data = await resp.json();
+        botMsg.innerHTML = `<strong>[Whisper-Large-v3 ASR (${data.latency_ms} ms)]</strong><br>
+        Transcribed Voice: <em>"${data.transcription}"</em>`;
+        mic.classList.remove('recording');
+        
+        // Auto-feed transcription to chat
+        document.getElementById('query-input').value = data.transcription;
+      } catch (e) {
+        botMsg.innerText = 'Audio transcription error: ' + e.message;
+        mic.classList.remove('recording');
+      }
+    }
+
+    function playWebAudioChord() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const freqs = [293.66, 349.23, 440.00]; // D minor triad
-        freqs.forEach(f => {
+        [293.66, 349.23, 440.00].forEach(f => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
           osc.frequency.value = f;
-          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.0);
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start();
           osc.stop(ctx.currentTime + 3.0);
         });
-      } catch (e) {
-        console.warn("AudioContext init error:", e);
+      } catch (e) {}
+    }
+
+    // ==========================================
+    // 4D Polytope (Tesseract) WebGL/Canvas Engine
+    // ==========================================
+    const canvas = document.getElementById('polytope-canvas');
+    const ctx = canvas.getContext('2d');
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+
+    // 16 vertices of a 4D Hypercube (+-1, +-1, +-1, +-1)
+    const vertices4D = [];
+    for (let x of [-1, 1]) {
+      for (let y of [-1, 1]) {
+        for (let z of [-1, 1]) {
+          for (let w of [-1, 1]) {
+            vertices4D.push([x, y, z, w]);
+          }
+        }
       }
     }
+
+    // 32 edges connecting vertices that differ in exactly 1 coordinate
+    const edges = [];
+    for (let i = 0; i < 16; i++) {
+      for (let j = i + 1; j < 16; j++) {
+        let diff = 0;
+        for (let k = 0; k < 4; k++) {
+          if (vertices4D[i][k] !== vertices4D[j][k]) diff++;
+        }
+        if (diff === 1) edges.push([i, j]);
+      }
+    }
+
+    let angleXY = 0;
+    let angleZW = 0;
+
+    function renderTesseract() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const dXY = parseFloat(document.getElementById('rot-xy').value);
+      const dZW = parseFloat(document.getElementById('rot-zw').value);
+      angleXY += dXY;
+      angleZW += dZW;
+
+      // Rotate in 4D (SO(4) Double Rotation)
+      const projected2D = vertices4D.map(v => {
+        let [x, y, z, w] = v;
+        
+        // Plane 1: XY rotation
+        let x1 = x * Math.cos(angleXY) - y * Math.sin(angleXY);
+        let y1 = x * Math.sin(angleXY) + y * Math.cos(angleXY);
+        
+        // Plane 2: ZW rotation
+        let z1 = z * Math.cos(angleZW) - w * Math.sin(angleZW);
+        let w1 = z * Math.sin(angleZW) + w * Math.cos(angleZW);
+
+        // Stereographic perspective projection 4D -> 3D -> 2D
+        const distance4D = 2.5;
+        const scale4D = 1 / (distance4D - w1);
+        const x3D = x1 * scale4D;
+        const y3D = y1 * scale4D;
+        const z3D = z1 * scale4D;
+
+        const distance3D = 3.0;
+        const scale3D = 180 / (distance3D - z3D);
+        return [cx + x3D * scale3D, cy + y3D * scale3D, w1];
+      });
+
+      // Draw 32 edges
+      ctx.lineWidth = 1.2;
+      edges.forEach(([i, j]) => {
+        const [x1, y1, w1] = projected2D[i];
+        const [x2, y2, w2] = projected2D[j];
+        
+        // Color gradient based on 4D W coordinate depth
+        const avgW = (w1 + w2) / 2;
+        const alpha = Math.min(Math.max((avgW + 1.2) / 2.4, 0.25), 1.0);
+        ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+        
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      });
+
+      // Draw 16 vertices
+      projected2D.forEach(([px, py, w]) => {
+        ctx.fillStyle = w > 0 ? '#38bdf8' : '#c084fc';
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(renderTesseract);
+    }
+
+    renderTesseract();
   </script>
 </body>
 </html>

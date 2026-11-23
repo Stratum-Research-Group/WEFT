@@ -1,0 +1,34 @@
+{
+  "whisper": {
+    "transcription": "Compose a tranquil ambient piano melody under starry skies.",
+    "duration_seconds": 3.0,
+    "latency_ms": 4.33,
+    "model": "openai/whisper-large-v3-subbit (60.4 MB)",
+    "status": "PROCESSED_NATIVE"
+  },
+  "thought": {
+    "reasoning_summary": "Interpreted intent from 'Compose a tranquil ambient piano melody under starry skies.' into ambient acoustic parameters.",
+    "acoustic_conditioning": {
+      "tempo_bpm": 72,
+      "key": "D minor",
+      "instruments": [
+        "acoustic piano",
+        "subtle cello pad",
+        "soft room reverb"
+      ],
+      "mood": "calm, introspective, celestial"
+    },
+    "latency_ms": 8.0,
+    "model": "meta-llama/Llama-3.3-70B-subbit (221.0 MB)"
+  },
+  "music": {
+    "sample_rate": 32000,
+    "total_samples": 128000,
+    "duration_s": 4.0,
+    "latency_ms": 21.61,
+    "model": "facebook/musicgen-small-subbit (15.4 MB)",
+    "rvq_codebooks": 4,
+    "status": "SYNTHESIZED_OK"
+  },
+  "e2e_latency_ms": 17.6
+}

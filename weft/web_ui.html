@@ -205,7 +205,12 @@
       <!-- 4D Polytope Visualizer Widget -->
       <div class="polytope-box">
         <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-          <span style="font-size: 12px; font-weight: bold; color: var(--accent);">4D Tesseract (Polytope)</span>
+          <select id="polytope-select" style="background: var(--panel); color: var(--accent); border: 1px solid var(--border); font-size: 11px; padding: 2px 4px; border-radius: 4px;" onchange="changePolytope()">
+            <option value="tesseract">4D Tesseract (Hypercube)</option>
+            <option value="16cell">4D 16-Cell (Cross-Polytope)</option>
+            <option value="5cell">4D 5-Cell (4-Simplex)</option>
+            <option value="24cell">4D 24-Cell (Octaplex)</option>
+          </select>
           <span style="font-size: 10px; color: var(--green);">SO(4) Spin</span>
         </div>
         <canvas id="polytope-canvas" width="280" height="200"></canvas>
@@ -217,8 +222,8 @@
           <span>ZW Spin ($\theta_{zw}$):</span>
           <input type="range" id="rot-zw" min="0" max="6.28" step="0.05" value="0.015">
         </div>
-        <div style="font-size: 10px; color: var(--muted); text-align: center; line-height: 1.3;">
-          Drag on canvas or adjust sliders to rotate through higher dimensions.
+        <div id="polytope-stats" style="font-size: 10px; color: var(--muted); text-align: center; line-height: 1.3;">
+          16 Vertices | 32 Edges | 8 Cubes
         </div>
       </div>
 
@@ -370,36 +375,119 @@
     }
 
     // ==========================================
-    // 4D Polytope (Tesseract) WebGL/Canvas Engine
+    // 4D Higher-Dimensional Polytope Library
     // ==========================================
     const canvas = document.getElementById('polytope-canvas');
     const ctx = canvas.getContext('2d');
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
 
-    // 16 vertices of a 4D Hypercube (+-1, +-1, +-1, +-1)
-    const vertices4D = [];
-    for (let x of [-1, 1]) {
-      for (let y of [-1, 1]) {
-        for (let z of [-1, 1]) {
-          for (let w of [-1, 1]) {
-            vertices4D.push([x, y, z, w]);
+    let vertices4D = [];
+    let edges = [];
+
+    function buildTesseract() {
+      vertices4D = [];
+      for (let x of [-1, 1]) {
+        for (let y of [-1, 1]) {
+          for (let z of [-1, 1]) {
+            for (let w of [-1, 1]) {
+              vertices4D.push([x, y, z, w]);
+            }
           }
         }
       }
+      edges = [];
+      for (let i = 0; i < 16; i++) {
+        for (let j = i + 1; j < 16; j++) {
+          let diff = 0;
+          for (let k = 0; k < 4; k++) {
+            if (vertices4D[i][k] !== vertices4D[j][k]) diff++;
+          }
+          if (diff === 1) edges.push([i, j]);
+        }
+      }
+      document.getElementById('polytope-stats').innerText = '16 Vertices | 32 Edges | 8 Cubes';
     }
 
-    // 32 edges connecting vertices that differ in exactly 1 coordinate
-    const edges = [];
-    for (let i = 0; i < 16; i++) {
-      for (let j = i + 1; j < 16; j++) {
-        let diff = 0;
-        for (let k = 0; k < 4; k++) {
-          if (vertices4D[i][k] !== vertices4D[j][k]) diff++;
+    function build16Cell() {
+      vertices4D = [];
+      // 8 vertices: (+-1, 0, 0, 0) and permutations
+      for (let dim = 0; dim < 4; dim++) {
+        for (let s of [-1.5, 1.5]) {
+          let v = [0, 0, 0, 0];
+          v[dim] = s;
+          vertices4D.push(v);
         }
-        if (diff === 1) edges.push([i, j]);
       }
+      edges = [];
+      // Connect all pairs except antipodal (same dimension, opposite sign)
+      for (let i = 0; i < 8; i++) {
+        for (let j = i + 1; j < 8; j++) {
+          if (Math.floor(i / 2) !== Math.floor(j / 2)) {
+            edges.push([i, j]);
+          }
+        }
+      }
+      document.getElementById('polytope-stats').innerText = '8 Vertices | 24 Edges | 16 Tetrahedra';
     }
+
+    function build5Cell() {
+      vertices4D = [
+        [1, 1, 1, -1/Math.sqrt(5)],
+        [1, -1, -1, -1/Math.sqrt(5)],
+        [-1, 1, -1, -1/Math.sqrt(5)],
+        [-1, -1, 1, -1/Math.sqrt(5)],
+        [0, 0, 0, 4/Math.sqrt(5) - 1/Math.sqrt(5)]
+      ];
+      edges = [];
+      for (let i = 0; i < 5; i++) {
+        for (let j = i + 1; j < 5; j++) {
+          edges.push([i, j]);
+        }
+      }
+      document.getElementById('polytope-stats').innerText = '5 Vertices | 10 Edges | 5 Tetrahedra (4-Simplex)';
+    }
+
+    function build24Cell() {
+      vertices4D = [];
+      // 8 vertices from 16-cell
+      for (let dim = 0; dim < 4; dim++) {
+        for (let s of [-1.4, 1.4]) {
+          let v = [0, 0, 0, 0];
+          v[dim] = s;
+          vertices4D.push(v);
+        }
+      }
+      // 16 vertices from tesseract (+-0.7, +-0.7, +-0.7, +-0.7)
+      for (let x of [-0.7, 0.7]) {
+        for (let y of [-0.7, 0.7]) {
+          for (let z of [-0.7, 0.7]) {
+            for (let w of [-0.7, 0.7]) {
+              vertices4D.push([x, y, z, w]);
+            }
+          }
+        }
+      }
+      edges = [];
+      for (let i = 0; i < 24; i++) {
+        for (let j = i + 1; j < 24; j++) {
+          let distSq = 0;
+          for (let k = 0; k < 4; k++) distSq += (vertices4D[i][k] - vertices4D[j][k]) ** 2;
+          if (Math.abs(distSq - 1.96) < 0.1) edges.push([i, j]);
+        }
+      }
+      document.getElementById('polytope-stats').innerText = '24 Vertices | 96 Edges | Octaplex (Self-Dual)';
+    }
+
+    function changePolytope() {
+      const type = document.getElementById('polytope-select').value;
+      if (type === 'tesseract') buildTesseract();
+      else if (type === '16cell') build16Cell();
+      else if (type === '5cell') build5Cell();
+      else if (type === '24cell') build24Cell();
+    }
+
+    buildTesseract();
 
     let angleXY = 0;
     let angleZW = 0;

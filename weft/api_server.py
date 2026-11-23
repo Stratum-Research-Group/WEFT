@@ -247,6 +247,30 @@ async def execute_code_endpoint(req: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/v1/council/deliberate")
+async def council_deliberate_endpoint(req: Request):
+    """Executes multi-agent consensus deliberation across DeepSeek-R1-32B, Qwen2.5-Coder-32B, and Llama-3.3-70B."""
+    try:
+        body = await req.json()
+        query = body.get("query", "Analyze the stability of the foundation fleet")
+        from weft.multi_agent_council import MultiAgentCouncil
+        council = MultiAgentCouncil()
+        return council.deliberate_consensus(query)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/v1/system/self-repair")
+async def system_self_repair_endpoint(req: Request):
+    """Benchmarks in-register stochastic bit-flip recovery and neural self-repair."""
+    try:
+        body = await req.json()
+        flip_rate = float(body.get("bit_flip_rate", 0.02))
+        from weft.self_repair_engine import InRegisterSelfRepairEngine
+        engine = InRegisterSelfRepairEngine(bit_flip_rate=flip_rate)
+        return engine.inject_and_repair(d_in=1024, d_out=1024)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/v1/health")
 @app.get("/health")
 async def health_check():

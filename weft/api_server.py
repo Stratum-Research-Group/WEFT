@@ -195,6 +195,32 @@ async def chat_completions(req: ChatCompletionRequest):
     }
 
 
+@app.post("/v1/audio/generate")
+async def generate_audio_endpoint(req: Request):
+    """Generates 32kHz acoustic audio using MusicGen-Small Sub-Bit (15.4 MB)."""
+    try:
+        body = await req.json()
+        prompt = body.get("prompt", "relaxing ambient piano melody")
+        duration_s = float(body.get("duration", 4.0))
+        
+        # Audio generation via MultimodalAudioPipeline
+        from weft.audio_pipeline import MultimodalAudioPipeline
+        pipeline = MultimodalAudioPipeline()
+        thought = pipeline.deliberate_thought(prompt)
+        res = pipeline.synthesize_music_rvq(thought["acoustic_conditioning"], duration_s=duration_s)
+        
+        return {
+            "status": "OK",
+            "prompt": prompt,
+            "conditioning": thought["acoustic_conditioning"],
+            "sample_rate": res["sample_rate"],
+            "duration_s": res["duration_s"],
+            "latency_ms": res["latency_ms"],
+            "model": res["model"]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/v1/health")
 @app.get("/health")
 async def health_check():

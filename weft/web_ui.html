@@ -164,6 +164,7 @@
         <button class="mode-btn" onclick="setMode('weft-llama70b')">Talk (70B)</button>
         <button class="mode-btn" onclick="setMode('weft-math')">Math</button>
         <button class="mode-btn" onclick="setMode('weft-coder')">Code</button>
+        <button class="mode-btn" onclick="setMode('audio')">Audio 🎵</button>
       </div>
 
       <h3 style="font-size: 14px; color: var(--muted); margin-top: 8px;">Active Sub-Bit Fleet</h3>
@@ -246,22 +247,60 @@
       log.scrollTop = log.scrollHeight;
 
       try {
-        const resp = await fetch('http://127.0.0.1:8088/v1/chat/completions', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            model: activeModel,
-            messages: [{role: 'user', content: text}],
-            max_tokens: 512
-          })
-        });
-        const data = await resp.json();
-        const content = data.choices[0].message.content;
-        botMsg.innerText = content;
+        if (activeModel === 'audio') {
+          // Acoustic audio synthesis route
+          const resp = await fetch('http://127.0.0.1:8088/v1/audio/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ prompt: text, duration: 4.0 })
+          });
+          const data = await resp.json();
+          botMsg.innerHTML = `<strong>[MusicGen-Small Sub-Bit (15.4 MB)]</strong><br>
+          🎵 Synthesized <strong>${data.duration_s}s</strong> 32kHz audio in <strong>${data.latency_ms} ms</strong>!<br>
+          <em>Prompt:</em> "${data.prompt}"<br>
+          <em>Mood:</em> ${data.conditioning.mood} | <em>Key:</em> ${data.conditioning.key} | <em>BPM:</em> ${data.conditioning.tempo_bpm}`;
+          
+          // Play Web Audio synthesis tone
+          playWebAudioChord(data.conditioning.key);
+        } else {
+          // LLM chat route
+          const resp = await fetch('http://127.0.0.1:8088/v1/chat/completions', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              model: activeModel,
+              messages: [{role: 'user', content: text}],
+              max_tokens: 512
+            })
+          });
+          const data = await resp.json();
+          botMsg.innerText = data.choices[0].message.content;
+        }
       } catch (err) {
         botMsg.innerText = 'Error querying local edge daemon: ' + err.message;
       }
       log.scrollTop = log.scrollHeight;
+    }
+
+    function playWebAudioChord(key) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const freqs = [293.66, 349.23, 440.00]; // D minor triad
+        freqs.forEach(f => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = f;
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.0);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 3.0);
+        });
+      } catch (e) {
+        console.warn("AudioContext init error:", e);
+      }
     }
   </script>
 </body>

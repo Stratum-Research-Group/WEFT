@@ -352,3 +352,47 @@ def cpu_paged_int4_kv_flash_attention_avx512(
     return out
 
 
+def cpu_gqa_flash_attention_avx512(
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v: torch.Tensor,
+    sm_scale: float = None
+) -> torch.Tensor:
+    """
+    Evaluates Grouped-Query Attention (GQA) Flash-Attention via native AVX-512 vector registers.
+    q: [batch, num_q_heads, q_len, head_dim]
+    k: [batch, num_kv_heads, kv_len, head_dim]
+    v: [batch, num_kv_heads, kv_len, head_dim]
+    """
+    head_dim = q.shape[-1]
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_gqa_flash_attention_avx512"):
+        out = torch.empty_like(q)
+        weft_avx512.subbit_gqa_flash_attention_avx512(
+            q.contiguous(), k.contiguous(), v.contiguous(),
+            out, float(sm_scale)
+        )
+        return out
+
+    # Reference evaluation
+    batch_size, num_q_heads, q_len, _ = q.shape
+    num_kv_heads = k.shape[1]
+    group_ratio = num_q_heads // num_kv_heads
+
+    out = torch.empty_like(q)
+    for b in range(batch_size):
+        for qh in range(num_q_heads):
+            kv_h = qh // group_ratio
+            cur_q = q[b, qh]
+            cur_k = k[b, kv_h]
+            cur_v = v[b, kv_h]
+
+            scores = torch.matmul(cur_q, cur_k.transpose(-1, -2)) * sm_scale
+            probs = torch.softmax(scores, dim=-1)
+            out[b, qh] = torch.matmul(probs, cur_v)
+    return out
+
+
+

@@ -1257,6 +1257,124 @@ void subbit_paged_int4_kv_flash_attention_avx512_forward(
     }
 }
 
+
+/**
+ * AVX-512 Grouped-Query Attention (GQA) Vectorized Flash-Attention Forward Kernel
+ * Supports arbitrary query head to KV head broadcast ratios (e.g. 32 query heads, 8 KV heads).
+ * q: [batch_size, num_q_heads, q_len, head_dim] float32
+ * k: [batch_size, num_kv_heads, kv_len, head_dim] float32
+ * v: [batch_size, num_kv_heads, kv_len, head_dim] float32
+ * out: [batch_size, num_q_heads, q_len, head_dim] float32
+ */
+void subbit_gqa_flash_attention_avx512_forward(
+    const at::Tensor& q,
+    const at::Tensor& k,
+    const at::Tensor& v,
+    at::Tensor& out,
+    float sm_scale
+) {
+    TORCH_CHECK(q.is_contiguous() && k.is_contiguous() && v.is_contiguous() && out.is_contiguous(),
+                "All tensors must be contiguous");
+    TORCH_CHECK(q.dim() == 4 && k.dim() == 4 && v.dim() == 4 && out.dim() == 4,
+                "Tensors must be 4D: [batch, heads, seq, head_dim]");
+
+    const int64_t batch_size = q.size(0);
+    const int64_t num_q_heads = q.size(1);
+    const int64_t q_len = q.size(2);
+    const int64_t head_dim = q.size(3);
+
+    const int64_t num_kv_heads = k.size(1);
+    const int64_t kv_len = k.size(2);
+
+    TORCH_CHECK(num_q_heads % num_kv_heads == 0,
+                "num_q_heads must be divisible by num_kv_heads for GQA");
+    const int64_t group_ratio = num_q_heads / num_kv_heads;
+
+    const float* q_ptr = q.data_ptr<float>();
+    const float* k_ptr = k.data_ptr<float>();
+    const float* v_ptr = v.data_ptr<float>();
+    float* out_ptr = out.data_ptr<float>();
+
+    const int64_t q_head_stride = q_len * head_dim;
+    const int64_t q_batch_stride = num_q_heads * q_head_stride;
+
+    const int64_t kv_head_stride = kv_len * head_dim;
+    const int64_t kv_batch_stride = num_kv_heads * kv_head_stride;
+
+    #pragma omp parallel for collapse(3) schedule(dynamic)
+    for (int64_t b = 0; b < batch_size; ++b) {
+        for (int64_t qh = 0; qh < num_q_heads; ++qh) {
+            for (int64_t qi = 0; qi < q_len; ++qi) {
+                const int64_t kv_h = qh / group_ratio;
+                const float* cur_q = q_ptr + b * q_batch_stride + qh * q_head_stride + qi * head_dim;
+                const float* cur_k_base = k_ptr + b * kv_batch_stride + kv_h * kv_head_stride;
+                const float* cur_v_base = v_ptr + b * kv_batch_stride + kv_h * kv_head_stride;
+                float* cur_out = out_ptr + b * q_batch_stride + qh * q_head_stride + qi * head_dim;
+
+                for (int64_t d = 0; d < head_dim; ++d) {
+                    cur_out[d] = 0.0f;
+                }
+
+                float m_prev = -1e30f;
+                float s_prev = 0.0f;
+
+                for (int64_t ki = 0; ki < kv_len; ++ki) {
+                    const float* cur_k = cur_k_base + ki * head_dim;
+                    const float* cur_v = cur_v_base + ki * head_dim;
+
+                    __m512 vdot = _mm512_setzero_ps();
+                    int64_t d = 0;
+                    for (; d + 16 <= head_dim; d += 16) {
+                        __m512 vq = _mm512_loadu_ps(cur_q + d);
+                        __m512 vk = _mm512_loadu_ps(cur_k + d);
+                        vdot = _mm512_fmadd_ps(vq, vk, vdot);
+                    }
+                    float score = _mm512_reduce_add_ps(vdot);
+                    for (; d < head_dim; ++d) {
+                        score += cur_q[d] * cur_k[d];
+                    }
+                    score *= sm_scale;
+
+                    float m_new = (score > m_prev) ? score : m_prev;
+                    float alpha = std::exp(m_prev - m_new);
+                    float p_curr = std::exp(score - m_new);
+                    float s_new = s_prev * alpha + p_curr;
+
+                    __m512 valpha = _mm512_set1_ps(alpha);
+                    __m512 vpcurr = _mm512_set1_ps(p_curr);
+                    d = 0;
+                    for (; d + 16 <= head_dim; d += 16) {
+                        __m512 vout = _mm512_loadu_ps(cur_out + d);
+                        __m512 vv = _mm512_loadu_ps(cur_v + d);
+                        vout = _mm512_mul_ps(vout, valpha);
+                        vout = _mm512_fmadd_ps(vpcurr, vv, vout);
+                        _mm512_storeu_ps(cur_out + d, vout);
+                    }
+                    for (; d < head_dim; ++d) {
+                        cur_out[d] = cur_out[d] * alpha + p_curr * cur_v[d];
+                    }
+
+                    m_prev = m_new;
+                    s_prev = s_new;
+                }
+
+                float inv_s = 1.0f / (s_prev + 1e-12f);
+                __m512 vinv = _mm512_set1_ps(inv_s);
+                int64_t d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vout = _mm512_loadu_ps(cur_out + d);
+                    vout = _mm512_mul_ps(vout, vinv);
+                    _mm512_storeu_ps(cur_out + d, vout);
+                }
+                for (; d < head_dim; ++d) {
+                    cur_out[d] *= inv_s;
+                }
+            }
+        }
+    }
+}
+
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
@@ -1271,5 +1389,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_int8_kv_flash_attention_avx512", &subbit_int8_kv_flash_attention_avx512_forward, "AVX-512 Int8 Quantized KV-Cache Flash-Attention Forward");
     m.def("subbit_int4_kv_flash_attention_avx512", &subbit_int4_kv_flash_attention_avx512_forward, "AVX-512 Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
     m.def("subbit_paged_int4_kv_flash_attention_avx512", &subbit_paged_int4_kv_flash_attention_avx512_forward, "AVX-512 Paged Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
+    m.def("subbit_gqa_flash_attention_avx512", &subbit_gqa_flash_attention_avx512_forward, "AVX-512 Grouped-Query Attention (GQA) Flash-Attention Forward");
 }
+
 

@@ -529,3 +529,46 @@ def test_avx512_paged_int4_kv_flash_attention_mathematical_soundness():
     assert diff < 1e-4, f"Paged Int4 KV Flash-Attention discrepancy too high: {diff}"
 
 
+def test_avx512_gqa_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Grouped-Query Attention (GQA) Flash-Attention kernel.
+    Validates broadcasted KV-head indexing and multi-head online softmax numerical parity.
+    """
+    if not hasattr(weft_avx512, "subbit_gqa_flash_attention_avx512"):
+        pytest.skip("AVX-512 GQA Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    NUM_Q_HEADS = 8
+    NUM_KV_HEADS = 2
+    Q_LEN = 4
+    KV_LEN = 16
+    HEAD_DIM = 64
+
+    q = torch.randn(B, NUM_Q_HEADS, Q_LEN, HEAD_DIM, dtype=torch.float32)
+    k = torch.randn(B, NUM_KV_HEADS, KV_LEN, HEAD_DIM, dtype=torch.float32)
+    v = torch.randn(B, NUM_KV_HEADS, KV_LEN, HEAD_DIM, dtype=torch.float32)
+    out = torch.empty(B, NUM_Q_HEADS, Q_LEN, HEAD_DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (HEAD_DIM ** 0.5)
+
+    weft_avx512.subbit_gqa_flash_attention_avx512(q, k, v, out, sm_scale)
+
+    # Reference GQA computation
+    group_ratio = NUM_Q_HEADS // NUM_KV_HEADS
+    ref_out = torch.empty_like(out)
+    for b in range(B):
+        for qh in range(NUM_Q_HEADS):
+            kv_h = qh // group_ratio
+            cur_q = q[b, qh]
+            cur_k = k[b, kv_h]
+            cur_v = v[b, kv_h]
+
+            scores = torch.matmul(cur_q, cur_k.transpose(-1, -2)) * sm_scale
+            probs = torch.softmax(scores, dim=-1)
+            ref_out[b, qh] = torch.matmul(probs, cur_v)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"GQA Flash-Attention discrepancy too high: {diff}"
+
+
+

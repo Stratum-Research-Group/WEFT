@@ -153,3 +153,35 @@ def benchmark_fused_gemv():
 
 if __name__ == "__main__":
     benchmark_fused_gemv()
+
+def benchmark_ternary_gemv():
+    print("\n" + "=" * 80)
+    print("  AVX-512 MASKED TERNARY ({-1, 0, +1}) POPCOUNT BENCHMARK")
+    print("=" * 80)
+
+    rows, cols = 8192, 8192
+    cols_u64 = cols // 64
+
+    b_nz = torch.randint(0, 2**62, (rows, cols_u64), dtype=torch.int64)
+    b_sign = torch.randint(0, 2**62, (rows, cols_u64), dtype=torch.int64)
+    x_quant = torch.randint(0, 2**62, (cols_u64,), dtype=torch.int64)
+    out = torch.zeros(rows, dtype=torch.float32)
+
+    for _ in range(5):
+        weft_avx512.subbit_ternary_gemv_avx512(b_nz, b_sign, x_quant, out, 0.05)
+
+    iters = 20
+    t0 = time.perf_counter()
+    for _ in range(iters):
+        weft_avx512.subbit_ternary_gemv_avx512(b_nz, b_sign, x_quant, out, 0.05)
+    t_ternary = (time.perf_counter() - t0) / iters
+
+    ops = 2.0 * rows * cols
+    effective_gflops = (ops / t_ternary) / 1e9
+
+    print(f"Matrix: 1.58-Bit Ternary Sparse Projection ({rows}x{cols})")
+    print(f"  Ternary Popcount Latency : {t_ternary * 1e6:8.2f} µs")
+    print(f"  Effective Throughput     : {effective_gflops:8.2f} GFLOPs/s equivalent")
+
+if __name__ == "__main__":
+    benchmark_ternary_gemv()

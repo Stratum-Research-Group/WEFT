@@ -204,8 +204,80 @@ void subbit_fused_gemv_avx512_forward(
     }
 }
 
+/**
+ * AVX-512 Masked Ternary GEMV Kernel
+ */
+void subbit_ternary_gemv_avx512_forward(
+    const at::Tensor& b_nonzero,      // [rows, cols / 64] uint64
+    const at::Tensor& b_sign,         // [rows, cols / 64] uint64
+    const at::Tensor& x_quant,        // [cols / 64] uint64
+    at::Tensor& output,               // [rows] float32
+    float scale
+) {
+    TORCH_CHECK(b_nonzero.is_contiguous(), "b_nonzero must be contiguous");
+    TORCH_CHECK(b_sign.is_contiguous(), "b_sign must be contiguous");
+    TORCH_CHECK(x_quant.is_contiguous(), "x_quant must be contiguous");
+    TORCH_CHECK(output.is_contiguous(), "output must be contiguous");
+
+    const int64_t rows = b_nonzero.size(0);
+    const int64_t cols_u64 = b_nonzero.size(1);
+
+    const uint64_t* nz_ptr = reinterpret_cast<const uint64_t*>(b_nonzero.data_ptr());
+    const uint64_t* sign_ptr = reinterpret_cast<const uint64_t*>(b_sign.data_ptr());
+    const uint64_t* x_ptr = reinterpret_cast<const uint64_t*>(x_quant.data_ptr());
+    float* out_ptr = output.data_ptr<float>();
+
+    #pragma omp parallel for schedule(static)
+    for (int64_t r = 0; r < rows; ++r) {
+        const uint64_t* row_nz = nz_ptr + r * cols_u64;
+        const uint64_t* row_sign = sign_ptr + r * cols_u64;
+        int64_t c = 0;
+
+        __m512i accum_pos = _mm512_setzero_si512();
+        __m512i accum_neg = _mm512_setzero_si512();
+
+        for (; c + 8 <= cols_u64; c += 8) {
+            __m512i vnz = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(row_nz + c));
+            __m512i vsign = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(row_sign + c));
+            __m512i vx = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(x_ptr + c));
+
+            __m512i vdiff = _mm512_xor_si512(vsign, vx);
+            __m512i vpos_mask = _mm512_andnot_si512(vdiff, vnz);
+            __m512i vneg_mask = _mm512_and_si512(vdiff, vnz);
+
+            accum_pos = _mm512_add_epi64(accum_pos, _mm512_popcnt_epi64(vpos_mask));
+            accum_neg = _mm512_add_epi64(accum_neg, _mm512_popcnt_epi64(vneg_mask));
+        }
+
+        uint64_t pos_lanes[8];
+        uint64_t neg_lanes[8];
+        _mm512_storeu_si512(reinterpret_cast<__m512i*>(pos_lanes), accum_pos);
+        _mm512_storeu_si512(reinterpret_cast<__m512i*>(neg_lanes), accum_neg);
+
+        uint64_t total_pos = 0;
+        uint64_t total_neg = 0;
+        for (int i = 0; i < 8; ++i) {
+            total_pos += pos_lanes[i];
+            total_neg += neg_lanes[i];
+        }
+
+        for (; c < cols_u64; ++c) {
+            uint64_t nz = row_nz[c];
+            uint64_t sign = row_sign[c];
+            uint64_t x = x_ptr[c];
+            uint64_t diff = sign ^ x;
+            total_pos += _mm_popcnt_u64((~diff) & nz);
+            total_neg += _mm_popcnt_u64(diff & nz);
+        }
+
+        int64_t net_dot = static_cast<int64_t>(total_pos) - static_cast<int64_t>(total_neg);
+        out_ptr[r] = static_cast<float>(net_dot) * scale;
+    }
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
     m.def("subbit_fused_gemv_avx512", &subbit_fused_gemv_avx512_forward, "Fused AVX-512 VPOPCNTDQ + Rank-1 SVD Correction GEMV");
+    m.def("subbit_ternary_gemv_avx512", &subbit_ternary_gemv_avx512_forward, "AVX-512 Masked Ternary GEMV with Hardware Popcount");
 }

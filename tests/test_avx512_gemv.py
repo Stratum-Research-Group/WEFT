@@ -116,3 +116,59 @@ def test_avx512_fused_gemv_mathematical_soundness():
 
     np.testing.assert_allclose(out_fused.numpy(), out_unfused.numpy(), atol=1e-5, rtol=1e-5)
     print("Exact fused mathematical soundness confirmed: Fused == Unfused Popcount + Rank-1!")
+
+def test_avx512_ternary_gemv_mathematical_soundness():
+    """Verify bit-exact soundness of masked ternary popcount GEMV against naive float dot product."""
+    rows = 64
+    cols = 512
+    cols_u64 = cols // 64
+
+    torch.manual_seed(777)
+    np.random.seed(777)
+
+    # Ternary weights W in {-1, 0, +1}
+    # 0 with 50% probability, +1 with 25%, -1 with 25%
+    w_raw = np.random.choice([0, 1, -1], size=(rows, cols), p=[0.5, 0.25, 0.25]).astype(np.float32)
+    x_bits = np.random.randint(0, 2, size=(cols,), dtype=np.uint8)
+    x_bipolar = x_bits.astype(np.float32) * 2.0 - 1.0
+
+    # Ground truth
+    expected_dot = w_raw @ x_bipolar
+
+    # Pack ternary weights into b_nonzero and b_sign
+    nz_mask = (w_raw != 0).astype(np.uint8)
+    sign_mask = (w_raw == 1).astype(np.uint8)
+
+    b_nz = np.zeros((rows, cols_u64), dtype=np.uint64)
+    b_sign = np.zeros((rows, cols_u64), dtype=np.uint64)
+
+    for r in range(rows):
+        for c in range(cols_u64):
+            word_nz = 0
+            word_sign = 0
+            for bit in range(64):
+                idx = c * 64 + bit
+                if nz_mask[r, idx] == 1:
+                    word_nz |= (1 << bit)
+                if sign_mask[r, idx] == 1:
+                    word_sign |= (1 << bit)
+            b_nz[r, c] = word_nz
+            b_sign[r, c] = word_sign
+
+    x_packed = np.zeros((cols_u64,), dtype=np.uint64)
+    for c in range(cols_u64):
+        word = 0
+        for bit in range(64):
+            if x_bits[c * 64 + bit] == 1:
+                word |= (1 << bit)
+        x_packed[c] = word
+
+    b_nz_torch = torch.from_numpy(b_nz.view(np.int64))
+    b_sign_torch = torch.from_numpy(b_sign.view(np.int64))
+    x_torch = torch.from_numpy(x_packed.view(np.int64))
+
+    out_ternary = torch.zeros(rows, dtype=torch.float32)
+    weft_avx512.subbit_ternary_gemv_avx512(b_nz_torch, b_sign_torch, x_torch, out_ternary, 1.0)
+
+    np.testing.assert_allclose(out_ternary.numpy(), expected_dot, atol=1e-5, rtol=1e-5)
+    print("Exact ternary mathematical soundness confirmed: Masked Popcount == Ternary Dot Product!")

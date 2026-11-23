@@ -110,3 +110,32 @@ def cpu_rope_avx512(x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> to
     out[..., 0::2] = out_even
     out[..., 1::2] = out_odd
     return out
+
+
+def cpu_flash_attention_avx512(
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v: torch.Tensor,
+    sm_scale: float = None
+) -> torch.Tensor:
+    """
+    Evaluates in-register tiled Flash-Attention via native AVX-512 vector registers.
+    q: [batch_heads, q_len, head_dim]
+    k: [batch_heads, kv_len, head_dim]
+    v: [batch_heads, kv_len, head_dim]
+    """
+    head_dim = q.shape[-1]
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_flash_attention_avx512"):
+        out = torch.empty_like(q)
+        weft_avx512.subbit_flash_attention_avx512(
+            q.contiguous(), k.contiguous(), v.contiguous(), out, float(sm_scale)
+        )
+        return out
+
+    # Standard fallback
+    scores = torch.matmul(q, k.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    return torch.matmul(probs, v)

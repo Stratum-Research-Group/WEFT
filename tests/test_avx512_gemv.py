@@ -227,3 +227,33 @@ def test_avx512_softmax_mathematical_soundness():
     assert np.all(out_avx.numpy() >= 0.0)
     np.testing.assert_allclose(out_avx.sum(dim=-1).numpy(), np.ones(batch_size), atol=1e-4)
     print("Exact Softmax mathematical soundness confirmed: AVX-512 Softmax == PyTorch Softmax!")
+
+
+def test_avx512_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 in-register Flash-Attention kernel against exact PyTorch reference.
+    Validates online max-subtraction, numerical stability, and value accumulation parity.
+    """
+    if not hasattr(weft_avx512, "subbit_flash_attention_avx512"):
+        pytest.skip("AVX-512 Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 4
+    Q_LEN = 16
+    KV_LEN = 32
+    DIM = 64
+
+    q = torch.randn(B, Q_LEN, DIM, dtype=torch.float32)
+    k = torch.randn(B, KV_LEN, DIM, dtype=torch.float32)
+    v = torch.randn(B, KV_LEN, DIM, dtype=torch.float32)
+    out = torch.empty(B, Q_LEN, DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (DIM ** 0.5)
+
+    weft_avx512.subbit_flash_attention_avx512(q, k, v, out, sm_scale)
+
+    scores = torch.matmul(q, k.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    ref = torch.matmul(probs, v)
+
+    diff = (out - ref).abs().max().item()
+    assert diff < 1e-4, f"Flash-Attention discrepancy too high: {diff}"

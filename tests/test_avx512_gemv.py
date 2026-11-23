@@ -1,7 +1,14 @@
 import pytest
 import torch
 import numpy as np
-import weft_avx512
+
+try:
+    import weft_avx512
+    _AVX512_EXT_AVAILABLE = True
+except ImportError:
+    _AVX512_EXT_AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(not _AVX512_EXT_AVAILABLE, reason="weft_avx512 extension not compiled")
 
 def test_avx512_exact_mathematical_soundness():
     """Verify bit-exact soundness between AVX-512 popcount GEMV and naive bipolar dot product."""

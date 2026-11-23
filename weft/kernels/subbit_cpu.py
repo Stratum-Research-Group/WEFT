@@ -25,15 +25,45 @@ def is_avx512_accelerated() -> bool:
     return _AVX512_AVAILABLE
 
 
-def cpu_unpack_bitboards(packed: torch.Tensor, rank: int) -> torch.Tensor:
+def pack_activations_to_u64(x_sign: torch.Tensor) -> torch.Tensor:
     """
-    Vectorized unpacking of packed uint32/uint64 bitboards into bipolar {-1.0, +1.0} float32 tensors.
+    Packs a tensor of signs [..., rank] (with values 0 or 1) into packed uint64/int64 words.
+    Each word holds 64 boolean signs packed along bit positions 0..63.
+    """
+    orig_shape = x_sign.shape
+    rank = orig_shape[-1]
+    num_words = (rank + 63) // 64
+    pad_len = num_words * 64 - rank
+    if pad_len > 0:
+        x_pad = torch.nn.functional.pad(x_sign, (0, pad_len), value=0)
+    else:
+        x_pad = x_sign
+    x_pad = x_pad.view(-1, num_words, 64).to(torch.int64)
+    shifts = torch.arange(64, dtype=torch.int64, device=x_sign.device)
+    packed = (x_pad << shifts).sum(dim=-1)
+    return packed.view(*orig_shape[:-1], num_words)
+
+
+def cpu_unpack_bitboards(packed: torch.Tensor, rank: int, mask_nonzero: torch.Tensor = None) -> torch.Tensor:
+    """
+    Vectorized unpacking of packed int32/int64 bitboards into bipolar {-1.0, +1.0} or ternary {-1.0, 0.0, +1.0} float32 tensors.
+    Correctly recognizes 64-bit int64 vs 32-bit int32 storage and applies non-zero ternary masks.
     """
     N, num_words = packed.shape
-    shifts = torch.arange(32, dtype=torch.int32, device=packed.device)
+    is_64 = (packed.dtype == torch.int64)
+    word_bits = 64 if is_64 else 32
+    shift_dtype = torch.int64 if is_64 else torch.int32
+    shifts = torch.arange(word_bits, dtype=shift_dtype, device=packed.device)
+    
     bits = (packed.unsqueeze(-1) >> shifts) & 1
-    bipolar = (bits.float() * 2.0 - 1.0).view(N, num_words * 32)
-    return bipolar[:, :rank]
+    bipolar = (bits.float() * 2.0 - 1.0).view(N, num_words * word_bits)[:, :rank]
+    
+    if mask_nonzero is not None:
+        mask_bits = (mask_nonzero.unsqueeze(-1) >> shifts) & 1
+        mask_f = mask_bits.float().view(N, num_words * word_bits)[:, :rank]
+        bipolar = bipolar * mask_f
+        
+    return bipolar
 
 
 def cpu_subbit_matmul(
@@ -54,37 +84,37 @@ def cpu_subbit_matmul(
     batch_size = x_2d.shape[0]
 
     if _AVX512_AVAILABLE and b_packed.dtype == torch.int64:
+        # Vectorized bit-packing of activation signs: [batch_size, (rank + 63) // 64] uint64
+        x_sign = (x_2d > 0).to(torch.int64)
+        x_packed = pack_activations_to_u64(x_sign)
+
         # Mode 1: Masked Ternary GEMV
         if b_nonzero is not None and hasattr(weft_avx512, "subbit_ternary_gemv_avx512") and batch_size == 1:
-            x_sign = (x_2d > 0).to(torch.int64)
             out = torch.zeros(b_packed.shape[0], dtype=torch.float32, device=x.device)
-            weft_avx512.subbit_ternary_gemv_avx512(b_nonzero, b_packed, x_sign.squeeze(0), out, scale)
+            weft_avx512.subbit_ternary_gemv_avx512(b_nonzero, b_packed, x_packed.squeeze(0), out, scale)
             return out.view(*orig_shape[:-1], b_packed.shape[0])
 
         # Mode 2: Fused Rank-1 SVD GEMV
         if u_proj is not None and v_proj is not None and hasattr(weft_avx512, "subbit_fused_gemv_avx512") and batch_size == 1:
-            x_sign = (x_2d > 0).to(torch.int64)
             v_dot_x = float(torch.dot(v_proj.float(), x_2d.squeeze(0).float()))
             out = torch.zeros(b_packed.shape[0], dtype=torch.float32, device=x.device)
-            weft_avx512.subbit_fused_gemv_avx512(b_packed, x_sign.squeeze(0), u_proj.float(), v_dot_x, out, scale)
+            weft_avx512.subbit_fused_gemv_avx512(b_packed, x_packed.squeeze(0), u_proj.float(), v_dot_x, out, scale)
             return out.view(*orig_shape[:-1], b_packed.shape[0])
 
         # Mode 3: Batch-4 GEMM with register reuse
         if batch_size == 4 and hasattr(weft_avx512, "subbit_gemm_avx512_batch4"):
-            x_sign = (x_2d > 0).to(torch.int64)
             out = torch.zeros(4, b_packed.shape[0], dtype=torch.float32, device=x.device)
-            weft_avx512.subbit_gemm_avx512_batch4(b_packed, x_sign, out, scale)
+            weft_avx512.subbit_gemm_avx512_batch4(b_packed, x_packed, out, scale)
             return out.view(*orig_shape[:-1], b_packed.shape[0])
 
         # Mode 4: Standard Single-Token GEMV
         if batch_size == 1 and hasattr(weft_avx512, "subbit_gemv_avx512"):
-            x_sign = (x_2d > 0).to(torch.int64)
             out = torch.zeros(b_packed.shape[0], dtype=torch.float32, device=x.device)
-            weft_avx512.subbit_gemv_avx512(b_packed, x_sign.squeeze(0), out, scale)
+            weft_avx512.subbit_gemv_avx512(b_packed, x_packed.squeeze(0), out, scale)
             return out.view(*orig_shape[:-1], b_packed.shape[0])
 
     # Fallback Path
-    bipolar = cpu_unpack_bitboards(b_packed, rank)
+    bipolar = cpu_unpack_bitboards(b_packed, rank, mask_nonzero=b_nonzero)
     out = torch.matmul(x_2d.float(), bipolar.t()) * scale
     if u_proj is not None and v_proj is not None:
         out += (x_2d.float() @ v_proj.float().unsqueeze(-1)) @ u_proj.float().unsqueeze(0)

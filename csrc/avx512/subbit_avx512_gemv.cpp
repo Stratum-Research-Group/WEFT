@@ -439,7 +439,7 @@ void subbit_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             // Online tiled loop over key/value positions
@@ -548,7 +548,7 @@ void subbit_causal_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             // In causal attention, only keys up to the query position (or context length) are visible
@@ -653,7 +653,7 @@ void subbit_dynamic_head_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             for (int64_t ki = 0; ki < kv_len; ++ki) {
@@ -771,7 +771,7 @@ void subbit_paged_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             for (int32_t ki = 0; ki < ctx_len; ++ki) {
@@ -884,7 +884,7 @@ void subbit_int8_kv_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             for (int64_t ki = 0; ki < kv_len; ++ki) {
@@ -1005,7 +1005,7 @@ void subbit_int4_kv_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             for (int64_t ki = 0; ki < kv_len; ++ki) {
@@ -1160,7 +1160,7 @@ void subbit_paged_int4_kv_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             for (int32_t ki = 0; ki < ctx_len; ++ki) {
@@ -1315,7 +1315,7 @@ void subbit_gqa_flash_attention_avx512_forward(
                     cur_out[d] = 0.0f;
                 }
 
-                float m_prev = -1e30f;
+                float m_prev = -std::numeric_limits<float>::infinity();
                 float s_prev = 0.0f;
 
                 for (int64_t ki = 0; ki < kv_len; ++ki) {
@@ -1438,7 +1438,7 @@ void subbit_asym_int4_kv_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             for (int64_t ki = 0; ki < kv_len; ++ki) {
@@ -1600,8 +1600,10 @@ void subbit_fused_swiglu_gemm_avx512_forward(
                 __m512i vwg = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(cur_wg + w));
                 __m512i vwu = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(cur_wu + w));
 
-                __m512i vxnor_g = _mm512_ternarylogic_epi64(vx, vwg, vwg, 0x99);
-                __m512i vxnor_u = _mm512_ternarylogic_epi64(vx, vwu, vwu, 0x99);
+                // XNOR(a, b) = ~(a ^ b): for a=vx (0xF0), b=vwg (0xCC), c=vwg (0xAA)
+                // ~(0xF0 ^ 0xCC) = 0xC3. (0x99 was incorrectly ~(b ^ c) = ~(vwg ^ vwg) = ~0)
+                __m512i vxnor_g = _mm512_ternarylogic_epi64(vx, vwg, vwg, 0xC3);
+                __m512i vxnor_u = _mm512_ternarylogic_epi64(vx, vwu, vwu, 0xC3);
 
                 __m512i cnt_g = _mm512_popcnt_epi64(vxnor_g);
                 __m512i cnt_u = _mm512_popcnt_epi64(vxnor_u);
@@ -1679,7 +1681,7 @@ void subbit_sliding_window_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             // Sliding window bounds: [k_start, k_end)
@@ -1876,7 +1878,7 @@ void subbit_ternary_flash_attention_avx512_forward(
                 cur_out[d] = 0.0f;
             }
 
-            float m_prev = -1e30f;
+            float m_prev = -std::numeric_limits<float>::infinity();
             float s_prev = 0.0f;
 
             // Causal attention upper bound

@@ -11,8 +11,8 @@ class TestUnifiedDispatch(unittest.TestCase):
         x = np.random.randint(0, 2, size=(cols,), dtype=np.uint8)
         
         # Scalar Hamming distance
-        hamming = np.sum(b ^ x)
-        dot_product = cols - 2 * hamming
+        hamming = int(np.sum(b ^ x))
+        dot_product = float(cols - 2 * hamming)
         
         # Bipolar dot product reference (-1, +1)
         b_bipolar = 1.0 - 2.0 * b

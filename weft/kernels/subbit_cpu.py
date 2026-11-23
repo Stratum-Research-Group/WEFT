@@ -212,3 +212,35 @@ def cpu_paged_flash_attention_avx512(
         probs = torch.softmax(scores, dim=-1)
         out[b] = torch.matmul(probs, v_contig)
     return out
+
+
+def cpu_int8_kv_flash_attention_avx512(
+    q: torch.Tensor,
+    k_cache: torch.Tensor,
+    v_cache: torch.Tensor,
+    k_scales: torch.Tensor,
+    v_scales: torch.Tensor,
+    sm_scale: float = None
+) -> torch.Tensor:
+    """
+    Evaluates Int8 Quantized KV-Cache Flash-Attention via native AVX-512 vector registers.
+    """
+    head_dim = q.shape[-1]
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_int8_kv_flash_attention_avx512"):
+        out = torch.empty_like(q)
+        weft_avx512.subbit_int8_kv_flash_attention_avx512(
+            q.contiguous(), k_cache.contiguous(), v_cache.contiguous(),
+            k_scales.contiguous(), v_scales.contiguous(),
+            out, float(sm_scale)
+        )
+        return out
+
+    # Standard dequantized fallback
+    k_deq = k_cache.float() * k_scales.unsqueeze(-1)
+    v_deq = v_cache.float() * v_scales.unsqueeze(-1)
+    scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    return torch.matmul(probs, v_deq)

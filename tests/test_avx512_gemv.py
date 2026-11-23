@@ -361,3 +361,45 @@ def test_avx512_paged_flash_attention_mathematical_soundness():
 
     diff = (out - ref_out).abs().max().item()
     assert diff < 1e-4, f"Paged Flash-Attention discrepancy too high: {diff}"
+
+
+def test_avx512_int8_kv_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Int8 Quantized KV-Cache Flash-Attention kernel.
+    Validates in-register sign-extension, int32-to-float32 conversion, and scaling parity.
+    """
+    if not hasattr(weft_avx512, "subbit_int8_kv_flash_attention_avx512"):
+        pytest.skip("AVX-512 Int8 KV Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    Q_LEN = 4
+    KV_LEN = 32
+    DIM = 64
+
+    q = torch.randn(B, Q_LEN, DIM, dtype=torch.float32)
+    k_fp = torch.randn(B, KV_LEN, DIM, dtype=torch.float32)
+    v_fp = torch.randn(B, KV_LEN, DIM, dtype=torch.float32)
+
+    k_scales = k_fp.abs().amax(dim=-1) / 127.0
+    v_scales = v_fp.abs().amax(dim=-1) / 127.0
+
+    k_int8 = torch.clamp(torch.round(k_fp / k_scales.unsqueeze(-1)), -128, 127).to(torch.int8)
+    v_int8 = torch.clamp(torch.round(v_fp / v_scales.unsqueeze(-1)), -128, 127).to(torch.int8)
+
+    out = torch.empty(B, Q_LEN, DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (DIM ** 0.5)
+
+    weft_avx512.subbit_int8_kv_flash_attention_avx512(
+        q, k_int8, v_int8, k_scales, v_scales, out, sm_scale
+    )
+
+    k_deq = k_int8.float() * k_scales.unsqueeze(-1)
+    v_deq = v_int8.float() * v_scales.unsqueeze(-1)
+
+    scores = torch.matmul(q, k_deq.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    ref_out = torch.matmul(probs, v_deq)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Int8 KV Flash-Attention discrepancy too high: {diff}"

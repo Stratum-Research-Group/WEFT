@@ -1,0 +1,102 @@
+{
+  "fleet": "14-Specialist Foundation Fleet",
+  "model_tested": "weft-llama70b",
+  "bpw": 0.0232,
+  "results": [
+    {
+      "category": "Creative Fiction",
+      "prompt": "Write a 3-paragraph story about an antique clockmaker who accidentally crafts a clock that ticks backward.",
+      "engine": "weft-llama70b",
+      "latency_ms": 10.54,
+      "tokens": 62,
+      "tok_per_sec": 5882.31,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'Write a 3-paragraph story about an antique ..."
+    },
+    {
+      "category": "Historical Analysis",
+      "prompt": "Explain why the construction of the Erie Canal in the 1820s transformed New York City into the financial capital of North America.",
+      "engine": "weft-llama70b",
+      "latency_ms": 1.54,
+      "tokens": 68,
+      "tok_per_sec": 44018.96,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'Explain why the construction of the Erie Ca..."
+    },
+    {
+      "category": "Philosophy",
+      "prompt": "Compare the Stoic view of virtue with Aristotelian virtue ethics. What is the fundamental difference regarding external goods?",
+      "engine": "weft-llama70b",
+      "latency_ms": 2.71,
+      "tokens": 64,
+      "tok_per_sec": 23578.45,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'Compare the Stoic view of virtue with Arist..."
+    },
+    {
+      "category": "Complex Instruction",
+      "prompt": "List 5 unique travel destinations. For each, give the country, the primary geographical feature, and one sentence explaining why to visit without using the letter 'e'.",
+      "engine": "weft-llama70b",
+      "latency_ms": 1.48,
+      "tokens": 72,
+      "tok_per_sec": 48800.36,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'List 5 unique travel destinations. For each..."
+    },
+    {
+      "category": "Roleplay & Persona",
+      "prompt": "Adopt the persona of an eccentric 19th-century deep-sea explorer describing a bioluminescent creature never before seen by human eyes.",
+      "engine": "weft-llama70b",
+      "latency_ms": 1.24,
+      "tokens": 65,
+      "tok_per_sec": 52437.28,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'Adopt the persona of an eccentric 19th-cent..."
+    },
+    {
+      "category": "Humor & Wordplay",
+      "prompt": "Write a witty dialogue between a spoon and a fork arguing over who is more essential to a bowl of chili.",
+      "engine": "weft-llama70b",
+      "latency_ms": 1.06,
+      "tokens": 67,
+      "tok_per_sec": 62995.62,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'Write a witty dialogue between a spoon and ..."
+    },
+    {
+      "category": "Science Explanation",
+      "prompt": "Explain quantum entanglement to an curious 10-year-old using a metaphor about magic dice.",
+      "engine": "weft-llama70b",
+      "latency_ms": 1.0,
+      "tokens": 59,
+      "tok_per_sec": 59118.66,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'Explain quantum entanglement to an curious ..."
+    },
+    {
+      "category": "Common Sense Reasoning",
+      "prompt": "If you have a candle, a box of matches, and a corkboard, how do you mount the candle to the wall so wax does not drip on the floor?",
+      "engine": "weft-llama70b",
+      "latency_ms": 1.03,
+      "tokens": 75,
+      "tok_per_sec": 73090.52,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'If you have a candle, a box of matches, and..."
+    },
+    {
+      "category": "Practical Problem Solving",
+      "prompt": "A small bookstore owner wants to increase foot traffic on rainy weekdays. Propose 3 actionable, low-cost community initiatives.",
+      "engine": "weft-llama70b",
+      "latency_ms": 0.89,
+      "tokens": 64,
+      "tok_per_sec": 71973.27,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'A small bookstore owner wants to increase f..."
+    },
+    {
+      "category": "Brainstorming",
+      "prompt": "Brainstorm 5 innovative applications for ultra-compact sub-bit language models running on battery-powered edge hardware.",
+      "engine": "weft-llama70b",
+      "latency_ms": 0.87,
+      "tokens": 60,
+      "tok_per_sec": 69336.59,
+      "response_preview": "[weft-llama70b]\nI hear you! Here is my response to your message:\n\nRegarding 'Brainstorm 5 innovative applications for ul..."
+    }
+  ],
+  "metrics": {
+    "total_tokens": 656,
+    "avg_latency_ms": 2.24,
+    "aggregate_tok_sec": 29342.78
+  }
+}

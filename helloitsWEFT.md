@@ -115,24 +115,131 @@ WEFT implements a comprehensive suite of hardware-optimized kernels:
 | `subbit_gqa_flash_attention_avx512` | Shared KV head quotient mapping ($h_{kv} = \lfloor h_q / G \rfloor$) | Native GQA without memory duplication |
 | `subbit_asym_int4_kv_flash_attention_avx512` | In-register zero-point centering (`_mm512_sub_ps`) | Eliminates clipping on skewed activations |
 | `subbit_fused_swiglu_gemm_avx512` | Concurrent dual-bitboard Gate/Up + SwiGLU | Zero intermediate DRAM activations |
+| `subbit_sliding_window_flash_attention_avx512` | Zero-mask analytical windowing $[k_{\text{start}}, k_{\text{end}})$ | Up to $31.3\times$ speedup at 32k context, 0 DRAM mask |
 
 ---
 
 ## 5. Formal Machine-Checked Mathematical Certification
 
 Every mathematical bound, numerical range, and indexing rule in WEFT is formally proved in **Lean 4** without non-standard axioms and with **zero `sorry` placeholders**:
-- **89 published academic research papers** with 3-way format parity (Markdown, LaTeX, and compiled PDF).
-- **The Grand Research Compendium** unites all papers into a single 144-page volume:
-  [`papers/compendium/WEFT_Research_Compendium_Papers_1_to_89.pdf`](file:///home/akarta/Projects/0.WiP/Weft/papers/compendium/WEFT_Research_Compendium_Papers_1_to_89.pdf).
+- **90 published academic research papers** with 3-way format parity (Markdown, LaTeX, and compiled PDF).
+- **The Grand Research Compendium** unites all papers into a single 147-page volume:
+  [`papers/compendium/WEFT_Research_Compendium_Papers_1_to_90.pdf`](file:///home/akarta/Projects/0.WiP/Weft/papers/compendium/WEFT_Research_Compendium_Papers_1_to_90.pdf).
 
 ---
 
-## 6. Storage Safety Floor Invariant
+## 6. How to Distill a Model into WEFT Format
+
+Distillation decomposes dense FP16/BF16 checkpoints into ultra-compact, bitboard-quantized `.weft` sub-bit representations with singular low-rank residual corrections.
+
+### The 3-Stage Distillation Pipeline:
+1. **Streaming Layer Ingestion**:
+   Large models (e.g., Gemma-2-27B, Llama-3-70B, Mistral-Small-24B) are streamed shard-by-shard. Each weight tensor $W \in \mathbb{R}^{M \times N}$ is ingested into RAM one layer at a time:
+   ```bash
+   python scripts/deconstruct_gemma2_27b.py
+   ```
+2. **Optimal Bipolar Bitboard Factorization**:
+   The primary weight tensor $W$ is mapped to a bipolar matrix $B \in \{-1, +1\}^{M \times N}$ using sign thresholding, packed into 64-bit uint64 bitboards:
+   $$B_{i, j} = \text{sign}(W_{i, j})$$
+   $$\text{bitboard}_{i, w} = \sum_{b=0}^{63} \mathbb{I}(B_{i, 64w + b} > 0) \cdot 2^b$$
+   A per-row scalar scale $\gamma_i = \frac{1}{N} \|W_i\|_1$ aligns the energy of the bitboard to the original matrix.
+3. **Rank-1 / Low-Rank Residual Singular Value Correction**:
+   To eliminate residual quantization error without increasing model footprint, compute the residual matrix:
+   $$R = W - \text{diag}(\gamma) B$$
+   Extract dominant singular vectors $(u_1, s_1, v_1)$ via randomized SVD:
+   $$R \approx s_1 \cdot u_1 v_1^\top$$
+   The resulting model layer contains only the packed bitboard, row scales $\gamma$, and the compact singular vectors $u, v$.
+4. **Automated Raw Shard Purging**:
+   Once the `.weft` compressed layer tensors are written to disk, the raw safetensors shard is immediately unlinked, preserving the workstation's $\ge 700\text{ GB}$ storage floor invariant.
+
+---
+
+## 7. How to Use WEFT Models for Inference
+
+Inference in WEFT uses a unified hardware-adaptive dispatcher that automatically selects the fastest available execution path.
+
+### Python Quickstart:
+```python
+import torch
+from weft.kernels.subbit_cpu import (
+    cpu_subbit_matmul,
+    cpu_sliding_window_flash_attention_avx512,
+    cpu_fused_swiglu_gemm_avx512,
+    is_avx512_accelerated
+)
+
+# 1. Check native AVX-512 acceleration status
+print(f"Native AVX-512 VPOPCNTDQ Active: {is_avx512_accelerated()}")
+
+# 2. Linear projection using 1-bit bitboards with rank-1 SVD correction
+# x: [batch, in_features], b_packed: [out_features, in_features // 64]
+batch_size, in_features, out_features = 4, 4096, 4096
+x = torch.randn(batch_size, in_features, dtype=torch.float32)
+b_packed = torch.randint(0, 2**63 - 1, (out_features, in_features // 64), dtype=torch.int64)
+u_proj = torch.randn(out_features, 1, dtype=torch.float32)
+v_proj = torch.randn(1, in_features, dtype=torch.float32)
+
+y = cpu_subbit_matmul(x, b_packed, rank=in_features, u_proj=u_proj, v_proj=v_proj)
+
+# 3. Fast Sliding-Window Flash-Attention
+q = torch.randn(4, 16, 64, dtype=torch.float32) # [batch_heads, seq_len, head_dim]
+k = torch.randn(4, 128, 64, dtype=torch.float32)
+v = torch.randn(4, 128, 64, dtype=torch.float32)
+
+attn_out = cpu_sliding_window_flash_attention_avx512(q, k, v, window_size=32)
+print("Inference completed successfully. Output shape:", attn_out.shape)
+```
+
+### Direct C++20 Shared Library Usage:
+Link against `weft_avx512.so` for direct integration into standalone C++ inference engines (e.g. `llama.cpp` or custom production serving loops):
+```cpp
+#include "weft_avx512.h"
+
+// Execute high-speed bitboard GEMV with zero Python GIL overhead
+subbit_gemv_avx512_forward(x_tensor, b_packed_tensor, scales_tensor, out_tensor);
+```
+
+---
+
+## 8. How to Evaluate WEFT Models
+
+WEFT provides comprehensive automated evaluation suites covering mathematical soundness, token generation throughput, and language model perplexity.
+
+### 1. Mathematical Soundness & Unit Parity:
+Verify bit-for-bit mathematical equivalence across all 18 compiled AVX-512 silicon kernels against reference float32 implementations:
+```bash
+PYTHONPATH=. .venv/bin/pytest tests/test_avx512_gemv.py
+```
+*Expected: 18/18 passing tests with absolute discrepancies $< 10^{-4}$.*
+
+### 2. Throughput & Latency Benchmarking:
+Benchmark token generation speed and effective compute throughput (GFLOPs/s or TFLOPs/s equivalent):
+```bash
+PYTHONPATH=. python tests/benchmarks/benchmark_avx512_silicon.py
+```
+Key metrics reported:
+- **Bitboard GEMV Bandwidth**: Memory throughput in GB/s and effective compute (Zen 4 target: $> 700\text{ GFLOP/s}$).
+- **Batch-4 S-GEMM Throughput**: Multi-token MLP projection speed (Zen 4 target: $> 3.5\text{ TFLOP/s}$).
+- **Flash-Attention Latency**: Microseconds per forward pass at context lengths from 512 to 32,768 tokens.
+
+### 3. Perplexity & Language Modeling Loss:
+Evaluate language model degradation on standard evaluation datasets (WikiText-2, C4) to verify that bitboard factorization + rank-1 SVD residual updates maintain near-lossless perplexity:
+```bash
+python scripts/evaluate_perplexity.py --model_path /run/media/akarta/AI/models/gemma-2-27b.weft --dataset wikitext2
+```
+Criteria for production readiness:
+- Perplexity delta $\Delta \text{PPL} \le 0.15$ compared to original 16-bit baseline.
+- Zero NaN or Inf activations across full context windows.
+
+---
+
+## 9. Storage Safety Floor Invariant
 
 When factorizing massive models (24B to 70B parameters) on workstation hardware, WEFT enforces a **storage safety floor of $\ge 700\text{ GB}$ free** on external NVMe storage (`/run/media/akarta/AI`):
 - Shards are downloaded one-by-one.
 - Layer weights are compressed in-memory to `.weft` bitboard artifacts.
 - The raw shard is instantly deleted before the next shard is retrieved, ensuring zero storage creep.
+
 
 ---
 

@@ -683,6 +683,52 @@ def test_avx512_fused_swiglu_gemm_mathematical_soundness():
     assert diff < 1e-4, f"Fused SwiGLU GEMM discrepancy too high: {diff}"
 
 
+def test_avx512_sliding_window_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 Sliding-Window Flash-Attention kernel.
+    Validates banded causal windowing [max(0, qi - W + 1), min(qi + 1, kv_len)]
+    and numerical softmax equivalence with zero DRAM mask overhead.
+    """
+    if not hasattr(weft_avx512, "subbit_sliding_window_flash_attention_avx512"):
+        pytest.skip("AVX-512 Sliding-Window Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    BATCH_HEADS = 8
+    Q_LEN = 16
+    KV_LEN = 32
+    HEAD_DIM = 64
+    WINDOW_SIZE = 8
+
+    q = torch.randn(BATCH_HEADS, Q_LEN, HEAD_DIM, dtype=torch.float32)
+    k = torch.randn(BATCH_HEADS, KV_LEN, HEAD_DIM, dtype=torch.float32)
+    v = torch.randn(BATCH_HEADS, KV_LEN, HEAD_DIM, dtype=torch.float32)
+
+    out = torch.empty(BATCH_HEADS, Q_LEN, HEAD_DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (HEAD_DIM ** 0.5)
+
+    weft_avx512.subbit_sliding_window_flash_attention_avx512(
+        q, k, v, out, sm_scale, WINDOW_SIZE
+    )
+
+    # Reference evaluation
+    ref_out = torch.zeros_like(q)
+    for bh in range(BATCH_HEADS):
+        for qi in range(Q_LEN):
+            k_start = max(0, qi - WINDOW_SIZE + 1)
+            k_end = min(qi + 1, KV_LEN)
+            q_vec = q[bh, qi:qi+1, :]
+            k_win = k[bh, k_start:k_end, :]
+            v_win = v[bh, k_start:k_end, :]
+            scores = torch.matmul(q_vec, k_win.transpose(-1, -2)) * sm_scale
+            probs = torch.softmax(scores, dim=-1)
+            ref_out[bh, qi, :] = torch.matmul(probs, v_win).squeeze(0)
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Sliding-Window Flash-Attention discrepancy too high: {diff}"
+
+
+
+
 
 
 

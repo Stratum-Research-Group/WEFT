@@ -485,6 +485,52 @@ def cpu_fused_swiglu_gemm_avx512(
     return swish * up
 
 
+def cpu_sliding_window_flash_attention_avx512(
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v: torch.Tensor,
+    window_size: int,
+    sm_scale: float = None
+) -> torch.Tensor:
+    """
+    Sliding-Window Flash-Attention vectorized forward pass.
+    Restricts attention queries qi to keys/values in [max(0, qi - W + 1), min(qi + 1, kv_len)].
+    q: [batch_heads, q_len, head_dim] float32
+    k: [batch_heads, kv_len, head_dim] float32
+    v: [batch_heads, kv_len, head_dim] float32
+    """
+    batch_heads, q_len, head_dim = q.shape
+    kv_len = k.shape[1]
+
+    if sm_scale is None:
+        sm_scale = 1.0 / (head_dim ** 0.5)
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_sliding_window_flash_attention_avx512"):
+        out = torch.empty(batch_heads, q_len, head_dim, dtype=torch.float32)
+        weft_avx512.subbit_sliding_window_flash_attention_avx512(
+            q.contiguous(), k.contiguous(), v.contiguous(), out, sm_scale, window_size
+        )
+        return out
+
+    # Reference implementation
+    out = torch.zeros_like(q)
+    for bh in range(batch_heads):
+        for qi in range(q_len):
+            k_start = max(0, qi - window_size + 1)
+            k_end = min(qi + 1, kv_len)
+            if k_end <= k_start:
+                continue
+            q_vec = q[bh, qi:qi+1, :]
+            k_win = k[bh, k_start:k_end, :]
+            v_win = v[bh, k_start:k_end, :]
+            scores = torch.matmul(q_vec, k_win.transpose(-1, -2)) * sm_scale
+            probs = torch.softmax(scores, dim=-1)
+            out[bh, qi, :] = torch.matmul(probs, v_win).squeeze(0)
+
+    return out
+
+
+
 
 
 

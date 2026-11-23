@@ -441,5 +441,50 @@ def cpu_asym_int4_kv_flash_attention_avx512(
     return torch.matmul(probs, v_deq)
 
 
+def cpu_fused_swiglu_gemm_avx512(
+    x: torch.Tensor,
+    w_gate_packed: torch.Tensor,
+    w_up_packed: torch.Tensor,
+    scales_gate: torch.Tensor,
+    scales_up: torch.Tensor
+) -> torch.Tensor:
+    """
+    Evaluates Fused Dual-Bitboard Gate-Up Projection GEMM with In-Register SwiGLU via native AVX-512.
+    """
+    batch_size = x.shape[0]
+    out_features = w_gate_packed.shape[0]
+
+    if _AVX512_AVAILABLE and hasattr(weft_avx512, "subbit_fused_swiglu_gemm_avx512"):
+        out = torch.empty(batch_size, out_features, dtype=torch.float32)
+        weft_avx512.subbit_fused_swiglu_gemm_avx512(
+            x.contiguous(), w_gate_packed.contiguous(), w_up_packed.contiguous(),
+            scales_gate.contiguous(), scales_up.contiguous(), out
+        )
+        return out
+
+    in_features = x.shape[1]
+    def unpack_bitboard(packed):
+        out_rows, num_words = packed.shape
+        w_bin = torch.zeros(out_rows, in_features, dtype=torch.float32)
+        for r in range(out_rows):
+            for w in range(num_words):
+                val = int(packed[r, w].item())
+                for b in range(64):
+                    bit = (val >> b) & 1
+                    w_bin[r, w * 64 + b] = 1.0 if bit else -1.0
+        return w_bin
+
+    w_g = unpack_bitboard(w_gate_packed) * scales_gate.unsqueeze(-1)
+    w_u = unpack_bitboard(w_up_packed) * scales_up.unsqueeze(-1)
+
+    x_bin = torch.where(x > 0.0, 1.0, -1.0)
+    gate = torch.matmul(x_bin, w_g.t())
+    up = torch.matmul(x_bin, w_u.t())
+
+    swish = gate * torch.sigmoid(gate)
+    return swish * up
+
+
+
 
 

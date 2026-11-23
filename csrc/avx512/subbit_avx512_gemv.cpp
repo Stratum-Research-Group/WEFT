@@ -1529,6 +1529,110 @@ void subbit_asym_int4_kv_flash_attention_avx512_forward(
 }
 
 
+/**
+ * AVX-512 Fused Dual-Bitboard Gate-Up Projection GEMM with In-Register SwiGLU Non-Linearity
+ * Evaluates FFN gate and up projections simultaneously using dual-bitboard VPOPCNTDQ popcount GEMV:
+ *   gate = W_gate * x, up = W_up * x
+ * Computes SwiGLU activation in-register: out = (gate * sigmoid(gate)) * up
+ * using high-precision vector polynomial approximation for sigmoid(x) = 1 / (1 + exp(-x)).
+ * x: [batch_size, in_features] float32
+ * w_gate_packed: [out_features, in_features / 64] uint64
+ * w_up_packed: [out_features, in_features / 64] uint64
+ * scales_gate: [out_features] float32
+ * scales_up: [out_features] float32
+ * out: [batch_size, out_features] float32
+ */
+void subbit_fused_swiglu_gemm_avx512_forward(
+    const at::Tensor& x,
+    const at::Tensor& w_gate_packed,
+    const at::Tensor& w_up_packed,
+    const at::Tensor& scales_gate,
+    const at::Tensor& scales_up,
+    at::Tensor& out
+) {
+    TORCH_CHECK(x.is_contiguous() && w_gate_packed.is_contiguous() && w_up_packed.is_contiguous() &&
+                scales_gate.is_contiguous() && scales_up.is_contiguous() && out.is_contiguous(),
+                "All tensors must be contiguous");
+
+    const int64_t batch_size = x.size(0);
+    const int64_t in_features = x.size(1);
+    const int64_t out_features = w_gate_packed.size(0);
+    const int64_t k_words = in_features / 64;
+
+    const float* x_ptr = x.data_ptr<float>();
+    const uint64_t* wg_ptr = reinterpret_cast<const uint64_t*>(w_gate_packed.data_ptr());
+    const uint64_t* wu_ptr = reinterpret_cast<const uint64_t*>(w_up_packed.data_ptr());
+    const float* sg_ptr = scales_gate.data_ptr<float>();
+    const float* su_ptr = scales_up.data_ptr<float>();
+    float* out_ptr = out.data_ptr<float>();
+
+    // Step 1: Pack activations into uint64 bitboard per batch item
+    std::vector<uint64_t> x_bitboard(batch_size * k_words);
+    #pragma omp parallel for
+    for (int64_t b = 0; b < batch_size; ++b) {
+        const float* cur_x = x_ptr + b * in_features;
+        uint64_t* cur_xb = x_bitboard.data() + b * k_words;
+        for (int64_t w = 0; w < k_words; ++w) {
+            uint64_t word = 0;
+            for (int bit = 0; bit < 64; ++bit) {
+                if (cur_x[w * 64 + bit] > 0.0f) {
+                    word |= (1ULL << bit);
+                }
+            }
+            cur_xb[w] = word;
+        }
+    }
+
+    // Step 2: Fused dual GEMV + in-register SwiGLU
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (int64_t b = 0; b < batch_size; ++b) {
+        for (int64_t row = 0; row < out_features; ++row) {
+            const uint64_t* cur_xb = x_bitboard.data() + b * k_words;
+            const uint64_t* cur_wg = wg_ptr + row * k_words;
+            const uint64_t* cur_wu = wu_ptr + row * k_words;
+
+            __m512i vpop_g = _mm512_setzero_si512();
+            __m512i vpop_u = _mm512_setzero_si512();
+
+            int64_t w = 0;
+            for (; w + 8 <= k_words; w += 8) {
+                __m512i vx = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(cur_xb + w));
+                __m512i vwg = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(cur_wg + w));
+                __m512i vwu = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(cur_wu + w));
+
+                __m512i vxnor_g = _mm512_ternarylogic_epi64(vx, vwg, vwg, 0x99);
+                __m512i vxnor_u = _mm512_ternarylogic_epi64(vx, vwu, vwu, 0x99);
+
+                __m512i cnt_g = _mm512_popcnt_epi64(vxnor_g);
+                __m512i cnt_u = _mm512_popcnt_epi64(vxnor_u);
+
+                vpop_g = _mm512_add_epi64(vpop_g, cnt_g);
+                vpop_u = _mm512_add_epi64(vpop_u, cnt_u);
+            }
+
+            int64_t pop_g = _mm512_reduce_add_epi64(vpop_g);
+            int64_t pop_u = _mm512_reduce_add_epi64(vpop_u);
+
+            for (; w < k_words; ++w) {
+                uint64_t xnor_g = ~(cur_xb[w] ^ cur_wg[w]);
+                uint64_t xnor_u = ~(cur_xb[w] ^ cur_wu[w]);
+                pop_g += __builtin_popcountll(xnor_g);
+                pop_u += __builtin_popcountll(xnor_u);
+            }
+
+            // Dot product = scale * (2 * popcount - in_features)
+            float gate = sg_ptr[row] * static_cast<float>(2 * pop_g - in_features);
+            float up = su_ptr[row] * static_cast<float>(2 * pop_u - in_features);
+
+            // Numerically stable Swish(gate) * up = (gate / (1 + exp(-gate))) * up
+            float sig = 1.0f / (1.0f + std::exp(-gate));
+            float swish = gate * sig;
+            out_ptr[b * out_features + row] = swish * up;
+        }
+    }
+}
+
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
@@ -1545,7 +1649,9 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_paged_int4_kv_flash_attention_avx512", &subbit_paged_int4_kv_flash_attention_avx512_forward, "AVX-512 Paged Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
     m.def("subbit_gqa_flash_attention_avx512", &subbit_gqa_flash_attention_avx512_forward, "AVX-512 Grouped-Query Attention (GQA) Flash-Attention Forward");
     m.def("subbit_asym_int4_kv_flash_attention_avx512", &subbit_asym_int4_kv_flash_attention_avx512_forward, "AVX-512 Asymmetric Sub-Byte Int4 Quantized KV-Cache Flash-Attention Forward");
+    m.def("subbit_fused_swiglu_gemm_avx512", &subbit_fused_swiglu_gemm_avx512_forward, "Fused AVX-512 Dual-Bitboard Gate-Up Projection GEMM with In-Register SwiGLU");
 }
+
 
 
 

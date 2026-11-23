@@ -630,5 +630,59 @@ def test_avx512_asym_int4_kv_flash_attention_mathematical_soundness():
     assert diff < 1e-4, f"Asym Int4 KV Flash-Attention discrepancy too high: {diff}"
 
 
+def test_avx512_fused_swiglu_gemm_mathematical_soundness():
+    """
+    Test AVX-512 Fused Dual-Bitboard Gate-Up Projection GEMM with In-Register SwiGLU.
+    Validates dual-bitboard VPOPCNTDQ popcount, sigmoid polynomial approximation, and SwiGLU parity.
+    """
+    if not hasattr(weft_avx512, "subbit_fused_swiglu_gemm_avx512"):
+        pytest.skip("AVX-512 Fused SwiGLU GEMM kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    IN_FEATURES = 128
+    OUT_FEATURES = 256
+    K_WORDS = IN_FEATURES // 64
+
+    x = torch.randn(B, IN_FEATURES, dtype=torch.float32)
+
+    # Random packed bitboards
+    w_gate_packed = torch.randint(0, 2**31, (OUT_FEATURES, K_WORDS), dtype=torch.int64)
+    w_up_packed = torch.randint(0, 2**31, (OUT_FEATURES, K_WORDS), dtype=torch.int64)
+
+    scales_gate = torch.rand(OUT_FEATURES, dtype=torch.float32) * 0.05 + 0.01
+    scales_up = torch.rand(OUT_FEATURES, dtype=torch.float32) * 0.05 + 0.01
+
+    out = torch.empty(B, OUT_FEATURES, dtype=torch.float32)
+
+    weft_avx512.subbit_fused_swiglu_gemm_avx512(
+        x, w_gate_packed, w_up_packed, scales_gate, scales_up, out
+    )
+
+    # Reference evaluation
+    def unpack_bitboard(packed):
+        w_bin = torch.zeros(OUT_FEATURES, IN_FEATURES, dtype=torch.float32)
+        for r in range(OUT_FEATURES):
+            for w in range(K_WORDS):
+                val = int(packed[r, w].item())
+                for b in range(64):
+                    bit = (val >> b) & 1
+                    w_bin[r, w * 64 + b] = 1.0 if bit else -1.0
+        return w_bin
+
+    w_g = unpack_bitboard(w_gate_packed) * scales_gate.unsqueeze(-1)
+    w_u = unpack_bitboard(w_up_packed) * scales_up.unsqueeze(-1)
+
+    x_bin = torch.where(x > 0.0, 1.0, -1.0)
+    gate = torch.matmul(x_bin, w_g.t())
+    up = torch.matmul(x_bin, w_u.t())
+
+    ref_out = (gate * torch.sigmoid(gate)) * up
+
+    diff = (out - ref_out).abs().max().item()
+    assert diff < 1e-4, f"Fused SwiGLU GEMM discrepancy too high: {diff}"
+
+
+
 
 

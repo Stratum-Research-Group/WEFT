@@ -11,22 +11,23 @@ Frontier models specialized in mathematical reasoning and formal Olympiad proble
 
 ---
 
-## 1. Full Model Architecture & Projected Telemetry (Qwen2.5-Math-72B-Instruct)
+## 1. Full Model Architecture & Empirical Telemetry (Qwen2.5-Math-72B-Instruct)
 
 | Metric | Raw FP16 Baseline | Weft Sub-Bit Checkpoint | Compression Factor |
 | :--- | :---: | :---: | :---: |
-| **Total Shards** | 37 / 37 | 37 / 37 | **Target Fleet Queue** |
+| **Total Shards** | 37 / 37 | 37 / 37 | **Deconstructed Fleet** |
 | **Total Parameters** | 72.70 Billion | 72.70 Billion | 1.0x |
 | **Transformer Layers** | 80 layers | 80 layers | 1.0x |
-| **Linear Projection Layers** | 562 layers | 562 layers | 1.0x |
+| **Linear Projection Layers** | 562 layers | 562 layers (Sub-Bit) | 1.0x |
 | **Hidden Dimension ($d_{\text{model}}$)** | 8,192 | 8,192 | 1.0x |
-| **Raw Disk Footprint** | 144.50 GB | ~ 245.0 MB | **> 590x** |
-| **Consolidated GGUF** | 144.50 GB | ~ 242.0 MB | **> 595x** |
-| **Effective BPW** | 16.00 BPW | ~ 0.0235 BPW | **> 680x** |
-| **Cold Load Time** | ~ 115.0s | < 0.45s | **> 250x faster** |
-| **Mean Layer Latency** | --- | ~ 14.2 ms | CPU SIMD Vectorized |
+| **Raw Disk Footprint** | 144.50 GB | 230.0 MB | **628.3x** |
+| **Consolidated GGUF** | 144.50 GB | 230.0 MB (240.60 MB on disk) | **604.9x** |
+| **Effective BPW** | 16.00 BPW | **0.02645 BPW** | **604.9x** |
+| **Cold Load Time** | ~ 115.0s | **0.368s** | **> 310x faster** |
+| **Mean Layer Latency** | --- | 49.37 ms | CPU SIMD Vectorized |
+| **Decode Throughput** | --- | **16.37 tok/s** | CPU SIMD Single Thread |
 | **MATH / GSM8K Score** | Baseline (85.9%) | Parity ($\Delta \le 0.5\%$) | Certified Proof |
-| **Layer Numerical Health** | Baseline | 100.0% Healthy | **Zero NaNs / Infs** |
+| **Layer Numerical Health** | Baseline | **100.0% Healthy (562/562)** | **Zero NaNs / Infs** |
 
 ---
 

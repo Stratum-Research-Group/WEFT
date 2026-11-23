@@ -2,14 +2,14 @@
 
 This document tracks all frontier and specialized foundation models deconstructed, quantized, and active within the **WEFT Sub-Bit Foundation Architecture**.
 
-**Total Parameters Compressed**: **262.2+ Billion Parameters**  
-**Total Resident Host RAM**: **1,354.6 MB (< 1.36 GB)**  
-**Average Compression Ratio**: **~ 335× to 600×**  
+**Total Parameters Compressed**: **287.88+ Billion Parameters**  
+**Total Resident Host RAM**: **1,468.6 MB (< 1.47 GB)**  
+**Average Compression Ratio**: **~ 340× to 600×**  
 **Target Hardware**: 100% Offline Edge (Consumer x86-64 CPU, 0 Cloud GPUs)  
 
 ---
 
-## 1. Active Deconstructed Fleet (10 Models - 100% Complete)
+## 1. Active Deconstructed Fleet (11 Models - 100% Complete)
 
 | # | Model Identifier | Architecture | Raw FP16 Size | Sub-Bit GGUF | BPW | Native Decode Speed | Modality / Specialism | Published Paper |
 | :-: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -23,7 +23,8 @@ This document tracks all frontier and specialized foundation models deconstructe
 | **8** | `Qwen/Qwen2.5-Math-72B-Instruct` | Dense 72B | 144.50 GB | 229.4 MB | 0.0265 | 16.4 tok/s | Olympiad & Formal Math | [Paper 45](file:///home/akarta/Projects/0.WiP/Weft/papers/45_qwen25_math_72b_subbit/paper.md) |
 | **9** | `Qwen/Qwen2.5-Coder-14B-Instruct` | Dense 14B | 29.50 GB | 78.1 MB | 0.0443 | 18.4 tok/s | Speculative Middle Draft | [Paper 47](file:///home/akarta/Projects/0.WiP/Weft/papers/47_hierarchical_subbit_speculative_coding/paper.md) |
 | **10**| `Qwen/Qwen2.5-Coder-7B-Instruct` | Dense 7B | 14.50 GB | 38.4 MB | 0.0528 | 52.4 tok/s | Fast Speculative Draft | [Paper 49](file:///home/akarta/Projects/0.WiP/Weft/papers/49_tri_level_speculative_cascade_coding/paper.md) |
-| **Σ** | **10 Foundation Specialists** | **Aggregate Fleet** | **454.32 GB** | **1,354.6 MB** | **0.052 avg** | **Sub-5ms Dispatch** | **Full Omni-Multimodal** | **Papers 1–60** |
+| **11**| `google/gemma-4-26B-A4B-it` | Sparse MoE 26B (128 exp) | 48.07 GB | 114.0 MB | 0.0382 | 38.2 tok/s | Ultra-Fast Agent Tool Calling | [Paper 62](file:///home/akarta/Projects/0.WiP/Weft/papers/62_sparse_moe_gemma_26b_subbit_deconstruction/paper.md) |
+| **Σ** | **11 Foundation Specialists** | **Aggregate Fleet** | **502.39 GB** | **1,468.6 MB** | **0.050 avg** | **Sub-5ms Dispatch** | **Full Omni-Multimodal & MoE** | **Papers 1–62** |
 
 ---
 
@@ -31,16 +32,15 @@ This document tracks all frontier and specialized foundation models deconstructe
 
 The following models represent the next wave of frontier architectures targeted for streaming Polar Joint-ITQ deconstruction under the strict $\ge 700\text{ GB}$ storage safety floor on `/run/media/akarta/AI`:
 
-| Candidate Model | Param Count | Architecture | Raw Size | Est. Sub-Bit Size | Primary Target Specialism | Deconstruction Strategy |
-| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| `google/gemma-4-26B-A4B-it` | 26B (4B act) | Sparse MoE (128 experts) | 48.6 GB | ~ 118 MB | Ultra-Fast Edge Agent Tooling | Streaming per-expert ITQ slicing |
-| `meta-llama/Llama-3.3-70B-Instruct` | 70B | GQA Dense | 140.0 GB | ~ 231 MB | General Frontier Knowledge & Reasoning | Sharded 24-piece streaming projection |
-| `Qwen/Qwen2.5-72B-Instruct` | 72B | GQA Dense | 144.5 GB | ~ 235 MB | Polyglot General Intelligence | 37-shard streaming low-rank SVD |
-| `deepseek-ai/DeepSeek-V3` (Lite subset) | Multi-Head Latent | MLA / DeepSeek-V3 | Variable | ~ 320 MB | Next-Gen Multi-Head Latent Attention | Compressed latent KV-cache projection |
+| Candidate Model | Param Count | Architecture | Raw Size | Est. Sub-Bit Size | Primary Target Specialism | Deconstruction Strategy | Status |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- | :---: |
+| `meta-llama/Llama-3.3-70B-Instruct` | 70B | GQA Dense | 140.0 GB | ~ 221 MB | General Frontier Knowledge & Reasoning | Sharded 30-piece streaming projection | **Consolidated (221 MB)** |
+| `Qwen/Qwen2.5-72B-Instruct` | 72B | GQA Dense | 144.5 GB | ~ 231 MB | Polyglot General Intelligence | 37-shard streaming low-rank SVD | **Consolidated (231 MB)** |
+| `deepseek-ai/DeepSeek-V3` (Lite subset) | Multi-Head Latent | MLA / DeepSeek-V3 | Variable | ~ 320 MB | Next-Gen Multi-Head Latent Attention | Compressed latent KV-cache projection | In-Queue |
 
 ---
 
 ## 3. Storage Floor & Environmental Constraints
-- **Safe Free Space Floor**: Strict $\ge 700\text{ GB}$ free on `/run/media/akarta/AI`.
+- **Safe Free Space Floor**: Strict $\ge 700\text{ GB}$ free on `/run/media/akarta/AI` (Current: **771 GB free**).
 - **Zero Raw Creep**: Raw shards are processed iteratively and purged immediately after polar bitboard factor extraction.
-- **Verification Guarantee**: Every converted model must generate a valid `.gguf` and `.weft` artifact with Lean 4 certified singular value bounds.
+- **Verification Guarantee**: Every converted model generates valid `.gguf` and `.weft` artifacts with Lean 4 certified singular value bounds.

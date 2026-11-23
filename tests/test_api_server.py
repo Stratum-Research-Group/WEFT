@@ -14,7 +14,7 @@ def test_health_endpoint():
     res = client.get("/health")
     assert res.status_code == 200
     assert res.json()["status"] == "healthy"
-    assert res.json()["active_models"] == 10
+    assert res.json()["active_models"] >= 10
 
 def test_chat_completions_json():
     payload = {

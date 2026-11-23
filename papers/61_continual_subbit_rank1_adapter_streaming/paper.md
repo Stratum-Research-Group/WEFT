@@ -1,10 +1,14 @@
-# Continual Sub-Bit Knowledge Integration: Streaming In-Register Rank-1 Updates Across Frozen Foundation Fleets with Certified Spectral Stability
+# Paper 61: Continual Sub-Bit Knowledge Integration: Streaming In-Register Rank-1 Updates Across Frozen Foundation Fleets with Certified Spectral Stability
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Deploying foundation models on edge devices typically freezes weights after quantization, creating a barrier to continual learning and immediate knowledge updates. Re-quantizing large foundation models or running full fine-tuning loops is prohibitive in low-resource environments. In this work, we present **Continual Sub-Bit Knowledge Integration (CSKI)**, an architecture enabling streaming rank-1 in-register adapter updates ($\mathbf{u} \mathbf{v}^T$) directly into frozen memory-resident bitboard matrices. Factoring weight delta projections into orthonormal vectors of dimension $m + n$ guarantees strictly linear memory scaling and prevents catastrophic forgetting of base representations. Executed across our active 10-model fleet in **under 1.36 GB of resident host RAM**, CSKI injects new verified mathematical lemmas and domain facts in under 100 milliseconds per layer without modifying underlying polar bitboards. We formally verify the mathematical guarantees in Lean 4 (`formal/StreamingAdapterInvariants.lean`), proving that outer product storage is strictly linear, scale adjustments remain bounded under Sherman-Morrison perturbations, and base bitboards remain strictly conserved.

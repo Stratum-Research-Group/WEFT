@@ -1,10 +1,14 @@
-# Dynamic Multi-Specialist Dispatch and Fleet Orchestration: Serving 255 Billion Parameters Across 9 Sub-Bit Models in 1.3 GB RAM
+# Paper 48: Dynamic Multi-Specialist Dispatch and Fleet Orchestration: Serving 255 Billion Parameters Across 9 Sub-Bit Models in 1.3 GB RAM
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Modern multi-agent architectures increasingly depend on heterogeneous domain specialists rather than a single monolithic generalist. However, orchestrating multiple foundation models simultaneously requires prohibitive memory capacity and complex distributed interconnects. In this work, we present the **WEFT Omni-Console Orchestration Architecture**, providing dynamic query routing and real-time execution across an active fleet of **9 sub-bit foundation models**: **Whisper-Large-v3** (Speech), **Qwen2-VL-7B** (Vision), **DeepSeek-R1-32B** (CoT Reasoning), **Qwen2.5-Math-72B** (Formal Olympiad Math), **Qwen2.5-Coder-14B** and **32B** (Hierarchical Speculative Coding), **Mixtral-8x7B** (Sparse MoE Routing), **DeepSeek-Coder-V2-Lite** (Polytope MoE), and **MusicGen-Small** (Acoustic Audio Generation). Factoring over **255 Billion cumulative parameters** using Polar Joint-ITQ reduces 440 GB of raw FP16 weights into packed sub-bit GGUF bitboards requiring an aggregate footprint of **1,316.3 MB** ($<1.32\text{ GB}$). We demonstrate sub-5-millisecond dynamic routing latency and confirm that all 9 specialists remain resident in consumer host memory simultaneously. We formally verify fleet memory additivity, dispatch latency monotonicity, and null query annihilation in Lean 4 (`formal/FleetDispatchInvariants.lean`).

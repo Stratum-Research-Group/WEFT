@@ -6,6 +6,10 @@
 
 ---
 
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
+
 ## Abstract
 We establish the rigorous mathematical framework underpinning Polar Joint Iterative Quantization (ITQ) under extreme low-rank parameter factorizations. We formalize and mechanically certify in Lean 4: (1) power-law spectral truncation error bounds, (2) hypercube coordinate isometry and energy conservation, and (3) dual-path ternary superposition sign alignment. Applied to full-scale foundation fleets, we demonstrate $42.7\times$ KV-cache memory contraction and sub-0.024 BPW weight compression across $>50\text{ Billion parameters}$ of Llama-3.3-70B and Qwen-2.5-72B, verifying end-to-end numerical stability with zero NaN/Inf activations.
 

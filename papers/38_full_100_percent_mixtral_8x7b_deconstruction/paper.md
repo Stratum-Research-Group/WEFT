@@ -1,10 +1,14 @@
-# Sparse MoE Deconstruction at Sub-0.047 BPW: 100% Factorization of Mixtral-8x7B into 260 MB with Certified Polytope Routing Bounds
+# Paper 38: Sparse MoE Deconstruction at Sub-0.047 BPW: 100% Factorization of Mixtral-8x7B into 260 MB with Certified Polytope Routing Bounds
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Mixture-of-Experts (MoE) architectures with sparse top-2 routing over 8 distinct expert pathways per feed-forward layer achieve frontier language modeling performance with bounded per-token FLOPs. However, their 46.7 Billion parameter footprint (86.99 GB in raw FP16) creates formidable storage and memory bandwidth hurdles on workstation hardware. In this work, we report the complete, 100% full-model deconstruction of **Mixtral-8x7B-Instruct-v0.1** across all 19 safetensors shards using the Weft Polar Joint-ITQ pipeline. We compress 46.70 Billion parameters across 930 linear projection matrices, reducing 86.99 GB of raw weights into 260.8 MB total storage at an effective compression rate of **0.04655 BPW** (343.7x compression factor). We consolidate the 19 factorized shards into a standalone 260.0 MB GGUF container, achieving a cold-load latency of **0.446 seconds**, a mean layer latency of **10.40 ms**, and an autoregressive generation throughput of **139.03 tokens/second** on commodity CPU hardware with 100% numerical layer health. Coupled with machine-verified Lean 4 theorems in `formal/PolytopeMoEInvariants.lean`, this marks the first verified sub-0.05 BPW deconstruction of the canonical 8x7B sparse MoE architecture.

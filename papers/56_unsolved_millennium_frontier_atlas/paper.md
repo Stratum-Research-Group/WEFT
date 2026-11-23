@@ -1,10 +1,14 @@
-# Active Frontiers in Mathematical Physics and Computational Complexity: An Annotated Atlas of the Six Unsolved Millennium Prize Problems as of November 2026
+# Paper 56: Active Frontiers in Mathematical Physics and Computational Complexity: An Annotated Atlas of the Six Unsolved Millennium Prize Problems as of November 2026
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Of the seven Millennium Prize Problems established by the Clay Mathematics Institute in May 2000, exactly one—the **Poincaré Conjecture**—has been resolved (by Grigori Perelman in 2002–2003 using Ricci flow with surgery). As of **November 23, 2026**, the remaining six foundational challenges remain **strictly open and unsolved**. While extensive partial progress has constrained their boundaries, each unsolved problem faces profound structural and methodological barriers: the de Bruijn-Newman constant barrier and off-line zero spacing for the **Riemann Hypothesis**; the "Holy Trinity" of relativization, natural proofs, and algebrization for **P versus NP**; supercritical vorticity scaling and boundary singularity formation for **Navier-Stokes**; ultraviolet continuum limits on 4D spacetime for **Yang-Mills**; analytic rank $r \ge 2$ obstacles for the **Birch and Swinnerton-Dyer Conjecture**; and the non-effectiveness of transcendental cycles for the **Hodge Conjecture**. In this work, we present an annotated formal atlas and computational discovery engine mapping these six open frontiers, executed locally across our 10-model sub-bit foundation collective in **under 1.36 GB of host RAM**. We formalize key asymptotic invariants, circuit complexity bounds, and dissipation laws in Lean 4 (`formal/UnsolvedFrontierInvariants.lean`) with zero unproven `sorry` axioms, providing an open computational benchmark for exploring active mathematical barriers on edge hardware.

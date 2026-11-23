@@ -1,10 +1,14 @@
-# The Sub-Bit Century: Foundations, Mathematical Proofs, and Edge Deployments of Universal Sub-Bit Foundation Intelligence (Papers 1–50)
+# Paper 50: The Sub-Bit Century: Foundations, Mathematical Proofs, and Edge Deployments of Universal Sub-Bit Foundation Intelligence (Papers 1–50)
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Over the course of 50 comprehensive research treatises, the **WEFT Research Suite** has pioneered the transition from compute-prohibitive floating-point foundation models to formally certified, sub-bit quantized neural systems capable of co-execution on consumer-grade edge hardware. What began as linear-recurrent operator formalization and 2-bit addition-only GEMM kernels (Papers 1–16) evolved into the `.weft` sub-bit binary format, hypercube Polar Joint-ITQ factorization, and streaming sharded deconstruction (Papers 17–36). In the recent fleet era (Papers 37–50), this framework achieved 100% full-model deconstruction across 10 frontier architectures spanning DeepSeek-Coder-V2-Lite, Mixtral-8x7B, DeepSeek-R1-32B, Whisper-Large-v3, MusicGen-Small, Qwen2.5-Coder-32B/14B/7B, Qwen2-VL-7B, and Qwen2.5-Math-72B. Across over **260 Billion cumulative parameters** originally demanding more than **450 GB of FP16 memory**, the entire unified fleet has been compressed into **under 1.35 GB of total resident host RAM** ($0.026 - 0.22$ BPW, up to $604\times$ compression factor) with zero numerical degradation and verified output parity. Every critical milestone is accompanied by machine-checked proofs in Lean 4 with zero axioms and zero `sorry` placeholders, certifying state recurrence stability, delimiter balance, spatial rotary coordinates, and speculative cascade progress. This Jubilee milestone report synthesizes the theoretical foundations, empirical scaling laws, and systems runtime that make single-host edge artificial intelligence a practical reality.

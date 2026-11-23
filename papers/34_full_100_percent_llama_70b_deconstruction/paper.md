@@ -6,6 +6,10 @@
 
 ---
 
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
+
 ## Abstract
 We report the first complete, 100% sub-bit deconstruction of a frontier 70B foundation model. Across all 30 shards of **Llama-3.3-70B-Instruct** (562 linear projection layers, 70.55 Billion parameters), our idempotent streaming Polar Joint-ITQ pipeline reduced 140.0 GB of raw floating-point weights into 231.6 MB of binary bitboard tensors and perimeter scale vectors, achieving an effective **0.0232 BPW** ($689.4\times$ parameter compression ratio). Evaluated against real and synthetic activations, the full-model checkpoint executes with zero NaN/Inf divergence. In parallel, Qwen-2.5-72B-Instruct crosses the 50% milestone (19 shards, 125.1 MB).
 

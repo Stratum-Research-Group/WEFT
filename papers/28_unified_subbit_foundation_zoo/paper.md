@@ -1,4 +1,4 @@
-# The Unified Sub-Bit Foundation Model Zoo: Cross-Architecture Empirical Scaling and Lean 4 Invariant Verification Across 70B+ LLMs
+# Paper 28: The Unified Sub-Bit Foundation Model Zoo: Cross-Architecture Empirical Scaling and Lean 4 Invariant Verification Across 70B+ LLMs
 
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  

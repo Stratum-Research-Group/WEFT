@@ -1,10 +1,14 @@
-# High-Throughput SIMD Bitboard Counterexample Search: Verifying Arithmetic Conjectures and Trajectory Bounds at 50+ Million Numbers/sec with Lean 4 Invariants
+# Paper 59: High-Throughput SIMD Bitboard Counterexample Search: Verifying Arithmetic Conjectures and Trajectory Bounds at 50+ Million Numbers/sec with Lean 4 Invariants
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Empirical verification of arithmetic conjectures requires high-throughput computational engines capable of evaluating billions of trajectories without numerical overflow or memory latency bottlenecks. In this work, we present a native C++20 SIMD bitboard counterexample search engine integrated with our sub-bit foundation collective. By exploiting bitwise register arithmetic (evaluating even reductions via right-shifts and fusing $3n+1$ odd mappings with hardware parallelism), the engine evaluates Collatz trajectories and arithmetic recurrence bounds at sustained throughput exceeding **50.4 Million numbers per second** on consumer multicore CPUs. We demonstrate the complete absence of counterexamples across 10,000,000 consecutive integers in under 0.20 seconds (maximum trajectory length 685 steps). We formally verify the mathematical search guarantees in Lean 4 (`formal/CounterexampleSearchInvariants.lean`) with zero unproven `sorry` axioms, proving that even bitshifts strictly decrease integer magnitude, parallel chunking exhausts search intervals, and zero recorded failures soundly certifies the bounded regime $[1, N]$.

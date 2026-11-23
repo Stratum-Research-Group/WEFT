@@ -1,10 +1,14 @@
-# Sub-Bit Mathematical Reasoning at Frontier Scale: Sub-0.024 BPW Deconstruction of Qwen2.5-Math-72B with Certified Proof Tree Invariants
+# Paper 45: Sub-Bit Mathematical Reasoning at Frontier Scale: Sub-0.024 BPW Deconstruction of Qwen2.5-Math-72B with Certified Proof Tree Invariants
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Frontier models specialized in mathematical reasoning and formal Olympiad problem solving require massive parametric capacity (70B+ parameters) to execute complex, multi-branching symbolic proof derivations without intermediate algebraic derailment. However, serving a dense 72-billion parameter model requires over 144 GB of high-bandwidth GPU memory, prohibiting edge-local formal proof search. In this work, we present the streaming polar sub-bit deconstruction of Alibaba's **Qwen2.5-Math-72B-Instruct** across all 37 safetensors shards using the Weft Polar Joint-ITQ pipeline. We compress 72.70 Billion parameters across 562 dense linear projection layers into packed 64-bit binary bitboards and low-rank polar scaling matrices ($k=64$). The raw 144.5 GB FP16 representation is compressed into an edge-resident GGUF artifact under **245.0 MB** (>590x compression factor) achieving an effective bitrate of **0.0235 BPW**. We formally verify proof tree depth monotonicity, sub-goal branching factor boundedness, and null lemma annihilation in Lean 4 (`formal/MathProofTreeInvariants.lean`), proving that deductive proof exploration sequences preserve mathematical derivations under bounded operator perturbation.

@@ -1,4 +1,4 @@
-# Sub-Bit Mathematical Provers at Scale: 100% Full Deconstruction of Goedel-Prover-V2-32B into 155 MB at 0.038 BPW with Certified Formal Invariants
+# Paper 36: Sub-Bit Mathematical Provers at Scale: 100% Full Deconstruction of Goedel-Prover-V2-32B into 155 MB at 0.038 BPW with Certified Formal Invariants
 
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
@@ -6,6 +6,10 @@
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Mathematical reasoning and formal proof generation models require heavy parametric capacity to accurately navigate complex proof spaces without hallucinations. However, deploying 32B-parameter provers requires multiple enterprise GPUs. In this work, we report the complete, 100% full-model deconstruction of **Goedel-Prover-V2-32B** across all 14 safetensors shards using the Weft Polar Joint-ITQ pipeline. We compress 32.76 Billion linear parameters across 450 projection layers, reducing 64.0 GB of raw FP16 weights into 155.9 MB total storage at an effective rate of **0.0380 BPW** (421.1x compression factor). We consolidate the deconstructed shards into a standalone 155.78 MB GGUF container with cold-load latency of 0.24 seconds and an autoregressive generation throughput of 13.65 tokens/second on commodity CPU SIMD. Full-layer activation energy evaluation demonstrates 100% numerical stability with 0 NaNs and 0 Infs across all layers. Coupled with Lean 4 machine-verified BitNet b1.58 ternary bounds and MoE routing stability theorems, this marks the first fully verified sub-bit mathematical theorem prover.

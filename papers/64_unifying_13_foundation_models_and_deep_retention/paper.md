@@ -1,10 +1,14 @@
-# Unifying 430+ Billion Parameters Across 13 Foundation Specialists: Single-Host Co-Execution in Under 1.93 GB RAM with Machine-Checked Adapter Retention
+# Paper 64: Unifying 430+ Billion Parameters Across 13 Foundation Specialists: Single-Host Co-Execution in Under 1.93 GB RAM with Machine-Checked Adapter Retention
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Edge deployment of large language models is conventionally limited to isolated small checkpoints due to severe memory and disk bandwidth bottlenecks. In this paper, we demonstrate the single-host co-execution of **13 specialized frontier foundation models** comprising **430.58+ Billion cumulative parameters** hosted within **1,920.6 MB (< 1.93 GB) resident host RAM** on commodity consumer x86-64 hardware. By extending our streaming Polar Joint-ITQ architecture to integrate dual-frontier 70B-class dense models (`Llama-3.3-70B-Instruct` at 221 MB and `Qwen-2.5-72B-Instruct` at 231 MB) alongside multi-expert MoE, coding, formal mathematics, vision, and acoustic speech specialists, the collective provides comprehensive omni-intelligence without cloud reliance. To resolve catastrophic forgetting and enable continuous learning, we implement an on-disk rank-1 adapter serialization pipeline (`.weft-adapter`) dynamically mapped into frozen base bitboards at runtime. We formally verify fleet capacity additivity, memory boundedness, and persistent retention soundness in Lean 4 (`formal/real_conjectures/DeepRetentionInvariants.lean`) with zero unproven `sorry` axioms.

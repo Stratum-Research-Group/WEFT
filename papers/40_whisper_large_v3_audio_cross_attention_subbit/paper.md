@@ -1,4 +1,4 @@
-# Extreme Low-Bitrate Speech Perception: Sub-0.085 BPW Deconstruction of Whisper-Large-v3 with Formally Certified Cross-Attention Invariants
+# Paper 40: Extreme Low-Bitrate Speech Perception: Sub-0.085 BPW Deconstruction of Whisper-Large-v3 with Formally Certified Cross-Attention Invariants
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  

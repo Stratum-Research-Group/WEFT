@@ -1,10 +1,14 @@
-# The Complete Sub-Bit Computational Laboratory: Unifying Edge Foundation Inference, High-Throughput SIMD Search, and Machine-Checked Formal Systems (Papers 1–60)
+# Paper 60: The Complete Sub-Bit Computational Laboratory: Unifying Edge Foundation Inference, High-Throughput SIMD Search, and Machine-Checked Formal Systems (Papers 1–60)
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Modern scientific research in computational mathematics and artificial intelligence has historically been bifurcated: deep neural models execute on high-power GPU clusters, while symbolic verification and combinatorial search run on isolated CPU theorem provers. In this milestone treatise (marking **Paper 60** of the WEFT Research Suite), we present the **Complete Sub-Bit Computational Laboratory**, a unified local scientific environment operating entirely on consumer-grade x86-64 hardware. The laboratory harmonizes three core pillars in under **1.36 GB of resident host RAM**:

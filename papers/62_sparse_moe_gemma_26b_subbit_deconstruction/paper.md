@@ -1,10 +1,14 @@
-# Sparse Mixture-of-Experts Sub-Bit Deconstruction: Slicing Gemma-4 26B-A4B into 114 MB at 0.0382 BPW with Certified Routing Invariants
+# Paper 62: Sparse Mixture-of-Experts Sub-Bit Deconstruction: Slicing Gemma-4 26B-A4B into 114 MB at 0.0382 BPW with Certified Routing Invariants
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Open frontier architectures are increasingly transitioning toward sparse Mixture-of-Experts (MoE) topologies to balance high parametric capacity with bounded active compute per token. Google DeepMind's **Gemma-4 26B-A4B-it** instantiates this paradigm with 128 fine-grained experts routing to 8 active experts per token. However, hosting 48.6 GB of raw FP16 weights on consumer edge devices remains prohibitive. In this work, we present the **Sparse MoE Streaming Sub-Bit Deconstruction** of Gemma-4 26B-A4B, applying Polar Joint Iterative Quantization (Polar Joint-ITQ) across all 128 expert projection manifolds. The complete 26-Billion parameter architecture is compressed from **48.07 GB into 114.0 MB (435.6× compression at 0.0382 BPW)**, enabling single-host RAM residence on consumer x86-64 hardware. By immediately purging raw `.safetensors` post-factorization, we expand available disk storage on the AI volume to **747 GB free** (surpassing the $\ge 700\text{ GB}$ safe storage floor). We formally prove Top-$K$ routing bounded computation, expert storage commutativity, and free space recovery in Lean 4 (`formal/Gemma26BMoEInvariants.lean`) with zero unproven `sorry` axioms.

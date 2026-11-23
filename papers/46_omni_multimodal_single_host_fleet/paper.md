@@ -1,10 +1,14 @@
-# The One-Gigabyte Frontier: Universal Sub-Bit Deconstruction and Single-Host Co-Execution of an 8-Model Multimodal Fleet
+# Paper 46: The One-Gigabyte Frontier: Universal Sub-Bit Deconstruction and Single-Host Co-Execution of an 8-Model Multimodal Fleet
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Modern artificial intelligence deployments typically require dedicated GPU clusters or high-bandwidth cloud infrastructure to serve heterogeneous foundation models spanning speech perception, high-resolution spatial vision, mathematical theorem proving, coding syntax, and acoustic music generation. Concurrently hosting multiple 30B to 70B parameter models in raw FP16 precision exceeds 400 GB of VRAM, rendering single-host edge deployment impossible. In this work, we present the universal sub-bit polar deconstruction of an **8-model multimodal fleet** comprising **DeepSeek-Coder-V2-Lite**, **Mixtral-8x7B**, **DeepSeek-R1-32B**, **Whisper-Large-v3**, **MusicGen-Small**, **Qwen2.5-Coder-32B**, **Qwen2-VL-7B**, and **Qwen2.5-Math-72B**. Using the Weft Polar Joint-ITQ pipeline with low-rank polar decomposition ($k=64$), over **240 Billion cumulative parameters** originally spanning **410 GB of FP16 tensors** are compressed into packed sub-bit GGUF bitboards occupying an aggregate footprint under **1.2 GB** ($0.026 - 0.22$ BPW, $>340\times$ mean compression factor). We demonstrate that all 8 foundation models load in under 400 milliseconds and can be co-executed simultaneously within a unified pipeline on a single consumer CPU host. Furthermore, we formally certify cross-modal storage bounds, sequential pipeline latency monotonicity, and token bandwidth conservation in Lean 4 (`formal/OmniMultimodalInvariants.lean`), establishing the theoretical and empirical viability of multi-agent foundation fleets at the edge.

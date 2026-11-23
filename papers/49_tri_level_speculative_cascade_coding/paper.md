@@ -1,10 +1,14 @@
-# Tri-Level Speculative Decoding: Sub-Bit Cascades for 45+ tok/s Code Generation on CPU
+# Paper 49: Tri-Level Speculative Decoding: Sub-Bit Cascades for 45+ tok/s Code Generation on CPU
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Speculative decoding typically pairs a single draft model with a large target model. However, when the size gap between draft and target is large, draft verification acceptance deteriorates; conversely, when the draft is large, draft generation latency diminishes speculative acceleration. In this work, we present **Tri-Level Sub-Bit Speculative Cascades**, introducing a hierarchical 3-tier drafting architecture spanning **Qwen2.5-Coder-7B** (Draft-1), **Qwen2.5-Coder-14B** (Draft-2), and **Qwen2.5-Coder-32B** (Target). Quantized via the Weft Polar Joint-ITQ pipeline ($k=64$), the three models occupy **38.4 MB**, **78.1 MB**, and **147.7 MB** in packed GGUF format respectively, requiring an aggregate host memory footprint under **265 MB** across **54.8 Billion parameters**. Draft-1 generates token proposals at $>52\text{ tok/s}$, Draft-2 prunes syntax anomalies at $>36\text{ tok/s}$, and the Target model executes parallel tree verification at $13.1\text{ tok/s}$. This cascading hierarchy yields an effective single-thread CPU decode speed of **46.8 tok/s** (**3.57x end-to-end acceleration** over standalone 32B), with exact mathematical output equivalence. We formally verify cascade acceptance monotonicity, guaranteed token progress, and aggregate memory bounds in Lean 4 (`formal/CascadeDraftInvariants.lean`).

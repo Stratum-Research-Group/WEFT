@@ -1,10 +1,14 @@
-# Extreme Sub-Bit Compression of 671B Sparse Mixture-of-Experts: Multi-Head Latent Attention Factorization and Certified Polytope Routing in DeepSeek-V3
+# Paper 44: Extreme Sub-Bit Compression of 671B Sparse Mixture-of-Experts: Multi-Head Latent Attention Factorization and Certified Polytope Routing in DeepSeek-V3
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Frontier foundation models scaling past half a trillion parameters present formidable operational bottlenecks in KV-cache memory and multi-node GPU interconnect bandwidth. DeepSeek-V3 introduces an innovative architecture uniting **Multi-Head Latent Attention (MLA)** for aggressive KV-cache compression with a fine-grained **671B Sparse Mixture-of-Experts (MoE)** routing across 256 routed experts and 1 shared expert (37B active parameters per token). In this work, we present the theoretical and empirical blueprint for streaming polar sub-bit deconstruction of DeepSeek-V3 across its 163 safetensors shards using the Weft Polar Joint-ITQ pipeline. We compress 671 Billion parameters across thousands of linear projections into packed 64-bit binary bitboards and low-rank polar matrices ($k=64$), reducing 685 GB of raw FP8/FP16 weights into an ultra-compact edge-resident GGUF artifact under **1.85 GB** (>370x compression factor) at an effective bitrate of **0.0221 BPW**. We accompany this architecture with formal verification in Lean 4 (`formal/MultiHeadLatentAttentionInvariants.lean`), proving that MLA latent dimension reduction preserves non-negative cache savings, decoupled RoPE positions maintain temporal monotonicity, and null queries strictly nullify latent representations.

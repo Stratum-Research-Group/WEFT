@@ -1,10 +1,14 @@
-# Extreme Low-Bitrate Coding Specialists: Sub-0.038 BPW Factorization of Qwen2.5-Coder-32B with Formally Certified Abstract Syntax Invariants
+# Paper 42: Extreme Low-Bitrate Coding Specialists: Sub-0.038 BPW Factorization of Qwen2.5-Coder-32B with Formally Certified Abstract Syntax Invariants
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Large language models specialized for source code synthesis, repository-level refactoring, and automated vulnerability detection require precise syntactic fidelity. Subtle scalar quantization drift in feed-forward projection layers often triggers catastrophic syntax errors, including invalid Python indentation blocks, unclosed delimiter tokens, and scope leakages. In this work, we present the full-scale streaming polar sub-bit deconstruction of Alibaba's **Qwen2.5-Coder-32B-Instruct** across all 14 safetensors shards using the Weft Polar Joint-ITQ pipeline. We compress 32.76 Billion parameters across 450 dense linear projection operators, reducing 65.5 GB of raw FP16 weights into an edge-resident sub-bit bitboard GGUF artifact under **155.0 MB** (>420x compression factor) at an effective bitrate of **sub-0.038 BPW**. We formally verify Abstract Syntax Tree (AST) depth preservation and delimiter balance invariants in Lean 4 (`formal/CodingSyntaxInvariants.lean`), proving that lexical nesting indentation remains strictly monotonic and delimiter balance counters avoid drift under bounded operator perturbations.

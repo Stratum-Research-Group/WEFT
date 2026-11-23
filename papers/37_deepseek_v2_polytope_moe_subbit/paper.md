@@ -1,10 +1,14 @@
-# Fine-Grained MoE Deconstruction at Sub-0.17 BPW: 100% Factorization of DeepSeek-Coder-V2-Lite with Certified Polytope Facet Stability
+# Paper 37: Fine-Grained MoE Deconstruction at Sub-0.17 BPW: 100% Factorization of DeepSeek-Coder-V2-Lite with Certified Polytope Facet Stability
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Modern Mixture-of-Experts (MoE) architectures with Multi-Head Latent Attention (MLA) and fine-grained expert division achieve state-of-the-art coding and reasoning performance, but their extensive routing weight footprint (e.g., 64 routed experts + 2 shared experts per layer) poses severe memory bandwidth barriers for local deployment. In this work, we report the complete, 100% full-model deconstruction of **DeepSeek-Coder-V2-Lite-Instruct** (15.7 Billion parameters, 5,209 linear layers) across all 4 safetensors shards using the Weft Polar Joint-ITQ pipeline. We compress 29.26 GB of raw FP16 weights into 322.8 MB of bipolar bitboards and rank-64 scales, achieving an effective compression rate of **0.1685 BPW** (94.9x compression factor). We consolidate the factorized model into a standalone 318.0 MB GGUF container, yielding a cold-load latency of **1.656 seconds** and an autoregressive generation throughput of **22.36 tokens/second** on commodity CPU hardware with 100% numerical layer health. Furthermore, we formalize **Polytope MoE Routing** in the Lean 4 proof assistant, proving machine-verified stability bounds showing that tokens with facet margin $\Delta > 2\epsilon$ maintain strictly invariant expert assignments under sub-bit low-rank quantization.

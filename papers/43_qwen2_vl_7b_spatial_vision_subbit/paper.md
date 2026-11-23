@@ -1,10 +1,14 @@
-# Sub-Bit High-Resolution Vision-Language Models: Sub-0.082 BPW Deconstruction of Qwen2-VL-7B with Formally Certified Spatial Rotary Invariants
+# Paper 43: Sub-Bit High-Resolution Vision-Language Models: Sub-0.082 BPW Deconstruction of Qwen2-VL-7B with Formally Certified Spatial Rotary Invariants
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Vision-language foundation models operating on arbitrary image resolutions, multi-page PDFs, and high-frame-rate video rely on dynamic 2D patch grids and Multi-Axis Rotary Position Embeddings (M-RoPE) to bind spatial coordinates $(t, h, w)$ to discrete visual tokens. Compressing high-resolution VLMs to the sub-bit frontier requires preserving both language generation fidelity and fine-grained visual coordinate geometry. In this work, we present the streaming polar sub-bit deconstruction of Alibaba's **Qwen2-VL-7B-Instruct** across all 5 safetensors shards using the Weft Polar Joint-ITQ pipeline. We compress 7.61 Billion parameters across its vision transformer (ViT) and language decoder into packed 64-bit binary bitboards and low-rank polar matrices ($k=64$). The raw 14.5 GB FP16 representation is reduced into an edge-resident GGUF artifact under **72.0 MB** (>200x compression factor) achieving an effective bitrate of **0.0814 BPW**. We formally verify dynamic patch token conservation, M-RoPE spatial coordinate monotonicity, and padded token annihilation in Lean 4 (`formal/SpatialVisionInvariants.lean`), proving that arbitrary image aspect ratios maintain strictly bounded spatial coordinate bounds.

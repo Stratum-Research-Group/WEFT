@@ -1,4 +1,4 @@
-# Sub-Bit Generative Music Synthesis: Sub-0.125 BPW Deconstruction of MusicGen with Formally Certified Residual Codebook Invariants
+# Paper 41: Sub-Bit Generative Music Synthesis: Sub-0.125 BPW Deconstruction of MusicGen with Formally Certified Residual Codebook Invariants
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  

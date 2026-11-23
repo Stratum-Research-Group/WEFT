@@ -1,4 +1,4 @@
-# Extreme Empirical Compression of Frontier 70B+ Foundation Models: Sub-0.03 BPW Polar Joint-ITQ on Llama-3.3 and Qwen-2.5
+# Paper 26: Extreme Empirical Compression of Frontier 70B+ Foundation Models: Sub-0.03 BPW Polar Joint-ITQ on Llama-3.3 and Qwen-2.5
 
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  

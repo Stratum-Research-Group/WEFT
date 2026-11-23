@@ -1,10 +1,14 @@
-# Dual-Frontier Foundation Compression at Scale: 100% Full Deconstruction of Qwen-2.5-72B into 241 MB at 0.0235 BPW with Verified Low-Rank Hypercube Invariants
+# Paper 35: Dual-Frontier Foundation Compression at Scale: 100% Full Deconstruction of Qwen-2.5-72B into 241 MB at 0.0235 BPW with Verified Low-Rank Hypercube Invariants
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group
 *Stratum Research Group*  
 **Date:** November 22, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Following the complete 100% sub-bit deconstruction of Llama-3.3-70B, we demonstrate the universality and architectural scale invariance of the Weft Polar Joint-ITQ pipeline by achieving 100% full-model deconstruction across all 37 shards of **Qwen-2.5-72B-Instruct**. We decompose 72.70 Billion parameters across 562 linear projection layers, reducing 144.5 GB of raw floating-point weights into 241.5 MB total on-disk representation at an effective rate of **0.0235 BPW** (679.1x parameter compression ratio). We construct an atomic 231.0 MB consolidated GGUF container compatible with llama.cpp and Ollama runtimes. Numerical fidelity evaluation reveals absolute numerical stability across all layers (0 NaNs, 0 Infs) with smooth activation energy distribution. Combined with formal Lean 4 invariants for mixture-of-experts routing and cross-attention multi-head rank bounds, this establishes sub-bit hypercube quantization as an exact, production-grade foundation architecture for 70B+ class frontier models.

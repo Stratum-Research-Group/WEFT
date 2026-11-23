@@ -1,10 +1,14 @@
-# Hierarchical Sub-Bit Speculative Coding: Zero-RAM Multi-Scale Verification of 14B and 32B Code Specialists
+# Paper 47: Hierarchical Sub-Bit Speculative Coding: Zero-RAM Multi-Scale Verification of 14B and 32B Code Specialists
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Accelerating autoregressive token generation for complex code synthesis typically encounters a trade-off between draft proposal latency and target model parametric fidelity. Speculative decoding bridges this divide by generating candidate token sequences with an efficient draft model and validating them in parallel with a larger target architecture. In this work, we present **Hierarchical Sub-Bit Speculative Coding**, deploying a **Qwen2.5-Coder-14B** draft model to accelerate a **Qwen2.5-Coder-32B** target model entirely within sub-bit quantized GGUF representations. Using the Weft Polar Joint-ITQ pipeline ($k=64$), the 14B model (29.5 GB FP16) and 32B model (65.5 GB FP16) are compressed into **72.1 MB** ($0.0384$ BPW, $409\times$ compression) and **147.7 MB** ($0.0378$ BPW, $423\times$ compression) artifacts respectively. Operating both models concurrently requires under **220 MB of resident host RAM**, enabling single-thread CPU speculative decoding that yields a **2.64x end-to-end decode acceleration** ($34.6$ tok/s effective throughput) with exact mathematical output equivalence. We formally prove draft acceptance monotonicity, guaranteed token progress, and cumulative storage additivity in Lean 4 (`formal/SpeculativeDraftInvariants.lean`).

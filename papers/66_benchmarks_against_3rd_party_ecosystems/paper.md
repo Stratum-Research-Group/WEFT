@@ -1,10 +1,14 @@
-# Benchmarking Sub-Bit Foundation Architectures Against the Open-Source Ecosystem: Pareto Frontier Evaluation of WEFT vs. llama.cpp, BitNet.cpp, AutoGPTQ, and vLLM
+# Paper 66: Benchmarking Sub-Bit Foundation Architectures Against the Open-Source Ecosystem: Pareto Frontier Evaluation of WEFT vs. llama.cpp, BitNet.cpp, AutoGPTQ, and vLLM
 
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  
 
 ---
+
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
 
 ## Abstract
 Local foundation model inference is dominated by open-source quantization and serving runtimes, notably **llama.cpp** (GGUF k-quants), **Microsoft BitNet.cpp** (1.58-bit ternary GEMM), **AutoGPTQ / AutoAWQ** (4-bit post-training quantization), and **vLLM** (paged attention serving). However, for 70B+ class frontier models, existing frameworks require between 18 GB and 42 GB of host RAM, precluding concurrent multi-model co-execution on consumer-grade edge hardware (16 GB RAM) and preventing lifelong knowledge retention. In this paper, we conduct an extensive Pareto frontier benchmark comparing **WEFT Polar Joint-ITQ** against prominent 3rd-party repositories. On **Llama-3.3-70B-Instruct**, WEFT compresses 140.0 GB of raw FP16 weights into **221.0 MB at 0.0232 BPW (633.5× compression)**, operating in 0.22 GB resident RAM—representing a **$81.6\times$ memory reduction over BitNet.cpp (18 GB)** and **$186.4\times$ reduction over llama.cpp Q4_K_M (41.2 GB)**. In cold-start load latency, WEFT maps into memory in **0.42 seconds** ($44\times$ faster than llama.cpp). Furthermore, WEFT uniquely enables concurrent co-residence of **13 foundation specialists (430B+ parameters) in 1.92 GB RAM** with live sub-10ms mathematical adapter hot-loading, backed by machine-checked Lean 4 invariants (`formal/real_conjectures/EcosystemBenchmarkInvariants.lean`) with zero unproven `sorry` axioms.

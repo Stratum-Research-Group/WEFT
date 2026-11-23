@@ -6,6 +6,10 @@
 
 ---
 
+
+> [!NOTE] Architectural Evolution & Research Continuum
+> In the WEFT research program, empirical benchmarks and fleet configurations reflect the incremental state of deconstruction at the time of each paper's publication (progressing from early single-model prototypes to multi-model collectives and high-throughput AVX-512/AVX2 vector engines).
+
 ## Abstract
 As large foundation models scale past 70 billion parameters, parameter storage in floating-point precisions presents an increasingly prohibitive bottleneck for edge and real-time execution. In this work, we present the theoretical and mechanical formulation of **Asymptotic Polar Joint-ITQ**, demonstrating both empirically and formally that sub-bit quantization exhibits dimensional BPW decay. Specifically, we prove mechanically in Lean 4 that the effective bits-per-weight (BPW) of rank-$r$ dual-path low-rank decomposition contracts monotonically with matrix dimensions, bounded by $\mathcal{O}(r(1/m + 1/n))$. We evaluate this paradigm on Llama-3.3-70B-Instruct across 21 sequential shards ($>50.2\text{ Billion parameters}$), reducing $>98\text{ GB}$ of raw FP16 weights into under $165\text{ MB}$ of signed bitboard tensors at an empirical $0.0232\text{ BPW}$ ($>689\times$ compression) with zero activation NaN/Inf errors. All invariants are verified without unproven axioms in the Lean 4 proof assistant.
 

@@ -1,4 +1,4 @@
-# Idempotent Sharded Sub-Bit Ingestion of 70B+ LLMs: Zero-Copy Bitboard Serialization and Unified GGUF Bridging
+# Paper 29: Idempotent Sharded Sub-Bit Ingestion of 70B+ LLMs: Zero-Copy Bitboard Serialization and Unified GGUF Bridging
 
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  

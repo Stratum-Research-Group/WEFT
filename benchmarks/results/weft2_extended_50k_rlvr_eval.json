@@ -1,0 +1,12 @@
+{
+  "model_dir": "/tmp/tmpa5lg2h4_",
+  "shards_count": 1,
+  "total_parameters": 80290304,
+  "effective_bpw": 0.6094320928215691,
+  "compression_ratio": 26.253950503201537,
+  "load_time_sec": 0.1662351280101575,
+  "mean_layer_latency_ms": 10.870707995491102,
+  "tokens_per_second": 147.68347943545814,
+  "generated_token_count": 28,
+  "all_layers_healthy": true
+}

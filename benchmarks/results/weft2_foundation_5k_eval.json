@@ -1,0 +1,12 @@
+{
+  "model_dir": "/tmp/eval_dir_weft2_foundation_5k",
+  "shards_count": 1,
+  "total_parameters": 80290304,
+  "effective_bpw": 0.6160767805786362,
+  "compression_ratio": 25.97078887630266,
+  "load_time_sec": 0.05701094900723547,
+  "mean_layer_latency_ms": 16.0067870921921,
+  "tokens_per_second": 100.30637010795388,
+  "generated_token_count": 20,
+  "all_layers_healthy": true
+}

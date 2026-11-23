@@ -1,0 +1,12 @@
+{
+  "model_dir": "/tmp/eval_dir_weft2_sft_15k",
+  "shards_count": 1,
+  "total_parameters": 80290304,
+  "effective_bpw": 0.6111028300503134,
+  "compression_ratio": 26.182172971908322,
+  "load_time_sec": 0.05580742098391056,
+  "mean_layer_latency_ms": 15.847605193266645,
+  "tokens_per_second": 151.56967498557051,
+  "generated_token_count": 20,
+  "all_layers_healthy": true
+}

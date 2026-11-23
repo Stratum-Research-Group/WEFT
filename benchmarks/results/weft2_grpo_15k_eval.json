@@ -1,0 +1,12 @@
+{
+  "model_dir": "/tmp/eval_dir_weft2_grpo_15k",
+  "shards_count": 1,
+  "total_parameters": 80290304,
+  "effective_bpw": 0.6111028300503134,
+  "compression_ratio": 26.182172971908322,
+  "load_time_sec": 0.05684381595347077,
+  "mean_layer_latency_ms": 15.83164450712502,
+  "tokens_per_second": 159.48274482107536,
+  "generated_token_count": 20,
+  "all_layers_healthy": true
+}

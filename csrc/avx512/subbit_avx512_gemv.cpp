@@ -609,6 +609,115 @@ void subbit_causal_flash_attention_avx512_forward(
     }
 }
 
+
+/**
+ * AVX-512 Masked Dynamic-Head Flash-Attention Forward Kernel
+ * Supports arbitrary head dimensions (e.g. 64, 80, 96, 128) via AVX-512 tail masking.
+ * Eliminates out-of-bounds reads and memory padding requirements.
+ */
+void subbit_dynamic_head_flash_attention_avx512_forward(
+    const at::Tensor& q,
+    const at::Tensor& k,
+    const at::Tensor& v,
+    at::Tensor& out,
+    float sm_scale
+) {
+    TORCH_CHECK(q.is_contiguous() && k.is_contiguous() && v.is_contiguous() && out.is_contiguous(),
+                "All tensors must be contiguous");
+
+    const int64_t batch_heads = q.size(0);
+    const int64_t q_len = q.size(1);
+    const int64_t head_dim = q.size(2);
+    const int64_t kv_len = k.size(1);
+
+    const float* q_ptr = q.data_ptr<float>();
+    const float* k_ptr = k.data_ptr<float>();
+    const float* v_ptr = v.data_ptr<float>();
+    float* out_ptr = out.data_ptr<float>();
+
+    const int64_t q_stride_b = q_len * head_dim;
+    const int64_t kv_stride_b = kv_len * head_dim;
+
+    const int64_t tail = head_dim % 16;
+    const __mmask16 tail_mask = (tail == 0) ? 0xFFFF : (static_cast<__mmask16>((1U << tail) - 1));
+
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (int64_t bh = 0; bh < batch_heads; ++bh) {
+        for (int64_t qi = 0; qi < q_len; ++qi) {
+            const float* cur_q = q_ptr + bh * q_stride_b + qi * head_dim;
+            const float* cur_k_base = k_ptr + bh * kv_stride_b;
+            const float* cur_v_base = v_ptr + bh * kv_stride_b;
+            float* cur_out = out_ptr + bh * q_stride_b + qi * head_dim;
+
+            for (int64_t d = 0; d < head_dim; ++d) {
+                cur_out[d] = 0.0f;
+            }
+
+            float m_prev = -1e30f;
+            float s_prev = 0.0f;
+
+            for (int64_t ki = 0; ki < kv_len; ++ki) {
+                const float* cur_k = cur_k_base + ki * head_dim;
+                const float* cur_v = cur_v_base + ki * head_dim;
+
+                __m512 vdot = _mm512_setzero_ps();
+                int64_t d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vq = _mm512_loadu_ps(cur_q + d);
+                    __m512 vk = _mm512_loadu_ps(cur_k + d);
+                    vdot = _mm512_fmadd_ps(vq, vk, vdot);
+                }
+                if (tail > 0) {
+                    __m512 vq = _mm512_maskz_loadu_ps(tail_mask, cur_q + d);
+                    __m512 vk = _mm512_maskz_loadu_ps(tail_mask, cur_k + d);
+                    vdot = _mm512_fmadd_ps(vq, vk, vdot);
+                }
+                float score = _mm512_reduce_add_ps(vdot) * sm_scale;
+
+                float m_new = (score > m_prev) ? score : m_prev;
+                float alpha = std::exp(m_prev - m_new);
+                float p_curr = std::exp(score - m_new);
+                float s_new = s_prev * alpha + p_curr;
+
+                __m512 valpha = _mm512_set1_ps(alpha);
+                __m512 vpcurr = _mm512_set1_ps(p_curr);
+                d = 0;
+                for (; d + 16 <= head_dim; d += 16) {
+                    __m512 vout = _mm512_loadu_ps(cur_out + d);
+                    __m512 vv = _mm512_loadu_ps(cur_v + d);
+                    vout = _mm512_mul_ps(vout, valpha);
+                    vout = _mm512_fmadd_ps(vpcurr, vv, vout);
+                    _mm512_storeu_ps(cur_out + d, vout);
+                }
+                if (tail > 0) {
+                    __m512 vout = _mm512_maskz_loadu_ps(tail_mask, cur_out + d);
+                    __m512 vv = _mm512_maskz_loadu_ps(tail_mask, cur_v + d);
+                    vout = _mm512_mul_ps(vout, valpha);
+                    vout = _mm512_fmadd_ps(vpcurr, vv, vout);
+                    _mm512_mask_storeu_ps(cur_out + d, tail_mask, vout);
+                }
+
+                m_prev = m_new;
+                s_prev = s_new;
+            }
+
+            float inv_s = 1.0f / (s_prev + 1e-12f);
+            __m512 vinv = _mm512_set1_ps(inv_s);
+            int64_t d = 0;
+            for (; d + 16 <= head_dim; d += 16) {
+                __m512 vout = _mm512_loadu_ps(cur_out + d);
+                vout = _mm512_mul_ps(vout, vinv);
+                _mm512_storeu_ps(cur_out + d, vout);
+            }
+            if (tail > 0) {
+                __m512 vout = _mm512_maskz_loadu_ps(tail_mask, cur_out + d);
+                vout = _mm512_mul_ps(vout, vinv);
+                _mm512_mask_storeu_ps(cur_out + d, tail_mask, vout);
+            }
+        }
+    }
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
@@ -618,4 +727,5 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_softmax_avx512", &subbit_softmax_avx512_forward, "AVX-512 Numerically-Stable Vectorized Softmax");
     m.def("subbit_flash_attention_avx512", &subbit_flash_attention_avx512_forward, "AVX-512 In-Register Tiled Flash-Attention Forward");
     m.def("subbit_causal_flash_attention_avx512", &subbit_causal_flash_attention_avx512_forward, "AVX-512 Fused Causal Block-Masked Flash-Attention Forward");
+    m.def("subbit_dynamic_head_flash_attention_avx512", &subbit_dynamic_head_flash_attention_avx512_forward, "AVX-512 Masked Dynamic-Head Flash-Attention Forward");
 }

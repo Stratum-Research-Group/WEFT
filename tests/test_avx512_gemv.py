@@ -288,3 +288,33 @@ def test_avx512_causal_flash_attention_mathematical_soundness():
 
     diff = (out - ref).abs().max().item()
     assert diff < 1e-4, f"Causal Flash-Attention discrepancy too high: {diff}"
+
+
+def test_avx512_dynamic_head_flash_attention_mathematical_soundness():
+    """
+    Test AVX-512 dynamic-head Flash-Attention kernel with non-multiple-of-16 head dimensions.
+    Validates AVX-512 tail masking (_mm512_maskz_loadu_ps, _mm512_mask_storeu_ps) parity.
+    """
+    if not hasattr(weft_avx512, "subbit_dynamic_head_flash_attention_avx512"):
+        pytest.skip("AVX-512 Dynamic-Head Flash-Attention kernel not compiled")
+
+    torch.manual_seed(42)
+    B = 2
+    Q_LEN = 8
+    KV_LEN = 16
+    DIM = 90  # 16 * 5 + 10 tail elements
+
+    q = torch.randn(B, Q_LEN, DIM, dtype=torch.float32)
+    k = torch.randn(B, KV_LEN, DIM, dtype=torch.float32)
+    v = torch.randn(B, KV_LEN, DIM, dtype=torch.float32)
+    out = torch.empty(B, Q_LEN, DIM, dtype=torch.float32)
+    sm_scale = 1.0 / (DIM ** 0.5)
+
+    weft_avx512.subbit_dynamic_head_flash_attention_avx512(q, k, v, out, sm_scale)
+
+    scores = torch.matmul(q, k.transpose(-1, -2)) * sm_scale
+    probs = torch.softmax(scores, dim=-1)
+    ref = torch.matmul(probs, v)
+
+    diff = (out - ref).abs().max().item()
+    assert diff < 1e-4, f"Dynamic-head Flash-Attention discrepancy too high: {diff}"

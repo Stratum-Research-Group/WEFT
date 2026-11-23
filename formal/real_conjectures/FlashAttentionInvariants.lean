@@ -46,3 +46,17 @@ theorem causal_attention_visibility_bound (qi ki : Int) (h_causal : ki ≤ qi) :
 theorem causal_attention_nonempty_context (qi : Int) (h_qi : 0 ≤ qi) :
     0 ≤ qi := by
   omega
+
+-- Theorem 7: Tail Mask Boundary Preservation
+-- For any head dimension d and vector chunk size c > 0, the remainder r = d % c satisfies 0 ≤ r < c.
+theorem tail_mask_remainder_bound (d c : Int) (h_c : 0 < c) :
+    0 ≤ d % c ∧ d % c < c := by
+  constructor
+  · apply Int.emod_nonneg; omega
+  · apply Int.emod_lt_of_pos _ h_c
+
+-- Theorem 8: Full Chunk Tiling Exactness
+-- If d is divisible by chunk size c (d % c = 0), the total elements are partitioned into exact integer multiples.
+theorem full_chunk_tiling_exactness (d c : Int) (h_div : d % c = 0) :
+    (d / c) * c = d := by
+  exact Int.ediv_mul_cancel_of_emod_eq_zero h_div

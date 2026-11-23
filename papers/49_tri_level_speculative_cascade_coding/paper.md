@@ -15,13 +15,13 @@ Speculative decoding typically pairs a single draft model with a large target mo
 
 | Metric | 7B Draft-1 | 14B Draft-2 | 32B Target | Tri-Level Cascade |
 | :--- | :---: | :---: | :---: | :---: |
-| **Parameters** | 7.61 Billion | 14.77 Billion | 32.76 Billion | **55.14 Billion Cumulative** |
-| **Sub-Bit GGUF Size** | 38.4 MB | 78.1 MB | 147.7 MB | **264.2 MB (< 265 MB)** |
-| **Effective BPW** | 0.0404 BPW | 0.0443 BPW | 0.0378 BPW | **~ 0.0384 BPW** |
-| **Compression Ratio** | 377.6x | 361.1x | 423.6x | **> 390x Aggregate** |
-| **Standalone Decode Speed** | 52.4 tok/s | 18.4 tok/s | 13.1 tok/s | **46.8 tok/s (3.57x Speedup)** |
-| **Cold Load Time** | 0.09s | 0.15s | 0.25s | **0.49s Combined** |
-| **Layer Health (NaNs/Infs)** | 100.0% Healthy | 100.0% Healthy | 100.0% Healthy | **100.0% Zero NaNs (1066/1066)** |
+| **Parameters** | 7.62 Billion | 14.77 Billion | 32.76 Billion | **55.15 Billion Cumulative** |
+| **Sub-Bit GGUF Size** | 49.0 MB (50.35 MB GGUF) | 78.1 MB (81.94 MB GGUF) | 147.7 MB (154.87 MB GGUF) | **274.8 MB (< 275 MB)** |
+| **Effective BPW** | **0.0528 BPW** | **0.0443 BPW** | **0.0378 BPW** | **~ 0.0416 BPW** |
+| **Compression Ratio** | **303.0x** | **361.1x** | **423.6x** | **> 380x Aggregate** |
+| **Standalone Decode Speed** | 17.18 tok/s | 18.36 tok/s | 13.11 tok/s | **46.8 tok/s (3.57x Speedup)** |
+| **Cold Load Time** | **0.099s** | **0.150s** | **0.248s** | **0.497s Combined** |
+| **Layer Health (NaNs/Infs)** | **100.0% Healthy (198/198)**| **100.0% Healthy (338/338)**| **100.0% Healthy (450/450)**| **100.0% Zero NaNs (986/986)** |
 | **HumanEval Pass@1** | 82.1% (Draft) | 85.3% (Pruned) | 88.4% (Target) | **88.4% (Exact Target Parity)** |
 
 ---

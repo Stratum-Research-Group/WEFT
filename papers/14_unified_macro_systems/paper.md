@@ -1,6 +1,7 @@
 # Paper 14: WEFT at Scale: A Formally Verified, Multi-Specialist Co-Processing Engine with 100\% Mathematical and Architectural Invariants
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/14_unified_macro_systems/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/14_unified_macro_systems/paper.tex)

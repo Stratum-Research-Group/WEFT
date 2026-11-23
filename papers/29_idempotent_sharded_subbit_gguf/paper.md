@@ -1,6 +1,7 @@
 # Idempotent Sharded Sub-Bit Ingestion of 70B+ LLMs: Zero-Copy Bitboard Serialization and Unified GGUF Bridging
 
-**Stratum Research Group**  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

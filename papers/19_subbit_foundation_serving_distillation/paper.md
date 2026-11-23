@@ -7,7 +7,7 @@
 ---
 
 ## Executive Summary
-While sub-bit parameter representations promise to democratize massive foundation models on edge and consumer devices, real-world deployment faces two critical hurdles: quantization-induced signal degradation and the memory bandwidth overhead of dequantization. In this paper, we introduce a dual breakthrough:
+While sub-bit parameter representations promise to democratize massive foundation models on edge and consumer devices, real-world deployment faces two critical hurdles: quantization-induced signal degradation and the memory bandwidth overhead of dequantization. In this paper, we introduce a dual advancement:
 1. **Scale Residual Distillation**: Gradient-based fine-tuning of floating-point channel and rank scales ($\mathbf{h}, \mathbf{l}, \mathbf{g}$) while keeping packed binary bitboards ($\mathbf{U}_b, \mathbf{V}_b$) frozen.
 2. **Zero-Copy In-Memory Serving**: Direct streaming inference from `.weft` model containers via fused Triton GPU and AVX2 CPU kernels.
 

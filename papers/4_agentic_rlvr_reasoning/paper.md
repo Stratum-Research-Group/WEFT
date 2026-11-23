@@ -1,6 +1,7 @@
 # Paper 4: Reasoning Through Action: Multi-Agent Environment-in-the-Loop RLVR on Hybrid Linear Recurrent Models
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/4_agentic_rlvr_reasoning/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/4_agentic_rlvr_reasoning/paper.tex)

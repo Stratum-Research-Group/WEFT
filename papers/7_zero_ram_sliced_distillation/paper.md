@@ -1,6 +1,7 @@
 # Paper 7: Zero-RAM Sliced Frontier Model Distillation: \\ Compressing Gemma 4 into Linear Recurrent Singlets via On-Demand Memory-Mapped Slicing
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/7_zero_ram_sliced_distillation/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/7_zero_ram_sliced_distillation/paper.tex)

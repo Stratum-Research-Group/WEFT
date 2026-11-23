@@ -1,6 +1,7 @@
 # Paper 5: Formal Verification of Deep Neural Network State Operators: Machine-Checked Proofs of Singlet Uncrossing and Linear Recurrence Boundedness in Lean 4
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/5_formal_lean4_verification/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/5_formal_lean4_verification/paper.tex)

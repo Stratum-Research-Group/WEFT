@@ -1,6 +1,7 @@
 # Paper 1: WEFT: Windowed Exponentially-Decayed Factorized Tensor Attention with Formal Machine-Checked Verification
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/1_weft_core_architecture/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/1_weft_core_architecture/paper.tex)

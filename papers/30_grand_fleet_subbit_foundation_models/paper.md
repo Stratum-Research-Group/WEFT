@@ -1,6 +1,7 @@
 # The Grand Fleet of Sub-Bit Foundation Models: Pushing Frontier 70B+ LLMs Below 0.02 BPW with Certified Mathematical Invariants
 
-**Stratum Research Group**  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

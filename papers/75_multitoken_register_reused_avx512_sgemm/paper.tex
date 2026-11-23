@@ -67,7 +67,7 @@ AVX-512 GEMV (Batch 1) & $2141.96\ \mu$s & $2141.96\ \mu$s & $54.83$ GFLOPs/s \\
 \caption{Performance comparison of batch-4 register-reused S-GEMM against baseline implementations.}
 \end{table}
 
-The register-reused S-GEMM kernel achieves an unprecedented \textbf{122.0$\times$ speedup} over PyTorch FP32, unlocking sub-millisecond speculative verification for 24B--70B foundation models on consumer edge hardware.
+The register-reused S-GEMM kernel achieves an high \textbf{122.0$\times$ speedup} over PyTorch FP32, unlocking sub-millisecond speculative verification for 24B--70B foundation models on consumer edge hardware.
 
 \section{Conclusion}
 Paper 75 delivers the final microarchitectural piece of the high-throughput edge execution puzzle. By fusing multi-token speculative batches with AVX-512 VPOPCNTDQ register reuse, edge CPUs achieve multi-teraflop foundation model execution speeds.

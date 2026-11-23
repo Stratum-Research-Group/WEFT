@@ -1,13 +1,14 @@
 # Paper 8: Sparse Top-$K$ Mixture-of-Experts Slicing and Ternary BitNet Distillation: \\ Scaling Speculative Co-Processing to 26B Frontier Models with Zero Resident RAM
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/8_sparse_moe_ternary_distillation/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/8_sparse_moe_ternary_distillation/paper.tex)
 
 ## Abstract
 
-As open frontier foundation models evolve toward multi-expert architectures (such as Google DeepMind's Gemma 4 26B-A4B with 128 experts routing to 8 active per token), local distillation on consumer developer workstations faces catastrophic memory bottlenecks. In this paper, we introduce a dual architectural breakthrough: (1) **Sparse Top-$K$ MoE Layer Slicing**, which dynamically streams only the active expert projection tensors via memory-mapped indices, reducing active expert memory by $93.75%$ during feature probing; and (2) **BitNet b1.58 Ternary Quantization** of the distilled linear recurrent student weights into $\-1, 0, +1\$ integer matrices. We evaluate this pipeline by distilling Gemma 4 into an ultra-compact 132 MB student model running Singlet Uncrossed Linear Attention (SULA). In speculative decoding co-processing benchmarks, our ternary student achieves a **$68.75%$ token acceptance rate** and **$2.58×$ empirical wall-clock speedup** while operating entirely via addition-only integer GEMMs in SRAM with zero persistent host RAM overhead.
+As open frontier foundation models evolve toward multi-expert architectures (such as Google DeepMind's Gemma 4 26B-A4B with 128 experts routing to 8 active per token), local distillation on consumer developer workstations faces catastrophic memory bottlenecks. In this paper, we introduce a dual architectural advancement: (1) **Sparse Top-$K$ MoE Layer Slicing**, which dynamically streams only the active expert projection tensors via memory-mapped indices, reducing active expert memory by $93.75%$ during feature probing; and (2) **BitNet b1.58 Ternary Quantization** of the distilled linear recurrent student weights into $\-1, 0, +1\$ integer matrices. We evaluate this pipeline by distilling Gemma 4 into an ultra-compact 132 MB student model running Singlet Uncrossed Linear Attention (SULA). In speculative decoding co-processing benchmarks, our ternary student achieves a **$68.75%$ token acceptance rate** and **$2.58×$ empirical wall-clock speedup** while operating entirely via addition-only integer GEMMs in SRAM with zero persistent host RAM overhead.
 
 ## Introduction
 

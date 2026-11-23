@@ -1,6 +1,7 @@
 # Paper 11: Provably Sound Speculative Co-Processing: Eliminating Acceleration Reversal via Formally Verified Adaptive Entropy Gating in Lean 4
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/11_provably_sound_entropy_gating/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/11_provably_sound_entropy_gating/paper.tex)

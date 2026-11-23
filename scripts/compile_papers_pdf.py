@@ -160,7 +160,7 @@ def build_pdf_for_paper(paper_dir: str):
     
     story = []
     story.append(Paragraph(title, title_style))
-    story.append(Paragraph("Stratum Research Group • November 2026", author_style))
+    story.append(Paragraph("Nicholas Charles Mynhardt • Stratum Research Group (research@stratum.org)", author_style))
     story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1'), spaceBefore=2, spaceAfter=10))
     
     if abstract:
@@ -176,14 +176,17 @@ def build_pdf_for_paper(paper_dir: str):
     doc.build(story)
     print(f"Compiled PDF: {pdf_path} ({os.path.getsize(pdf_path) / 1024:.1f} KB)")
 
-def generate_all_missing_pdfs():
+def generate_all_pdfs(force=False):
     papers_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "papers")
-    for d in sorted(os.listdir(papers_dir)):
+    dirs = sorted([d for d in os.listdir(papers_dir) if d != 'compendium' and os.path.isdir(os.path.join(papers_dir, d))],
+                  key=lambda x: int(x.split('_')[0]))
+    for d in dirs:
         p = os.path.join(papers_dir, d)
-        if os.path.isdir(p):
-            pdf_path = os.path.join(p, "paper.pdf")
-            if not os.path.exists(pdf_path):
-                build_pdf_for_paper(p)
+        pdf_path = os.path.join(p, "paper.pdf")
+        if force or not os.path.exists(pdf_path):
+            build_pdf_for_paper(p)
 
 if __name__ == "__main__":
-    generate_all_missing_pdfs()
+    import sys
+    force_build = "--force" in sys.argv
+    generate_all_pdfs(force=force_build)

@@ -29,7 +29,7 @@ Quantizing ultra-large foundation models (70B+ parameters) is severely constrain
 \end{abstract}
 
 \section{Introduction}
-Modern autoregressive foundation models have reached unprecedented parameter scales, with frontier generalist models such as Llama-3.3-70B and Qwen-2.5-72B occupying over 140\,GB of FP16 memory. Serving these models on resource-constrained consumer edge devices, single-socket developer workstations, or bandwidth-limited inference clusters is bottlenecked by the memory wall: transferring hundreds of gigabytes across interconnects incurs prohibitive latency and thermal throttling.
+Modern autoregressive foundation models have reached high parameter scales, with frontier generalist models such as Llama-3.3-70B and Qwen-2.5-72B occupying over 140\,GB of FP16 memory. Serving these models on resource-constrained consumer edge devices, single-socket developer workstations, or bandwidth-limited inference clusters is bottlenecked by the memory wall: transferring hundreds of gigabytes across interconnects incurs prohibitive latency and thermal throttling.
 
 While sub-bit quantization (such as LittleBit-2) enables compressing weight matrices into bipolar $\{-1, +1\}$ bitboards with low-rank scale vectors, existing quantization toolchains suffer from a catastrophic staging bottleneck: they require downloading and storing the entire uncompressed checkpoint before beginning matrix decomposition. For researchers operating with modest NVMe allocations (e.g., $< 1$\,TB), staging a 70B+ model alongside intermediate activations and SVD scratch spaces risks disk exhaustion.
 

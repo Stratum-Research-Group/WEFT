@@ -1,6 +1,7 @@
 # Paper 25: Streaming Sharded Sub-Bit Quantization of 70B+ Foundation Models via Polar Joint-ITQ Factorization
 
-**WEFT Core Research Group** • November 2026
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 ## Abstract
 Quantizing ultra-large foundation models (70B+ parameters) is severely constrained by local host memory and disk capacity boundaries. Standard post-training quantization schemes require staging complete uncompressed FP16/BF16 checkpoints (140–150 GB), demanding massive host RAM and excessive high-bandwidth storage. In this work, we present the **Streaming Sharded Sub-Bit Quantization Pipeline**, a bounded-resource framework that streams remote model shards on-the-fly, executes alternating Polar Iterative Quantization (Joint-ITQ) and dual-path low-rank decomposition into packed bipolar bitboards ($\le 0.052$ bits per weight), and immediately purges raw weight staging buffers. We validate this architecture on the frontier **Qwen-2.5-72B-Instruct** (145.4 GB nominal) and **Gemma-4-26B-A4B-it** (51.6 GB nominal). On Qwen-2.5-72B, our pipeline achieves an empirical compression ratio of **$757.3\times$** ($3,762.35$ MB uncompressed $\to 4.97$ MB `.weft` container), delivering an effective mean bitrate of $0.0521$ BPW with strictly bounded $O(1)$ disk overhead.

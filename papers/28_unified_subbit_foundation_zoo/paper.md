@@ -1,6 +1,7 @@
 # The Unified Sub-Bit Foundation Model Zoo: Cross-Architecture Empirical Scaling and Lean 4 Invariant Verification Across 70B+ LLMs
 
-**Stratum Research Group**  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*  
 *Google DeepMind & WEFT Research Initiative*  
 `research@weft.ai`
 

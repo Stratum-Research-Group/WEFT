@@ -48,7 +48,7 @@ Benchmark on AMD Ryzen 5 7600X (Zen 4) for Mistral-Small-24B MLP layer ($14336 \
 | **AVX-512 GEMV (Batch 1)** | $2141.96\text{ }\mu\text{s}$ | $2141.96\text{ }\mu\text{s}$ | $54.83\text{ GFLOPs/s}$ |
 | **AVX-512 S-GEMM (Batch 4)** | **$119.71\text{ }\mu\text{s}$** | **$29.93\text{ }\mu\text{s}$** | **$3924.22\text{ GFLOPs/s}$ ($3.92\text{ TFLOPs/s}$)** |
 
-The register-reused S-GEMM kernel achieves an unprecedented **$122.0\times$ speedup** over PyTorch FP32, unlocking sub-millisecond speculative verification for 24B–70B foundation models on consumer edge hardware.
+The register-reused S-GEMM kernel achieves an high **$122.0\times$ speedup** over PyTorch FP32, unlocking sub-millisecond speculative verification for 24B–70B foundation models on consumer edge hardware.
 
 ---
 

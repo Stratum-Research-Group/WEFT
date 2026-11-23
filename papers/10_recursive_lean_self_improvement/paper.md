@@ -1,6 +1,7 @@
 # Paper 10: Recursive Self-Improvement via Kernel-Checked Proofs: Automated Lean 4 Synthesis with SULA Linear Attention
 
-**Stratum Research Group • November 2026**
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • research@stratum.org*
 
 - **PDF Format:** [paper.pdf](file:///home/akarta/Projects/0.WiP/Weft/papers/10_recursive_lean_self_improvement/paper.pdf)
 - **LaTeX Source:** [paper.tex](file:///home/akarta/Projects/0.WiP/Weft/papers/10_recursive_lean_self_improvement/paper.tex)

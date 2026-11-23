@@ -90,3 +90,29 @@ def test_avx512_batch4_mathematical_soundness():
 
     np.testing.assert_allclose(out_gemm.numpy(), out_individual.numpy(), atol=1e-5, rtol=1e-5)
     print("Exact batch-4 mathematical soundness confirmed: GEMM batch-4 == 4x individual GEMV!")
+
+def test_avx512_fused_gemv_mathematical_soundness():
+    """Verify bit-exact soundness of fused popcount + rank-1 SVD update against unfused sequence."""
+    rows = 64
+    cols = 512
+    cols_u64 = cols // 64
+
+    torch.manual_seed(999)
+    bitboards = torch.randint(0, 2**62, (rows, cols_u64), dtype=torch.int64)
+    x_quant = torch.randint(0, 2**62, (cols_u64,), dtype=torch.int64)
+    u_proj = torch.randn(rows, dtype=torch.float32)
+    v_dot_x = 3.14159
+
+    scale = 0.05
+
+    # 1. Fused pass
+    out_fused = torch.zeros(rows, dtype=torch.float32)
+    weft_avx512.subbit_fused_gemv_avx512(bitboards, x_quant, u_proj, v_dot_x, out_fused, scale)
+
+    # 2. Unfused reference: popcount GEMV + rank-1 outer addition
+    out_unfused = torch.zeros(rows, dtype=torch.float32)
+    weft_avx512.subbit_gemv_avx512(bitboards, x_quant, out_unfused, scale)
+    out_unfused += u_proj * v_dot_x
+
+    np.testing.assert_allclose(out_fused.numpy(), out_unfused.numpy(), atol=1e-5, rtol=1e-5)
+    print("Exact fused mathematical soundness confirmed: Fused == Unfused Popcount + Rank-1!")

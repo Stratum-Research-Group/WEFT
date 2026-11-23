@@ -109,3 +109,47 @@ def benchmark_batch4_gemm():
 
 if __name__ == "__main__":
     benchmark_batch4_gemm()
+
+def benchmark_fused_gemv():
+    print("\n" + "=" * 80)
+    print("  FUSED AVX-512 VPOPCNTDQ + RANK-1 SVD LOW-RANK CORRECTION BENCHMARK")
+    print("=" * 80)
+
+    rows, cols = 8192, 8192
+    cols_u64 = cols // 64
+
+    bitboards = torch.randint(0, 2**62, (rows, cols_u64), dtype=torch.int64)
+    x_quant = torch.randint(0, 2**62, (cols_u64,), dtype=torch.int64)
+    u_proj = torch.randn(rows, dtype=torch.float32)
+    v_dot_x = 1.61803
+
+    out_fused = torch.zeros(rows, dtype=torch.float32)
+    out_unfused = torch.zeros(rows, dtype=torch.float32)
+
+    # Warmup
+    for _ in range(5):
+        weft_avx512.subbit_fused_gemv_avx512(bitboards, x_quant, u_proj, v_dot_x, out_fused, 0.05)
+        weft_avx512.subbit_gemv_avx512(bitboards, x_quant, out_unfused, 0.05)
+        out_unfused += u_proj * v_dot_x
+
+    iters = 20
+    # 1. Benchmark Unfused
+    t0 = time.perf_counter()
+    for _ in range(iters):
+        weft_avx512.subbit_gemv_avx512(bitboards, x_quant, out_unfused, 0.05)
+        out_unfused += u_proj * v_dot_x
+    t_unfused = (time.perf_counter() - t0) / iters
+
+    # 2. Benchmark Fused
+    t0 = time.perf_counter()
+    for _ in range(iters):
+        weft_avx512.subbit_fused_gemv_avx512(bitboards, x_quant, u_proj, v_dot_x, out_fused, 0.05)
+    t_fused = (time.perf_counter() - t0) / iters
+
+    print(f"Matrix: Llama-3.3-70B Attention Projection ({rows}x{cols})")
+    print(f"  Unfused Latency (GEMV + Add) : {t_unfused * 1e6:8.2f} µs")
+    print(f"  Fused Latency (Single Pass)  : {t_fused * 1e6:8.2f} µs")
+    print(f"  Fused Speedup Factor         : {t_unfused / t_fused:8.2f}x (Zero intermediate memory traffic)")
+
+if __name__ == "__main__":
+    benchmark_fused_gemv()

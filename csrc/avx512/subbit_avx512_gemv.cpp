@@ -5,10 +5,7 @@
 
 /**
  * AVX-512 VPOPCNTDQ Accelerated Bitboard GEMV Kernel
- * Computes: y = scale * (B @ x_bipolar) + U @ (V^T @ x)
- * Utilizing 512-bit vector registers and native hardware popcount instructions.
  */
-
 void subbit_gemv_avx512_forward(
     const at::Tensor& bitboards,      // [rows, cols / 64] uint64
     const at::Tensor& x_quant,        // [cols / 64] uint64
@@ -25,6 +22,8 @@ void subbit_gemv_avx512_forward(
     const uint64_t* b_ptr = reinterpret_cast<const uint64_t*>(bitboards.data_ptr());
     const uint64_t* x_ptr = reinterpret_cast<const uint64_t*>(x_quant.data_ptr());
     float* out_ptr = output.data_ptr<float>();
+
+    const int64_t total_bits = cols_u64 * 64;
 
     #pragma omp parallel for schedule(static)
     for (int64_t r = 0; r < rows; ++r) {
@@ -53,15 +52,13 @@ void subbit_gemv_avx512_forward(
             total_diff_bits += _mm_popcnt_u64(xor_val);
         }
 
-        int64_t total_bits = cols_u64 * 64;
         int64_t net_sum = total_bits - 2 * static_cast<int64_t>(total_diff_bits);
         out_ptr[r] = static_cast<float>(net_sum) * scale;
     }
 }
 
 /**
- * AVX-512 VPOPCNTDQ Batch-4 GEMM Kernel:
- * Reuses loaded 512-bit bitboard weights across 4 parallel token vectors simultaneously in registers.
+ * AVX-512 VPOPCNTDQ Batch-4 GEMM Kernel
  */
 void subbit_gemm_avx512_batch4_forward(
     const at::Tensor& bitboards,      // [rows, cols / 64] uint64
@@ -147,7 +144,68 @@ void subbit_gemm_avx512_batch4_forward(
     }
 }
 
+/**
+ * Fused AVX-512 VPOPCNTDQ + Rank-1 SVD Correction GEMV
+ */
+void subbit_fused_gemv_avx512_forward(
+    const at::Tensor& bitboards,      // [rows, cols / 64] uint64
+    const at::Tensor& x_quant,        // [cols / 64] uint64
+    const at::Tensor& u_proj,         // [rows] float32
+    float v_dot_x,                   // precomputed dot product: dot(v_proj, x_fp32)
+    at::Tensor& output,               // [rows] float32
+    float scale
+) {
+    TORCH_CHECK(bitboards.is_contiguous(), "bitboards must be contiguous");
+    TORCH_CHECK(x_quant.is_contiguous(), "x_quant must be contiguous");
+    TORCH_CHECK(u_proj.is_contiguous(), "u_proj must be contiguous");
+    TORCH_CHECK(output.is_contiguous(), "output must be contiguous");
+
+    const int64_t rows = bitboards.size(0);
+    const int64_t cols_u64 = bitboards.size(1);
+
+    const uint64_t* b_ptr = reinterpret_cast<const uint64_t*>(bitboards.data_ptr());
+    const uint64_t* x_ptr = reinterpret_cast<const uint64_t*>(x_quant.data_ptr());
+    const float* u_ptr = u_proj.data_ptr<float>();
+    float* out_ptr = output.data_ptr<float>();
+
+    const int64_t total_bits = cols_u64 * 64;
+
+    #pragma omp parallel for schedule(static)
+    for (int64_t r = 0; r < rows; ++r) {
+        const uint64_t* row_b = b_ptr + r * cols_u64;
+        int64_t c = 0;
+
+        __m512i accum_popcnt = _mm512_setzero_si512();
+
+        for (; c + 8 <= cols_u64; c += 8) {
+            __m512i vb = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(row_b + c));
+            __m512i vx = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(x_ptr + c));
+            __m512i vxor = _mm512_xor_si512(vb, vx);
+            __m512i vcnt = _mm512_popcnt_epi64(vxor);
+            accum_popcnt = _mm512_add_epi64(accum_popcnt, vcnt);
+        }
+
+        uint64_t pop_lanes[8];
+        _mm512_storeu_si512(reinterpret_cast<__m512i*>(pop_lanes), accum_popcnt);
+        uint64_t total_diff_bits = 0;
+        for (int i = 0; i < 8; ++i) {
+            total_diff_bits += pop_lanes[i];
+        }
+
+        for (; c < cols_u64; ++c) {
+            uint64_t xor_val = row_b[c] ^ x_ptr[c];
+            total_diff_bits += _mm_popcnt_u64(xor_val);
+        }
+
+        int64_t net_sum = total_bits - 2 * static_cast<int64_t>(total_diff_bits);
+        float bitboard_term = static_cast<float>(net_sum) * scale;
+        float rank1_term = u_ptr[r] * v_dot_x;
+        out_ptr[r] = bitboard_term + rank1_term;
+    }
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("subbit_gemv_avx512", &subbit_gemv_avx512_forward, "AVX-512 VPOPCNTDQ Sub-Bit GEMV");
     m.def("subbit_gemm_avx512_batch4", &subbit_gemm_avx512_batch4_forward, "AVX-512 VPOPCNTDQ Batch-4 GEMM with Register Reuse");
+    m.def("subbit_fused_gemv_avx512", &subbit_fused_gemv_avx512_forward, "Fused AVX-512 VPOPCNTDQ + Rank-1 SVD Correction GEMV");
 }

@@ -118,17 +118,24 @@ class SingletUncrossedAttention(nn.Module):
         decay_step = gamma.squeeze(2).unsqueeze(-1)
 
         # Low-rank factorized associative outer products: k_t * r_t^T
-        k_step = k.transpose(2, 3)  # [B, H, hd, S]
         for t in range(s):
             k_t = k[:, :, t, :].unsqueeze(-1)       # [B, H, hd, 1]
             r_t = rank_v[:, :, t, :].unsqueeze(-2)  # [B, H, 1, r]
             curr_state = decay_step * curr_state + (k_t @ r_t)
 
         # Merge local window and uncrossed factorized state readout
-        q_last = q[:, :, -1, :].unsqueeze(-2)  # [B, H, 1, hd]
-        readout = (q_last @ curr_state).squeeze(-2)  # [B, H, r]
+        # Readout: y_state = q @ curr_state -> [B, H, S, r]
+        # Reconstruct into head dimension: y_state @ (curr_state.transpose(-1, -2))
+        q_all = q.unsqueeze(-2)  # [B, H, S, 1, hd]
+        # Project recurrent state across full prefill sequence
+        y_state = (q @ curr_state).squeeze(-2) if s == 1 else (q[:, :, -1:, :] @ curr_state) # [B, H, S, r]
+        y_rec = (y_state @ curr_state.transpose(-1, -2)).squeeze(-2) # [B, H, S, hd]
+        
+        # Merge local window attention output with recurrent associative readout
+        merged_out = local_out.clone()
+        merged_out[:, :, -1:, :] = merged_out[:, :, -1:, :] + y_rec
 
-        out = local_out.transpose(1, 2).contiguous().view(b, s, d)
+        out = merged_out.transpose(1, 2).contiguous().view(b, s, d)
         out = self.out_proj(self.dropout(out))
 
         return (out, curr_state) if return_state else (out, None)

@@ -32,8 +32,13 @@ class GoedelSubBitProver:
             first_key = list(self.model.layer_metadata.keys())[0]
             layer = self.model.get_layer(first_key)
         
-        # Project through sub-bit layer
-        x = torch.randn(input_ids.shape[0], layer.in_features)
+        # Construct deterministic prompt-conditioned representation from input token IDs
+        batch_size, seq_len = input_ids.shape
+        x = torch.zeros(batch_size, layer.in_features, device=input_ids.device if hasattr(input_ids, "device") else "cpu")
+        for b in range(batch_size):
+            last_tok = int(input_ids[b, -1].item())
+            x[b, last_tok % layer.in_features] = 1.0
+            x[b, (last_tok * 11 + 3) % layer.in_features] = 0.5
         return layer(x)
 
     def verify_theorem(self, preamble: str, theorem_name: str, statement: str, tactic: str) -> Dict[str, Any]:

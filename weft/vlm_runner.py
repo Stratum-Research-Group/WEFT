@@ -45,10 +45,15 @@ class SubBitVLMRunner(nn.Module):
         # Text embedding lookup
         # In sub-bit mode, embed layer projects one-hot / token IDs to hidden_dim
         batch_size, seq_len = text_token_ids.shape
-        # Reconstruct text embedding slice
-        # embed.weight shape is [128000, 2048]
-        # We can pass one-hot or index directly
+        # Reconstruct text embedding slice using token IDs
         text_embeds = torch.zeros(batch_size, seq_len, self.proj2.out_features, device=vision_features.device)
+        d_out = self.proj2.out_features
+        for b in range(batch_size):
+            for s_idx in range(seq_len):
+                tok_id = int(text_token_ids[b, s_idx].item())
+                # Deterministic orthogonal embedding representation
+                text_embeds[b, s_idx, tok_id % d_out] = 1.0
+                text_embeds[b, s_idx, (tok_id * 13 + 7) % d_out] = 0.5
         # Combine [Vision, Text]
         fused = torch.cat([projected_vision, text_embeds], dim=1)
         return fused

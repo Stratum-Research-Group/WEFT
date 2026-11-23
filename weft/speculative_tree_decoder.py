@@ -106,23 +106,52 @@ class SpeculativeTreeDecoder(nn.Module):
         self,
         target_logits: torch.Tensor,
         nodes: List[SpeculativeTreeNode],
+        acceptance_threshold: float = 0.85
     ) -> List[int]:
         """
-        Selects the best accepted path from root to leaf matching target teacher logits.
+        Evaluates candidate tokens against target teacher logits across tree nodes.
+        Selects the longest valid candidate trajectory where target model agrees with draft tokens.
         """
         best_path: List[int] = []
         
-        # Traverse tree and greedy search for highest agreement chain
-        # Find path from depth 1 downward
-        for depth_1_idx, node in enumerate(nodes):
-            if node.depth == 1:
-                path = [node.token_id]
-                curr_node = node
-                while curr_node.children:
-                    next_child_idx = curr_node.children[0]
-                    curr_node = nodes[next_child_idx]
-                    path.append(curr_node.token_id)
-                if len(path) > len(best_path):
-                    best_path = path
+        # target_logits: [1, num_nodes, vocab_size]
+        if target_logits.ndim == 3:
+            target_probs = torch.softmax(target_logits[0], dim=-1)
+        else:
+            target_probs = torch.softmax(target_logits, dim=-1)
+
+        # Greedily search child paths starting from root's direct children (depth 1)
+        depth_1_nodes = [idx for idx, n in enumerate(nodes) if n.depth == 1]
+        
+        for root_child_idx in depth_1_nodes:
+            curr_idx = root_child_idx
+            path = []
+            
+            while curr_idx is not None:
+                curr_node = nodes[curr_idx]
+                tok = curr_node.token_id
+                
+                # Check target model probability at this token node
+                tok_prob = float(target_probs[curr_idx, tok].item())
+                top_tok = int(torch.argmax(target_probs[curr_idx]).item())
+                
+                # Accept if exact match or above acceptance threshold
+                if tok == top_tok or tok_prob >= acceptance_threshold:
+                    path.append(tok)
+                    # Find best valid child
+                    best_child = None
+                    best_child_prob = -1.0
+                    for c_idx in curr_node.children:
+                        c_tok = nodes[c_idx].token_id
+                        c_prob = float(target_probs[c_idx, c_tok].item())
+                        if c_prob > best_child_prob:
+                            best_child_prob = c_prob
+                            best_child = c_idx
+                    curr_idx = best_child if best_child_prob >= (acceptance_threshold * 0.5) else None
+                else:
+                    break
+                    
+            if len(path) > len(best_path):
+                best_path = path
 
         return best_path

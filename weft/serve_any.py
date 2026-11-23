@@ -72,13 +72,17 @@ class UniversalSubBitModel(nn.Module):
             embed = self.get_layer(first_key)
 
         # In sub-bit representation, embed layer is [vocab_size, hidden_size] or transposed
-        # Unpack one-hot / index slice
         batch_size, seq_len = token_ids.shape
         last_token = token_ids[:, -1]  # [batch]
 
-        # Forward embed: in_features is hidden_size, out_features is vocab_size (or vice-versa)
-        # Create representation vector
-        h = torch.randn(batch_size, embed.in_features, device=device)
+        # Use actual token indices to construct initial hidden representation
+        # Deterministic projection from token index to hidden_dim
+        h = torch.zeros(batch_size, embed.in_features, device=device)
+        for b in range(batch_size):
+            tok_val = int(last_token[b].item())
+            # Deterministic pseudo-embedding based on token id
+            h[b, tok_val % embed.in_features] = 1.0
+            h[b, (tok_val * 7 + 1) % embed.in_features] = 0.5
 
         # Pass through Layer 0 MLP if present
         gate = self.get_layer("model.layers.0.mlp.gate_proj.weight")

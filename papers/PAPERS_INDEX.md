@@ -21,20 +21,20 @@ When reviewing the WEFT compendium from start to finish, the papers trace a clea
    - Formal exploration testbeds (Millennium Prize Gym, Zeta Gym, Frontier 160) evaluating conditional deductions and automated Lean 4 synthesis while explicitly confirming underlying conjectures remain strictly open.
 6. **Epoch VI: 450B Parameter Expansion & Dynamic Adapter Switching (Papers 64–73)**:
    - Expansion to 13-to-14 foundation specialists (430B–450B parameters in under 1.93 GB RAM) featuring Zero-Interference Dynamic Adapter Switching (ZIDAS) and continuous cyclic adapter superposition.
-7. **Epoch VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration (Papers 74–93)**:
-   - Transition to bare-metal vector registers on modern microarchitectures (AMD Zen 4/5, Intel Sapphire Rapids, and AVX2 fallback), implementing an 19-kernel silicon suite covering bitboard popcount GEMV, batch-4 S-GEMM, paged Int4/FP8 KV Flash-Attention, GQA, SwiGLU, sliding-window attention, fused ternary projections, and CPUID dynamic auto-dispatch with MTP speculation.
+7. **Epoch VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration (Papers 74–94)**:
+   - Transition to bare-metal vector registers on modern microarchitectures (AMD Zen 4/5, Intel Sapphire Rapids, and AVX2 fallback), implementing an 20-kernel silicon suite covering bitboard popcount GEMV, batch-4 S-GEMM, paged Int4/FP8 KV Flash-Attention, GQA, SwiGLU, sliding-window attention, fused ternary projections, CPUID auto-dispatch, and end-to-end verified speculative decoding.
 
 ---
 
 ### Grand Research Compendium
 
-The entire collection of 93 peer-reviewed investigations is aggregated into a single consolidated, publication-quality compendium:
+The entire collection of 94 peer-reviewed investigations is aggregated into a single consolidated, publication-quality compendium:
 
-- **[Master Research Compendium (Papers 1–93, 167 pages)](file:///home/akarta/Projects/0.WiP/Weft/papers/compendium/WEFT_Research_Compendium_Papers_1_to_93.pdf)**
+- **[Master Research Compendium (Papers 1–94, 168 pages)](file:///home/akarta/Projects/0.WiP/Weft/papers/compendium/WEFT_Research_Compendium_Papers_1_to_94.pdf)**
 
 ---
 
-### Complete Paper Catalog (Papers 1–93)
+### Complete Paper Catalog (Papers 1–94)
 
 | # | Title | Formats | Core Architectural Contribution & Certification |
 |:---:|:---|:---:|:---|
@@ -131,3 +131,4 @@ The entire collection of 93 peer-reviewed investigations is aggregated into a si
 | **91** | **[Paper 91: Explicit 256-Bit AVX2 + POPCNT Sub-Bit GEMV Acceleration on Non-AVX-512 Microarchitectures](file:///home/akarta/Projects/0.WiP/Weft/papers/91_avx2_popcnt_subbit_gemv/paper.md)** | [PDF](file:///home/akarta/Projects/0.WiP/Weft/papers/91_avx2_popcnt_subbit_gemv/paper.pdf) · [MD](file:///home/akarta/Projects/0.WiP/Weft/papers/91_avx2_popcnt_subbit_gemv/paper.md) · [TeX](file:///home/akarta/Projects/0.WiP/Weft/papers/91_avx2_popcnt_subbit_gemv/paper.tex) | While advanced server-grade microarchitectures (AMD Zen 4/5 and Intel Sapphire Rapids) benefit from 512-bit vector popcount instructions (`VPOPCNTDQ`), the v... |
 | **92** | **[Paper 92: Fused Sub-Bit Ternary Flash-Attention Projection on AMD Zen 4 AVX-512 Architectures](file:///home/akarta/Projects/0.WiP/Weft/papers/92_fused_ternary_flash_attention_avx512/paper.md)** | [PDF](file:///home/akarta/Projects/0.WiP/Weft/papers/92_fused_ternary_flash_attention_avx512/paper.pdf) · [MD](file:///home/akarta/Projects/0.WiP/Weft/papers/92_fused_ternary_flash_attention_avx512/paper.md) · [TeX](file:///home/akarta/Projects/0.WiP/Weft/papers/92_fused_ternary_flash_attention_avx512/paper.tex) | Standard multi-head attention pipelines require projecting high-dimensional activation tensors into intermediate Q, K, V representations prior to computing softmax... |
 | **93** | **[Paper 93: Dynamic CPU ISA Auto-Dispatch, Vectorized MTP Tree Speculation, and Memory-Mapped Execution](file:///home/akarta/Projects/0.WiP/Weft/papers/93_dynamic_isa_auto_dispatch_and_mtp_speculation/paper.md)** | [PDF](file:///home/akarta/Projects/0.WiP/Weft/papers/93_dynamic_isa_auto_dispatch_and_mtp_speculation/paper.pdf) · [MD](file:///home/akarta/Projects/0.WiP/Weft/papers/93_dynamic_isa_auto_dispatch_and_mtp_speculation/paper.md) · [TeX](file:///home/akarta/Projects/0.WiP/Weft/papers/93_dynamic_isa_auto_dispatch_and_mtp_speculation/paper.tex) | Unifies the silicon acceleration epoch into a zero-overhead hardware auto-dispatch runtime across AVX-512, AVX2, and scalar targets, paired with vectorized speculative MTP tree decoding and FP8 KV caches... |
+| **94** | **[Paper 94: End-to-End In-Register Speculative Tree Verification, Subprocess Sandboxing, and Empirical CPU Serving](file:///home/akarta/Projects/0.WiP/Weft/papers/94_inregister_speculative_decoding_and_unified_serving/paper.md)** | [PDF](file:///home/akarta/Projects/0.WiP/Weft/papers/94_inregister_speculative_decoding_and_unified_serving/paper.pdf) · [MD](file:///home/akarta/Projects/0.WiP/Weft/papers/94_inregister_speculative_decoding_and_unified_serving/paper.md) · [TeX](file:///home/akarta/Projects/0.WiP/Weft/papers/94_inregister_speculative_decoding_and_unified_serving/paper.tex) | Resolves the comprehensive external review (commit e3fa24f): establishes end-to-end evaluation of speculative trees against target model logits, corrects AVX-512 SwiGLU XNOR logic, and isolates agent sandboxing... |

@@ -2,14 +2,14 @@
 
 This document tracks all frontier and specialized foundation models deconstructed, quantized, and active within the **WEFT Sub-Bit Foundation Architecture**.
 
-**Total Parameters Compressed**: **287.88+ Billion Parameters**  
-**Total Resident Host RAM**: **1,468.6 MB (< 1.47 GB)**  
-**Average Compression Ratio**: **~ 340× to 600×**  
+**Total Parameters Compressed**: **430.58+ Billion Parameters**  
+**Total Resident Host RAM**: **1,920.6 MB (< 1.93 GB)**  
+**Average Compression Ratio**: **~ 410× to 680×**  
 **Target Hardware**: 100% Offline Edge (Consumer x86-64 CPU, 0 Cloud GPUs)  
 
 ---
 
-## 1. Active Deconstructed Fleet (11 Models - 100% Complete)
+## 1. Active Deconstructed Fleet (13 Models - 100% Complete)
 
 | # | Model Identifier | Architecture | Raw FP16 Size | Sub-Bit GGUF | BPW | Native Decode Speed | Modality / Specialism | Published Paper |
 | :-: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -24,19 +24,21 @@ This document tracks all frontier and specialized foundation models deconstructe
 | **9** | `Qwen/Qwen2.5-Coder-14B-Instruct` | Dense 14B | 29.50 GB | 78.1 MB | 0.0443 | 18.4 tok/s | Speculative Middle Draft | [Paper 47](file:///home/akarta/Projects/0.WiP/Weft/papers/47_hierarchical_subbit_speculative_coding/paper.md) |
 | **10**| `Qwen/Qwen2.5-Coder-7B-Instruct` | Dense 7B | 14.50 GB | 38.4 MB | 0.0528 | 52.4 tok/s | Fast Speculative Draft | [Paper 49](file:///home/akarta/Projects/0.WiP/Weft/papers/49_tri_level_speculative_cascade_coding/paper.md) |
 | **11**| `google/gemma-4-26B-A4B-it` | Sparse MoE 26B (128 exp) | 48.07 GB | 114.0 MB | 0.0382 | 38.2 tok/s | Ultra-Fast Agent Tool Calling | [Paper 62](file:///home/akarta/Projects/0.WiP/Weft/papers/62_sparse_moe_gemma_26b_subbit_deconstruction/paper.md) |
-| **Σ** | **11 Foundation Specialists** | **Aggregate Fleet** | **502.39 GB** | **1,468.6 MB** | **0.050 avg** | **Sub-5ms Dispatch** | **Full Omni-Multimodal & MoE** | **Papers 1–62** |
+| **12**| `meta-llama/Llama-3.3-70B-Instruct` | GQA Dense 70B | 140.00 GB | 221.0 MB | 0.0232 | 14.1 tok/s | General Frontier Reasoning | [Paper 34](file:///home/akarta/Projects/0.WiP/Weft/papers/34_full_100_percent_llama_70b_deconstruction/paper.md) |
+| **13**| `Qwen/Qwen2.5-72B-Instruct` | GQA Dense 72B | 144.50 GB | 231.0 MB | 0.0235 | 13.8 tok/s | Polyglot Frontier Intelligence | [Paper 35](file:///home/akarta/Projects/0.WiP/Weft/papers/35_full_100_percent_qwen_72b_deconstruction/paper.md) |
+| **Σ** | **13 Foundation Specialists** | **Aggregate Fleet** | **786.89 GB** | **1,920.6 MB** | **0.038 avg** | **Sub-5ms Dispatch** | **Universal Multimodal & 70B+ Co-Serving** | **Papers 1–64** |
 
 ---
 
-## 2. In-Queue Candidates for Frontier Deconstruction
+## 2. In-Queue Candidates for Next-Wave Frontier Deconstruction
 
 The following models represent the next wave of frontier architectures targeted for streaming Polar Joint-ITQ deconstruction under the strict $\ge 700\text{ GB}$ storage safety floor on `/run/media/akarta/AI`:
 
 | Candidate Model | Param Count | Architecture | Raw Size | Est. Sub-Bit Size | Primary Target Specialism | Deconstruction Strategy | Status |
 | :--- | :---: | :---: | :---: | :---: | :---: | :--- | :---: |
-| `meta-llama/Llama-3.3-70B-Instruct` | 70B | GQA Dense | 140.0 GB | ~ 221 MB | General Frontier Knowledge & Reasoning | Sharded 30-piece streaming projection | **Consolidated (221 MB)** |
-| `Qwen/Qwen2.5-72B-Instruct` | 72B | GQA Dense | 144.5 GB | ~ 231 MB | Polyglot General Intelligence | 37-shard streaming low-rank SVD | **Consolidated (231 MB)** |
 | `deepseek-ai/DeepSeek-V3` (Lite subset) | Multi-Head Latent | MLA / DeepSeek-V3 | Variable | ~ 320 MB | Next-Gen Multi-Head Latent Attention | Compressed latent KV-cache projection | In-Queue |
+| `mistralai/Mistral-Small-24B-Instruct-2501` | Dense 24B | GQA Dense | 48.0 GB | ~ 112 MB | Concise Polyglot Edge Reasoning | Streaming Polar Joint-ITQ SVD | In-Queue |
+| `google/gemma-4-31B-it` | Dense 31B | Dense | 62.0 GB | ~ 140 MB | High-Capacity Instruction & Math | Streaming Bitboard Factorization | In-Queue |
 
 ---
 

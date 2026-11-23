@@ -16,8 +16,9 @@
 #include <immintrin.h>
 #include <omp.h>
 #include "weft_adapter.h"
+#include "work_stealing_pool.h"
 
-// Zero-Dependency Native C++20 HTTP/SSE Streaming Server
+// Zero-Dependency Native C++20 HTTP/SSE Streaming Server with Work-Stealing Pool
 // Direct socket I/O serving OpenAI-compatible chat completions + Dynamic Micro-Adapter Hot-Swapping
 
 void run_subbit_gemv_avx512(
@@ -92,10 +93,12 @@ int main(int argc, char* argv[]) {
     const uint8_t* byte_ptr = static_cast<const uint8_t*>(mmapped_addr);
     const uint32_t* mmapped_weights = reinterpret_cast<const uint32_t*>(byte_ptr + 64);
 
+    // Multi-threaded work-stealing pool for concurrent request handling
+    weft::WorkStealingPool worker_pool(4);
+
     // Active in-memory micro-adapters map
     std::map<std::string, WeftAdapter> loaded_adapters;
     const int d_model = 2048;
-    // Default fallback adapter
     loaded_adapters["default"] = WeftAdapter::load_synthetic_specialist("default", d_model, d_model);
 
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -112,7 +115,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    listen(server_fd, 10);
+    listen(server_fd, 64);
     std::cout << "[SERVER] Native C++ Server listening on http://127.0.0.1:" << port << std::endl;
     std::cout << "[SERVER] Ready for OpenAI-compatible /v1/chat/completions requests" << std::endl;
 
@@ -128,6 +131,7 @@ int main(int argc, char* argv[]) {
             std::string body = "{\"status\":\"healthy\",\"server\":\"weft-native-cpp\",\"avx512\":true,\"loaded_adapters\":" + std::to_string(loaded_adapters.size()) + "}\n";
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         } else if (request.find("GET /v1/adapters") != std::string::npos) {
             std::string body = "{\"object\":\"list\",\"data\":[";
             bool first = true;
@@ -139,8 +143,8 @@ int main(int argc, char* argv[]) {
             body += "]}\n";
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         } else if (request.find("POST /v1/adapters/load") != std::string::npos) {
-            // Hot-load adapter payload parsing
             std::string id = "micro-adapter-hot";
             size_t id_pos = request.find("\"id\": \"");
             if (id_pos != std::string::npos) {
@@ -152,10 +156,10 @@ int main(int argc, char* argv[]) {
             std::string body = "{\"status\":\"loaded\",\"id\":\"" + id + "\"}\n";
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         } else if (request.find("POST /v1/chat/completions") != std::string::npos || request.find("POST /v1/completions") != std::string::npos) {
             bool is_stream = (request.find("\"stream\": true") != std::string::npos || request.find("\"stream\":true") != std::string::npos);
 
-            // Check for adapter routing header
             std::string adapter_id = "default";
             size_t hdr_pos = request.find("X-Weft-Adapter: ");
             if (hdr_pos != std::string::npos) {
@@ -163,40 +167,42 @@ int main(int argc, char* argv[]) {
                 adapter_id = request.substr(hdr_pos + 16, hdr_end - (hdr_pos + 16));
             }
 
-            // Execute forward pass token step with dynamic adapter
-            const int words = d_model / 32;
-            std::vector<uint32_t> X_packed(words, 0x55555555);
-            std::vector<float> In_norm(d_model, 0.5f);
-            std::vector<float> Out(d_model, 0.0f);
+            // Execute forward pass asynchronously via work-stealing thread pool
+            worker_pool.enqueue([client_socket, mmapped_weights, is_stream, adapter_id, d_model, &loaded_adapters]() {
+                const int words = d_model / 32;
+                std::vector<uint32_t> X_packed(words, 0x55555555);
+                std::vector<float> In_norm(d_model, 0.5f);
+                std::vector<float> Out(d_model, 0.0f);
 
-            run_subbit_gemv_avx512(mmapped_weights, X_packed.data(), Out.data(), d_model, words, 0.01f);
-            if (loaded_adapters.count(adapter_id)) {
-                loaded_adapters[adapter_id].apply_adapter(Out.data(), In_norm.data());
-            }
-
-            if (is_stream) {
-                std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-cache\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
-                send(client_socket, header.c_str(), header.size(), 0);
-
-                std::vector<std::string> words_stream = {" The", " native", " C++", " WEFT", " server", " streams", " tokens", " directly", " via", " AVX-512", " bitboards."};
-                for (size_t i = 0; i < words_stream.size(); ++i) {
-                    std::string chunk = "data: {\"id\":\"chatcmpl-cpp\",\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"" + words_stream[i] + "\"},\"finish_reason\":null}]}\n\n";
-                    send(client_socket, chunk.c_str(), chunk.size(), 0);
-                    usleep(10000); // 10 ms stream pacing
+                run_subbit_gemv_avx512(mmapped_weights, X_packed.data(), Out.data(), d_model, words, 0.01f);
+                if (loaded_adapters.count(adapter_id)) {
+                    loaded_adapters[adapter_id].apply_adapter(Out.data(), In_norm.data());
                 }
-                std::string done = "data: [DONE]\n\n";
-                send(client_socket, done.c_str(), done.size(), 0);
-            } else {
-                std::string body = "{\"id\":\"chatcmpl-cpp\",\"object\":\"chat.completion\",\"model\":\"weft-subbit\",\"adapter\":\"" + adapter_id + "\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The native C++ WEFT server streams tokens directly via AVX-512 bitboards.\"},\"finish_reason\":\"stop\"}]}\n";
-                std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
-                send(client_socket, resp.c_str(), resp.size(), 0);
-            }
+
+                if (is_stream) {
+                    std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-cache\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
+                    send(client_socket, header.c_str(), header.size(), 0);
+
+                    std::vector<std::string> words_stream = {" The", " native", " C++", " WEFT", " server", " streams", " tokens", " directly", " via", " AVX-512", " bitboards."};
+                    for (size_t i = 0; i < words_stream.size(); ++i) {
+                        std::string chunk = "data: {\"id\":\"chatcmpl-cpp\",\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"" + words_stream[i] + "\"},\"finish_reason\":null}]}\n\n";
+                        send(client_socket, chunk.c_str(), chunk.size(), 0);
+                        usleep(10000);
+                    }
+                    std::string done = "data: [DONE]\n\n";
+                    send(client_socket, done.c_str(), done.size(), 0);
+                } else {
+                    std::string body = "{\"id\":\"chatcmpl-cpp\",\"object\":\"chat.completion\",\"model\":\"weft-subbit\",\"adapter\":\"" + adapter_id + "\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The native C++ WEFT server streams tokens directly via AVX-512 bitboards.\"},\"finish_reason\":\"stop\"}]}\n";
+                    std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+                    send(client_socket, resp.c_str(), resp.size(), 0);
+                }
+                close(client_socket);
+            });
         } else {
             std::string resp = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
             send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         }
-
-        close(client_socket);
     }
 
     munmap(mmapped_addr, file_size);

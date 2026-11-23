@@ -76,3 +76,36 @@ def benchmark_avx512_throughput():
 
 if __name__ == "__main__":
     benchmark_avx512_throughput()
+
+def benchmark_batch4_gemm():
+    print("\n" + "=" * 80)
+    print("  BATCH-4 MULTI-TOKEN REGISTER REUSE BENCHMARK")
+    print("=" * 80)
+
+    rows, cols = 14336, 4096
+    cols_u64 = cols // 64
+
+    bitboards = torch.randint(0, 2**62, (rows, cols_u64), dtype=torch.int64)
+    x_batch = torch.randint(0, 2**62, (4, cols_u64), dtype=torch.int64)
+    out_batch = torch.zeros(4, rows, dtype=torch.float32)
+
+    # Warmup
+    for _ in range(5):
+        weft_avx512.subbit_gemm_avx512_batch4(bitboards, x_batch, out_batch, 0.05)
+
+    iters = 20
+    t0 = time.perf_counter()
+    for _ in range(iters):
+        weft_avx512.subbit_gemm_avx512_batch4(bitboards, x_batch, out_batch, 0.05)
+    t_batch = (time.perf_counter() - t0) / iters
+
+    total_tokens = 4
+    total_ops = 2.0 * rows * cols * total_tokens
+    effective_gflops = (total_ops / t_batch) / 1e9
+
+    print(f"Matrix: Mistral-Small-24B MLP ({rows}x{cols}) | Batch: 4 Tokens")
+    print(f"  Batch-4 Execution Time : {t_batch * 1e6:8.2f} µs ({t_batch * 1e6 / 4:8.2f} µs/token)")
+    print(f"  Effective Throughput   : {effective_gflops:8.2f} GFLOPs/s equivalent")
+
+if __name__ == "__main__":
+    benchmark_batch4_gemm()

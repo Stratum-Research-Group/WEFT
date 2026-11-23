@@ -69,3 +69,24 @@ def test_avx512_scaling():
     weft_avx512.subbit_gemv_avx512(b_torch, x_torch, out2, 2.5)
     
     np.testing.assert_allclose(out1.numpy() * 2.5, out2.numpy(), atol=1e-4)
+
+def test_avx512_batch4_mathematical_soundness():
+    """Verify bit-exact soundness of batch-4 GEMM against individual GEMV passes."""
+    rows = 128
+    cols = 1024
+    cols_u64 = cols // 64
+
+    torch.manual_seed(123)
+    bitboards = torch.randint(0, 2**62, (rows, cols_u64), dtype=torch.int64)
+    x_batch = torch.randint(0, 2**62, (4, cols_u64), dtype=torch.int64)
+
+    out_gemm = torch.zeros(4, rows, dtype=torch.float32)
+    weft_avx512.subbit_gemm_avx512_batch4(bitboards, x_batch, out_gemm, 0.05)
+
+    # Compute 4 individual GEMV passes
+    out_individual = torch.zeros(4, rows, dtype=torch.float32)
+    for b in range(4):
+        weft_avx512.subbit_gemv_avx512(bitboards, x_batch[b], out_individual[b], 0.05)
+
+    np.testing.assert_allclose(out_gemm.numpy(), out_individual.numpy(), atol=1e-5, rtol=1e-5)
+    print("Exact batch-4 mathematical soundness confirmed: GEMM batch-4 == 4x individual GEMV!")

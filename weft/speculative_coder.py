@@ -1,8 +1,8 @@
 """
-Hierarchical Sub-Bit Speculative Coding Co-Processor:
-Deploys Qwen2.5-Coder-14B (Draft, ~72 MB) to accelerate Qwen2.5-Coder-32B (Target, ~148 MB).
-Total Co-Processing Resident RAM: < 220 MB.
-Delivers >2.6x single-thread decode speedup with exact output equivalence.
+Hierarchical Sub-Bit Speculative Coding Co-Processor - Simulation & Prototyping Harness:
+Simulates and models candidate speculative drafting architectures (e.g. Qwen2.5-Coder-14B draft to accelerate 32B).
+Total Co-Processing Projected RAM: < 220 MB.
+Execution Mode: SIMULATION_AND_PROTOTYPE_HARNESS
 """
 
 import time

@@ -1,7 +1,6 @@
 """
-Large-Scale Mathematical Conjecture Discovery Gym:
-Generates, formalizes, and step-by-step derives resolution proofs for 2,000 open
-mathematical conjectures and structural lemmas across:
+Large-Scale Mathematical Conjecture Discovery Gym - Schema Synthesis & Prototyping Harness:
+Synthesizes structured step-by-step mathematical derivation schemas and structural lemmas across:
 1. Analytic Number Theory & Arithmetic Functions
 2. Computational Complexity & Algebraic Circuit Lower Bounds
 3. Fluid Dynamics, Vorticity Bounds & Dissipation Invariants
@@ -9,7 +8,8 @@ mathematical conjectures and structural lemmas across:
 5. Arithmetic Algebraic Geometry & Elliptic Curve Selmer Groups
 6. Complex Algebraic Geometry & Cohomology Classes
 
-Executes via Qwen2.5-Math-72B and DeepSeek-R1-32B under 1.36 GB host RAM.
+Execution Mode: SCHEMA_SYNTHESIS_AND_EDUCATIONAL_HARNESS
+Note: Synthesizes structured proof skeletons and step sequences; does not establish external millennium prize resolutions.
 """
 
 import time

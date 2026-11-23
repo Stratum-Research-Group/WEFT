@@ -1,8 +1,8 @@
 """
-Cross-Model Speculative Verification Cascade (CMSV):
-Pairs fast sub-bit draft models (Qwen2.5-Coder-7B at 52.4 tok/s, Qwen2.5-Coder-14B at 18.4 tok/s)
-with frontier target foundation models (Llama-3.3-70B and Qwen2.5-72B at 14.1 tok/s)
-to achieve an empirical 2.5x to 3.5x decode speedup while preserving target model exact distribution.
+Cross-Model Speculative Verification Cascade (CMSV) - Analytical Simulator & Benchmark Harness:
+Provides theoretical speedup modeling, binomial acceptance simulation, and empirical performance projections
+for pairing fast sub-bit draft models (e.g. Qwen2.5-Coder-7B) with frontier target foundation models (e.g. Llama-3.3-70B).
+Execution Mode: SIMULATION_AND_THEORETICAL_HARNESS
 """
 
 import time

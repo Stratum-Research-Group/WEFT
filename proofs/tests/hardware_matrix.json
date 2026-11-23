@@ -1,0 +1,5 @@
+{
+  "gemv_time_us": 0.04,
+  "adapter_swap_us": 3.85,
+  "gpu_tree_us": 341.49
+}

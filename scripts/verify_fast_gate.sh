@@ -31,7 +31,7 @@ echo "[PASS] GGUF 32-byte alignment certified."
 
 # 5. Test Live Socket Server & SSE Streaming
 echo -e "\n[5/5] Testing Socket Server & REST Endpoints..."
-./build/weft-server 8089 /run/media/akarta/AI/models/gemma-4-E2B-it-subbit.weft &
+./build/weft-server /run/media/akarta/AI/models/gemma-4-E2B-it-subbit.weft 8089 &
 SERVER_PID=$!
 sleep 1
 HEALTH=$(curl -s http://127.0.0.1:8089/health)

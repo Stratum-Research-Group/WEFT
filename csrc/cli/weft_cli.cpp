@@ -11,9 +11,10 @@
 #include <unistd.h>
 #include <immintrin.h>
 #include <omp.h>
+#include "weft_adapter.h"
 
 // Full-Pipeline Multi-Core Native WEFT Inference Engine
-// Zero-Copy mmap + In-Register AVX-512 Bitboard GEMV + RMSNorm + SwiGLU + Residual Adds
+// Zero-Copy mmap + In-Register AVX-512 Bitboard GEMV + RMSNorm + Vector SwiGLU + Dynamic Rank-1 Micro-Adapters
 
 void run_subbit_gemv_avx512(
     const uint32_t* B_packed,
@@ -59,39 +60,54 @@ void rms_norm(float* out, const float* in, int dim, float eps = 1e-6f) {
     for (int i = 0; i < dim; ++i) {
         sum_sq += in[i] * in[i];
     }
-    float inv_rms = 1.0f / std::sqrt(sum_sq / dim + eps);
+    float scale = 1.0f / std::sqrt(sum_sq / (float)dim + eps);
     #pragma omp parallel for
     for (int i = 0; i < dim; ++i) {
-        out[i] = in[i] * inv_rms;
+        out[i] = in[i] * scale;
     }
 }
 
+inline float silu(float x) {
+    return x / (1.0f + std::exp(-x));
+}
+
+// Vectorized SwiGLU: out = silu(gate) * up
 void swiglu(float* out, const float* gate, const float* up, int dim) {
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < dim; ++i) {
-        float g = gate[i];
-        float silu = g / (1.0f + std::exp(-g));
-        out[i] = silu * up[i];
+        out[i] = silu(gate[i]) * up[i];
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
     std::cout << "=================================================================" << std::endl;
-    std::cout << "  WEFT Full Multi-Core OpenMP Native AVX-512 Inference Engine" << std::endl;
+    std::cout << "  WEFT Native Zero-Copy AVX-512 VPOPCNTDQ CLI Inference Engine" << std::endl;
     std::cout << "  Stratum Research Group • research@stratum.org" << std::endl;
     std::cout << "=================================================================" << std::endl;
 
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " <path_to_model.weft> [tokens_to_generate]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <model.weft> [num_tokens] [--adapter <adapter_file>]" << std::endl;
         return 1;
     }
 
-    std::string model_path = argv[1];
-    int num_tokens = (argc >= 3) ? std::stoi(argv[2]) : 32;
+    const char* model_path = argv[1];
+    int num_tokens = 20;
+    std::string adapter_path = "";
 
-    int fd = open(model_path.c_str(), O_RDONLY);
-    if (fd == -1) {
-        std::cerr << "Error: Unable to open model file: " << model_path << std::endl;
+    for (int i = 2; i < argc; ++i) {
+        if (std::string(argv[i]) == "--adapter" && i + 1 < argc) {
+            adapter_path = argv[++i];
+        } else if (argv[i][0] != '-') {
+            num_tokens = std::atoi(argv[i]);
+        }
+    }
+
+    std::cout << "[INFO] Loading model via mmap: " << model_path << std::endl;
+    auto t_load_start = std::chrono::high_resolution_clock::now();
+
+    int fd = open(model_path, O_RDONLY);
+    if (fd < 0) {
+        std::cerr << "Error: Cannot open model file: " << model_path << std::endl;
         return 1;
     }
 
@@ -106,6 +122,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    auto t_load_end = std::chrono::high_resolution_clock::now();
+    double load_latency_ms = std::chrono::duration<double, std::milli>(t_load_end - t_load_start).count();
+    std::cout << "[INFO] Zero-Copy mmap Attached in: " << load_latency_ms << " ms" << std::endl;
+
     char magic[9] = {0};
     std::memcpy(magic, mmapped_addr, 8);
     std::cout << "[INFO] Verified Magic Header: " << magic << std::endl;
@@ -117,6 +137,19 @@ int main(int argc, char** argv) {
     const int d_model = 2048;
     const int d_ffn = 8192;
     const int words = d_model / 32;
+
+    // Load Adapter if specified
+    bool adapter_active = false;
+    WeftAdapter adapter;
+    if (!adapter_path.empty()) {
+        auto t_adapt_start = std::chrono::high_resolution_clock::now();
+        adapter = WeftAdapter::load_from_file(adapter_path, d_model, d_model);
+        adapter_active = true;
+        auto t_adapt_end = std::chrono::high_resolution_clock::now();
+        double adapt_ms = std::chrono::duration<double, std::milli>(t_adapt_end - t_adapt_start).count();
+        std::cout << "[ADAPTER] Loaded Rank-1 Micro-Adapter: " << adapter_path 
+                  << " (" << adapt_ms << " ms, " << (adapter.u_rank1.size() * sizeof(float) / 1024.0) << " KB)" << std::endl;
+    }
 
     std::vector<float> X_norm(d_model, 0.0f);
     std::vector<float> Attn_out(d_model, 0.0f);
@@ -134,6 +167,9 @@ int main(int argc, char** argv) {
     for (int i = 0; i < 5; ++i) {
         rms_norm(X_norm.data(), Residual.data(), d_model);
         run_subbit_gemv_avx512(mmapped_weights, X_packed.data(), Attn_out.data(), d_model, words, 0.01f);
+        if (adapter_active) {
+            adapter.apply_adapter(Attn_out.data(), X_norm.data());
+        }
         for (int j = 0; j < d_model; ++j) Residual[j] += Attn_out[j];
     }
 
@@ -144,6 +180,11 @@ int main(int argc, char** argv) {
         
         // Step 2: Attention Projection (Bitboard GEMV)
         run_subbit_gemv_avx512(mmapped_weights, X_packed.data(), Attn_out.data(), d_model, words, 0.01f);
+        
+        // Dynamic Adapter rank-1 correction pass
+        if (adapter_active) {
+            adapter.apply_adapter(Attn_out.data(), X_norm.data());
+        }
         for (int j = 0; j < d_model; ++j) Residual[j] += Attn_out[j];
 
         // Step 3: Pre-FFN RMSNorm
@@ -156,6 +197,9 @@ int main(int argc, char** argv) {
         
         // Step 5: Down Projection & Residual Add
         run_subbit_gemv_avx512(mmapped_weights, X_packed.data(), FFN_down.data(), d_model, words, 0.01f);
+        if (adapter_active) {
+            adapter.apply_adapter(FFN_down.data(), FFN_mid.data());
+        }
         for (int j = 0; j < d_model; ++j) Residual[j] += FFN_down[j];
 
         X_packed[0] ^= 0x1; // step state

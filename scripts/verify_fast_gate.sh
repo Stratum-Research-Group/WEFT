@@ -106,6 +106,9 @@ lean formal/AnabelianRecoveryInvariants.lean
 lean formal/TannakianGaloisInvariants.lean
 lean formal/PerfectoidShimuraInvariants.lean
 lean formal/FarguesFontaineInvariants.lean
+lean formal/ShimuraCurvesInvariants.lean
+lean formal/AdicHuberInvariants.lean
+lean formal/LocalLanglandsInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

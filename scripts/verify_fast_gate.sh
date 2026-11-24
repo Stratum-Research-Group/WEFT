@@ -46,6 +46,7 @@ lean formal/SpectralWaveletInvariance.lean
 lean formal/LatticeQuantizationInvariants.lean
 lean formal/GramSchmidtDraftOrthogonalityInvariants.lean
 lean formal/PolyhedralCacheObliviousInvariants.lean
+lean formal/HierarchicalTrieSpeculationInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

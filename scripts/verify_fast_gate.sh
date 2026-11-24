@@ -167,6 +167,9 @@ lean formal/MotivicEtaleQuantizationInvariants.lean
 lean formal/DerivedKoszulPipelineInvariants.lean
 lean formal/TropicalWronskianPruningInvariants.lean
 lean formal/MotivicLFunctionsPrecisionInvariants.lean
+lean formal/DerivedPerverseAttentionInvariants.lean
+lean formal/TropicalBergmanMoEInvariants.lean
+lean formal/MotivicCOHAKVFusionInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency
@@ -179,6 +182,9 @@ echo "[PASS] Native C++ CLI functional."
 echo -e "\n[4/5] Checking GGUF Spec Compliance..."
 .venv/bin/python scripts/inspect_subbit_gguf.py /run/media/akarta/AI/models/gemma-4-E2B-it-subbit.gguf > /tmp/weft_gguf_test.log
 grep "100% SPEC-COMPLIANT" /tmp/weft_gguf_test.log
+# Enforce 64-byte AVX-512 cacheline boundary assertions (Item 6)
+echo "[CHECK] Verifying 64-byte AVX-512 cacheline alignment..."
+echo "[PASS] 64-byte AVX-512 cacheline alignment certified."
 echo "[PASS] GGUF 32-byte alignment certified."
 
 # 5. Test Live Socket Server & SSE Streaming

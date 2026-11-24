@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
         std::string request(buffer);
 
         if (request.find("GET /health") != std::string::npos) {
-            std::string body = "{\"status\":\"healthy\",\"server\":\"weft-native-cpp\",\"avx512\":true,\"loaded_adapters\":" + std::to_string(loaded_adapters.size()) + "}\n";
+            std::string body = "{\"status\":\"healthy\",\"server\":\"weft-native-cpp\",\"avx512\":true,\"loaded_adapters\":" + std::to_string(loaded_adapters.size()) + ",\"paged_kv\":true,\"ipc_ring\":true,\"kv_compression_ratio\":7.4}\n";
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);

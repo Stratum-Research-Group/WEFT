@@ -70,6 +70,9 @@ lean formal/VoronoiDelaunayQuantizationInvariants.lean
 lean formal/ContactHamiltonianKVCacheInvariants.lean
 lean formal/TropicalPolytopeInvariants.lean
 lean formal/HodgeLaplacianKVCacheInvariants.lean
+lean formal/SubRiemannianCarnotInvariants.lean
+lean formal/QuaternionicKahlerInvariants.lean
+lean formal/PersistentHomologyKVCacheInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

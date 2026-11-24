@@ -49,17 +49,20 @@ def chat_repl():
         print(f"{GREEN}[INFO] Connected to live endpoint: {base_url} ({server_name}){RESET}")
 
     current_adapter = "default"
+    current_fused_adapters = ""
     print(f"[INFO] Active Micro-Adapter: {BOLD}{current_adapter}{RESET}")
     print("Commands:")
-    print("  /adapter <name>   - Hot-swap active domain specialist micro-adapter")
-    print("  /adapters         - Query in-memory specialist adapters")
-    print("  exit / quit       - Terminate session\n")
+    print("  /adapter <name>        - Hot-swap active single domain specialist micro-adapter")
+    print("  /fuse <a1=w1,a2=w2>    - Dynamically fuse multi-specialist micro-adapters in-register")
+    print("  /adapters              - Query in-memory specialist adapters")
+    print("  exit / quit            - Terminate session\n")
 
     conversation_history = []
     
     test_prompts = [
         "/adapters",
         "/adapter code-specialist",
+        "/fuse coder=0.7,prover=0.3",
         "Explain the WEFT dual-path LittleBit-2 factorization.",
         "How fast does zero-copy mmap attach to process virtual memory?"
     ]
@@ -79,6 +82,7 @@ def chat_repl():
 
         if prompt.strip().startswith("/adapter "):
             current_adapter = prompt.strip().split(" ", 1)[1]
+            current_fused_adapters = ""
             try:
                 load_payload = {"id": current_adapter}
                 req = urllib.request.Request(
@@ -91,6 +95,12 @@ def chat_repl():
                     print(f"{GREEN}[ADAPTER SWAPPED]{RESET} Successfully routed to {BOLD}{res.get('id')}{RESET} in 0.038 ms")
             except Exception:
                 print(f"{GREEN}[ADAPTER SWAPPED]{RESET} Local simulated routing switched to: {BOLD}{current_adapter}{RESET}")
+            continue
+
+        if prompt.strip().startswith("/fuse "):
+            current_fused_adapters = prompt.strip().split(" ", 1)[1]
+            current_adapter = f"fused({current_fused_adapters})"
+            print(f"{GREEN}[ADAPTER FUSION ACTIVE]{RESET} Dynamic in-register linear superposition: {BOLD}{current_fused_adapters}{RESET}")
             continue
 
         conversation_history.append({"role": "user", "content": prompt})
@@ -106,14 +116,18 @@ def chat_repl():
         t0 = time.perf_counter()
         token_count = 0
 
+        headers = {
+            "Content-Type": "application/json",
+            "X-Weft-Adapter": current_adapter
+        }
+        if current_fused_adapters:
+            headers["X-Weft-Adapters"] = current_fused_adapters
+
         try:
             req = urllib.request.Request(
                 f"{base_url}/v1/chat/completions",
                 data=json.dumps(payload).encode("utf-8"),
-                headers={
-                    "Content-Type": "application/json",
-                    "X-Weft-Adapter": current_adapter
-                }
+                headers=headers
             )
             with urllib.request.urlopen(req, timeout=3.0) as resp:
                 for line in resp:

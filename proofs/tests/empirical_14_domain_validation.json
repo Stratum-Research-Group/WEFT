@@ -1,0 +1,93 @@
+{
+  "timestamp": "2026-11-24 07:31:50 UTC",
+  "total_domains": 14,
+  "passed": 14,
+  "success_rate_percent": 100.0,
+  "total_runtime_sec": 2.07,
+  "results": [
+    {
+      "domain": "x86_64 Assembly (GAS/Intel)",
+      "status": "PASS",
+      "latency_ms": 3.33,
+      "message": "x86-64 assembly compiled successfully to machine object."
+    },
+    {
+      "domain": "ARM64 (AArch64) Assembly",
+      "status": "PASS",
+      "latency_ms": 33.46,
+      "message": "ARM64 (AArch64) assembly compiled successfully to target object."
+    },
+    {
+      "domain": "RISC-V (RV64) Assembly",
+      "status": "PASS",
+      "latency_ms": 22.3,
+      "message": "RISC-V (RV64) assembly compiled successfully to target object."
+    },
+    {
+      "domain": "LLVM-IR SSA Verification",
+      "status": "PASS",
+      "latency_ms": 17.24,
+      "message": "Valid LLVM-IR syntax & SSA invariant verification."
+    },
+    {
+      "domain": "CUDA C++ Kernel (NVCC)",
+      "status": "PASS",
+      "latency_ms": 1297.41,
+      "message": "CUDA C++ kernel compiled successfully (NVCC)."
+    },
+    {
+      "domain": "Modern C++20 Concepts & PMR",
+      "status": "PASS",
+      "latency_ms": 291.6,
+      "message": "C++20 concepts & templates verified (g++)."
+    },
+    {
+      "domain": "Linux Kernel eBPF Bytecode",
+      "status": "PASS",
+      "latency_ms": 29.39,
+      "message": "eBPF bytecode assembly and map descriptors verified."
+    },
+    {
+      "domain": "C17 Systems Memory Bounds",
+      "status": "PASS",
+      "latency_ms": 14.69,
+      "message": "C17 syntax and strict warning conformance verified."
+    },
+    {
+      "domain": "Rust Strict Type-Checking",
+      "status": "PASS",
+      "latency_ms": 83.5,
+      "message": "Rust type-checking and borrow-checker passed."
+    },
+    {
+      "domain": "Python Algorithmic Execution",
+      "status": "PASS",
+      "latency_ms": 46.96,
+      "message": "Unit tests passed with 0 assertion failures."
+    },
+    {
+      "domain": "Lean 4 Formal Proof Oracle",
+      "status": "PASS",
+      "latency_ms": 229.59,
+      "message": "Lean 4 machine-checked formal proof certified with 0 non-standard axioms."
+    },
+    {
+      "domain": "CRISPR Genomics & Watson-Crick",
+      "status": "PASS",
+      "latency_ms": 0.01,
+      "message": "Valid DNA sequence (length=22 bp, GC=54.5%)."
+    },
+    {
+      "domain": "Cheminformatics SMILES Valency",
+      "status": "PASS",
+      "latency_ms": 0.08,
+      "message": "SMILES string has valid grammar, ring closures, and bracket topology."
+    },
+    {
+      "domain": "Agentic Tool Calling JSON RPC",
+      "status": "PASS",
+      "latency_ms": 0.02,
+      "message": "Valid RPC tool call for 'weft_adapter.route' with 2 arguments."
+    }
+  ]
+}

@@ -21,6 +21,7 @@ lean formal/FixedPointHardwareDequant.lean
 lean formal/AdapterFusionLayerSkipping.lean
 lean formal/PrefetchCacheInvariance.lean
 lean formal/AdapterSparsificationBounds.lean
+lean formal/AsymmetricActivationQuantization.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

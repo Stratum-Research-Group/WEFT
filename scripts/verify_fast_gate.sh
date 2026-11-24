@@ -113,6 +113,9 @@ lean formal/DiamondsSpeculationInvariants.lean
 lean formal/ScholzeWeinsteinInvariants.lean
 lean formal/HigherToposInvariants.lean
 lean formal/GrandUnifiedArithmeticInvariants.lean
+lean formal/ArithmeticQFTInvariants.lean
+lean formal/BrauerManinInvariants.lean
+lean formal/MotivicLFunctionsInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

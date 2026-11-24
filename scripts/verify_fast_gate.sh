@@ -170,6 +170,9 @@ lean formal/MotivicLFunctionsPrecisionInvariants.lean
 lean formal/DerivedPerverseAttentionInvariants.lean
 lean formal/TropicalBergmanMoEInvariants.lean
 lean formal/MotivicCOHAKVFusionInvariants.lean
+lean formal/DerivedRingSpectraActivationInvariants.lean
+lean formal/TropicalBerkovichKVCompactionInvariants.lean
+lean formal/MotivicPolylogRoPEInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency
@@ -186,6 +189,10 @@ grep "100% SPEC-COMPLIANT" /tmp/weft_gguf_test.log
 echo "[CHECK] Verifying 64-byte AVX-512 cacheline alignment..."
 echo "[PASS] 64-byte AVX-512 cacheline alignment certified."
 echo "[PASS] GGUF 32-byte alignment certified."
+# Enforce Academic Release Kit Checksum Manifest (Item 6)
+echo "[CHECK] Verifying SHA-256 release checksum manifests..."
+sha256sum --check --status RELEASE_CHECKSUMS.sha256
+echo "[PASS] Release kits SHA-256 checksums verified 100% intact."
 
 # 5. Test Live Socket Server & SSE Streaming
 echo -e "\n[5/5] Testing Socket Server & REST Endpoints..."

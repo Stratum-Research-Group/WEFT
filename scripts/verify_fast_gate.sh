@@ -61,6 +61,9 @@ lean formal/MatrixProductStateInvariants.lean
 lean formal/LieGroupGaugeInvariants.lean
 lean formal/PAdicUltrametricInvariants.lean
 lean formal/OptimalTransportWassersteinInvariants.lean
+lean formal/TropicalSemiringInvariants.lean
+lean formal/OctonionDivisionAlgebraInvariants.lean
+lean formal/SymplecticGrassmannianInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

@@ -6,6 +6,20 @@ echo "  WEFT MASTER RELEASE & QUALITY ASSURANCE GATEKEEPER"
 echo "================================================================="
 
 # 1. Quick Unit Test Pass
+# Enforce Storage Safety Floor (Item 6)
+echo "[CHECK] Enforcing storage safety floor (>=700 GB on /run/media/akarta/AI, >=200 GB on /home)..."
+AI_AVAIL=$(df --output=avail -BG /run/media/akarta/AI | tail -n 1 | tr -dc '0-9')
+HOME_AVAIL=$(df --output=avail -BG /home | tail -n 1 | tr -dc '0-9')
+if [ "$AI_AVAIL" -lt 700 ]; then
+    echo "[FAIL] /run/media/akarta/AI storage below 700GB safety floor: ${AI_AVAIL}GB"
+    exit 1
+fi
+if [ "$HOME_AVAIL" -lt 200 ]; then
+    echo "[FAIL] /home storage below 200GB safety floor: ${HOME_AVAIL}GB"
+    exit 1
+fi
+echo "[PASS] Storage safety floors certified (AI: ${AI_AVAIL}GB >= 700GB, Home: ${HOME_AVAIL}GB >= 200GB)."
+
 echo -e "\n[1/5] Executing Core Unit Test Suite..."
 .venv/bin/pytest tests/test_avx512_gemv.py tests/test_fused_swiglu_avx512.py -q --tb=line
 
@@ -179,6 +193,9 @@ lean formal/MotivicGaloisAlignmentInvariants.lean
 lean formal/DerivedDeRhamGaussManinInvariants.lean
 lean formal/TropicalGrassmannianPruningInvariants.lean
 lean formal/MotivicSliceQuantizationInvariants.lean
+lean formal/DerivedKoszulTreeInvariants.lean
+lean formal/TropicalConvexityKVInvariants.lean
+lean formal/MotivicSteenrodRecoveryInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

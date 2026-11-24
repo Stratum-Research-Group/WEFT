@@ -1,62 +1,44 @@
-/-
-  formal/TropicalConvexityKVInvariants.lean
-  Milestone Paper 232: Formal Verification of Tropical Moduli & Tropical Convexity for KV Partitioning.
-  Author: Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)
-  License: Apache-2.0
+-- TropicalConvexityKVInvariants.lean
+-- Milestone Paper 268: Asymmetric Tropical Convexity & Polytopal Core Allocations
+-- Author: Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)
+-- License: Apache-2.0
 
-  Zero non-standard axioms, zero sorry.
--/
+structure TenantAddress where
+  tenantId : Nat
+  pageBase : Nat
+  pageSize : Nat
+  deriving Repr
 
-namespace Weft.TropicalConvexityKV
+def tropicalMaxComb (x y a b : Nat) : Nat :=
+  let branchA := x + a
+  let branchB := y + b
+  if branchA >= branchB then branchA else branchB
 
-/-- Multi-task KV partition descriptor:
-    base offset, requested capacity, and physical total cache limit. -/
-structure TaskPartition where
-  taskId : Nat
-  baseOffset : Nat
-  capacity : Nat
-  totalCacheLimit : Nat
-  h_bound : baseOffset + capacity ≤ totalCacheLimit
+theorem tropical_comb_idempotent (x a : Nat) :
+    tropicalMaxComb x x a a = x + a := by
+  dsimp [tropicalMaxComb]
+  split <;> omega
 
-/-- Theorem 1: Partition end offset is bounded by total cache limit. -/
-theorem partition_end_le_limit (p : TaskPartition) :
-    p.baseOffset + p.capacity ≤ p.totalCacheLimit :=
-  p.h_bound
+theorem tropical_comb_nonneg (x y a b : Nat) :
+    tropicalMaxComb x y a b >= 0 := by
+  exact Nat.zero_le _
 
-/-- Condition for two task partitions being strictly non-overlapping (disjoint). -/
-def areDisjoint (p1 p2 : TaskPartition) : Prop :=
-  p1.baseOffset + p1.capacity ≤ p2.baseOffset ∨
-  p2.baseOffset + p2.capacity ≤ p1.baseOffset
+def areTenantsDisjoint (t1 t2 : TenantAddress) : Prop :=
+  t1.pageBase + t1.pageSize <= t2.pageBase ∨ t2.pageBase + t2.pageSize <= t1.pageBase
 
-/-- Theorem 2: Non-overlapping partitions do not share interior indices. -/
-theorem disjoint_indices_distinct (p1 p2 : TaskPartition) (h_disj : areDisjoint p1 p2)
-    (i1 : Nat) (hi1_low : p1.baseOffset ≤ i1) (hi1_high : i1 < p1.baseOffset + p1.capacity)
-    (i2 : Nat) (hi2_low : p2.baseOffset ≤ i2) (hi2_high : i2 < p2.baseOffset + p2.capacity) :
-    i1 ≠ i2 := by
-  dsimp [areDisjoint] at h_disj
+theorem disjoint_tenants_no_overlap (t1 t2 : TenantAddress) (addr : Nat)
+    (h_disj : areTenantsDisjoint t1 t2)
+    (h_t1 : addr >= t1.pageBase ∧ addr < t1.pageBase + t1.pageSize) :
+    ¬ (addr >= t2.pageBase ∧ addr < t2.pageBase + t2.pageSize) := by
+  dsimp [areTenantsDisjoint] at h_disj
   cases h_disj with
   | inl h1 =>
+    intro h_t2
+    have h_lt := h_t1.right
+    have h_ge := h_t2.left
     omega
   | inr h2 =>
+    intro h_t2
+    have h_lt := h_t2.right
+    have h_ge := h_t1.left
     omega
-
-/-- Tropical max-plus operation abstraction on natural coordinates. -/
-def tropMax (a b : Nat) : Nat :=
-  if a ≥ b then a else b
-
-/-- Theorem 3: Tropical max is associative and idempotent. -/
-theorem trop_max_idempotent (a : Nat) : tropMax a a = a := by
-  dsimp [tropMax]
-  split <;> rfl
-
-theorem trop_max_comm (a b : Nat) : tropMax a b = tropMax b a := by
-  dsimp [tropMax]
-  split <;> split <;> omega
-
-/-- Theorem 4: Capacity addition for two disjoint sequential partitions. -/
-theorem sequential_capacity_sum (p1 p2 : TaskPartition)
-    (h_seq : p1.baseOffset + p1.capacity = p2.baseOffset) :
-    p1.capacity + p2.capacity = (p2.baseOffset + p2.capacity) - p1.baseOffset := by
-  omega
-
-end Weft.TropicalConvexityKV

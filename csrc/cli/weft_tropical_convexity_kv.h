@@ -1,55 +1,44 @@
 #pragma once
 // weft_tropical_convexity_kv.h
-// Milestone Paper 232: Native AVX-512 Tropical Moduli & Tropical Convexity for KV Partitioning
+// Milestone Paper 268: Asymmetric Tropical Convexity & Polytopal Core Allocations
 // Author: Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)
 // License: Apache-2.0
 
 #include <cstddef>
 #include <cmath>
 #include <immintrin.h>
-#include <vector>
-#include <algorithm>
 
 namespace weft {
 
-struct TropicalTaskPartition {
-    size_t task_id;
-    size_t base_offset;
-    size_t capacity;
-    size_t total_limit;
-
-    bool is_disjoint_from(const TropicalTaskPartition& other) const {
-        return (base_offset + capacity <= other.base_offset) ||
-               (other.base_offset + other.capacity <= base_offset);
-    }
-};
-
-// AVX-512 kernel to evaluate tropical max-plus convex combination across cache score vectors
-inline void avx512_tropical_max_plus(
-    const float* __restrict__ a,
-    const float* __restrict__ b,
-    float* __restrict__ out,
-    size_t count,
-    float offset_a,
-    float offset_b
+// Vectorized tropical polytope membership distance evaluation:
+// out_distances[i] = max(0, addr[i] - page_base[i] - page_size[i]) + max(0, page_base[i] - addr[i])
+inline void avx512_tropical_polytope_isolation(
+    const float* __restrict__ query_addrs,
+    const float* __restrict__ page_base,
+    const float* __restrict__ page_size,
+    float* __restrict__ out_violations,
+    size_t count
 ) {
-    __m512 v_off_a = _mm512_set1_ps(offset_a);
-    __m512 v_off_b = _mm512_set1_ps(offset_b);
+    __m512 v_zero = _mm512_setzero_ps();
 
     size_t i = 0;
     for (; i + 16 <= count; i += 16) {
-        __m512 va = _mm512_loadu_ps(a + i);
-        __m512 vb = _mm512_loadu_ps(b + i);
+        __m512 va = _mm512_loadu_ps(query_addrs + i);
+        __m512 vb = _mm512_loadu_ps(page_base + i);
+        __m512 vs = _mm512_loadu_ps(page_size + i);
 
-        __m512 va_shifted = _mm512_add_ps(va, v_off_a);
-        __m512 vb_shifted = _mm512_add_ps(vb, v_off_b);
+        __m512 v_upper = _mm512_add_ps(vb, vs);
+        __m512 v_above = _mm512_max_ps(_mm512_sub_ps(va, v_upper), v_zero);
+        __m512 v_below = _mm512_max_ps(_mm512_sub_ps(vb, va), v_zero);
 
-        __m512 v_max = _mm512_max_ps(va_shifted, vb_shifted);
-        _mm512_storeu_ps(out + i, v_max);
+        __m512 v_viol = _mm512_add_ps(v_above, v_below);
+        _mm512_storeu_ps(out_violations + i, v_viol);
     }
 
     for (; i < count; ++i) {
-        out[i] = std::max(a[i] + offset_a, b[i] + offset_b);
+        float above = std::max(0.0f, query_addrs[i] - (page_base[i] + page_size[i]));
+        float below = std::max(0.0f, page_base[i] - query_addrs[i]);
+        out_violations[i] = above + below;
     }
 }
 

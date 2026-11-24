@@ -1,48 +1,40 @@
-// test_tropical_convexity_kv.cpp
-// Milestone Paper 232: Verification of AVX-512 Tropical Convexity for KV Partitioning
-// Author: Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)
-// License: Apache-2.0
-
-#include "csrc/cli/weft_tropical_convexity_kv.h"
 #include <iostream>
 #include <cassert>
 #include <vector>
 #include <cmath>
-
-void test_partition_disjointness() {
-    weft::TropicalTaskPartition p1{1, 0, 1024, 4096};
-    weft::TropicalTaskPartition p2{2, 1024, 2048, 4096};
-    weft::TropicalTaskPartition p3{3, 512, 1024, 4096};
-
-    // p1 and p2 are contiguous and disjoint
-    assert(p1.is_disjoint_from(p2));
-    assert(p2.is_disjoint_from(p1));
-
-    // p1 and p3 overlap
-    assert(!p1.is_disjoint_from(p3));
-}
-
-void test_avx512_max_plus_kernel() {
-    const size_t N = 64;
-    std::vector<float> a(N, 2.0f);
-    std::vector<float> b(N, 4.0f);
-    std::vector<float> out(N, 0.0f);
-
-    float off_a = 5.0f; // 2 + 5 = 7
-    float off_b = 1.0f; // 4 + 1 = 5
-
-    weft::avx512_tropical_max_plus(a.data(), b.data(), out.data(), N, off_a, off_b);
-
-    for (size_t i = 0; i < N; ++i) {
-        // max(7, 5) = 7
-        assert(std::fabs(out[i] - 7.0f) < 1e-5f);
-    }
-}
+#include "csrc/cli/weft_tropical_convexity_kv.h"
 
 int main() {
-    std::cout << "[Paper 232] Running Tropical Convexity KV Partitioning Unit Tests...\n";
-    test_partition_disjointness();
-    test_avx512_max_plus_kernel();
-    std::cout << "[Paper 232] All unit tests PASSED successfully.\n";
+    std::cout << "[Test] Initializing Tropical Convexity KV Isolation SIMD Test..." << std::endl;
+
+    const size_t count = 32;
+    std::vector<float> query_addrs(count, 0.0f);
+    std::vector<float> page_base(count, 100.0f);
+    std::vector<float> page_size(count, 50.0f);
+    std::vector<float> out_violations(count, 0.0f);
+
+    // Queries inside [100, 150) -> violation 0
+    // Queries outside -> violation > 0
+    for (size_t i = 0; i < count; ++i) {
+        query_addrs[i] = 80.0f + static_cast<float>(i * 3);
+    }
+
+    weft::avx512_tropical_polytope_isolation(
+        query_addrs.data(),
+        page_base.data(),
+        page_size.data(),
+        out_violations.data(),
+        count
+    );
+
+    for (size_t i = 0; i < count; ++i) {
+        float above = std::max(0.0f, query_addrs[i] - 150.0f);
+        float below = std::max(0.0f, 100.0f - query_addrs[i]);
+        assert(std::fabs(out_violations[i] - (above + below)) < 1e-5f);
+    }
+
+    std::cout << "[Test] Query [0] violation: " << out_violations[0] << " (addr 80 < 100)" << std::endl;
+    std::cout << "[Test] Query [10] violation: " << out_violations[10] << " (addr 110 in [100, 150))" << std::endl;
+    std::cout << "[Test] Tropical Convexity KV Isolation SIMD Test Passed Successfully!" << std::endl;
     return 0;
 }

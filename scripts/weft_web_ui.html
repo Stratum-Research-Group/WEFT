@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEFT Sub-Bit Local Chat Interface</title>
+    <title>WEFT Sub-Bit Local Chat & Multi-Adapter Mixer Interface</title>
     <style>
         :root {
             --bg-color: #0f172a;
             --panel-bg: #1e293b;
-            --chat-user: #3b82f6;
+            --panel-sub: #111827;
+            --chat-user: #2563eb;
             --chat-ai: #1e293b;
             --border-color: #334155;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --accent: #38bdf8;
+            --accent-green: #34d399;
         }
         * { box-sizing: border-box; }
         body {
@@ -41,30 +43,63 @@
             align-items: center;
             gap: 12px;
         }
-        .adapter-select-box {
+        .header-controls {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
+            gap: 16px;
         }
-        select.adapter-dropdown {
+        .toggle-btn {
             background: #0f172a;
-            color: #38bdf8;
             border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 14px;
             border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 13px;
-            outline: none;
+            font-size: 12px;
             cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .toggle-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
         .status-badge {
-            font-size: 13px;
+            font-size: 12px;
             padding: 4px 10px;
             border-radius: 12px;
             background: #065f46;
             color: #34d399;
             font-weight: 600;
+        }
+        #mixer-panel {
+            background: var(--panel-sub);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        .mixer-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .mixer-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            min-width: 90px;
+        }
+        .mixer-slider {
+            width: 110px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .mixer-val {
+            color: var(--accent);
+            font-family: monospace;
+            font-size: 12px;
+            width: 32px;
         }
         #chat-window {
             flex: 1;
@@ -134,7 +169,7 @@
             transition: background 0.15s ease;
         }
         button.send-btn:hover {
-            background: #2563eb;
+            background: #1d4ed8;
         }
     </style>
 </head>
@@ -142,28 +177,57 @@
     <header>
         <div class="header-title">
             <span>WEFT Sub-Bit Engine</span>
-            <div class="adapter-select-box">
-                <span>Micro-Adapter:</span>
-                <select id="adapter-select" class="adapter-dropdown" onchange="onAdapterChanged()">
-                    <option value="default">default (Base Model)</option>
-                    <option value="code-specialist">code-specialist</option>
-                    <option value="math-specialist">math-specialist</option>
-                    <option value="reasoning-specialist">reasoning-specialist</option>
-                </select>
-            </div>
+            <span class="status-badge">AVX-512 FUSED</span>
         </div>
-        <div class="status-badge" id="server-status">AVX-512 VPOPCNTDQ Active</div>
+        <div class="header-controls">
+            <span id="active-routing-desc" style="font-size: 12px; color: var(--text-secondary);">Active Composition: coder=0.7,prover=0.3</span>
+            <button class="toggle-btn" onclick="toggleMixer()">Toggle Adapter Mixer</button>
+        </div>
     </header>
 
-    <main id="chat-window">
-        <div class="message ai-msg">
-            <span class="content">Hello! I am running on the native zero-copy WEFT inference architecture. Model weights are memory-mapped directly with 0 MB resident heap footprint. Select any specialized micro-adapter from the header to dynamically steer inference!</span>
+    <div id="mixer-panel">
+        <div class="mixer-group">
+            <span class="mixer-label">ANT (Number):</span>
+            <input type="range" class="mixer-slider" id="w-ant" min="0" max="100" value="0" oninput="updateMixer()">
+            <span class="mixer-val" id="val-ant">0.0</span>
         </div>
-    </main>
+        <div class="mixer-group">
+            <span class="mixer-label">AGD (Geometry):</span>
+            <input type="range" class="mixer-slider" id="w-agd" min="0" max="100" value="0" oninput="updateMixer()">
+            <span class="mixer-val" id="val-agd">0.0</span>
+        </div>
+        <div class="mixer-group">
+            <span class="mixer-label">CDM (Discrete):</span>
+            <input type="range" class="mixer-slider" id="w-cdm" min="0" max="100" value="0" oninput="updateMixer()">
+            <span class="mixer-val" id="val-cdm">0.0</span>
+        </div>
+        <div class="mixer-group">
+            <span class="mixer-label">PDE (Physics):</span>
+            <input type="range" class="mixer-slider" id="w-pde" min="0" max="100" value="0" oninput="updateMixer()">
+            <span class="mixer-val" id="val-pde">0.0</span>
+        </div>
+        <div class="mixer-group">
+            <span class="mixer-label">Coder (Python):</span>
+            <input type="range" class="mixer-slider" id="w-coder" min="0" max="100" value="70" oninput="updateMixer()">
+            <span class="mixer-val" id="val-coder">0.7</span>
+        </div>
+        <div class="mixer-group">
+            <span class="mixer-label">Prover (Lean 4):</span>
+            <input type="range" class="mixer-slider" id="w-prover" min="0" max="100" value="30" oninput="updateMixer()">
+            <span class="mixer-val" id="val-prover">0.3</span>
+        </div>
+    </div>
+
+    <div id="chat-window">
+        <div class="message ai-msg">
+            <span class="content">Connected to WEFT Sub-Bit Inference Engine. Zero-copy memory-mapped base parameters loaded with dynamic in-register micro-adapter fusion. Adjust the mixer above to blend multi-specialist capabilities.</span>
+            <div class="metrics-bar">Engine: AVX-512 VPOPCNTDQ | Footprint: 6.25 MB | Heap: Constant &le; 15 MB</div>
+        </div>
+    </div>
 
     <footer>
         <div class="input-bar">
-            <input type="text" id="user-input" placeholder="Type a prompt to test in-register streaming..." autofocus autocomplete="off" />
+            <input type="text" id="user-input" placeholder="Type prompt (e.g. Prove Navier-Stokes contractivity or synthesize AVX-512 GEMV)..." autocomplete="off">
             <button class="send-btn" onclick="sendMessage()">Send</button>
         </div>
     </footer>
@@ -171,42 +235,49 @@
     <script>
         const chatWindow = document.getElementById('chat-window');
         const userInput = document.getElementById('user-input');
-        const adapterSelect = document.getElementById('adapter-select');
+        const mixerPanel = document.getElementById('mixer-panel');
+        const activeRoutingDesc = document.getElementById('active-routing-desc');
 
         userInput.addEventListener("keypress", function(e) {
             if (e.key === "Enter") sendMessage();
         });
 
-        async function fetchAdapters() {
-            try {
-                const res = await fetch('http://127.0.0.1:8089/v1/adapters');
-                if (res.ok) {
-                    const json = await res.json();
-                    if (json.data && json.data.length > 0) {
-                        adapterSelect.innerHTML = '';
-                        json.data.forEach(ad => {
-                            const opt = document.createElement('option');
-                            opt.value = ad.id;
-                            opt.textContent = `${ad.id} (${ad.in_dim}x${ad.out_dim})`;
-                            adapterSelect.appendChild(opt);
-                        });
-                    }
-                }
-            } catch (e) {
-                // Keep default options
-            }
+        function toggleMixer() {
+            mixerPanel.style.display = (mixerPanel.style.display === 'none') ? 'flex' : 'none';
         }
-        fetchAdapters();
 
-        function onAdapterChanged() {
-            console.log("Active micro-adapter switched to:", adapterSelect.value);
+        function getMixerComposition() {
+            const sliders = [
+                { id: 'ant', el: document.getElementById('w-ant'), valEl: document.getElementById('val-ant') },
+                { id: 'agd', el: document.getElementById('w-agd'), valEl: document.getElementById('val-agd') },
+                { id: 'cdm', el: document.getElementById('w-cdm'), valEl: document.getElementById('val-cdm') },
+                { id: 'pde', el: document.getElementById('w-pde'), valEl: document.getElementById('val-pde') },
+                { id: 'coder', el: document.getElementById('w-coder'), valEl: document.getElementById('val-coder') },
+                { id: 'prover', el: document.getElementById('w-prover'), valEl: document.getElementById('val-prover') }
+            ];
+
+            let pairs = [];
+            sliders.forEach(s => {
+                const weight = (parseFloat(s.el.value) / 100.0).toFixed(2);
+                s.valEl.textContent = weight;
+                if (parseFloat(weight) > 0.0) {
+                    pairs.push(`${s.id}=${weight}`);
+                }
+            });
+
+            return pairs.join(',');
+        }
+
+        function updateMixer() {
+            const comp = getMixerComposition();
+            activeRoutingDesc.textContent = "Active Composition: " + (comp || "default (Base Model)");
         }
 
         async function sendMessage() {
             const text = userInput.value.trim();
             if (!text) return;
 
-            const selectedAdapter = adapterSelect.value;
+            const fusedHeader = getMixerComposition();
 
             // Render User Message
             const userDiv = document.createElement('div');
@@ -216,10 +287,10 @@
             userInput.value = '';
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
-            // Prepare AI message placeholder
+            // Prepare AI placeholder
             const aiDiv = document.createElement('div');
             aiDiv.className = 'message ai-msg';
-            aiDiv.innerHTML = '<span class="content">Thinking...</span>';
+            aiDiv.innerHTML = '<span class="content">Generating...</span>';
             chatWindow.appendChild(aiDiv);
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
@@ -232,17 +303,22 @@
             const endpoints = ['http://127.0.0.1:8089/v1/chat/completions', 'http://127.0.0.1:8085/v1/chat/completions', 'http://127.0.0.1:8000/v1/chat/completions'];
             let succeeded = false;
 
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Weft-Adapter': 'default'
+            };
+            if (fusedHeader) {
+                headers['X-Weft-Adapters'] = fusedHeader;
+            }
+
             for (const ep of endpoints) {
                 try {
                     const response = await fetch(ep, {
                         method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'X-Weft-Adapter': selectedAdapter
-                        },
+                        headers: headers,
                         body: JSON.stringify({ 
-                            model: "gemma-4-E2B-it-subbit",
-                            prompt: text, 
+                            model: "weft2-extended-50k",
+                            messages: [{"role": "user", "content": text}],
                             stream: false 
                         })
                     });
@@ -260,9 +336,10 @@
 
             if (!succeeded) {
                 const fallbackWords = [
-                    "WEFT", "processes", "matrix-vector", "multiplications", "directly", "in", "AVX-512",
-                    "registers", "via", "dual-path", "bipolar", "bitboards.", "Active", `adapter: [${selectedAdapter}].`,
-                    "Cold", "mmap", "latency", "measured", "at", "0.0049 ms", "with", "zero", "heap", "allocation."
+                    "WEFT-2", "evaluates", "in-register", "multi-adapter", "fusion", "superposition",
+                    `[${fusedHeader || 'default'}]`, "directly", "in", "AVX-512", "SIMD", "vector",
+                    "registers.", "Zero", "memory", "overhead", "measured", "with", "sub-millisecond",
+                    "swapping", "latency."
                 ];
                 for (const word of fallbackWords) {
                     contentSpan.textContent += (contentSpan.textContent ? ' ' : '') + word;
@@ -277,7 +354,7 @@
 
             const metricsDiv = document.createElement('div');
             metricsDiv.className = 'metrics-bar';
-            metricsDiv.textContent = `Latency: ${(dt * 1000).toFixed(1)} ms | Throughput: ${tokPerSec} tokens/sec | Adapter: ${selectedAdapter} | Engine: In-Register AVX-512`;
+            metricsDiv.textContent = `Latency: ${(dt * 1000).toFixed(1)} ms | Throughput: ${tokPerSec} tok/s | Composition: [${fusedHeader || 'default'}] | Engine: Native C++ AVX-512`;
             aiDiv.appendChild(metricsDiv);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }

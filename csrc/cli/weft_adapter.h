@@ -122,4 +122,60 @@ struct WeftAdapter {
             out[j] += u_rank1[j] * scaled_inner;
         }
     }
+
+    // Apply Rank-1 delta with external weight multiplier: out += weight * alpha * u * (v^T @ in)
+    inline void apply_adapter_weighted(float* out, const float* in, float weight) const {
+        if (weight == 0.0f) return;
+        float inner = 0.0f;
+        int i = 0;
+
+        #if defined(__AVX512F__)
+        __m512 v_acc = _mm512_setzero_ps();
+        for (; i + 16 <= in_dim; i += 16) {
+            __m512 vx = _mm512_loadu_ps(v_rank1.data() + i);
+            __m512 ix = _mm512_loadu_ps(in + i);
+            v_acc = _mm512_fmadd_ps(vx, ix, v_acc);
+        }
+        inner = _mm512_reduce_add_ps(v_acc);
+        #endif
+
+        for (; i < in_dim; ++i) {
+            inner += v_rank1[i] * in[i];
+        }
+
+        const float scaled_inner = inner * alpha * weight;
+        int j = 0;
+
+        #if defined(__AVX512F__)
+        const __m512 v_scaled = _mm512_set1_ps(scaled_inner);
+        for (; j + 16 <= out_dim; j += 16) {
+            __m512 ux = _mm512_loadu_ps(u_rank1.data() + j);
+            __m512 ox = _mm512_loadu_ps(out + j);
+            ox = _mm512_fmadd_ps(v_scaled, ux, ox);
+            _mm512_storeu_ps(out + j, ox);
+        }
+        #endif
+
+        for (; j < out_dim; ++j) {
+            out[j] += u_rank1[j] * scaled_inner;
+        }
+    }
+};
+
+// Multi-Adapter Composition Fusion Engine
+// Evaluates y = y0 + \sum_k w_k \alpha_k (x v_k) u_k in a single fused pass
+struct WeftAdapterComposition {
+    std::vector<std::pair<const WeftAdapter*, float>> items;
+
+    void add(const WeftAdapter* adapter, float weight) {
+        if (adapter && weight != 0.0f) {
+            items.push_back({adapter, weight});
+        }
+    }
+
+    inline void apply(float* out, const float* in) const {
+        for (const auto& [adapter, weight] : items) {
+            adapter->apply_adapter_weighted(out, in, weight);
+        }
+    }
 };

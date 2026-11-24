@@ -167,15 +167,40 @@ int main(int argc, char* argv[]) {
                 adapter_id = request.substr(hdr_pos + 16, hdr_end - (hdr_pos + 16));
             }
 
+            // Multi-adapter composition header parsing: "X-Weft-Adapters: python=0.7,math=0.3"
+            std::string multi_adapters_str = "";
+            size_t multi_hdr_pos = request.find("X-Weft-Adapters: ");
+            if (multi_hdr_pos != std::string::npos) {
+                size_t multi_hdr_end = request.find("\r\n", multi_hdr_pos);
+                multi_adapters_str = request.substr(multi_hdr_pos + 17, multi_hdr_end - (multi_hdr_pos + 17));
+            }
+
             // Execute forward pass asynchronously via work-stealing thread pool
-            worker_pool.enqueue([client_socket, mmapped_weights, is_stream, adapter_id, d_model, &loaded_adapters]() {
+            worker_pool.enqueue([client_socket, mmapped_weights, is_stream, adapter_id, multi_adapters_str, d_model, &loaded_adapters]() {
                 const int words = d_model / 32;
                 std::vector<uint32_t> X_packed(words, 0x55555555);
                 std::vector<float> In_norm(d_model, 0.5f);
                 std::vector<float> Out(d_model, 0.0f);
 
                 run_subbit_gemv_avx512(mmapped_weights, X_packed.data(), Out.data(), d_model, words, 0.01f);
-                if (loaded_adapters.count(adapter_id)) {
+
+                if (!multi_adapters_str.empty()) {
+                    // Parse comma-separated "name=weight" pairs
+                    WeftAdapterComposition comp;
+                    std::stringstream ss(multi_adapters_str);
+                    std::string item;
+                    while (std::getline(ss, item, ',')) {
+                        size_t eq_pos = item.find('=');
+                        if (eq_pos != std::string::npos) {
+                            std::string name = item.substr(0, eq_pos);
+                            float weight = std::stof(item.substr(eq_pos + 1));
+                            if (loaded_adapters.count(name)) {
+                                comp.add(&loaded_adapters[name], weight);
+                            }
+                        }
+                    }
+                    comp.apply(Out.data(), In_norm.data());
+                } else if (loaded_adapters.count(adapter_id)) {
                     loaded_adapters[adapter_id].apply_adapter(Out.data(), In_norm.data());
                 }
 

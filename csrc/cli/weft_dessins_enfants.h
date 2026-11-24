@@ -1,46 +1,64 @@
-#ifndef WEFT_DESSINS_ENFANTS_H
-#define WEFT_DESSINS_ENFANTS_H
+#pragma once
+// Copyright (c) 2026 Nicholas Charles Mynhardt, Stratum Research Group.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Asymmetric Absolute Galois Groups & Grothendieck's Dessins d'Enfants for Bipartite Attention Permutations
+// Paper 210 Native Kernel Implementation
 
+#include <vector>
 #include <cstdint>
 #include <cstddef>
-#include <cmath>
-#include <vector>
-#include <algorithm>
+#include <cassert>
 #include <immintrin.h>
 
 namespace weft {
+namespace dessins_enfants {
 
-struct BipartiteDessinEdge {
-    uint32_t black_vertex;
-    uint32_t white_vertex;
-    float weight;
+struct DessinPermutation {
+    std::vector<uint32_t> sigma_0;   // Rotation around black vertices
+    std::vector<uint32_t> sigma_1;   // Rotation around white vertices
+    std::vector<uint32_t> sigma_inf; // Rotation around faces: (sigma_0 * sigma_1)^(-1)
 };
 
-// Computes the Euler characteristic of a dessin ribbon graph: chi = V_b + V_w + F - E
-inline int32_t compute_dessin_euler_characteristic(uint32_t vb, uint32_t vw, uint32_t faces, uint32_t edges) {
-    return static_cast<int32_t>(vb + vw + faces) - static_cast<int32_t>(edges);
-}
-
-// In-register SIMD permutation routing of token features via dessin permutation sigma_0
-inline void permute_tokens_by_dessin_simd(const float* tokens_in, const uint32_t* sigma_perm,
-                                          size_t num_tokens, size_t dim, float* tokens_out) {
-    for (size_t t = 0; t < num_tokens; ++t) {
-        uint32_t src_idx = sigma_perm[t];
-        const float* src = &tokens_in[src_idx * dim];
-        float* dst = &tokens_out[t * dim];
-        size_t d = 0;
-#if defined(__AVX2__)
-        for (; d + 8 <= dim; d += 8) {
-            __m256 v = _mm256_loadu_ps(&src[d]);
-            _mm256_storeu_ps(&dst[d], v);
-        }
+// Permute attention token embeddings using dessin permutation indices
+inline void permute_dessin_channels(
+    const float* src_channels,
+    const uint32_t* perm_indices,
+    float* dst_channels,
+    size_t count)
+{
+    size_t i = 0;
+#if defined(__AVX512F__)
+    for (; i + 16 <= count; i += 16) {
+        __m512i idx = _mm512_loadu_si512((const __m512i*)(perm_indices + i));
+        __m512 val = _mm512_i32gather_ps(idx, src_channels, 4);
+        _mm512_storeu_ps(dst_channels + i, val);
+    }
 #endif
-        for (; d < dim; ++d) {
-            dst[d] = src[d];
-        }
+    for (; i < count; ++i) {
+        dst_channels[i] = src_channels[perm_indices[i]];
     }
 }
 
-} // namespace weft
+// Compute the face monodromy permutation: sigma_inf = (sigma_0 * sigma_1)^(-1)
+inline std::vector<uint32_t> compute_sigma_infinity(
+    const std::vector<uint32_t>& sigma_0,
+    const std::vector<uint32_t>& sigma_1)
+{
+    size_t n = sigma_0.size();
+    std::vector<uint32_t> prod(n);
+    std::vector<uint32_t> inv(n);
 
-#endif // WEFT_DESSINS_ENFANTS_H
+    // prod = sigma_0 * sigma_1: prod[i] = sigma_0[sigma_1[i]]
+    for (size_t i = 0; i < n; ++i) {
+        prod[i] = sigma_0[sigma_1[i]];
+    }
+    // inv = prod^(-1)
+    for (size_t i = 0; i < n; ++i) {
+        inv[prod[i]] = static_cast<uint32_t>(i);
+    }
+    return inv;
+}
+
+} // namespace dessins_enfants
+} // namespace weft

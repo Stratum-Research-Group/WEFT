@@ -1,40 +1,53 @@
+// Copyright (c) 2026 Nicholas Charles Mynhardt, Stratum Research Group.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Unit tests for Dessins d'Enfants Attention Permutation Invariants (Paper 210)
+
+#include "csrc/cli/weft_dessins_enfants.h"
 #include <iostream>
 #include <cassert>
-#include <cmath>
 #include <vector>
-#include "../csrc/cli/weft_dessins_enfants.h"
+#include <numeric>
 
-int main() {
-    std::cout << "[TEST] Running Grothendieck Dessins d'Enfants Attention Test..." << std::endl;
+void test_sigma_infinity_monodromy() {
+    // 4-edge cycle: sigma_0 = (0 1 2 3), sigma_1 = (0)(1 2)(3)
+    std::vector<uint32_t> s0 = {1, 2, 3, 0};
+    std::vector<uint32_t> s1 = {0, 2, 1, 3};
 
-    // Test 1: Euler characteristic on sphere: V_b=2, V_w=2, F=2, E=4 -> chi = 6 - 4 = 2
-    int32_t chi = weft::compute_dessin_euler_characteristic(2, 2, 2, 4);
-    std::cout << "  Computed Euler characteristic: " << chi << " (Expected: 2)" << std::endl;
-    assert(chi == 2);
+    std::vector<uint32_t> s_inf = weft::dessins_enfants::compute_sigma_infinity(s0, s1);
 
-    // Test 2: In-register token permutation routing
-    const size_t NUM_TOKENS = 4;
-    const size_t DIM = 16;
-    std::vector<float> tokens_in(NUM_TOKENS * DIM);
-    std::vector<float> tokens_out(NUM_TOKENS * DIM, 0.0f);
+    // Verify s_inf * s0 * s1 = identity: s_inf[s0[s1[i]]] == i
+    for (size_t i = 0; i < 4; ++i) {
+        uint32_t comp = s_inf[s0[s1[i]]];
+        assert(comp == i);
+    }
+    std::cout << "[PASS] test_sigma_infinity_monodromy (relation verified)" << std::endl;
+}
 
-    for (size_t t = 0; t < NUM_TOKENS; ++t) {
-        for (size_t d = 0; d < DIM; ++d) {
-            tokens_in[t * DIM + d] = static_cast<float>(t + 1);
-        }
+void test_permute_channels_gather() {
+    const size_t N = 32;
+    std::vector<float> src(N);
+    std::vector<float> dst(N, 0.0f);
+    std::vector<uint32_t> perm(N);
+
+    for (size_t i = 0; i < N; ++i) {
+        src[i] = static_cast<float>(i * 10);
+        perm[i] = static_cast<uint32_t>((i + 3) % N);
     }
 
-    // Cyclic permutation sigma = (0 1 2 3) -> 1, 2, 3, 0
-    std::vector<uint32_t> sigma = {1, 2, 3, 0};
-    weft::permute_tokens_by_dessin_simd(tokens_in.data(), sigma.data(), NUM_TOKENS, DIM, tokens_out.data());
+    weft::dessins_enfants::permute_dessin_channels(src.data(), perm.data(), dst.data(), N);
 
-    // Token 0 should have value from token 1 (2.0f)
-    assert(tokens_out[0] == 2.0f);
-    assert(tokens_out[1 * DIM] == 3.0f);
-    assert(tokens_out[2 * DIM] == 4.0f);
-    assert(tokens_out[3 * DIM] == 1.0f);
+    for (size_t i = 0; i < N; ++i) {
+        float expected = src[perm[i]];
+        assert(dst[i] == expected);
+    }
+    std::cout << "[PASS] test_permute_channels_gather (N=32 verified)" << std::endl;
+}
 
-    std::cout << "  Permuted token values successfully verified." << std::endl;
-    std::cout << "[PASS] All Grothendieck Dessins d'Enfants invariants verified." << std::endl;
+int main() {
+    std::cout << "=== Running Paper 210: Dessins d'Enfants Unit Tests ===" << std::endl;
+    test_sigma_infinity_monodromy();
+    test_permute_channels_gather();
+    std::cout << "All Dessins d'Enfants tests PASSED." << std::endl;
     return 0;
 }

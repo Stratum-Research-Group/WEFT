@@ -131,6 +131,9 @@ lean formal/ToricArithmeticChowInvariants.lean
 lean formal/SyntomicPrismaticInvariants.lean
 lean formal/EquivariantChowLocalizationInvariants.lean
 lean formal/MotivicLoopSpacesInvariants.lean
+lean formal/LiquidSoftmaxInvariants.lean
+lean formal/MotivicMilnorInvariants.lean
+lean formal/FarguesFontaineTreeInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

@@ -176,6 +176,9 @@ lean formal/MotivicPolylogRoPEInvariants.lean
 lean formal/DerivedCriticalLociInvariants.lean
 lean formal/TropicalToricSSMInvariants.lean
 lean formal/MotivicGaloisAlignmentInvariants.lean
+lean formal/DerivedDeRhamGaussManinInvariants.lean
+lean formal/TropicalGrassmannianPruningInvariants.lean
+lean formal/MotivicSliceQuantizationInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency
@@ -210,5 +213,7 @@ echo "$HEALTH" | grep -q "healthy"
 echo "[PASS] Socket server health check passed."
 
 echo -e "\n================================================================="
+# Synchronize semantic release tags (Item 7)
+bash scripts/sync_release_tags.sh
 echo "  ALL GATES CLOSED: 100% VERIFIED & PRODUCTION READY"
 echo "================================================================="

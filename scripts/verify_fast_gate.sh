@@ -64,6 +64,9 @@ lean formal/OptimalTransportWassersteinInvariants.lean
 lean formal/TropicalSemiringInvariants.lean
 lean formal/OctonionDivisionAlgebraInvariants.lean
 lean formal/SymplecticGrassmannianInvariants.lean
+lean formal/SheafCohomologyKVCacheInvariants.lean
+lean formal/FinslerGeometricAttentionInvariants.lean
+lean formal/VoronoiDelaunayQuantizationInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

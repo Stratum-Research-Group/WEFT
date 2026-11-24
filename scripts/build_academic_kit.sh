@@ -8,7 +8,7 @@ RELEASE_DIR="release_academic_kit"
 rm -rf "$RELEASE_DIR"
 mkdir -p "$RELEASE_DIR"/{papers,proofs,bin,specs}
 
-echo "=== Packaging WEFT Academic Release Kit v109 ==="
+echo "=== Packaging WEFT Academic Release Kit v110 ==="
 
 # 1. Copy Research Compendium & Papers
 cp papers/compendium/WEFT_Research_Compendium_Papers_1_to_100.pdf "$RELEASE_DIR"/papers/ 2>/dev/null || true
@@ -26,6 +26,7 @@ cp papers/106_dynamic_micro_adapter_fusion_and_adaptive_layer_skipping/paper.md 
 cp papers/107_geometric_facet_hashing_and_asynchronous_prefetching/paper.md "$RELEASE_DIR"/papers/milestones/Paper_107.md
 cp papers/108_dynamic_adapter_sparsification_and_subvector_pruning/paper.md "$RELEASE_DIR"/papers/milestones/Paper_108.md
 cp papers/109_asymmetric_subbit_activation_quantization/paper.md "$RELEASE_DIR"/papers/milestones/Paper_109.md
+cp papers/110_asynchronous_ring_concurrency_and_heterogeneous_mtp_verification/paper.md "$RELEASE_DIR"/papers/milestones/Paper_110.md
 
 # 2. Copy Proofs and Test Verification Logs
 cp -r proofs/tests/* "$RELEASE_DIR"/proofs/
@@ -40,5 +41,5 @@ cd "$RELEASE_DIR"
 find . -type f ! -name "SHA256SUMS.txt" -exec sha256sum {} + > SHA256SUMS.txt
 cd ..
 
-tar -czf weft_academic_release_kit_v109.tar.gz "$RELEASE_DIR"
-echo "=== Packaging Complete: weft_academic_release_kit_v109.tar.gz ==="
+tar -czf weft_academic_release_kit_v110.tar.gz "$RELEASE_DIR"
+echo "=== Packaging Complete: weft_academic_release_kit_v110.tar.gz ==="

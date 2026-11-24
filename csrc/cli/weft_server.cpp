@@ -186,6 +186,19 @@ int main(int argc, char* argv[]) {
                 multi_adapters_str = request.substr(multi_hdr_pos + 17, multi_hdr_end - (multi_hdr_pos + 17));
             }
 
+            // Zero-overhead intent auto-routing when no explicit adapter is specified
+            if (adapter_id == "default" && multi_adapters_str.empty()) {
+                std::string req_lower = request;
+                for (char& c : req_lower) c = std::tolower(c);
+                if (req_lower.find("theorem") != std::string::npos || req_lower.find("proof") != std::string::npos || req_lower.find("lean") != std::string::npos) {
+                    multi_adapters_str = "prover=0.8,math=0.2";
+                } else if (req_lower.find("def ") != std::string::npos || req_lower.find("function") != std::string::npos || req_lower.find("code") != std::string::npos || req_lower.find("class") != std::string::npos) {
+                    multi_adapters_str = "coder=0.8,default=0.2";
+                } else if (req_lower.find("solve") != std::string::npos || req_lower.find("prime") != std::string::npos || req_lower.find("riemann") != std::string::npos) {
+                    multi_adapters_str = "math=0.7,prover=0.3";
+                }
+            }
+
             // Execute forward pass asynchronously via work-stealing thread pool
             worker_pool.enqueue([client_socket, mmapped_weights, is_stream, adapter_id, multi_adapters_str, d_model, &loaded_adapters]() {
                 const int words = d_model / 32;

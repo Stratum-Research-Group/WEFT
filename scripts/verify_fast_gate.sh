@@ -173,12 +173,17 @@ lean formal/MotivicCOHAKVFusionInvariants.lean
 lean formal/DerivedRingSpectraActivationInvariants.lean
 lean formal/TropicalBerkovichKVCompactionInvariants.lean
 lean formal/MotivicPolylogRoPEInvariants.lean
+lean formal/DerivedCriticalLociInvariants.lean
+lean formal/TropicalToricSSMInvariants.lean
+lean formal/MotivicGaloisAlignmentInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency
 echo -e "\n[3/5] Verifying Native AVX-512 Zero-Copy CLI Execution..."
 ./build/weft-cli /run/media/akarta/AI/models/gemma-4-E2B-it-subbit.weft 10 > /tmp/weft_cli_test.log
 grep "Transformer Layer Throughput" /tmp/weft_cli_test.log
+# Enforce automated benchmark throughput latency ceiling (Item 7)
+awk '/Transformer Layer Throughput/ { val = $(NF-1); if (val < 5.0) { print "[FAIL] Throughput below 5.0 layers/sec: " val; exit 1 } else { print "[PASS] Throughput meets performance floor (>5.0 layers/sec): " val } }' /tmp/weft_cli_test.log
 echo "[PASS] Native C++ CLI functional."
 
 # 4. Test GGUF 32-Byte Cache Alignment Specification

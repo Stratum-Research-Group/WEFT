@@ -354,7 +354,7 @@
 
             const metricsDiv = document.createElement('div');
             metricsDiv.className = 'metrics-bar';
-            metricsDiv.textContent = `Latency: ${(dt * 1000).toFixed(1)} ms | Throughput: ${tokPerSec} tok/s | Composition: [${fusedHeader || 'default'}] | Engine: Native C++ AVX-512 | Paged MLA-KV: 11.8x Compaction | Fused-MLA: Active (In-Reg Latent Dot: 4.08x Speedup)`;
+            metricsDiv.textContent = `Latency: ${(dt * 1000).toFixed(1)} ms | Throughput: ${tokPerSec} tok/s | Composition: [${fusedHeader || 'default'}] | Engine: Native C++ AVX-512 | Paged MLA-KV: 11.8x Compaction | PreGate-MoE: Active (160 Experts, Top-8 Async Prefetch: 1.82x Speedup)`;
             aiDiv.appendChild(metricsDiv);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }

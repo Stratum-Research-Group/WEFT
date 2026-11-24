@@ -30,6 +30,7 @@ lean formal/SpeculativeTreeEarlyExitInvariants.lean
 lean formal/AdaptiveTreeTopologyInvariants.lean
 lean formal/RingPagedKVCacheInvariants.lean
 lean formal/FusedMLALatentAttentionInvariants.lean
+lean formal/PreGatedMoERoutingInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

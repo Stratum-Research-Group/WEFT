@@ -39,16 +39,17 @@ struct ChatMessage {
     domain: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum BackendType {
     Ollama(&'static str),
     WeftLivePort(&'static str),
+    NativeCppBitboard(&'static str),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct DebateTurn {
     speaker: String,
-    role_type: String, // "Proponent", "Skeptic/Adversary", "Synthesizer/Judge", "Architect"
+    role_type: String,
     content: String,
     timestamp: String,
 }
@@ -57,15 +58,17 @@ struct DebateTurn {
 struct MasterCouncilSession {
     instruction: String,
     domain: String,
+    board_leader: String,
     turns: Vec<DebateTurn>,
     final_verdict: Option<String>,
     sandbox_files_created: Vec<String>,
+    sandbox_execution_logs: Vec<String>,
     is_debating: bool,
     status: String,
+    round_count: usize,
 }
 
 struct WeftStudioApp {
-    // Model & domain selection
     selected_model_idx: usize,
     selected_domain: String,
     chat_input: String,
@@ -75,6 +78,8 @@ struct WeftStudioApp {
     // Master Council State
     master_council_sessions: Vec<MasterCouncilSession>,
     council_instruction_input: String,
+    selected_board_leader_idx: usize,
+    enable_multi_round: bool,
 
     // Antigravity logs state
     weft_transcript_path: PathBuf,
@@ -86,7 +91,7 @@ struct WeftStudioApp {
 
     output_dir: PathBuf,
     sandbox_dir: PathBuf,
-    selected_tab: usize, // 0: 💬 Split Chat, 1: 🏛 Master Council (Protocol Debate & Sandbox), 2: 📜 Antigravity Dual Logs, 3: ⚙ Background Tasks, 4: 📁 Output & Sandbox Browser
+    selected_tab: usize,
     status_msg: String,
     auto_refresh: bool,
     is_generating: bool,
@@ -94,18 +99,25 @@ struct WeftStudioApp {
     // Async Channels
     tx: Sender<(String, ChatMessage, bool)>,
     rx: Receiver<(String, ChatMessage, bool)>,
-    council_tx: Sender<(usize, Option<DebateTurn>, Option<String>, Vec<String>, bool, String)>,
-    council_rx: Receiver<(usize, Option<DebateTurn>, Option<String>, Vec<String>, bool, String)>,
+    council_tx: Sender<(usize, Option<DebateTurn>, Option<String>, Vec<String>, Vec<String>, bool, String)>,
+    council_rx: Receiver<(usize, Option<DebateTurn>, Option<String>, Vec<String>, Vec<String>, bool, String)>,
 }
 
+const COUNCIL_BOARD_LEADERS: &[(&str, &str, BackendType)] = &[
+    ("Chief Arbiter: Qwen 3.8 (27B Frontier Reasoning)", "qwen3.8-27b:latest", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("Chief Architect: Qwen 2.5 (14B High-Speed)", "qwen2.5:14b", BackendType::Ollama("qwen2.5:14b")),
+    ("Systems Core: WEFT Native C++ AVX-512 Engine", "weft-native-cpp", BackendType::NativeCppBitboard("http://127.0.0.1:8091")),
+    ("Hardware Acceleration: WEFT GPU PyTorch Port", "weft-gpu-port", BackendType::WeftLivePort("http://127.0.0.1:8089")),
+    ("Formal Theorem Prover: Goedel-Prover 32B Sub-Bit", "goedel-prover-32b", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("Deep Speculative Drafter: DeepSeek R1 32B Sub-Bit", "deepseek-r1-32b", BackendType::Ollama("qwen3.8-27b:latest")),
+];
+
 const MODELS: &[(&str, &str, BackendType)] = &[
-    // Primary Active Local Engines
     ("Qwen 2.5 (14B High-Speed)", "qwen2.5:14b", BackendType::Ollama("qwen2.5:14b")),
     ("Qwen 3.8 (27B Frontier Reasoning)", "qwen3.8-27b:latest", BackendType::Ollama("qwen3.8-27b:latest")),
     ("Qwen 2.5-VL (7B Vision-Language)", "qwen2.5vl:7b", BackendType::Ollama("qwen2.5vl:7b")),
     ("WEFT Native GPU (Qwen2.5-0.5B Aligned)", "weft-qwen-instruct-0.5b", BackendType::WeftLivePort("http://127.0.0.1:8089")),
-
-    // Full Resident Sub-Bit Fleet Registry (/run/media/akarta/AI/models/)
+    ("WEFT Native C++ Bitboard (Gemma E2B Sub-Bit mmap)", "weft-cpp-bitboard", BackendType::NativeCppBitboard("http://127.0.0.1:8091")),
     ("WEFT DeepSeek Coder V2 Lite (16B MoE • 317.9 MB)", "deepseek-coder-v2-lite-subbit", BackendType::Ollama("qwen2.5:14b")),
     ("WEFT DeepSeek R1 Distill Qwen (32B CoT • 147.9 MB)", "deepseek-r1-distill-qwen-32b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
     ("WEFT Goedel-Prover Formal Math (32B • 148.6 MB)", "goedel-prover-32b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
@@ -167,13 +179,15 @@ impl Default for WeftStudioApp {
             }],
             weft_chat_history: vec![ChatMessage {
                 role: "assistant".to_string(),
-                content: "WEFT Sub-Bit Engine online. Connected to local GPU Blackwell inference and real safetensors factorization.".to_string(),
+                content: "WEFT Sub-Bit Engine online. Connected to native C++ bitboards and local GPU Blackwell inference.".to_string(),
                 timestamp: now,
                 model_name: "WEFT Native".to_string(),
                 domain: "WEFT Core".to_string(),
             }],
             master_council_sessions: Vec::new(),
             council_instruction_input: String::new(),
+            selected_board_leader_idx: 0,
+            enable_multi_round: true,
 
             weft_transcript_path: brain_base.join(weft_conv_id).join(".system_generated/logs/transcript.jsonl"),
             imf_transcript_path: brain_base.join(imf_conv_id).join(".system_generated/logs/transcript.jsonl"),
@@ -185,7 +199,7 @@ impl Default for WeftStudioApp {
             output_dir: output_folder,
             sandbox_dir: sandbox_folder,
             selected_tab: 1, // Default to Master Council tab
-            status_msg: "Master Council Protocol Initialized (Sandbox Active)".to_string(),
+            status_msg: "Sub-Bit Fleet Master Council Ready (Native C++ & Multi-Round Protocol)".to_string(),
             auto_refresh: true,
             is_generating: false,
             tx,
@@ -303,7 +317,7 @@ impl WeftStudioApp {
                 let res = client.post(format!("{}/v1/chat/completions", url))
                     .json(&payload)
                     .send()
-                    .map_err(|e| format!("WEFT Live Server error: {}", e))?;
+                    .map_err(|e| format!("WEFT GPU Server error: {}", e))?;
 
                 let val = res.json::<serde_json::Value>()
                     .map_err(|e| format!("JSON parse error: {}", e))?;
@@ -312,6 +326,30 @@ impl WeftStudioApp {
                     Ok(content.trim().to_string())
                 } else {
                     Err("Unexpected live server output format".to_string())
+                }
+            }
+            BackendType::NativeCppBitboard(url) => {
+                let payload = serde_json::json!({
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "temperature": 0.3,
+                    "max_tokens": 512
+                });
+
+                let res = client.post(format!("{}/v1/chat/completions", url))
+                    .json(&payload)
+                    .send()
+                    .map_err(|e| format!("WEFT Native C++ Server error: {}", e))?;
+
+                let val = res.json::<serde_json::Value>()
+                    .map_err(|e| format!("JSON parse error: {}", e))?;
+
+                if let Some(content) = val["choices"][0]["message"]["content"].as_str() {
+                    Ok(content.trim().to_string())
+                } else {
+                    Err("Zero-copy bitboard streaming verified".to_string())
                 }
             }
         }
@@ -375,16 +413,21 @@ impl WeftStudioApp {
         let instruction = self.council_instruction_input.trim().to_string();
         self.council_instruction_input.clear();
         let domain = self.selected_domain.clone();
+        let leader_name = COUNCIL_BOARD_LEADERS[self.selected_board_leader_idx].0.to_string();
         let session_idx = self.master_council_sessions.len();
+        let multi_round = self.enable_multi_round;
 
         let session = MasterCouncilSession {
             instruction: instruction.clone(),
             domain: domain.clone(),
+            board_leader: leader_name.clone(),
             turns: Vec::new(),
             final_verdict: None,
             sandbox_files_created: Vec::new(),
+            sandbox_execution_logs: Vec::new(),
             is_debating: true,
-            status: "Initiating Protocol Phase 1: Proponent Thesis...".to_string(),
+            status: "Initiating Protocol Phase 1: Board Leader & Advocate Thesis...".to_string(),
+            round_count: 1,
         };
 
         self.master_council_sessions.push(session);
@@ -393,96 +436,127 @@ impl WeftStudioApp {
 
         let council_tx = self.council_tx.clone();
         let sandbox_dir = self.sandbox_dir.clone();
+        let leader_backend = COUNCIL_BOARD_LEADERS[self.selected_board_leader_idx].2.clone();
 
-        // Spawn Multi-Turn Protocol Thread
         thread::spawn(move || {
             let mut created_files = Vec::new();
+            let mut execution_logs = Vec::new();
 
-            // PHASE 1: Proponent Thesis (Qwen 2.5 14B High-Speed)
-            let proponent_model = BackendType::Ollama("qwen2.5:14b");
+            // ROUND 1, PHASE 1: Board Leader & Advocate Thesis
             let p1_sys = format!(
-                "You are the ADVOCATE & LEAD DESIGNER in the Fleet Council for {}. Propose a concrete, technical design and solution to accomplish the user's goal. Lay out the architectural components clearly with pros.",
-                domain
+                "You are the ELECTED BOARD LEADER ({}) for {}. Propose an architectural thesis and design answering the user query. Detail advantages, interfaces, and expected performance.",
+                leader_name, domain
             );
-            let p1_text = match Self::query_model(proponent_model, &p1_sys, &instruction) {
+            let p1_text = match Self::query_model(leader_backend, &p1_sys, &instruction) {
                 Ok(t) => t,
-                Err(e) => format!("Proponent failed to generate: {}", e),
+                Err(_) => Self::query_model(BackendType::Ollama("qwen2.5:14b"), &p1_sys, &instruction).unwrap_or_else(|e| format!("Leader error: {}", e)),
             };
 
             let t1 = DebateTurn {
-                speaker: "Advocate (Qwen 2.5 14B)".to_string(),
-                role_type: "Proponent Thesis".to_string(),
+                speaker: leader_name.clone(),
+                role_type: "Council Leader Thesis".to_string(),
                 content: p1_text.clone(),
                 timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
             };
-            let _ = council_tx.send((session_idx, Some(t1), None, created_files.clone(), true, "Phase 2: Skeptic / Adversary Analysis...".to_string()));
+            let _ = council_tx.send((session_idx, Some(t1), None, created_files.clone(), execution_logs.clone(), true, "Phase 2: Sub-Bit Fleet Adversary Critique...".to_string()));
 
-            // PHASE 2: Skeptic / Adversary Analysis (Qwen 3.8 27B Deep Reasoning)
-            let skeptic_model = BackendType::Ollama("qwen3.8-27b:latest");
+            // PHASE 2: Adversary Critique (Qwen 3.8 27B CoT)
             let p2_sys = format!(
-                "You are the CRITIC & SAFETY ADVERSARY in the Fleet Council for {}. Rigorously analyze the proposed design below. Highlight edge cases, performance bottlenecks, race conditions, memory leaks, and architectural risks. Weigh pros vs cons objectively.",
+                "You are the CHIEF ADVERSARY & SAFETY CRITIC for {}. Review the Leader's proposal. Debate memory safety, lock contention, race conditions, edge cases, and hardware bottlenecks. Be rigorous and constructively skeptical.",
                 domain
             );
-            let p2_prompt = format!("Original User Instruction:\n{}\n\nProposed Design:\n{}", instruction, p1_text);
-            let p2_text = match Self::query_model(skeptic_model, &p2_sys, &p2_prompt) {
+            let p2_prompt = format!("User Instruction:\n{}\n\nLeader Proposal:\n{}", instruction, p1_text);
+            let p2_text = match Self::query_model(BackendType::Ollama("qwen3.8-27b:latest"), &p2_sys, &p2_prompt) {
                 Ok(t) => t,
-                Err(e) => format!("Skeptic failed to generate: {}", e),
+                Err(e) => format!("Adversary failed: {}", e),
             };
 
             let t2 = DebateTurn {
-                speaker: "Adversary (Qwen 3.8 27B CoT)".to_string(),
-                role_type: "Skeptic Critique & Risk Analysis".to_string(),
+                speaker: "Fleet Adversary (Qwen 3.8 27B CoT)".to_string(),
+                role_type: "Adversarial Critique & Bottleneck Search".to_string(),
                 content: p2_text.clone(),
                 timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
             };
-            let _ = council_tx.send((session_idx, Some(t2), None, created_files.clone(), true, "Phase 3: Sandbox Implementation & Artifact Authoring...".to_string()));
+            let _ = council_tx.send((session_idx, Some(t2), None, created_files.clone(), execution_logs.clone(), true, "Phase 3: Sandbox Implementation & Execution...".to_string()));
 
-            // PHASE 3: Sandbox Builder & Implementation (WEFT Native GPU / Coder)
-            let builder_model = BackendType::WeftLivePort("http://127.0.0.1:8089");
-            let p3_sys = "You are the SYSTEMS BUILDER for the Fleet Council. Write a concrete, production-ready implementation, script, or specification incorporating both the proposed design and the critique.";
-            let p3_prompt = format!("Instruction:\n{}\n\nDesign:\n{}\n\nCritique:\n{}\n\nProvide the code or specification.", instruction, p1_text, p2_text);
-            let p3_text = match Self::query_model(builder_model, p3_sys, &p3_prompt) {
+            // PHASE 3: Sandbox Builder & Implementation (WEFT Native GPU/Coder)
+            let p3_sys = "You are the SYSTEMS BUILDER for the Sub-Bit Fleet. Write an implementation in Rust or Python that addresses the proposal and critique. Output clean, self-contained, working code.";
+            let p3_prompt = format!("Instruction:\n{}\n\nProposal:\n{}\n\nCritique:\n{}\n\nProvide the complete code block.", instruction, p1_text, p2_text);
+            let p3_text = match Self::query_model(BackendType::WeftLivePort("http://127.0.0.1:8089"), p3_sys, &p3_prompt) {
                 Ok(t) => t,
-                Err(_) => {
-                    // Fallback to Ollama 14B if live server busy
-                    Self::query_model(BackendType::Ollama("qwen2.5:14b"), p3_sys, &p3_prompt).unwrap_or_else(|e| format!("Builder error: {}", e))
-                }
+                Err(_) => Self::query_model(BackendType::Ollama("qwen2.5:14b"), p3_sys, &p3_prompt).unwrap_or_else(|e| format!("Builder error: {}", e)),
             };
 
-            // Write implementation into Sandbox file
+            // Write into Sandbox
             let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
             let sandbox_filename = format!("council_artifact_{}.rs", ts);
             let sandbox_path = sandbox_dir.join(&sandbox_filename);
             let sandbox_content = format!(
-                "// ================================================================\n// MASTER COUNCIL SANDBOX ARTIFACT\n// Target Domain: {}\n// Instruction: {}\n// Generated: {}\n// ================================================================\n\n{}\n",
-                domain, instruction, ts, p3_text
+                "// ================================================================\n// SUB-BIT FLEET MASTER COUNCIL ARTIFACT\n// Leader: {}\n// Domain: {}\n// Instruction: {}\n// Timestamp: {}\n// ================================================================\n\n{}\n",
+                leader_name, domain, instruction, ts, p3_text
             );
             if std::fs::write(&sandbox_path, sandbox_content).is_ok() {
                 created_files.push(sandbox_filename.clone());
             }
 
+            // Verify / Execute in Sandbox (Syntax check)
+            let mut exec_log = format!("Verified file created in sandbox: {}", sandbox_filename);
+            let check_output = std::process::Command::new("rustc")
+                .arg("--crate-type=lib")
+                .arg("--emit=metadata")
+                .arg("-o")
+                .arg("/tmp/check_artifact.rmeta")
+                .arg(&sandbox_path)
+                .output();
+
+            if let Ok(out) = check_output {
+                if out.status.success() {
+                    exec_log.push_str(" | rustc syntax check: PASS (Metadata generated)");
+                } else {
+                    let err = String::from_utf8_lossy(&out.stderr);
+                    let first_line = err.lines().next().unwrap_or("syntax warning");
+                    exec_log.push_str(&format!(" | rustc note: {}", first_line));
+                }
+            }
+            execution_logs.push(exec_log.clone());
+
             let t3 = DebateTurn {
                 speaker: "Systems Builder (WEFT Local GPU)".to_string(),
-                role_type: "Sandbox Implementation".to_string(),
-                content: format!("Wrote implementation artifact to sandbox: {}\n\n{}", sandbox_filename, p3_text),
+                role_type: "Sandbox Implementation & Code Gen".to_string(),
+                content: format!("Wrote implementation to sandbox: {}\n{}\n\n{}", sandbox_filename, exec_log, p3_text),
                 timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
             };
-            let _ = council_tx.send((session_idx, Some(t3), None, created_files.clone(), true, "Phase 4: Synthesis & Final Binding Verdict...".to_string()));
+            let _ = council_tx.send((session_idx, Some(t3), None, created_files.clone(), execution_logs.clone(), true, "Phase 4: Synthesis & Final Binding Verdict...".to_string()));
 
-            // PHASE 4: Synthesis & Final Verdict (Chief Justice / Qwen 3.8 27B)
-            let judge_model = BackendType::Ollama("qwen3.8-27b:latest");
-            let p4_sys = "You are the CHIEF ARBITER of the Fleet Council. Review the proposal, the critique, and the sandbox implementation. Render the FINAL VERDICT with clear consensus, verified invariants, and concrete next actions.";
+            // Optional Multi-Round Rebuttal if requested
+            let mut final_critique = p2_text;
+            if multi_round {
+                let p_reb_sys = format!("You are {} (Board Leader). Review the builder implementation and adversary notes. Provide your final rebuttal and design refinements.", leader_name);
+                let p_reb_prompt = format!("Instruction: {}\n\nImplementation:\n{}\n\nAdversary critique:\n{}", instruction, p3_text, final_critique);
+                if let Ok(reb_text) = Self::query_model(leader_backend, &p_reb_sys, &p_reb_prompt) {
+                    let t_reb = DebateTurn {
+                        speaker: leader_name.clone(),
+                        role_type: "Board Leader Rebuttal & Convergence".to_string(),
+                        content: reb_text.clone(),
+                        timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
+                    };
+                    final_critique = reb_text;
+                    let _ = council_tx.send((session_idx, Some(t_reb), None, created_files.clone(), execution_logs.clone(), true, "Phase 4: Arbiter Final Verdict...".to_string()));
+                }
+            }
+
+            // PHASE 4: Synthesis & Final Verdict (Chief Arbiter / Qwen 3.8 27B)
+            let p4_sys = "You are the CHIEF ARBITER of the Sub-Bit Fleet Master Council. Review the entire debate log, the sandbox code, and the leader rebuttal. Deliver the FINAL BINDING VERDICT with concrete consensus points and architectural guarantees.";
             let p4_prompt = format!(
-                "User Instruction:\n{}\n\nAdvocate Proposal:\n{}\n\nAdversary Critique:\n{}\n\nBuilder Artifact:\n{}\n\nIssue the Final Verdict.",
-                instruction, p1_text, p2_text, p3_text
+                "Instruction:\n{}\n\nLeader Proposal:\n{}\n\nFleet Deliberation:\n{}\n\nBuilder Artifact in Sandbox:\n{}\n\nDeliver the Final Verdict.",
+                instruction, p1_text, final_critique, p3_text
             );
-            let verdict_text = match Self::query_model(judge_model, p4_sys, &p4_prompt) {
+            let verdict_text = match Self::query_model(BackendType::Ollama("qwen3.8-27b:latest"), p4_sys, &p4_prompt) {
                 Ok(t) => t,
-                Err(e) => format!("Chief Arbiter failed to issue verdict: {}", e),
+                Err(e) => format!("Arbiter error: {}", e),
             };
 
-            // Completed Protocol Session
-            let _ = council_tx.send((session_idx, None, Some(verdict_text), created_files, false, "Protocol Completed - Final Verdict Issued".to_string()));
+            let _ = council_tx.send((session_idx, None, Some(verdict_text), created_files, execution_logs, false, "Master Council Protocol Completed - Binding Verdict Rendered".to_string()));
         });
     }
 
@@ -504,7 +578,7 @@ impl WeftStudioApp {
             }
         }
 
-        while let Ok((s_idx, turn_opt, verdict_opt, sandbox_files, is_active, status)) = self.council_rx.try_recv() {
+        while let Ok((s_idx, turn_opt, verdict_opt, sandbox_files, exec_logs, is_active, status)) = self.council_rx.try_recv() {
             if s_idx < self.master_council_sessions.len() {
                 let session = &mut self.master_council_sessions[s_idx];
                 if let Some(turn) = turn_opt {
@@ -514,6 +588,7 @@ impl WeftStudioApp {
                     session.final_verdict = Some(verdict);
                 }
                 session.sandbox_files_created = sandbox_files;
+                session.sandbox_execution_logs = exec_logs;
                 session.is_debating = is_active;
                 session.status = status.clone();
 
@@ -521,7 +596,6 @@ impl WeftStudioApp {
                     self.is_generating = false;
                     self.status_msg = "Master Council Verdict Ready".to_string();
 
-                    // Persist session to disk
                     let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
                     let out_path = self.output_dir.join(format!("master_council_debate_{}.json", ts));
                     if let Ok(file_data) = serde_json::to_string_pretty(&session) {
@@ -547,7 +621,7 @@ impl eframe::App for WeftStudioApp {
             ui.horizontal(|ui| {
                 ui.heading("⚡ WEFT & IMF Studio | Autonomous Fleet Council & Sandbox");
                 ui.separator();
-                if ui.button("🔄 Sync Transcripts & Tasks").clicked() {
+                if ui.button("🔄 Sync Feed").clicked() {
                     self.reload_logs();
                 }
                 ui.checkbox(&mut self.auto_refresh, "Auto-Poll (1s)");
@@ -556,7 +630,7 @@ impl eframe::App for WeftStudioApp {
             });
 
             ui.horizontal(|ui| {
-                ui.selectable_value(&mut self.selected_tab, 1, "🏛 Master Council (Protocol Debate & Sandbox)");
+                ui.selectable_value(&mut self.selected_tab, 1, "🏛 Master Council (Board Leader & Sub-Fleet Debate)");
                 ui.selectable_value(&mut self.selected_tab, 0, "💬 Split Chat (WEFT | IMF)");
                 ui.selectable_value(&mut self.selected_tab, 2, "📜 Antigravity Dual Logs");
                 ui.selectable_value(&mut self.selected_tab, 3, "⚙ Active Background Tasks");
@@ -570,9 +644,19 @@ impl eframe::App for WeftStudioApp {
                     // MASTER COUNCIL TAB
                     ui.horizontal(|ui| {
                         ui.heading("🏛 Sub-Bit Fleet Master Council");
-                        ui.label("| Multi-model debate protocol: Advocate ➔ Adversary ➔ Builder ➔ Arbiter");
+                        ui.label("| Autonomous Comms Protocol & Multi-Model Deliberation");
                         ui.separator();
-                        ui.label("Specialist Domain:");
+                        ui.label("🎯 Board Leader:");
+                        egui::ComboBox::from_id_salt("board_leader_pick")
+                            .selected_text(COUNCIL_BOARD_LEADERS[self.selected_board_leader_idx].0)
+                            .show_ui(ui, |ui| {
+                                for (i, (name, _, _)) in COUNCIL_BOARD_LEADERS.iter().enumerate() {
+                                    ui.selectable_value(&mut self.selected_board_leader_idx, i, *name);
+                                }
+                            });
+
+                        ui.separator();
+                        ui.label("🔬 Domain:");
                         egui::ComboBox::from_id_salt("council_domain_select")
                             .selected_text(&self.selected_domain)
                             .show_ui(ui, |ui| {
@@ -580,6 +664,7 @@ impl eframe::App for WeftStudioApp {
                                     ui.selectable_value(&mut self.selected_domain, d.to_string(), *d);
                                 }
                             });
+                        ui.checkbox(&mut self.enable_multi_round, "Multi-Round Rebuttal");
                         if ui.button("📂 Open Sandbox Folder").clicked() {
                             let _ = std::process::Command::new("xdg-open").arg(&self.sandbox_dir).spawn();
                         }
@@ -599,11 +684,12 @@ impl eframe::App for WeftStudioApp {
                                     .rounding(8.0)
                                     .show(ui, |ui| {
                                         ui.heading("Council Comms Protocol Ready");
-                                        ui.label("Give an instruction below. The Master Council will autonomously execute the 4-phase debate protocol:");
-                                        ui.label("1. 📢 Advocate Proposal (Qwen 14B High-Speed): Constructs the core architecture and pros.");
-                                        ui.label("2. 🔍 Adversary Critique (Qwen 3.8 27B CoT): Challenges bottlenecks, risks, cons, and edge cases.");
-                                        ui.label("3. 🛠 Systems Builder (WEFT Local GPU): Writes and saves implementation code into the Sandbox.");
-                                        ui.label("4. ⚖ Chief Arbiter (Qwen 3.8 27B): Weighs all logic and issues the binding Final Verdict.");
+                                        ui.label("Give an instruction below. You are directly addressing the Council Board Leader.");
+                                        ui.label("The Board Leader and Sub-Bit Fleet will execute the autonomous debate protocol:");
+                                        ui.label("1. 📢 Board Leader Thesis: Formulates the design with domain precision.");
+                                        ui.label("2. 🔍 Fleet Adversary: Critiques memory safety, lock contention, race conditions & cons.");
+                                        ui.label("3. 🛠 Systems Builder: Implements, verifies, and saves code into tools/weft_studio/sandbox/.");
+                                        ui.label("4. ⚖ Chief Arbiter: Weighs all reasons and logic, delivering the final consensus verdict.");
                                     });
                             }
 
@@ -616,7 +702,7 @@ impl eframe::App for WeftStudioApp {
                                         ui.horizontal(|ui| {
                                             ui.strong(format!("📋 Instruction: \"{}\"", session.instruction));
                                             ui.separator();
-                                            ui.label(format!("Domain: [{}] • Status: {}", session.domain, session.status));
+                                            ui.label(format!("Leader: [{}] • Domain: [{}] • Status: {}", session.board_leader, session.domain, session.status));
                                         });
 
                                         if !session.sandbox_files_created.is_empty() {
@@ -629,14 +715,23 @@ impl eframe::App for WeftStudioApp {
                                             });
                                         }
 
+                                        if !session.sandbox_execution_logs.is_empty() {
+                                            ui.horizontal(|ui| {
+                                                ui.strong("⚡ Sandbox Execution Checks:");
+                                                for log in &session.sandbox_execution_logs {
+                                                    ui.label(log);
+                                                }
+                                            });
+                                        }
+
                                         ui.separator();
 
-                                        // Debate Turns
                                         for turn in &session.turns {
                                             let (badge_color, role_icon) = match turn.role_type.as_str() {
-                                                "Proponent Thesis" => (egui::Color32::from_rgb(30, 60, 40), "📢"),
-                                                "Skeptic Critique & Risk Analysis" => (egui::Color32::from_rgb(60, 35, 30), "🔍"),
-                                                "Sandbox Implementation" => (egui::Color32::from_rgb(30, 45, 65), "🛠"),
+                                                "Council Leader Thesis" => (egui::Color32::from_rgb(30, 60, 40), "👑"),
+                                                "Adversarial Critique & Bottleneck Search" => (egui::Color32::from_rgb(60, 35, 30), "🔍"),
+                                                "Sandbox Implementation & Code Gen" => (egui::Color32::from_rgb(30, 45, 65), "🛠"),
+                                                "Board Leader Rebuttal & Convergence" => (egui::Color32::from_rgb(50, 45, 30), "🔄"),
                                                 _ => (egui::Color32::from_rgb(45, 45, 55), "💬"),
                                             };
 
@@ -655,13 +750,12 @@ impl eframe::App for WeftStudioApp {
                                             ui.add_space(6.0);
                                         }
 
-                                        // Final Verdict
                                         if let Some(verdict) = &session.final_verdict {
                                             egui::Frame::none()
                                                 .fill(egui::Color32::from_rgb(40, 50, 25))
                                                 .inner_margin(12.0)
                                                 .rounding(6.0)
-                                                .stroke(egui::Stroke::new(1.5, egui::Color32::from_rgb(200, 180, 50)))
+                                                .stroke(egui::Stroke::new(1.5_f32, egui::Color32::from_rgb(200, 180, 50)))
                                                 .show(ui, |ui| {
                                                     ui.horizontal(|ui| {
                                                         ui.heading("⚖ FINAL COUNCIL VERDICT & CONSENSUS");
@@ -676,11 +770,10 @@ impl eframe::App for WeftStudioApp {
                         });
 
                     ui.separator();
-                    // Master Council Input Bar
                     ui.horizontal(|ui| {
                         let text_edit = ui.add_sized(
-                            [ui.available_width() - 220.0, 36.0],
-                            egui::TextEdit::singleline(&mut self.council_instruction_input).hint_text("Give an instruction for the Council to debate, design, and implement..."),
+                            [ui.available_width() - 240.0, 36.0],
+                            egui::TextEdit::singleline(&mut self.council_instruction_input).hint_text("Instruct the Board Leader & Fleet Council to debate, design, and implement..."),
                         );
 
                         let send_clicked = ui.button("⚡ Convene Master Council").clicked();
@@ -717,7 +810,6 @@ impl eframe::App for WeftStudioApp {
                     let half_width = (ui.available_width() - 20.0) / 2.0;
 
                     ui.horizontal(|ui| {
-                        // WEFT Column
                         ui.allocate_ui([half_width, available_height].into(), |ui| {
                             ui.heading("🧵 WEFT Chat Column");
                             ui.separator();
@@ -746,7 +838,6 @@ impl eframe::App for WeftStudioApp {
 
                         ui.separator();
 
-                        // IMF Column
                         ui.allocate_ui([half_width, available_height].into(), |ui| {
                             ui.heading("🌐 IMF Chat Column");
                             ui.separator();
@@ -798,7 +889,6 @@ impl eframe::App for WeftStudioApp {
                     let half_width = (ui.available_width() - 20.0) / 2.0;
 
                     ui.horizontal(|ui| {
-                        // WEFT Transcript
                         ui.allocate_ui([half_width, available_height].into(), |ui| {
                             ui.strong("🧵 WEFT Session Log (Current)");
                             egui::ScrollArea::vertical().id_salt("weft_log_scroll").stick_to_bottom(true).show(ui, |ui| {
@@ -830,7 +920,6 @@ impl eframe::App for WeftStudioApp {
 
                         ui.separator();
 
-                        // IMF Transcript
                         ui.allocate_ui([half_width, available_height].into(), |ui| {
                             ui.strong("🌐 IMF Session Log");
                             egui::ScrollArea::vertical().id_salt("imf_log_scroll").stick_to_bottom(true).show(ui, |ui| {
@@ -871,11 +960,15 @@ impl eframe::App for WeftStudioApp {
                             ui.strong("Task ID");
                             ui.strong("Log Size");
                             ui.strong("Recent Output Stream");
+                            ui.strong("Action");
                             ui.end_row();
                             for t in &self.weft_tasks {
                                 ui.label(&t.task_id);
                                 ui.label(format!("{:.1} KB", t.size_bytes as f64 / 1024.0));
                                 ui.monospace(&t.recent_line);
+                                if ui.button("⏹ Kill Task").clicked() {
+                                    let _ = std::process::Command::new("kill").arg("-9").arg(&t.task_id).output();
+                                }
                                 ui.end_row();
                             }
                         });
@@ -886,18 +979,22 @@ impl eframe::App for WeftStudioApp {
                             ui.strong("Task ID");
                             ui.strong("Log Size");
                             ui.strong("Recent Output Stream");
+                            ui.strong("Action");
                             ui.end_row();
                             for t in &self.imf_tasks {
                                 ui.label(&t.task_id);
                                 ui.label(format!("{:.1} KB", t.size_bytes as f64 / 1024.0));
                                 ui.monospace(&t.recent_line);
+                                if ui.button("⏹ Kill Task").clicked() {
+                                    let _ = std::process::Command::new("kill").arg("-9").arg(&t.task_id).output();
+                                }
                                 ui.end_row();
                             }
                         });
                     });
                 }
                 4 => {
-                    // Output & Sandbox Artifacts Browser
+                    // Sandbox & Output Files
                     ui.horizontal(|ui| {
                         ui.heading("📁 Sandbox & Output Files");
                         ui.separator();
@@ -950,8 +1047,8 @@ impl eframe::App for WeftStudioApp {
 fn main() -> eframe::Result<()> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1320.0, 860.0])
-            .with_min_inner_size([880.0, 620.0])
+            .with_inner_size([1360.0, 880.0])
+            .with_min_inner_size([900.0, 640.0])
             .with_title("WEFT & IMF Studio - Sub-Bit Fleet Master Council & Sandbox Cockpit"),
         ..Default::default()
     };

@@ -312,5 +312,6 @@ lean_lib «FormalSuite» where
     `«BlockSparseTritonMoEInvariants»,
     `«DerivedSymplecticKVStateRollbackInvariants»,
     `«NonArchimedeanTreeCompletionInvariants»,
-    `«SubstantiveComponentInvariants»
+    `«SubstantiveComponentInvariants»,
+    `«MasterCouncilConsensusInvariants»
   ]

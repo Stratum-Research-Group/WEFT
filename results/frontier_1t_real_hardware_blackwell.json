@@ -1,0 +1,14 @@
+{
+  "device": "NVIDIA GeForce RTX 5060 Ti",
+  "architecture": "Frontier 1.04T Sparse MoE",
+  "total_shards": 64,
+  "sample_bytes_read": 4194304,
+  "nvme_prefetch_mb_s": 2813.962628371259,
+  "batch_size": 128,
+  "num_experts": 128,
+  "top_k": 4,
+  "dispatch_latency_ms": 0.018059669964713976,
+  "throughput_tokens_sec": 7087615.679029227,
+  "timestamp": 1795629203.8223724,
+  "hardware_grounded": true
+}

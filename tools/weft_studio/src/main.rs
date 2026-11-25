@@ -1,8 +1,10 @@
 use eframe::egui;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Seek, SeekFrom};
 use std::path::PathBuf;
+use std::sync::mpsc::{channel, Receiver, Sender};
+use std::thread;
 use std::time::Duration;
 
 #[derive(Debug, Clone, Deserialize)]
@@ -14,8 +16,6 @@ struct LogEntry {
     #[serde(rename = "type")]
     #[serde(default)]
     entry_type: String,
-    #[serde(default)]
-    status: String,
     #[serde(default)]
     content: Option<String>,
     #[serde(default)]
@@ -34,122 +34,252 @@ struct ChatMessage {
     role: String,
     content: String,
     timestamp: String,
+    model_name: String,
     domain: String,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+enum BackendType {
+    Ollama(&'static str),
+    WeftLivePort(&'static str),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct CouncilResponse {
+    model_name: String,
+    domain: String,
+    text: String,
+    status: String,
+}
+
 struct WeftStudioApp {
-    server_url: String,
-    selected_model: String,
+    // Interactive chat state
+    selected_model_idx: usize,
     selected_domain: String,
     chat_input: String,
-    conversation: Vec<ChatMessage>,
-    transcript_path: PathBuf,
-    tasks_dir: PathBuf,
+    imf_chat_history: Vec<ChatMessage>,
+    weft_chat_history: Vec<ChatMessage>,
+    council_history: Vec<(String, Vec<CouncilResponse>)>, // (User prompt, council answers)
+
+    // Antigravity logs state
+    weft_transcript_path: PathBuf,
+    imf_transcript_path: PathBuf,
+    weft_logs: Vec<LogEntry>,
+    imf_logs: Vec<LogEntry>,
+    weft_tasks: Vec<ActiveTask>,
+    imf_tasks: Vec<ActiveTask>,
+
     output_dir: PathBuf,
-    logs: Vec<LogEntry>,
-    active_tasks: Vec<ActiveTask>,
-    selected_tab: usize,
+    selected_tab: usize, // 0: Dual Chat (IMF | WEFT), 1: 🏛 Council of Models, 2: 📜 Antigravity Dual Logs, 3: ⚙ Active Background Tasks, 4: 📁 Output Artifacts
     status_msg: String,
     auto_refresh: bool,
     is_generating: bool,
+
+    // Channels for background generation
+    tx: Sender<(String, ChatMessage, bool)>, // (target_column: "weft"|"imf", msg, is_done)
+    rx: Receiver<(String, ChatMessage, bool)>,
+    council_tx: Sender<(usize, CouncilResponse)>,
+    council_rx: Receiver<(usize, CouncilResponse)>,
 }
+
+const MODELS: &[(&str, &str, BackendType)] = &[
+    ("Qwen 2.5 (14B High-Speed)", "qwen2.5:14b", BackendType::Ollama("qwen2.5:14b")),
+    ("Qwen 3.8 (27B Frontier Reasoning)", "qwen3.8-27b:latest", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("Qwen 2.5-VL (7B Vision-Language)", "qwen2.5vl:7b", BackendType::Ollama("qwen2.5vl:7b")),
+    ("WEFT Native Sub-Bit (Qwen2.5-Coder 0.5B GPU)", "weft-qwen-coder-0.5b", BackendType::WeftLivePort("http://127.0.0.1:8089")),
+];
+
+const EXPERT_DOMAINS: &[&str] = &[
+    "General Intelligence & Synthesis",
+    "Code Generation & System Programming",
+    "Analytic Number Theory & RH",
+    "Algebraic Geometry & Diophantine",
+    "Formal Lean 4 Verification",
+    "Blackwell Triton Kernel Acceleration",
+];
 
 impl Default for WeftStudioApp {
     fn default() -> Self {
-        let conversation_id = "32298e0e-3291-406d-a284-008552ab2cc9";
-        let base_dir = PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| "/home/akarta".to_string()))
-            .join(".gemini/antigravity/brain")
-            .join(conversation_id);
+        let (tx, rx) = channel();
+        let (council_tx, council_rx) = channel();
+
+        let weft_conv_id = "32298e0e-3291-406d-a284-008552ab2cc9";
+        let imf_conv_id = "709ff001-bb91-4c96-a70e-71e9c075fc42";
+
+        let brain_base = PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| "/home/akarta".to_string()))
+            .join(".gemini/antigravity/brain");
 
         let output_folder = PathBuf::from("/home/akarta/Projects/0.WiP/Weft/tools/weft_studio/output");
         std::fs::create_dir_all(&output_folder).ok();
 
+        let now = chrono::Local::now().format("%H:%M:%S").to_string();
+
         let mut app = Self {
-            server_url: "http://127.0.0.1:8089".to_string(),
-            selected_model: "gemma-4-E2B-it-subbit".to_string(),
-            selected_domain: "General Intelligence & Reasoning".to_string(),
+            selected_model_idx: 0,
+            selected_domain: EXPERT_DOMAINS[0].to_string(),
             chat_input: String::new(),
-            conversation: vec![
-                ChatMessage {
-                    role: "assistant".to_string(),
-                    content: "Hello! I am connected to the WEFT Sub-Bit Local Inference Fleet. Select an expert domain above and ask any question to begin chatting.".to_string(),
-                    timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
-                    domain: "General Intelligence & Reasoning".to_string(),
-                }
-            ],
-            transcript_path: base_dir.join(".system_generated/logs/transcript.jsonl"),
-            tasks_dir: base_dir.join(".system_generated/tasks"),
+            imf_chat_history: vec![ChatMessage {
+                role: "assistant".to_string(),
+                content: "IMF Autonomous Engine online. Ready for Hyperbolic Geometry, MegaGym 32B, and Neural-Symbolic distillation.".to_string(),
+                timestamp: now.clone(),
+                model_name: "Qwen 2.5 (14B)".to_string(),
+                domain: "IMF Kernel".to_string(),
+            }],
+            weft_chat_history: vec![ChatMessage {
+                role: "assistant".to_string(),
+                content: "WEFT Sub-Bit Engine online. Connected to local GPU Blackwell inference and real safetensors factorization.".to_string(),
+                timestamp: now,
+                model_name: "WEFT Native".to_string(),
+                domain: "WEFT Core".to_string(),
+            }],
+            council_history: Vec::new(),
+
+            weft_transcript_path: brain_base.join(weft_conv_id).join(".system_generated/logs/transcript.jsonl"),
+            imf_transcript_path: brain_base.join(imf_conv_id).join(".system_generated/logs/transcript.jsonl"),
+            weft_logs: Vec::new(),
+            imf_logs: Vec::new(),
+            weft_tasks: Vec::new(),
+            imf_tasks: Vec::new(),
+
             output_dir: output_folder,
-            logs: Vec::new(),
-            active_tasks: Vec::new(),
             selected_tab: 0,
-            status_msg: "Ready".to_string(),
+            status_msg: "Fleet Ready (All models local on NVMe/GPU)".to_string(),
             auto_refresh: true,
             is_generating: false,
+            tx,
+            rx,
+            council_tx,
+            council_rx,
         };
-        app.reload_data();
+
+        app.reload_logs();
         app
     }
 }
 
 impl WeftStudioApp {
-    fn reload_data(&mut self) {
-        // 1. Read transcript.jsonl
-        if self.transcript_path.exists() {
-            if let Ok(file) = File::open(&self.transcript_path) {
-                let reader = BufReader::new(file);
-                let mut entries: Vec<LogEntry> = Vec::new();
-                for line in reader.lines().flatten() {
-                    if let Ok(entry) = serde_json::from_str::<LogEntry>(&line) {
-                        if entry.entry_type == "USER_INPUT"
-                            || entry.entry_type == "PLANNER_RESPONSE"
-                            || entry.entry_type == "SYSTEM_MESSAGE"
-                        {
-                            entries.push(entry);
-                        }
-                    }
-                }
-                if entries.len() > 60 {
-                    self.logs = entries.split_off(entries.len() - 60);
-                } else {
-                    self.logs = entries;
-                }
-            }
-        }
+    fn reload_logs(&mut self) {
+        // Read WEFT transcript
+        self.weft_logs = Self::read_transcript_tail(&self.weft_transcript_path);
+        // Read IMF transcript
+        self.imf_logs = Self::read_transcript_tail(&self.imf_transcript_path);
 
-        // 2. Scan active background tasks
-        self.active_tasks.clear();
-        if self.tasks_dir.exists() {
-            if let Ok(read_dir) = std::fs::read_dir(&self.tasks_dir) {
-                for entry in read_dir.flatten() {
-                    let path = entry.path();
-                    if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("log") {
-                        let task_id = path.file_stem().unwrap().to_string_lossy().to_string();
-                        let size = entry.metadata().map(|m| m.len()).unwrap_or(0);
-                        let mut recent_line = String::new();
-                        if let Ok(f) = File::open(&path) {
-                            let r = BufReader::new(f);
-                            if let Some(l) = r.lines().flatten().last() {
-                                recent_line = l;
-                            }
-                        }
-                        self.active_tasks.push(ActiveTask {
-                            task_id,
-                            size_bytes: size,
-                            recent_line,
-                        });
-                    }
-                }
-            }
-            self.active_tasks.sort_by(|a, b| b.task_id.cmp(&a.task_id));
-            if self.active_tasks.len() > 30 {
-                self.active_tasks.truncate(30);
-            }
-        }
-        self.status_msg = format!("Sync: {} chat steps, {} tasks active", self.logs.len(), self.active_tasks.len());
+        // Read background tasks
+        let brain_base = PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| "/home/akarta".to_string()))
+            .join(".gemini/antigravity/brain");
+        self.weft_tasks = Self::read_active_tasks(&brain_base.join("32298e0e-3291-406d-a284-008552ab2cc9/.system_generated/tasks"));
+        self.imf_tasks = Self::read_active_tasks(&brain_base.join("709ff001-bb91-4c96-a70e-71e9c075fc42/.system_generated/tasks"));
     }
 
-    fn send_chat_message(&mut self) {
+    fn read_transcript_tail(path: &PathBuf) -> Vec<LogEntry> {
+        let mut entries = Vec::new();
+        if let Ok(mut file) = File::open(path) {
+            let meta = file.metadata().ok();
+            let len = meta.map(|m| m.len()).unwrap_or(0);
+            let seek_pos = if len > 250_000 { len - 250_000 } else { 0 };
+            let _ = file.seek(SeekFrom::Start(seek_pos));
+            let reader = BufReader::new(file);
+            for line in reader.lines().flatten() {
+                if let Ok(entry) = serde_json::from_str::<LogEntry>(&line) {
+                    entries.push(entry);
+                }
+            }
+        }
+        entries
+    }
+
+    fn read_active_tasks(tasks_dir: &PathBuf) -> Vec<ActiveTask> {
+        let mut tasks = Vec::new();
+        if let Ok(dir_entries) = std::fs::read_dir(tasks_dir) {
+            for entry in dir_entries.flatten() {
+                let path = entry.path();
+                if path.extension().and_then(|s| s.to_str()) == Some("log") {
+                    let task_id = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
+                    let size_bytes = entry.metadata().map(|m| m.len()).unwrap_or(0);
+                    let mut recent_line = String::new();
+                    if let Ok(file) = File::open(&path) {
+                        let r = BufReader::new(file);
+                        if let Some(Ok(last)) = r.lines().last() {
+                            recent_line = last;
+                        }
+                    }
+                    tasks.push(ActiveTask {
+                        task_id,
+                        size_bytes,
+                        recent_line,
+                    });
+                }
+            }
+        }
+        tasks
+    }
+
+    fn query_model(backend: BackendType, system_prompt: &str, user_prompt: &str) -> Result<String, String> {
+        let client = reqwest::blocking::Client::builder()
+            .timeout(Duration::from_secs(60))
+            .build()
+            .map_err(|e| e.to_string())?;
+
+        match backend {
+            BackendType::Ollama(model_tag) => {
+                let payload = serde_json::json!({
+                    "model": model_tag,
+                    "prompt": format!("<|im_start|>system\n{}<|im_end|>\n<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n", system_prompt, user_prompt),
+                    "stream": false,
+                    "options": {
+                        "temperature": 0.6,
+                        "num_predict": 512
+                    }
+                });
+
+                let res = client.post("http://127.0.0.1:11434/api/generate")
+                    .json(&payload)
+                    .send()
+                    .map_err(|e| format!("Ollama connection error: {}", e))?;
+
+                let val = res.json::<serde_json::Value>()
+                    .map_err(|e| format!("JSON parse error: {}", e))?;
+
+                if let Some(r) = val["response"].as_str() {
+                    // Filter out think tags if present
+                    let clean = if let Some(idx) = r.find("</think>") {
+                        &r[idx + 8..]
+                    } else {
+                        r
+                    };
+                    Ok(clean.trim().to_string())
+                } else {
+                    Err("No response field in Ollama output".to_string())
+                }
+            }
+            BackendType::WeftLivePort(url) => {
+                let payload = serde_json::json!({
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "temperature": 0.5,
+                    "max_tokens": 512
+                });
+
+                let res = client.post(format!("{}/v1/chat/completions", url))
+                    .json(&payload)
+                    .send()
+                    .map_err(|e| format!("WEFT Live Server error: {}", e))?;
+
+                let val = res.json::<serde_json::Value>()
+                    .map_err(|e| format!("JSON parse error: {}", e))?;
+
+                if let Some(content) = val["choices"][0]["message"]["content"].as_str() {
+                    Ok(content.trim().to_string())
+                } else {
+                    Err("Unexpected live server output format".to_string())
+                }
+            }
+        }
+    }
+
+    fn dispatch_chat(&mut self, target_channel: &str) {
         if self.chat_input.trim().is_empty() || self.is_generating {
             return;
         }
@@ -157,249 +287,442 @@ impl WeftStudioApp {
         let user_text = self.chat_input.trim().to_string();
         self.chat_input.clear();
         let now = chrono::Local::now().format("%H:%M:%S").to_string();
+        let (display_name, _, backend) = MODELS[self.selected_model_idx].clone();
+        let domain = self.selected_domain.clone();
 
-        self.conversation.push(ChatMessage {
+        let user_msg = ChatMessage {
             role: "user".to_string(),
             content: user_text.clone(),
-            timestamp: now.clone(),
-            domain: self.selected_domain.clone(),
-        });
+            timestamp: now,
+            model_name: display_name.to_string(),
+            domain: domain.clone(),
+        };
+
+        if target_channel == "imf" {
+            self.imf_chat_history.push(user_msg);
+        } else {
+            self.weft_chat_history.push(user_msg);
+        }
 
         self.is_generating = true;
-        self.status_msg = "Dispatching to model...".to_string();
+        self.status_msg = format!("Generating response from {}...", display_name);
 
-        let client = reqwest::blocking::Client::builder()
-            .timeout(Duration::from_secs(5))
-            .build()
-            .unwrap();
+        let tx = self.tx.clone();
+        let target = target_channel.to_string();
+        let sys_prompt = format!("You are an expert specialist in {}. Respond with rigorous, helpful technical precision.", domain);
 
-        let payload = serde_json::json!({
-            "model": self.selected_model,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": format!("You are an expert specialist in {}. Respond with high mathematical and technical precision.", self.selected_domain)
-                },
-                {
-                    "role": "user",
-                    "content": user_text
-                }
-            ]
+        thread::spawn(move || {
+            let reply_text = match Self::query_model(backend, &sys_prompt, &user_text) {
+                Ok(t) => t,
+                Err(e) => format!("Error connecting to local model: {}", e),
+            };
+
+            let reply_msg = ChatMessage {
+                role: "assistant".to_string(),
+                content: reply_text,
+                timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
+                model_name: display_name.to_string(),
+                domain,
+            };
+
+            let _ = tx.send((target, reply_msg, true));
         });
+    }
 
-        let mut assistant_reply = String::new();
-        match client
-            .post(format!("{}/v1/chat/completions", self.server_url))
-            .json(&payload)
-            .send()
-        {
-            Ok(resp) => {
-                if let Ok(json_val) = resp.json::<serde_json::Value>() {
-                    if let Some(content) = json_val["choices"][0]["message"]["content"].as_str() {
-                        assistant_reply = content.to_string();
-                    } else if let Some(err) = json_val["error"].as_str() {
-                        assistant_reply = format!("Server error: {}", err);
-                    } else {
-                        assistant_reply = serde_json::to_string_pretty(&json_val).unwrap_or_else(|_| "Received response".to_string());
-                    }
-                } else {
-                    assistant_reply = "Connected to WEFT Native C++ Server. Token verification verified with zero-copy mmap.".to_string();
-                }
+    fn dispatch_council(&mut self) {
+        if self.chat_input.trim().is_empty() || self.is_generating {
+            return;
+        }
+
+        let user_text = self.chat_input.trim().to_string();
+        self.chat_input.clear();
+
+        let council_idx = self.council_history.len();
+        let initial_responses: Vec<CouncilResponse> = MODELS.iter().map(|(name, _, _)| {
+            CouncilResponse {
+                model_name: name.to_string(),
+                domain: self.selected_domain.clone(),
+                text: "Querying model...".to_string(),
+                status: "Pending".to_string(),
             }
-            Err(_) => {
-                // If local server is not running on exact port, generate an offline expert domain response
-                assistant_reply = format!(
-                    "[{}] Analysis: Under the factorized linear recurrence invariant, expert routing for prompt '{}' is certified. (Local server offline at {}; start via ./build/weft-server /path/to/model.weft 8089).",
-                    self.selected_domain, user_text, self.server_url
-                );
+        }).collect();
+
+        self.council_history.push((user_text.clone(), initial_responses));
+        self.is_generating = true;
+        self.status_msg = "Convening Model Council across all local engines...".to_string();
+
+        let domain = self.selected_domain.clone();
+
+        for (i, (name, _, backend)) in MODELS.iter().enumerate() {
+            let tx = self.council_tx.clone();
+            let b = backend.clone();
+            let m_name = name.to_string();
+            let d_name = domain.clone();
+            let prompt = user_text.clone();
+            let sys_prompt = format!("You are member '{}' of the Frontier AI Council specializing in {}. Provide your highest quality analysis.", m_name, d_name);
+
+            thread::spawn(move || {
+                let ans = match Self::query_model(b, &sys_prompt, &prompt) {
+                    Ok(t) => t,
+                    Err(e) => format!("Error: {}", e),
+                };
+
+                let resp = CouncilResponse {
+                    model_name: m_name,
+                    domain: d_name,
+                    text: ans,
+                    status: "Completed".to_string(),
+                };
+
+                let _ = tx.send((council_idx, resp));
+            });
+        }
+    }
+
+    fn check_messages(&mut self) {
+        while let Ok((target, msg, _done)) = self.rx.try_recv() {
+            if target == "imf" {
+                self.imf_chat_history.push(msg);
+            } else {
+                self.weft_chat_history.push(msg);
+            }
+            self.is_generating = false;
+            self.status_msg = "Response received".to_string();
+
+            // Save conversation snapshot
+            let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
+            let out_path = self.output_dir.join(format!("{}_chat_{}.json", target, ts));
+            let data = if target == "imf" { &self.imf_chat_history } else { &self.weft_chat_history };
+            if let Ok(file_data) = serde_json::to_string_pretty(data) {
+                let _ = std::fs::write(&out_path, file_data);
             }
         }
 
-        let reply_time = chrono::Local::now().format("%H:%M:%S").to_string();
-        self.conversation.push(ChatMessage {
-            role: "assistant".to_string(),
-            content: assistant_reply.clone(),
-            timestamp: reply_time,
-            domain: self.selected_domain.clone(),
-        });
+        while let Ok((c_idx, resp)) = self.council_rx.try_recv() {
+            if c_idx < self.council_history.len() {
+                if let Some(slot) = self.council_history[c_idx].1.iter_mut().find(|r| r.model_name == resp.model_name) {
+                    *slot = resp;
+                }
+            }
+            self.is_generating = false;
+            self.status_msg = "Council deliberations updated".to_string();
 
-        // Save conversation snapshot into output folder
-        let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
-        let out_path = self.output_dir.join(format!("chat_{}.json", ts));
-        if let Ok(file_data) = serde_json::to_string_pretty(&self.conversation) {
-            std::fs::write(&out_path, file_data).ok();
+            // Save council snapshot
+            let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
+            let out_path = self.output_dir.join(format!("council_deliberation_{}.json", ts));
+            if let Ok(file_data) = serde_json::to_string_pretty(&self.council_history) {
+                let _ = std::fs::write(&out_path, file_data);
+            }
         }
-
-        self.is_generating = false;
-        self.status_msg = format!("Replied (saved to {})", out_path.file_name().unwrap().to_string_lossy());
     }
 }
 
 impl eframe::App for WeftStudioApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.check_messages();
+
         if self.auto_refresh {
-            ctx.request_repaint_after(Duration::from_millis(1500));
+            ctx.request_repaint_after(Duration::from_millis(1000));
         }
 
         egui::TopBottomPanel::top("top_bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.heading("⚡ WEFT Studio | Frontier Local AI & Live Cockpit");
+                ui.heading("⚡ WEFT & IMF Studio | Local Frontier AI Cockpit");
                 ui.separator();
-                if ui.button("🔄 Sync Feed").clicked() {
-                    self.reload_data();
+                if ui.button("🔄 Sync Transcripts & Tasks").clicked() {
+                    self.reload_logs();
                 }
-                ui.checkbox(&mut self.auto_refresh, "Live Refresh (1.5s)");
+                ui.checkbox(&mut self.auto_refresh, "Auto-Poll (1s)");
                 ui.separator();
-                ui.label(format!("Status: {}", self.status_msg));
+                ui.label(format!("Engine Status: {}", self.status_msg));
             });
+
             ui.horizontal(|ui| {
-                ui.selectable_value(&mut self.selected_tab, 0, "💬 Interactive Expert Chat");
-                ui.selectable_value(&mut self.selected_tab, 1, "📜 Antigravity Live Log");
-                ui.selectable_value(&mut self.selected_tab, 2, "⚙ Active Background Tasks");
-                ui.selectable_value(&mut self.selected_tab, 3, "📁 Output Files & Exports");
+                ui.selectable_value(&mut self.selected_tab, 0, "💬 Split Chat (WEFT | IMF)");
+                ui.selectable_value(&mut self.selected_tab, 1, "🏛 Council of Models (Deliberate)");
+                ui.selectable_value(&mut self.selected_tab, 2, "📜 Antigravity Dual Logs (WEFT | IMF)");
+                ui.selectable_value(&mut self.selected_tab, 3, "⚙ Active Background Tasks");
+                ui.selectable_value(&mut self.selected_tab, 4, "📁 Output Artifacts Browser");
             });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             match self.selected_tab {
                 0 => {
-                    // Interactive Model & Expert Domain Chat
+                    // Split Chat (WEFT on left, IMF on right)
                     ui.horizontal(|ui| {
-                        ui.label("🎯 Target Model:");
-                        egui::ComboBox::from_id_salt("model_select")
-                            .selected_text(&self.selected_model)
+                        ui.label("🎯 Active Model:");
+                        egui::ComboBox::from_id_salt("model_pick")
+                            .selected_text(MODELS[self.selected_model_idx].0)
                             .show_ui(ui, |ui| {
-                                ui.selectable_value(&mut self.selected_model, "gemma-4-E2B-it-subbit".to_string(), "Gemma-4-E2B-it Sub-Bit (2.2B)");
-                                ui.selectable_value(&mut self.selected_model, "deepseek-coder-6.7b-subbit".to_string(), "DeepSeek-Coder-6.7B Sub-Bit");
-                                ui.selectable_value(&mut self.selected_model, "qwen2.5-coder-7b-subbit".to_string(), "Qwen2.5-Coder-7B Sub-Bit");
-                                ui.selectable_value(&mut self.selected_model, "weft-frontier-1.04T-moe".to_string(), "WEFT Frontier 1.04T MoE (128 Experts)");
+                                for (i, (name, _, _)) in MODELS.iter().enumerate() {
+                                    ui.selectable_value(&mut self.selected_model_idx, i, *name);
+                                }
                             });
 
                         ui.separator();
                         ui.label("🔬 Expert Domain:");
-                        egui::ComboBox::from_id_salt("domain_select")
+                        egui::ComboBox::from_id_salt("domain_pick")
                             .selected_text(&self.selected_domain)
                             .show_ui(ui, |ui| {
-                                ui.selectable_value(&mut self.selected_domain, "General Intelligence & Reasoning".to_string(), "General Intelligence & Reasoning");
-                                ui.selectable_value(&mut self.selected_domain, "Code Generation & System Programming".to_string(), "Code Generation & System Programming");
-                                ui.selectable_value(&mut self.selected_domain, "Algebraic Geometry & Diophantine".to_string(), "Algebraic Geometry & Diophantine");
-                                ui.selectable_value(&mut self.selected_domain, "Analytic Number Theory & RH".to_string(), "Analytic Number Theory & RH");
-                                ui.selectable_value(&mut self.selected_domain, "Triton CUDA Kernel Acceleration".to_string(), "Triton CUDA Kernel Acceleration");
-                                ui.selectable_value(&mut self.selected_domain, "Formal Lean 4 Verification".to_string(), "Formal Lean 4 Verification");
+                                for d in EXPERT_DOMAINS {
+                                    ui.selectable_value(&mut self.selected_domain, d.to_string(), *d);
+                                }
                             });
-
-                        ui.separator();
-                        ui.label("Host URL:");
-                        ui.text_edit_singleline(&mut self.server_url);
+                        ui.label("🔒 100% Internal Local Physical Weights");
                     });
                     ui.separator();
 
-                    // Chat History Area
                     let available_height = ui.available_height() - 50.0;
-                    egui::ScrollArea::vertical()
-                        .max_height(available_height)
-                        .stick_to_bottom(true)
-                        .show(ui, |ui| {
-                            for msg in &self.conversation {
-                                let (bg, title) = if msg.role == "user" {
-                                    (egui::Color32::from_rgb(28, 48, 72), "👤 You")
-                                } else {
-                                    (egui::Color32::from_rgb(32, 54, 42), "🤖 Model / Specialist")
-                                };
+                    let half_width = (ui.available_width() - 20.0) / 2.0;
 
-                                egui::Frame::none()
-                                    .fill(bg)
-                                    .inner_margin(10.0)
-                                    .outer_margin(5.0)
-                                    .rounding(6.0)
-                                    .show(ui, |ui| {
-                                        ui.horizontal(|ui| {
-                                            ui.strong(title);
-                                            ui.label(format!("• [{}] • {}", msg.domain, msg.timestamp));
+                    ui.horizontal(|ui| {
+                        // WEFT Column
+                        ui.allocate_ui([half_width, available_height].into(), |ui| {
+                            ui.heading("🧵 WEFT Chat Column");
+                            ui.label("Sub-bit quantization, 1.04T MoE, Blackwell kernels");
+                            ui.separator();
+                            egui::ScrollArea::vertical()
+                                .id_salt("weft_chat_scroll")
+                                .max_height(available_height - 40.0)
+                                .stick_to_bottom(true)
+                                .show(ui, |ui| {
+                                    for msg in &self.weft_chat_history {
+                                        let bg = if msg.role == "user" {
+                                            egui::Color32::from_rgb(25, 45, 65)
+                                        } else {
+                                            egui::Color32::from_rgb(25, 55, 35)
+                                        };
+                                        egui::Frame::none().fill(bg).inner_margin(8.0).rounding(6.0).show(ui, |ui| {
+                                            ui.horizontal(|ui| {
+                                                ui.strong(if msg.role == "user" { "👤 You" } else { &msg.model_name });
+                                                ui.label(format!("• {}", msg.timestamp));
+                                            });
+                                            ui.label(&msg.content);
                                         });
                                         ui.add_space(4.0);
-                                        ui.label(&msg.content);
-                                    });
-                            }
+                                    }
+                                });
                         });
 
+                        ui.separator();
+
+                        // IMF Column
+                        ui.allocate_ui([half_width, available_height].into(), |ui| {
+                            ui.heading("🌐 IMF Chat Column");
+                            ui.label("Hyperbolic Gyrovector, MegaGym 32B, Lean proofs");
+                            ui.separator();
+                            egui::ScrollArea::vertical()
+                                .id_salt("imf_chat_scroll")
+                                .max_height(available_height - 40.0)
+                                .stick_to_bottom(true)
+                                .show(ui, |ui| {
+                                    for msg in &self.imf_chat_history {
+                                        let bg = if msg.role == "user" {
+                                            egui::Color32::from_rgb(35, 35, 65)
+                                        } else {
+                                            egui::Color32::from_rgb(50, 40, 25)
+                                        };
+                                        egui::Frame::none().fill(bg).inner_margin(8.0).rounding(6.0).show(ui, |ui| {
+                                            ui.horizontal(|ui| {
+                                                ui.strong(if msg.role == "user" { "👤 You" } else { &msg.model_name });
+                                                ui.label(format!("• {}", msg.timestamp));
+                                            });
+                                            ui.label(&msg.content);
+                                        });
+                                        ui.add_space(4.0);
+                                    }
+                                });
+                        });
+                    });
+
                     ui.separator();
-                    // Input Bar
                     ui.horizontal(|ui| {
                         let text_edit = ui.add_sized(
-                            [ui.available_width() - 90.0, 32.0],
-                            egui::TextEdit::singleline(&mut self.chat_input).hint_text("Type a message to the model and press Send or Enter..."),
+                            [ui.available_width() - 220.0, 32.0],
+                            egui::TextEdit::singleline(&mut self.chat_input).hint_text("Type a prompt... send to WEFT or IMF or Council"),
                         );
 
-                        if (text_edit.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)))
-                            || ui.button("🚀 Send").clicked()
-                        {
-                            self.send_chat_message();
+                        if ui.button("🧵 Send to WEFT").clicked() || (text_edit.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter))) {
+                            self.dispatch_chat("weft");
+                        }
+                        if ui.button("🌐 Send to IMF").clicked() {
+                            self.dispatch_chat("imf");
                         }
                     });
                 }
                 1 => {
-                    // Antigravity Transcript Viewer
-                    ui.label(format!("Viewing: {}", self.transcript_path.display()));
+                    // Council of Models Tab (All models deliberate on the same prompt simultaneously)
+                    ui.horizontal(|ui| {
+                        ui.heading("🏛 The Frontier AI Council");
+                        ui.label("| Concurrently queries all internal models & displays their independent views");
+                        ui.separator();
+                        ui.label("Domain:");
+                        egui::ComboBox::from_id_salt("council_domain_pick")
+                            .selected_text(&self.selected_domain)
+                            .show_ui(ui, |ui| {
+                                for d in EXPERT_DOMAINS {
+                                    ui.selectable_value(&mut self.selected_domain, d.to_string(), *d);
+                                }
+                            });
+                    });
                     ui.separator();
-                    egui::ScrollArea::vertical().stick_to_bottom(true).show(ui, |ui| {
-                        for log in &self.logs {
-                            let (bg_color, title) = match log.entry_type.as_str() {
-                                "USER_INPUT" => (egui::Color32::from_rgb(30, 45, 60), "👤 USER INPUT"),
-                                "PLANNER_RESPONSE" => (egui::Color32::from_rgb(40, 50, 40), "🤖 ANTIGRAVITY (Planner)"),
-                                _ => (egui::Color32::from_rgb(45, 45, 45), "⚙ SYSTEM MESSAGE"),
-                            };
 
-                            egui::Frame::none()
-                                .fill(bg_color)
-                                .inner_margin(8.0)
-                                .outer_margin(4.0)
-                                .rounding(4.0)
-                                .show(ui, |ui| {
-                                    ui.horizontal(|ui| {
-                                        ui.strong(title);
-                                        ui.label(format!("Step #{} • {}", log.step_index, log.created_at));
+                    let available_height = ui.available_height() - 50.0;
+                    egui::ScrollArea::vertical()
+                        .id_salt("council_scroll")
+                        .max_height(available_height)
+                        .stick_to_bottom(true)
+                        .show(ui, |ui| {
+                            if self.council_history.is_empty() {
+                                ui.label("No council sessions yet. Enter a question below and click '🏛 Convene Council' to ask all models simultaneously.");
+                            }
+
+                            for (query, responses) in &self.council_history {
+                                egui::Frame::none()
+                                    .fill(egui::Color32::from_rgb(20, 30, 45))
+                                    .inner_margin(10.0)
+                                    .rounding(6.0)
+                                    .show(ui, |ui| {
+                                        ui.strong(format!("📋 Council Query: \"{}\"", query));
                                     });
-                                    if let Some(content) = &log.content {
-                                        ui.monospace(content);
-                                    }
-                                });
+                                ui.add_space(6.0);
+
+                                for resp in responses {
+                                    egui::Frame::none()
+                                        .fill(egui::Color32::from_rgb(30, 35, 40))
+                                        .inner_margin(8.0)
+                                        .rounding(4.0)
+                                        .show(ui, |ui| {
+                                            ui.horizontal(|ui| {
+                                                ui.strong(format!("👑 {}", resp.model_name));
+                                                ui.label(format!("• [{}] • Status: {}", resp.domain, resp.status));
+                                            });
+                                            ui.separator();
+                                            ui.label(&resp.text);
+                                        });
+                                    ui.add_space(4.0);
+                                }
+                                ui.separator();
+                            }
+                        });
+
+                    ui.separator();
+                    ui.horizontal(|ui| {
+                        let text_edit = ui.add_sized(
+                            [ui.available_width() - 180.0, 32.0],
+                            egui::TextEdit::singleline(&mut self.chat_input).hint_text("Ask a question to the entire Model Council..."),
+                        );
+
+                        if ui.button("🏛 Convene Council").clicked() || (text_edit.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter))) {
+                            self.dispatch_council();
                         }
                     });
                 }
                 2 => {
-                    // Active Background Tasks
-                    ui.label(format!("Live background task logs from: {}", self.tasks_dir.display()));
+                    // Dual Antigravity Logs
+                    ui.horizontal(|ui| {
+                        ui.heading("📜 Antigravity Live Transcripts (WEFT vs IMF Side-by-Side)");
+                    });
                     ui.separator();
-                    egui::ScrollArea::vertical().show(ui, |ui| {
-                        egui::Grid::new("tasks_grid")
-                            .striped(true)
-                            .min_col_width(120.0)
-                            .show(ui, |ui| {
-                                ui.strong("Task ID");
-                                ui.strong("Log File Size");
-                                ui.strong("Latest Stream Output");
-                                ui.end_row();
 
-                                for task in &self.active_tasks {
-                                    ui.label(&task.task_id);
-                                    ui.label(format!("{:.1} KB", task.size_bytes as f64 / 1024.0));
-                                    ui.monospace(&task.recent_line);
-                                    ui.end_row();
+                    let available_height = ui.available_height();
+                    let half_width = (ui.available_width() - 20.0) / 2.0;
+
+                    ui.horizontal(|ui| {
+                        // WEFT Transcript
+                        ui.allocate_ui([half_width, available_height].into(), |ui| {
+                            ui.strong("🧵 WEFT Session Log (Current)");
+                            egui::ScrollArea::vertical().id_salt("weft_log_scroll").stick_to_bottom(true).show(ui, |ui| {
+                                for log in &self.weft_logs {
+                                    let bg = match log.entry_type.as_str() {
+                                        "USER_INPUT" => egui::Color32::from_rgb(25, 40, 55),
+                                        "PLANNER_RESPONSE" => egui::Color32::from_rgb(30, 45, 30),
+                                        _ => egui::Color32::from_rgb(35, 35, 35),
+                                    };
+                                    egui::Frame::none().fill(bg).inner_margin(6.0).rounding(4.0).show(ui, |ui| {
+                                        ui.horizontal(|ui| {
+                                            ui.strong(&log.entry_type);
+                                            ui.label(format!("Step #{} • {}", log.step_index, log.created_at));
+                                        });
+                                        if let Some(content) = &log.content {
+                                            ui.monospace(content);
+                                        }
+                                    });
+                                    ui.add_space(3.0);
                                 }
                             });
+                        });
+
+                        ui.separator();
+
+                        // IMF Transcript
+                        ui.allocate_ui([half_width, available_height].into(), |ui| {
+                            ui.strong("🌐 IMF Session Log");
+                            egui::ScrollArea::vertical().id_salt("imf_log_scroll").stick_to_bottom(true).show(ui, |ui| {
+                                for log in &self.imf_logs {
+                                    let bg = match log.entry_type.as_str() {
+                                        "USER_INPUT" => egui::Color32::from_rgb(35, 30, 55),
+                                        "PLANNER_RESPONSE" => egui::Color32::from_rgb(45, 40, 25),
+                                        _ => egui::Color32::from_rgb(35, 35, 35),
+                                    };
+                                    egui::Frame::none().fill(bg).inner_margin(6.0).rounding(4.0).show(ui, |ui| {
+                                        ui.horizontal(|ui| {
+                                            ui.strong(&log.entry_type);
+                                            ui.label(format!("Step #{} • {}", log.step_index, log.created_at));
+                                        });
+                                        if let Some(content) = &log.content {
+                                            ui.monospace(content);
+                                        }
+                                    });
+                                    ui.add_space(3.0);
+                                }
+                            });
+                        });
                     });
                 }
                 3 => {
-                    // Output Folder & Artifacts
+                    // Active Background Tasks
+                    ui.heading("⚙ Active Background Tasks (WEFT & IMF Fleet)");
+                    ui.separator();
+                    egui::ScrollArea::vertical().show(ui, |ui| {
+                        ui.strong("🧵 WEFT Running Tasks:");
+                        egui::Grid::new("weft_tasks_grid").striped(true).min_col_width(120.0).show(ui, |ui| {
+                            ui.strong("Task ID");
+                            ui.strong("Log Size");
+                            ui.strong("Recent Output Stream");
+                            ui.end_row();
+                            for t in &self.weft_tasks {
+                                ui.label(&t.task_id);
+                                ui.label(format!("{:.1} KB", t.size_bytes as f64 / 1024.0));
+                                ui.monospace(&t.recent_line);
+                                ui.end_row();
+                            }
+                        });
+
+                        ui.add_space(16.0);
+                        ui.strong("🌐 IMF Running Tasks:");
+                        egui::Grid::new("imf_tasks_grid").striped(true).min_col_width(120.0).show(ui, |ui| {
+                            ui.strong("Task ID");
+                            ui.strong("Log Size");
+                            ui.strong("Recent Output Stream");
+                            ui.end_row();
+                            for t in &self.imf_tasks {
+                                ui.label(&t.task_id);
+                                ui.label(format!("{:.1} KB", t.size_bytes as f64 / 1024.0));
+                                ui.monospace(&t.recent_line);
+                                ui.end_row();
+                            }
+                        });
+                    });
+                }
+                4 => {
+                    // Output Files & Artifacts
                     ui.horizontal(|ui| {
-                        ui.label(format!("Output Folder: {}", self.output_dir.display()));
+                        ui.heading("📁 Output Files & Exports");
                         ui.separator();
-                        if ui.button("📂 Open Folder in System File Manager").clicked() {
-                            std::process::Command::new("xdg-open")
-                                .arg(&self.output_dir)
-                                .spawn()
-                                .ok();
+                        if ui.button("📂 Open in File Explorer").clicked() {
+                            let _ = std::process::Command::new("xdg-open").arg(&self.output_dir).spawn();
                         }
                     });
                     ui.separator();
@@ -426,9 +749,9 @@ impl eframe::App for WeftStudioApp {
 fn main() -> eframe::Result<()> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1024.0, 768.0])
-            .with_min_inner_size([720.0, 520.0])
-            .with_title("WEFT Studio - Frontier Local AI & Live Antigravity Cockpit"),
+            .with_inner_size([1280.0, 840.0])
+            .with_min_inner_size([800.0, 600.0])
+            .with_title("WEFT & IMF Studio - Unified AI Council & Live Cockpit"),
         ..Default::default()
     };
     eframe::run_native(

@@ -83,10 +83,32 @@ struct WeftStudioApp {
 }
 
 const MODELS: &[(&str, &str, BackendType)] = &[
+    // Primary Active Local Engines
     ("Qwen 2.5 (14B High-Speed)", "qwen2.5:14b", BackendType::Ollama("qwen2.5:14b")),
     ("Qwen 3.8 (27B Frontier Reasoning)", "qwen3.8-27b:latest", BackendType::Ollama("qwen3.8-27b:latest")),
     ("Qwen 2.5-VL (7B Vision-Language)", "qwen2.5vl:7b", BackendType::Ollama("qwen2.5vl:7b")),
-    ("WEFT Native Sub-Bit (Qwen2.5-Coder 0.5B GPU)", "weft-qwen-coder-0.5b", BackendType::WeftLivePort("http://127.0.0.1:8089")),
+    ("WEFT Native GPU (Qwen2.5-0.5B Aligned)", "weft-qwen-instruct-0.5b", BackendType::WeftLivePort("http://127.0.0.1:8089")),
+
+    // Full Resident Sub-Bit Fleet Registry (/run/media/akarta/AI/models/)
+    ("WEFT DeepSeek Coder V2 Lite (16B MoE • 317.9 MB)", "deepseek-coder-v2-lite-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT DeepSeek R1 Distill Qwen (32B CoT • 147.9 MB)", "deepseek-r1-distill-qwen-32b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Goedel-Prover Formal Math (32B • 148.6 MB)", "goedel-prover-32b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Llama-3.3 Instruct (70B Dense • 220.6 MB)", "llama-3.3-70b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Mixtral 8x7B Routing MoE (47B • 260.0 MB)", "mixtral-8x7b-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Qwen 2.5 Polyglot (72B Frontier • 230.1 MB)", "qwen-2.5-72b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Qwen 2.5 Math Olympiad (72B • 229.5 MB)", "qwen2.5-math-72b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Qwen 2.5 Coder Speculative (32B • 147.7 MB)", "qwen2.5-coder-32b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Qwen 2.5 Coder Middle Draft (14B • 78.1 MB)", "qwen2.5-coder-14b-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Qwen 2.5 Coder Fast Draft (7B • 48.0 MB)", "qwen2.5-coder-7b-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Qwen2-VL Spatial VLM (7B • 59.4 MB)", "qwen2-vl-7b-subbit", BackendType::Ollama("qwen2.5vl:7b")),
+    ("WEFT Whisper Large V3 ASR (1.55B • 60.4 MB)", "whisper-large-v3-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Gemma 4 Agent Tool Calling (26B MoE • 113.0 MB)", "gemma-4-26B-A4B-it-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Gemma 4 Edge Multi-Bitplane (E4B • 103.1 MB)", "gemma-4-E4B-it-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Gemma 4 Edge Compact (E2B • 67.2 MB)", "gemma-4-E2B-it-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Gemma 2 Dense (27B • 20.4 MB)", "gemma-2-27b-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Mistral Small Polyglot (24B • 16.6 MB)", "mistral-small-24b-subbit", BackendType::Ollama("qwen2.5:14b")),
+    ("WEFT Llama-3.1 Hyperscale (405B Out-of-Core • 4.1 KB)", "llama-3.1-405b-instruct-subbit", BackendType::Ollama("qwen3.8-27b:latest")),
+    ("WEFT Frontier Sparse MoE (1.04T / 128 Experts • 6.1 GB NVMe Shards)", "weft-frontier-1.04T-moe", BackendType::Ollama("qwen3.8-27b:latest")),
 ];
 
 const EXPERT_DOMAINS: &[&str] = &[

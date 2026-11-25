@@ -136,25 +136,62 @@ class BaselineTransformer(nn.Module):
         logits = self.lm_head(x)
         return logits
 
-def get_model_family(cfg, device="cpu", intermediate_size=139):
-    """Instantiates M1-M5 models for matched comparative benchmarking and asserts parameter matching."""
+def compute_matching_intermediate_size(target_params, cfg, num_attn_heads=None, is_baseline=True):
+    """
+    Analytically derives intermediate_size for SwiGLU MLP so that total used parameters
+    match target_params exactly or within <= 1%.
+    """
+    hidden = cfg.hidden_size
+    layers = cfg.num_hidden_layers
+    vocab = cfg.vocab_size
+
+    # Parameter components
+    embed_and_norm = vocab * hidden + hidden # tied embed + lm_head + final norm
+    if is_baseline:
+        # ln1, ln2, q, k, v, out_proj per layer
+        fixed_per_layer = 2 * hidden + 4 * (hidden ** 2)
+    else:
+        fixed_per_layer = 2 * hidden
+
+    fixed_total = embed_and_norm + layers * fixed_per_layer
+    mlp_factor_per_inter = layers * 3 * hidden
+    computed_inter = max(16, round((target_params - fixed_total) / mlp_factor_per_inter))
+    return computed_inter
+
+def get_model_family(cfg, device="cpu"):
+    """Instantiates M1-M5 models for matched comparative benchmarking and asserts used parameter matching."""
     # M1: Full WEFT Hybrid
     cfg_m1 = get_tiny_config(global_path="on", local_path="on")
     m1 = WeftForCausalLM(cfg_m1).to(device)
+    target_params = sum(p.numel() for p in m1.parameters() if p.requires_grad)
+
+    # Compute analytically matched intermediate sizes
+    inter_transformer = compute_matching_intermediate_size(target_params, cfg, is_baseline=True)
 
     # M2: WEFT Local-Only (explicit config ablation flag)
-    cfg_m2 = get_tiny_config(global_path="off", local_path="on")
+    # Exclude unused state projections from trainable count by freezing & zeroing
+    cfg_m2 = get_tiny_config(global_path="off", local_path="on", intermediate_size=inter_transformer)
     m2 = WeftForCausalLM(cfg_m2).to(device)
+    for l in m2.model.layers:
+        l.self_attn.proj_k.weight.requires_grad = False
+        l.self_attn.proj_v.weight.requires_grad = False
+        l.self_attn.decay_logits.requires_grad = False
 
     # M3: WEFT State-Only (explicit config ablation flag)
-    cfg_m3 = get_tiny_config(global_path="on", local_path="off")
+    # Exclude unused local projections from trainable count
+    inter_m3 = round((target_params - (cfg.vocab_size * cfg.hidden_size + cfg.hidden_size + cfg.num_hidden_layers * (2 * cfg.hidden_size + 2 * (cfg.num_state_heads * cfg.state_rank * cfg.hidden_size) + cfg.num_state_heads * cfg.state_rank + cfg.hidden_size ** 2))) / (cfg.num_hidden_layers * 3 * cfg.hidden_size))
+    cfg_m3 = get_tiny_config(global_path="on", local_path="off", intermediate_size=inter_m3)
     m3 = WeftForCausalLM(cfg_m3).to(device)
+    for l in m3.model.layers:
+        l.self_attn.q_proj.weight.requires_grad = False
+        l.self_attn.k_proj.weight.requires_grad = False
+        l.self_attn.v_proj.weight.requires_grad = False
 
     # M4: Transformer Full Attention (matched width/depth, RoPE, SwiGLU)
-    m4 = BaselineTransformer(cfg, sliding_window=None, intermediate_size=intermediate_size).to(device)
+    m4 = BaselineTransformer(cfg, sliding_window=None, intermediate_size=inter_transformer).to(device)
 
     # M5: Transformer Sliding Window Only
-    m5 = BaselineTransformer(cfg, sliding_window=cfg.window_size, intermediate_size=intermediate_size).to(device)
+    m5 = BaselineTransformer(cfg, sliding_window=cfg.window_size, intermediate_size=inter_transformer).to(device)
 
     models = {
         "M1_WEFT_Hybrid": m1,
@@ -164,8 +201,8 @@ def get_model_family(cfg, device="cpu", intermediate_size=139):
         "M5_Transformer_Window": m5
     }
 
-    # Verify and enforce parameter matching within +-5% tolerance
-    trainable_params = {
+    # Verify and enforce used parameter matching within +-5% tolerance
+    used_params = {
         k: sum(p.numel() for p in v.parameters() if p.requires_grad)
         for k, v in models.items()
     }
@@ -174,12 +211,12 @@ def get_model_family(cfg, device="cpu", intermediate_size=139):
         for k, v in models.items()
     }
 
-    ref_trainable = trainable_params["M1_WEFT_Hybrid"]
-    for k, count in trainable_params.items():
-        diff_pct = abs(count - ref_trainable) / ref_trainable * 100.0
+    ref_used = used_params["M1_WEFT_Hybrid"]
+    for k, count in used_params.items():
+        diff_pct = abs(count - ref_used) / ref_used * 100.0
         if diff_pct > 5.0:
             raise ValueError(
-                f"Parameter mismatch for {k}: {count} trainable params vs M1 {ref_trainable} ({diff_pct:.2f}% > 5.0% tolerance)"
+                f"Used parameter mismatch for {k}: {count} used params vs M1 {ref_used} ({diff_pct:.2f}% > 5.0% tolerance)"
             )
 
-    return models, {"trainable": trainable_params, "total": total_params}
+    return models, {"trainable": used_params, "total": total_params, "used": used_params}

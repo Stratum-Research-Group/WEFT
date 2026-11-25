@@ -14,30 +14,39 @@ import numpy as np
 from weft_suite.common import get_tiny_config, set_seed
 from weft_suite.baselines import get_model_family
 
-def get_wikitext_splits(val_ratio=0.2):
-    """Loads WikiText-2 tokens and partitions into deterministic train/val splits."""
+import hashlib
+
+def get_wikitext_splits(tier="standard", val_ratio=0.2):
+    """Loads WikiText-2 tokens and partitions into deterministic train/val splits.
+    Fails if the file is missing outside smoke tier. Computes and returns sha256 hash.
+    """
     wikitext_path = "data/wikitext2/wikitext-2-raw-test.txt"
     if os.path.exists(wikitext_path):
-        with open(wikitext_path, "r", encoding="utf-8") as f:
-            text = f.read()
-        raw_bytes = list(text.encode("utf-8"))
-        # Byte values 0..255 mapped to token IDs 1..256 (0 reserved for pad)
-        token_ids = [b + 1 for b in raw_bytes]
+        with open(wikitext_path, "rb") as f:
+            raw_data = f.read()
+        file_hash = hashlib.sha256(raw_data).hexdigest()
+        token_ids = [b + 1 for b in raw_data]
     else:
-        # Deterministic pseudo-random fallback text stream for isolated environments
+        if tier != "smoke":
+            raise FileNotFoundError(
+                f"Missing required real dataset {wikitext_path}. Outside smoke tier, silent fallback is prohibited. "
+                f"Run 'python scripts/download_wikitext2.py' to fetch the canonical dataset."
+            )
+        file_hash = "synthetic_smoke_stream_fallback"
         rng = np.random.RandomState(42)
         token_ids = rng.randint(1, 257, size=50000).tolist()
 
+    # Split into contiguous blocks (80% train / 20% val)
     split_idx = int(len(token_ids) * (1.0 - val_ratio))
     train_tokens = torch.tensor(token_ids[:split_idx], dtype=torch.long)
     val_tokens = torch.tensor(token_ids[split_idx:], dtype=torch.long)
-    return train_tokens, val_tokens
+    return train_tokens, val_tokens, file_hash
 
-def run_a1_language_modeling_sweep(device="cpu", steps=100, seeds=(1234, 1235, 1236)):
+def run_a1_language_modeling_sweep(device="cpu", steps=100, seeds=(1234, 1235, 1236), tier="standard"):
     """A1: Evaluates learning curves across M1-M5 on real token streams with held-out validation."""
-    print(f"[BENCH A1] Running matched architecture language modeling sweep ({device}, {steps} steps, 3 seeds)...")
+    print(f"[BENCH A1] Running matched architecture language modeling sweep ({device}, {steps} steps, 3 seeds, tier={tier})...")
     cfg = get_tiny_config()
-    train_tokens, val_tokens = get_wikitext_splits()
+    train_tokens, val_tokens, data_hash = get_wikitext_splits(tier=tier)
     seq_len = 64
     batch_size = 4
     val_steps = 20
@@ -107,11 +116,11 @@ def run_a1_language_modeling_sweep(device="cpu", steps=100, seeds=(1234, 1235, 1
             results[m_name]["final_val_ppls"].append(final_val_ppl)
             results[m_name]["train_curves"].append(train_losses)
 
-    summary = {}
+    summary = {"dataset_sha256": data_hash, "tier": tier, "models": {}}
     for m_name, d in results.items():
         arr_loss = np.array(d["final_val_losses"])
         arr_ppl = np.array(d["final_val_ppls"])
-        summary[m_name] = {
+        summary["models"][m_name] = {
             "trainable_params": d["trainable_params"],
             "mean_val_loss": float(np.mean(arr_loss)),
             "std_val_loss": float(np.std(arr_loss)),
@@ -119,7 +128,7 @@ def run_a1_language_modeling_sweep(device="cpu", steps=100, seeds=(1234, 1235, 1
             "std_val_ppl": float(np.std(arr_ppl)),
             "per_seed_loss": [float(v) for v in arr_loss]
         }
-        print(f"  - {m_name:<22s}: Val Loss = {summary[m_name]['mean_val_loss']:.4f} +- {summary[m_name]['std_val_loss']:.4f} (PPL = {summary[m_name]['mean_val_ppl']:.2f})")
+        print(f"  - {m_name:<22s}: Val Loss = {summary['models'][m_name]['mean_val_loss']:.4f} +- {summary['models'][m_name]['std_val_loss']:.4f} (PPL = {summary['models'][m_name]['mean_val_ppl']:.2f})")
 
     return summary
 

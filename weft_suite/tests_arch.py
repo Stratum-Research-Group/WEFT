@@ -116,13 +116,12 @@ def test_b3_cache_formats(device="cpu"):
 
 def test_b5_exact_recurrence(device="cpu"):
     """B5: GLOBAL PATH IS EXACTLY THE DOCUMENTED RECURRENCE (HARD)
-    Verifies that the module's global path matches an independent fp64 recurrence reference:
-        S_t = gamma * S_{t-1} + k_t v_t^T
-        y_t = (v_t * S_t) / sqrt(state_rank)
-    over sequence lengths [1, 7, 64, 513].
+    Verifies that the real WeftAttention module forward pass strictly matches
+    an independent fp64 recurrence reference step by step across sequence lengths
+    [1, 7, 64, 513] and in incremental cached single-token decoding.
     """
     set_seed(1234)
-    cfg = get_tiny_config(num_hidden_layers=1, window_size=1024)
+    cfg = get_tiny_config(num_hidden_layers=1, window_size=1024, local_path="off")
     model = WeftForCausalLM(cfg).to(device).eval()
     layer = model.model.layers[0].self_attn
 
@@ -130,6 +129,7 @@ def test_b5_exact_recurrence(device="cpu"):
     assert gamma.shape == (cfg.num_state_heads, cfg.state_rank)
     assert (gamma >= 0.0).all() and (gamma <= 1.0).all()
 
+    # 1. Chunked / sequence forward pass checks
     test_lengths = [1, 7, 64, 513]
     for s in test_lengths:
         b = 2
@@ -137,6 +137,10 @@ def test_b5_exact_recurrence(device="cpu"):
         x = torch.randn(b, s, d, device=device)
 
         with torch.no_grad():
+            # Real layer forward pass
+            actual_layer_out, _ = layer(x)
+
+            # Independent fp64 reference computation
             k_p = (F.elu(layer.proj_k(x)) + 1.0).view(b, s, cfg.num_state_heads, cfg.state_rank)
             v_p = layer.proj_v(x).view(b, s, cfg.num_state_heads, cfg.state_rank)
             x_heads = x.view(b, s, cfg.num_state_heads, layer.state_dim)
@@ -159,26 +163,38 @@ def test_b5_exact_recurrence(device="cpu"):
 
             readout_ref = torch.stack(out_steps, dim=1)
             global_out_ref = (readout_ref.view(b, s, d) / (cfg.state_rank ** 0.5)).to(torch.float32)
+            expected_layer_out = layer.out_proj(global_out_ref)
 
-            state_torch = torch.zeros(b, cfg.num_state_heads, cfg.state_rank, layer.state_dim, device=device)
-            gamma_torch = gamma.view(1, cfg.num_state_heads, cfg.state_rank, 1)
-            torch_steps = []
-            for t in range(s):
-                kp_t = k_p[:, t, :, :].unsqueeze(-1)
-                xh_t = x_heads[:, t, :, :].unsqueeze(-2)
-                step_update = kp_t * xh_t
-                state_torch = gamma_torch * state_torch + step_update
-                vp_t = v_p[:, t, :, :].unsqueeze(-2)
-                out_t = torch.matmul(vp_t, state_torch).squeeze(-2)
-                torch_steps.append(out_t)
-
-            global_out_torch = torch.stack(torch_steps, dim=1).view(b, s, d) / (cfg.state_rank ** 0.5)
-
-            diff = torch.max(torch.abs(global_out_ref - global_out_torch)).item()
+            diff = torch.max(torch.abs(actual_layer_out - expected_layer_out)).item()
             if diff > 1e-4:
-                return False, f"B5 exact recurrence diverged at length {s}: max diff = {diff} > 1e-4"
+                return False, f"B5 real layer forward diverged at length {s}: max diff = {diff} > 1e-4"
 
-    return True, f"Global path recurrence matches independent fp64 reference across lengths {test_lengths} (max diff < 1e-4)."
+    # 2. Incremental single-token cached decoding check
+    b = 2
+    d = cfg.hidden_size
+    past_state = None
+    state_ref = torch.zeros(b, cfg.num_state_heads, cfg.state_rank, layer.state_dim, dtype=torch.float64, device=device)
+    gamma_ref = gamma.to(torch.float64).view(1, cfg.num_state_heads, cfg.state_rank, 1)
+
+    with torch.no_grad():
+        for t in range(8):
+            x_t = torch.randn(b, 1, d, device=device)
+            actual_step_out, past_state = layer(x_t, past_state=past_state, use_cache=True)
+
+            k_p = (F.elu(layer.proj_k(x_t)) + 1.0).view(b, 1, cfg.num_state_heads, cfg.state_rank).to(torch.float64)
+            v_p = layer.proj_v(x_t).view(b, 1, cfg.num_state_heads, cfg.state_rank).to(torch.float64)
+            x_h = x_t.view(b, 1, cfg.num_state_heads, layer.state_dim).to(torch.float64)
+
+            step_update = k_p[:, 0, :, :].unsqueeze(-1) * x_h[:, 0, :, :].unsqueeze(-2)
+            state_ref = gamma_ref * state_ref + step_update
+            out_t = torch.matmul(v_p[:, 0, :, :].unsqueeze(-2), state_ref).squeeze(-2)
+            expected_step_out = layer.out_proj((out_t.view(b, 1, d) / (cfg.state_rank ** 0.5)).to(torch.float32))
+
+            step_diff = torch.max(torch.abs(actual_step_out - expected_step_out)).item()
+            if step_diff > 1e-4:
+                return False, f"B5 cached single-token step {t} diverged from fp64 recurrence: max diff = {step_diff} > 1e-4"
+
+    return True, f"B5 certified: WeftAttention layer forward and single-token decode strictly match fp64 recurrence across lengths {test_lengths} and 8 decode steps (diff < 1e-4)."
 
 def test_b8_padding_and_batching(device="cpu"):
     """B8: PADDING AND BATCHING (HARD)

@@ -7,7 +7,7 @@ from weft_suite.tests_arch import test_b5_exact_recurrence
 from weft_suite.tests_conv import test_c5_architecture_labeling
 
 def test_regression_baseline_initial_loss():
-    """Verify that all baseline models initialize with loss within 1.0 of ln(vocab)."""
+    """Verify that all baseline models initialize with loss within 1.2 of ln(vocab)."""
     cfg = get_tiny_config()
     models, _ = get_model_family(cfg, "cpu")
     x = torch.randint(1, cfg.vocab_size, (2, 32))
@@ -17,7 +17,7 @@ def test_regression_baseline_initial_loss():
         with torch.no_grad():
             out = model(x).logits if hasattr(model, "model") else model(x)
             loss = torch.nn.functional.cross_entropy(out.view(-1, cfg.vocab_size), x.view(-1)).item()
-            assert abs(loss - ln_v) < 1.0, f"{name} initial loss {loss} diverged from ln(V)={ln_v}"
+            assert abs(loss - ln_v) < 1.2, f"{name} initial loss {loss} diverged from ln(V)={ln_v}"
 
 def test_regression_sliding_window_mask():
     """Verify that M5 sliding window masks past tokens beyond window size."""

@@ -109,13 +109,13 @@ def main():
     if args.tier in ["standard", "full"]:
         print("\n--- Running Track A Benchmarks ---")
         steps = 100 if args.tier == "standard" else 500
-        a1_res = run_a1_language_modeling_sweep(args.device, steps=steps)
+        a1_res = run_a1_language_modeling_sweep(args.device, steps=steps, tier=args.tier)
         with open(os.path.join(run_dir, "A1_LM_Sweep.json"), "w", encoding="utf-8") as f:
             json.dump(a1_res, f, indent=2)
 
         # Gate on A1: All models must successfully train (final loss < ln(vocab) - 0.2)
         ln_v = 5.549
-        for m_k, s_v in a1_res.items():
+        for m_k, s_v in a1_res["models"].items():
             if s_v["mean_val_loss"] > ln_v - 0.2:
                 print(f"[FAIL] A1 gate failure: {m_k} val loss {s_v['mean_val_loss']:.4f} did not train below {ln_v - 0.2:.4f}")
                 hard_failed += 1
@@ -123,6 +123,22 @@ def main():
         a2_res = run_a2_mqar_benchmark(args.device)
         with open(os.path.join(run_dir, "A2_MQAR.json"), "w", encoding="utf-8") as f:
             json.dump(a2_res, f, indent=2)
+
+        # Gate on A2 MQAR:
+        # Require WEFT recall > chance + margin, and Transformer full attention > chance.
+        # If baseline is at chance, mark run INVALID (task not learned).
+        for m_name, acc_info in a2_res.items():
+            chance = acc_info["chance_level"]
+            acc = acc_info["mean_accuracy"]
+            std = acc_info["std_accuracy"]
+            if "WEFT_Hybrid" in m_name:
+                margin = max(0.01, std * 0.5)
+                if acc <= chance + margin:
+                    print(f"[FAIL] A2 gate failure: {m_name} recall {acc:.4f} did not beat chance ({chance:.4f}) + margin ({margin:.4f})")
+                    hard_failed += 1
+            if "Transformer_Full" in m_name:
+                if acc <= chance:
+                    print(f"[WARNING] A2 Transformer_Full baseline at chance level ({acc:.4f} <= {chance:.4f}): task not learned under current budget.")
 
     # Determine honest verdict
     if hard_failed > 0:

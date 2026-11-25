@@ -331,5 +331,6 @@ lean_lib «FormalSuite» where
     `«CoSpeculativeLivenessInvariants»,
     `«RoPEOrthogonalityInvariants»,
     `«OnlineSoftmaxStability»,
-    `«MultiAgentDebateConvergence»
+    `«MultiAgentDebateConvergence»,
+    `«SpeculativeAcceptanceBounds»
   ]

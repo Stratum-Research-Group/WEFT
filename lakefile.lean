@@ -323,5 +323,6 @@ lean_lib «FormalSuite» where
     `«EntropyTreeBranchingBounds»,
     `«ActiveInferenceInvariants»,
     `«SpeculativeTreeRollbackInvariants»,
-    `«MultiHeadBitboardEquivalence»
+    `«MultiHeadBitboardEquivalence»,
+    `«DynamicDepthScalingBounds»
   ]

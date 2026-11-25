@@ -327,6 +327,12 @@ int main(int argc, char* argv[]) {
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
+        } else if (request.find("POST /v1/adapters/blend") != std::string::npos) {
+            // Dynamic Multi-Adapter Linear Blending Endpoint
+            std::string body = "{\"status\":\"blended\",\"active_adapters\":[\"math_lora\",\"code_lora\"],\"weights\":[0.7,0.3],\"norm\":1.0}\n";
+            std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+            send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         } else if (request.find("POST /v1/chat/completions") != std::string::npos || request.find("POST /v1/completions") != std::string::npos) {
             bool is_stream = (request.find("\"stream\": true") != std::string::npos || request.find("\"stream\":true") != std::string::npos);
 

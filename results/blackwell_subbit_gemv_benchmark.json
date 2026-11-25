@@ -1,0 +1,15 @@
+{
+  "device": "NVIDIA GeForce RTX 5060 Ti",
+  "matrix_dimension": "4096x4096",
+  "fp16_weight_size_mb": 32.0,
+  "subbit_weight_size_mb": 4.0,
+  "compression_factor": 8.0,
+  "fp16_gemv_latency_ms": 0.08495041998685338,
+  "subbit_gemv_latency_ms": 0.5055801550042816,
+  "effective_speedup": 0.16802562194343637,
+  "fp16_memory_bandwidth_gb_s": 367.86163040554874,
+  "subbit_memory_bandwidth_gb_s": 7.726272404752357,
+  "iterations": 200,
+  "hardware_grounded": true,
+  "timestamp": 1795630128.4081411
+}

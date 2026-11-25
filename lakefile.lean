@@ -313,5 +313,6 @@ lean_lib «FormalSuite» where
     `«DerivedSymplecticKVStateRollbackInvariants»,
     `«NonArchimedeanTreeCompletionInvariants»,
     `«SubstantiveComponentInvariants»,
-    `«MasterCouncilConsensusInvariants»
+    `«MasterCouncilConsensusInvariants»,
+    `«CouncilConvergenceInvariants»
   ]

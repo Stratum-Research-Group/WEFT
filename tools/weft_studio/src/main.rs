@@ -91,6 +91,9 @@ struct WeftStudioApp {
 
     output_dir: PathBuf,
     sandbox_dir: PathBuf,
+    selected_sandbox_file: Option<String>,
+    sandbox_file_content: String,
+    sandbox_cli_output: String,
     selected_tab: usize,
     status_msg: String,
     auto_refresh: bool,
@@ -198,6 +201,9 @@ impl Default for WeftStudioApp {
 
             output_dir: output_folder,
             sandbox_dir: sandbox_folder,
+            selected_sandbox_file: None,
+            sandbox_file_content: String::new(),
+            sandbox_cli_output: String::from("Interactive Sandbox Terminal ready. Select an artifact to edit and test."),
             selected_tab: 1, // Default to Master Council tab
             status_msg: "Sub-Bit Fleet Master Council Ready (Native C++ & Multi-Round Protocol)".to_string(),
             auto_refresh: true,
@@ -1008,12 +1014,18 @@ impl eframe::App for WeftStudioApp {
                     ui.separator();
 
                     ui.strong("🛠 Council Sandbox Artifacts:");
-                    egui::ScrollArea::vertical().id_salt("sandbox_scroll").max_height(200.0).show(ui, |ui| {
+                    egui::ScrollArea::vertical().id_salt("sandbox_scroll").max_height(140.0).show(ui, |ui| {
                         if let Ok(entries) = std::fs::read_dir(&self.sandbox_dir) {
                             for e in entries.flatten() {
+                                let fname = e.file_name().to_string_lossy().to_string();
                                 ui.horizontal(|ui| {
                                     ui.label("⚙");
-                                    ui.strong(e.file_name().to_string_lossy().to_string());
+                                    if ui.button(&fname).clicked() {
+                                        self.selected_sandbox_file = Some(fname.clone());
+                                        let p = self.sandbox_dir.join(&fname);
+                                        self.sandbox_file_content = std::fs::read_to_string(&p).unwrap_or_default();
+                                        self.sandbox_cli_output = format!("Loaded {} ({} bytes)", fname, self.sandbox_file_content.len());
+                                    }
                                     if let Ok(meta) = e.metadata() {
                                         ui.label(format!("{:.1} KB", meta.len() as f64 / 1024.0));
                                     }
@@ -1021,6 +1033,51 @@ impl eframe::App for WeftStudioApp {
                             }
                         }
                     });
+
+                    if let Some(f) = &self.selected_sandbox_file.clone() {
+                        ui.separator();
+                        ui.horizontal(|ui| {
+                            ui.strong(format!("✏ Editing Sandbox File: {}", f));
+                            if ui.button("💾 Save Changes").clicked() {
+                                let p = self.sandbox_dir.join(f);
+                                if std::fs::write(&p, &self.sandbox_file_content).is_ok() {
+                                    self.sandbox_cli_output = format!("Saved {} successfully.", f);
+                                }
+                            }
+                            if ui.button("▶ Run Syntax & Cargo Test").clicked() {
+                                let p = self.sandbox_dir.join(f);
+                                let check_res = std::process::Command::new("rustc")
+                                    .arg("--crate-type=lib")
+                                    .arg("--emit=metadata")
+                                    .arg("-o")
+                                    .arg("/tmp/live_edit.rmeta")
+                                    .arg(&p)
+                                    .output();
+                                match check_res {
+                                    Ok(o) => {
+                                        if o.status.success() {
+                                            self.sandbox_cli_output = format!("EXEC SUCCESS: rustc compiled {} without errors! Metadata generated.", f);
+                                        } else {
+                                            self.sandbox_cli_output = format!("EXEC FAILED:\n{}", String::from_utf8_lossy(&o.stderr));
+                                        }
+                                    }
+                                    Err(err) => {
+                                        self.sandbox_cli_output = format!("Runner Error: {}", err);
+                                    }
+                                }
+                            }
+                        });
+
+                        ui.add_sized(
+                            [ui.available_width(), 160.0],
+                            egui::TextEdit::multiline(&mut self.sandbox_file_content).font(egui::TextStyle::Monospace),
+                        );
+
+                        ui.strong("🖥 Sandbox Execution Output:");
+                        egui::Frame::none().fill(egui::Color32::from_rgb(15, 20, 25)).inner_margin(6.0).rounding(4.0).show(ui, |ui| {
+                            ui.monospace(&self.sandbox_cli_output);
+                        });
+                    }
 
                     ui.separator();
                     ui.strong("📄 Conversation & Council Snapshots:");

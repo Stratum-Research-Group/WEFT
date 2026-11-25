@@ -46,6 +46,17 @@ print("[+] Live local model initialized and ready for chat.")
 def health():
     return {"status": "healthy", "engine": "weft-live-local-inference", "model": "Qwen2.5-Coder-0.5B"}
 
+@app.get("/v1/models")
+def list_models():
+    return {
+        "object": "list",
+        "data": [
+            {"id": "qwen2.5-coder-0.5b", "object": "model", "owned_by": "weft"},
+            {"id": "weft-subbit-gpu", "object": "model", "owned_by": "weft"},
+            {"id": "frontier-1.04t-moe", "object": "model", "owned_by": "weft"}
+        ]
+    }
+
 @app.post("/v1/chat/completions")
 async def chat_completions(req: Request):
     data = await req.json()

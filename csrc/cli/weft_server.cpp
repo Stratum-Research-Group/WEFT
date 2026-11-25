@@ -123,9 +123,31 @@ int main(int argc, char* argv[]) {
         int client_socket = accept(server_fd, nullptr, nullptr);
         if (client_socket < 0) break;
 
-        char buffer[4096] = {0};
-        read(client_socket, buffer, sizeof(buffer) - 1);
-        std::string request(buffer);
+        std::string request = "";
+        char buffer[4096];
+        // Read full HTTP headers and potential body
+        while (true) {
+            ssize_t bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+            if (bytes_read <= 0) break;
+            buffer[bytes_read] = '\0';
+            request.append(buffer, bytes_read);
+
+            // Check if headers are fully read
+            size_t header_end = request.find("\r\n\r\n");
+            if (header_end != std::string::npos) {
+                // If Content-Length is present, ensure full body is read
+                size_t cl_pos = request.find("Content-Length: ");
+                if (cl_pos == std::string::npos) cl_pos = request.find("content-length: ");
+                if (cl_pos != std::string::npos) {
+                    size_t cl_end = request.find("\r\n", cl_pos);
+                    int cl = std::stoi(request.substr(cl_pos + 16, cl_end - (cl_pos + 16)));
+                    size_t body_len = request.size() - (header_end + 4);
+                    if (body_len >= (size_t)cl) break;
+                } else {
+                    break;
+                }
+            }
+        }
 
         if (request.find("GET /health") != std::string::npos) {
             std::string body = "{\"status\":\"healthy\",\"server\":\"weft-native-cpp\",\"avx512\":true,\"loaded_adapters\":" + std::to_string(loaded_adapters.size()) + ",\"paged_kv\":true,\"ipc_ring\":true,\"kv_compression_ratio\":7.4}\n";

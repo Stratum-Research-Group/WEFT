@@ -1,0 +1,52 @@
+{
+  "M1_WEFT_Hybrid": {
+    "mean_accuracy": 0.014583333333333335,
+    "std_accuracy": 0.005311478659992483,
+    "chance_level": 0.0078125,
+    "per_seed": [
+      0.0125,
+      0.021875,
+      0.009375
+    ]
+  },
+  "M2_WEFT_LocalOnly": {
+    "mean_accuracy": 0.008333333333333333,
+    "std_accuracy": 0.002946278254943948,
+    "chance_level": 0.0078125,
+    "per_seed": [
+      0.00625,
+      0.0125,
+      0.00625
+    ]
+  },
+  "M3_WEFT_StateOnly": {
+    "mean_accuracy": 0.009375,
+    "std_accuracy": 0.004419417382415922,
+    "chance_level": 0.0078125,
+    "per_seed": [
+      0.00625,
+      0.00625,
+      0.015625
+    ]
+  },
+  "M4_Transformer_Full": {
+    "mean_accuracy": 0.011458333333333334,
+    "std_accuracy": 0.005892556509887896,
+    "chance_level": 0.0078125,
+    "per_seed": [
+      0.015625,
+      0.003125,
+      0.015625
+    ]
+  },
+  "M5_Transformer_Window": {
+    "mean_accuracy": 0.010416666666666666,
+    "std_accuracy": 0.002946278254943948,
+    "chance_level": 0.0078125,
+    "per_seed": [
+      0.0125,
+      0.00625,
+      0.0125
+    ]
+  }
+}

@@ -28,3 +28,9 @@ weft2_*_ckpt/
 bin/
 checkpoints/
 weft_academic_release_kit_v*.tar.gz
+.lake/
+data/wikitext2/
+benchmarks/bench_avx512_cache_tiling
+benchmarks/bench_paged_attention_rigorous
+tests/test_avx512_recurrent_engine
+tests/test_cycle21_kernels

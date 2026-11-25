@@ -1,0 +1,8 @@
+{
+  "test_id": "B14_State_Growth_Bounds",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.6111419200897217,
+  "note": "B14 certified: Recurrent state strictly bounded and free of NaN/Inf across 4096 steps."
+}

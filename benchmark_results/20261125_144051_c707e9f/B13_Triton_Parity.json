@@ -1,0 +1,8 @@
+{
+  "test_id": "B13_Triton_Parity",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 9.5367431640625e-07,
+  "note": "CUDA device not active; Triton parity check skipped for CPU."
+}

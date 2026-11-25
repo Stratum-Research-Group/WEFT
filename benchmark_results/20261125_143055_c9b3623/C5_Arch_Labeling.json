@@ -1,0 +1,8 @@
+{
+  "test_id": "C5_Arch_Labeling",
+  "track": "Track B",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 5.984306335449219e-05,
+  "note": "Track B results verified with 'transformer_converted' architecture label."
+}

@@ -63,4 +63,10 @@ def run_multiscale_distillation_sweep(
     return results
 
 if __name__ == "__main__":
-    run_multiscale_distillation_sweep(steps=100)
+    import argparse
+    parser = argparse.ArgumentParser(description="Multi-scale ITQ distillation sweep")
+    parser.add_argument("--steps", type=int, default=100)
+    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--out_path", type=str, default="results/distill_multiscale_results.json")
+    args = parser.parse_args()
+    run_multiscale_distillation_sweep(steps=args.steps, device=args.device, out_path=args.out_path)

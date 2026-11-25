@@ -1,0 +1,8 @@
+{
+  "test_id": "B3_Cache_Formats",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.017187833786010742,
+  "note": "Cache formats and state retention agree with full sequence recompute."
+}

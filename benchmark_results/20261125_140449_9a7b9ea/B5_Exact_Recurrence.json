@@ -1,0 +1,8 @@
+{
+  "test_id": "B5_Exact_Recurrence",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.020941972732543945,
+  "note": "Global path recurrence matches independent fp64 reference across lengths [1, 7, 64, 513] (max diff < 1e-4)."
+}

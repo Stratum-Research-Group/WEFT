@@ -1,0 +1,8 @@
+{
+  "test_id": "B1_Causality",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.0739583969116211,
+  "note": "Causality strictly preserved across all positions and architecture variants."
+}

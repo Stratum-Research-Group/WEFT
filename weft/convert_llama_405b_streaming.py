@@ -7,12 +7,23 @@ and immediately evicts raw weight allocations to enforce workstation storage saf
 import os
 import sys
 import json
+import struct
 import shutil
 import torch
 from weft.format import WeftModelContainer, WeftSubBitLinear
 
 STORAGE_FLOOR_AI_GB = 700.0
 STORAGE_FLOOR_HOME_GB = 200.0
+
+def parse_safetensors_header(file_path: str) -> dict:
+    """Reads 8-byte length prefix and parses JSON metadata dictionary."""
+    with open(file_path, "rb") as f:
+        header_len_bytes = f.read(8)
+        if len(header_len_bytes) < 8:
+            raise ValueError(f"File {file_path} too small for safetensors header")
+        header_len = struct.unpack("<Q", header_len_bytes)[0]
+        header_json_bytes = f.read(header_len)
+        return json.loads(header_json_bytes.decode("utf-8"))
 
 def verify_storage_safety():
     # Use standard POSIX integer-block GB calculation matching verify_fast_gate.sh

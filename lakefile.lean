@@ -290,5 +290,8 @@ lean_lib «FormalSuite» where
     `«ZipfTheorems»,
     `«DerivedMotivicToricSparsityInvariants»,
     `«TropicalHyperplaneSpeculativeTreeInvariants»,
-    `«MotivicGaloisVariableContextRecurrenceInvariants»
+    `«MotivicGaloisVariableContextRecurrenceInvariants»,
+    `«MotivicGaloisDualPathHybridInvariants»,
+    `«TropicalToricSpeculativeVerificationInvariants»,
+    `«DerivedKoszulOperadScanInvariants»
   ]

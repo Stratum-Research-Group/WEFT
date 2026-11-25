@@ -74,6 +74,19 @@ kill $SERVER_PID
 echo "$HEALTH" | grep -q "healthy"
 echo "[PASS] Native C++20 Socket server health check passed."
 
+if [ "$CI_MODE" = false ]; then
+    echo -e "\n[6/6] Executing Complete Architecture & Regression Suite Smoke Check..."
+    .venv/bin/python run_weft_suite.py --tier smoke --device cpu > /tmp/suite_smoke.log 2>&1
+    if [ $? -ne 0 ]; then
+        echo "[FAIL] Architecture & Regression Suite Smoke Check failed!"
+        cat /tmp/suite_smoke.log
+        exit 1
+    fi
+    echo "[PASS] All 14 Architecture, Conversion, and Regression gates passed."
+else
+    echo -e "\n[6/6] SKIPPED: Full suite runner skipped in --ci mode to preserve test sandbox boundaries."
+fi
+
 echo -e "\n================================================================="
 bash scripts/sync_release_tags.sh
 if [ "$SKIPPED_COUNT" -gt 0 ]; then

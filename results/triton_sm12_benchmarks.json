@@ -1,0 +1,26 @@
+{
+  "device": "NVIDIA GeForce RTX 5060 Ti",
+  "lengths": {
+    "1024": {
+      "pytorch_ms": 56.52,
+      "triton_ms": 0.23,
+      "speedup": 242.0
+    },
+    "4096": {
+      "pytorch_ms": 235.36,
+      "triton_ms": 1.83,
+      "speedup": 128.6
+    },
+    "16384": {
+      "pytorch_ms": 926.93,
+      "triton_ms": 7.42,
+      "speedup": 124.9
+    },
+    "65536": {
+      "triton_ms": 29.54
+    },
+    "131072": {
+      "triton_ms": 59.37
+    }
+  }
+}

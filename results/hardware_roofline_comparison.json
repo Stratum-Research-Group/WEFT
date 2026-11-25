@@ -1,20 +1,17 @@
 {
   "workload": {
-    "B": 1,
     "K": 3584,
     "N": 18944,
     "rank": 64,
-    "iterations": 50
+    "ops": 2883584.0,
+    "warmup_iterations": 50,
+    "benchmark_iterations": 200
   },
-  "cpu_ryzen_7600x": {
-    "giga_ops_per_second": 7.349140744194639,
-    "latency_microseconds": 392.37022399902344,
-    "elapsed_seconds": 0.019618511199951172
-  },
-  "gpu_rtx_5060_ti": {
-    "giga_ops_per_second": 25.072822060483436,
-    "latency_microseconds": 115.00835418701172,
-    "elapsed_seconds": 0.005750417709350586,
-    "speedup_vs_cpu": 3.411667150379369
+  "gpu_blackwell_sm12": {
+    "device": "NVIDIA GeForce RTX 5060 Ti",
+    "median_latency_us": 273.0560004711151,
+    "p25_latency_us": 223.4720028936863,
+    "p75_latency_us": 300.32000690698624,
+    "throughput_gops": 10.560412497893582
   }
 }

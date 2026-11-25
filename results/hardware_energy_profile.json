@@ -1,22 +1,13 @@
 {
-  "duration_seconds": 3,
+  "status": "NOT_MEASURED_UNDER_LOAD",
+  "note": "RAPL hardware energy counters require root or CAP_SYS_RAWIO. GPU readings reflect static idle states (26.9W), not dynamic active inference workload energy.",
   "cpu_rapl": {
     "sensor": "/sys/class/powercap/intel-rapl:0/energy_uj",
-    "status": "PERMISSION_DENIED_ROOT_REQUIRED",
-    "note": "Requires root or CAP_SYS_RAWIO to read /sys/class/powercap/*/energy_uj directly."
+    "status": "PERMISSION_DENIED_ROOT_REQUIRED"
   },
   "gpu_telemetry": {
-    "before": {
-      "power_draw_w": 26.96,
-      "power_limit_w": 180.0,
-      "temp_c": 46.82,
-      "status": "MEASURED"
-    },
-    "after": {
-      "power_draw_w": 26.85,
-      "power_limit_w": 180.0,
-      "temp_c": 46.57,
-      "status": "MEASURED"
-    }
+    "state": "IDLE_ONLY",
+    "power_draw_w": 26.9,
+    "status": "UNMEASURED_UNDER_LOAD"
   }
 }

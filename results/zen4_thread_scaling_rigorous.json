@@ -1,0 +1,34 @@
+{
+  "cpu": "AMD Ryzen 5 7600X (6C/12T)",
+  "repeats": 20,
+  "scaling": [
+    {
+      "threads": 1,
+      "median_ms": 55.5542,
+      "min_ms": 54.4025,
+      "max_ms": 59.5386,
+      "speedup": 1
+    },
+    {
+      "threads": 2,
+      "median_ms": 31.3878,
+      "min_ms": 27.9335,
+      "max_ms": 72.3706,
+      "speedup": 1.76993
+    },
+    {
+      "threads": 4,
+      "median_ms": 22.8815,
+      "min_ms": 16.1127,
+      "max_ms": 65.3853,
+      "speedup": 2.42791
+    },
+    {
+      "threads": 6,
+      "median_ms": 25.2322,
+      "min_ms": 13.0018,
+      "max_ms": 41.34,
+      "speedup": 2.20172
+    }
+  ]
+}

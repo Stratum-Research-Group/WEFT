@@ -27,3 +27,4 @@ weft2_*_ckpt/
 *.so
 bin/
 checkpoints/
+weft_academic_release_kit_v*.tar.gz

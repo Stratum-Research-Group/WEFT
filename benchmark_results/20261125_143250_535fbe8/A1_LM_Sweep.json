@@ -1,0 +1,66 @@
+{
+  "dataset_sha256": "696cca6b65a171b0a358a4be6732cdfdf2dd6164a32e20fd70e3c13fc4dfae83",
+  "tier": "standard",
+  "models": {
+    "M1_WEFT_Hybrid": {
+      "trainable_params": 102816,
+      "mean_val_loss": 3.0517274538675943,
+      "std_val_loss": 0.005861610229067022,
+      "mean_val_ppl": 21.152214873117373,
+      "std_val_ppl": 0.12386730834958669,
+      "per_seed_loss": [
+        3.0439831733703615,
+        3.0530388712882996,
+        3.0581603169441225
+      ]
+    },
+    "M2_WEFT_LocalOnly": {
+      "trainable_params": 102912,
+      "mean_val_loss": 2.8601678093274434,
+      "std_val_loss": 0.07240806911259107,
+      "mean_val_ppl": 17.510968818639025,
+      "std_val_ppl": 1.2952793347597693,
+      "per_seed_loss": [
+        2.8232617497444155,
+        2.7958993196487425,
+        2.9613423585891723
+      ]
+    },
+    "M3_WEFT_StateOnly": {
+      "trainable_params": 102816,
+      "mean_val_loss": 3.049301862716675,
+      "std_val_loss": 0.07269260613895216,
+      "mean_val_ppl": 21.15723752833971,
+      "std_val_ppl": 1.570779337361812,
+      "per_seed_loss": [
+        3.0131263852119448,
+        2.9840539932250976,
+        3.150725209712982
+      ]
+    },
+    "M4_Transformer_Full": {
+      "trainable_params": 102912,
+      "mean_val_loss": 2.8510230461756385,
+      "std_val_loss": 0.03700253983479804,
+      "mean_val_ppl": 17.31740168464376,
+      "std_val_ppl": 0.6467003225816832,
+      "per_seed_loss": [
+        2.901708948612213,
+        2.8144112706184385,
+        2.8369489192962645
+      ]
+    },
+    "M5_Transformer_Window": {
+      "trainable_params": 102912,
+      "mean_val_loss": 2.8253185749053955,
+      "std_val_loss": 0.03938730205184618,
+      "mean_val_ppl": 16.87952364096146,
+      "std_val_ppl": 0.6737887685380807,
+      "per_seed_loss": [
+        2.880992388725281,
+        2.795945703983307,
+        2.799017632007599
+      ]
+    }
+  }
+}

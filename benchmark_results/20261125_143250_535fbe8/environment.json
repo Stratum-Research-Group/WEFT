@@ -1,0 +1,11 @@
+{
+  "timestamp_utc": "2026-11-25T14:32:50.763775+00:00",
+  "git_commit": "535fbe83a31870bc84d23c4dbdc2b019e5f1defe",
+  "git_commit_short": "535fbe8",
+  "git_dirty": false,
+  "python_version": "3.12.14",
+  "torch_version": "2.15.0+cu132",
+  "cuda_available": true,
+  "gpu": {},
+  "device": "cpu"
+}

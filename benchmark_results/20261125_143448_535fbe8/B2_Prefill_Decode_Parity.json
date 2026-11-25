@@ -1,0 +1,8 @@
+{
+  "test_id": "B2_Prefill_Decode_Parity",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.17290782928466797,
+  "note": "Prefill vs Decode parity certified (max diff = 0.000000)"
+}

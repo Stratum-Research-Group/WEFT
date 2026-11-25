@@ -1,0 +1,8 @@
+{
+  "test_id": "RG3_Gate_Active_Checks",
+  "track": "System",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 7.0307090282440186,
+  "note": "Fast gatekeeper executes active test scripts and passes --ci."
+}

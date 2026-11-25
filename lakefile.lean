@@ -320,5 +320,6 @@ lean_lib «FormalSuite» where
     `«SpeculativeTreeEquivalence»,
     `«MultiAdapterCompositionBounds»,
     `«CognitiveFlowInvariants»,
-    `«EntropyTreeBranchingBounds»
+    `«EntropyTreeBranchingBounds»,
+    `«ActiveInferenceInvariants»
   ]

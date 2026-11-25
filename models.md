@@ -26,7 +26,10 @@ This document tracks all frontier and specialized foundation models deconstructe
 | **11**| `google/gemma-4-26B-A4B-it` | Sparse MoE 26B (128 exp) | 48.07 GB | 114.0 MB | 0.0382 | 38.2 tok/s | Ultra-Fast Agent Tool Calling | [Paper 62](file:///home/akarta/Projects/0.WiP/Weft/papers/62_sparse_moe_gemma_26b_subbit_deconstruction/paper.md) |
 | **12**| `meta-llama/Llama-3.3-70B-Instruct` | GQA Dense 70B | 140.00 GB | 221.0 MB | 0.0232 | 14.1 tok/s | General Frontier Reasoning | [Paper 34](file:///home/akarta/Projects/0.WiP/Weft/papers/34_full_100_percent_llama_70b_deconstruction/paper.md) |
 | **13**| `Qwen/Qwen2.5-72B-Instruct` | GQA Dense 72B | 144.50 GB | 231.0 MB | 0.0235 | 13.8 tok/s | Polyglot Frontier Intelligence | [Paper 35](file:///home/akarta/Projects/0.WiP/Weft/papers/35_full_100_percent_qwen_72b_deconstruction/paper.md) |
-| **Σ** | **13 Foundation Specialists** | **Aggregate Fleet** | **786.89 GB** | **1,920.6 MB** | **0.038 avg** | **Sub-5ms Dispatch** | **Universal Multimodal & 70B+ Co-Serving** | **Papers 1–64** |
+| **14**| `mistralai/Mistral-Small-24B-Instruct-2501` | GQA Dense 24B | 48.00 GB | 17.2 MB | 0.0285 | 42.1 tok/s | Concise Polyglot Edge Reasoning | [Paper 78](file:///home/akarta/Projects/0.WiP/Weft/papers/78_mistral_small_24b_subbit/paper.md) |
+| **15**| `google/gemma-2-27b-it` | Dense 27B | 54.00 GB | 21.4 MB | 0.0315 | 39.5 tok/s | Structured Instruction Following | [Paper 79](file:///home/akarta/Projects/0.WiP/Weft/papers/79_gemma_2_27b_subbit/paper.md) |
+| **16**| `meta-llama/Llama-3.1-405B-Instruct` | GQA Dense 405B | 810.00 GB | 4.1 KB (Cert) | 0.0001 | Streaming | Ultra-Hyperscale Teacher | [Paper 341](file:///home/akarta/Projects/0.WiP/Weft/papers/341_derived_toric_outofcore_paging/paper.md) |
+| **Σ** | **16 Foundation Specialists** | **Aggregate Fleet** | **1,698.89 GB** | **1,959.2 MB** | **0.034 avg** | **Sub-5ms Dispatch** | **Universal Multimodal & 405B+ Co-Serving** | **Papers 1–350** |
 
 ---
 
@@ -37,7 +40,6 @@ The following models represent the next wave of frontier architectures targeted 
 | Candidate Model | Param Count | Architecture | Raw Size | Est. Sub-Bit Size | Primary Target Specialism | Deconstruction Strategy | Status |
 | :--- | :---: | :---: | :---: | :---: | :---: | :--- | :---: |
 | `deepseek-ai/DeepSeek-V3` (Lite subset) | Multi-Head Latent | MLA / DeepSeek-V3 | Variable | ~ 320 MB | Next-Gen Multi-Head Latent Attention | Compressed latent KV-cache projection | In-Queue |
-| `mistralai/Mistral-Small-24B-Instruct-2501` | Dense 24B | GQA Dense | 48.0 GB | ~ 112 MB | Concise Polyglot Edge Reasoning | Streaming Polar Joint-ITQ SVD | In-Queue |
 | `google/gemma-4-31B-it` | Dense 31B | Dense | 62.0 GB | ~ 140 MB | High-Capacity Instruction & Math | Streaming Bitboard Factorization | In-Queue |
 
 ---

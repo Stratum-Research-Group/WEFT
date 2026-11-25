@@ -39,5 +39,6 @@
     "torch": "2.15.0+cu132",
     "device": "NVIDIA GeForce RTX 5060 Ti",
     "python": "3.12.14"
-  }
+  },
+  "architecture": "transformer_converted"
 }

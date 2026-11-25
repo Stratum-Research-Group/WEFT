@@ -17,7 +17,8 @@ namespace weft {
 
 class GeometricLanglandsAlignmentEngine {
 public:
-    // Project vector a onto normalized basis vector b: out = (a.b) * b
+    // Project vector a onto basis vector b: out = (a.b / b.b) * b
+    // Correctly normalizes by ||b||^2 for arbitrary non-zero basis vectors
     static void project_eigensheaf(
         const float* __restrict__ a,
         const float* __restrict__ b,
@@ -25,18 +26,23 @@ public:
         size_t dim
     ) {
         __m512 v_dot = _mm512_setzero_ps();
+        __m512 v_norm_sq = _mm512_setzero_ps();
         size_t i = 0;
         for (; i + 16 <= dim; i += 16) {
             __m512 va = _mm512_loadu_ps(a + i);
             __m512 vb = _mm512_loadu_ps(b + i);
             v_dot = _mm512_fmadd_ps(va, vb, v_dot);
+            v_norm_sq = _mm512_fmadd_ps(vb, vb, v_norm_sq);
         }
         float dot = _mm512_reduce_add_ps(v_dot);
+        float norm_sq = _mm512_reduce_add_ps(v_norm_sq);
         for (; i < dim; ++i) {
             dot += a[i] * b[i];
+            norm_sq += b[i] * b[i];
         }
 
-        __m512 v_coeff = _mm512_set1_ps(dot);
+        float factor = (norm_sq > 1e-12f) ? (dot / norm_sq) : 0.0f;
+        __m512 v_coeff = _mm512_set1_ps(factor);
         i = 0;
         for (; i + 16 <= dim; i += 16) {
             __m512 vb = _mm512_loadu_ps(b + i);
@@ -44,7 +50,7 @@ public:
             _mm512_storeu_ps(out + i, vo);
         }
         for (; i < dim; ++i) {
-            out[i] = dot * b[i];
+            out[i] = factor * b[i];
         }
     }
 };

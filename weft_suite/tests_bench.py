@@ -226,3 +226,122 @@ def run_a2_mqar_benchmark(device="cpu", seq_len=64, num_pairs=4, steps=100, seed
         print(f"  - {m_name:<22s}: Recall Acc = {summary[m_name]['mean_accuracy']:.4f} +- {summary[m_name]['std_accuracy']:.4f} (Chance = {summary[m_name]['chance_level']:.4f})")
 
     return summary
+
+def run_a3_needle_retrieval_benchmark(device="cpu", seq_lens=(512, 1024, 2048), depths=(0.1, 0.5, 0.9)):
+    """
+    A3: Needle-in-a-Haystack & Long-Context Retrieval Benchmark.
+    Evaluates exact value recovery at designated depths across sequence lengths.
+    """
+    print(f"[BENCH A3] Running Needle-in-a-Haystack retrieval ({device}, lengths={seq_lens}, depths={depths})...")
+    set_seed(1234)
+    cfg = get_tiny_config()
+    models, _ = get_model_family(cfg, device)
+    results = {}
+
+    needle_key = 15
+    needle_val = 45
+    query_token = 15
+
+    for m_name, model in models.items():
+        model.eval()
+        results[m_name] = {}
+        for sl in seq_lens:
+            results[m_name][sl] = {}
+            for depth in depths:
+                # Construct haystack
+                x = torch.randint(1, cfg.vocab_size - 1, (1, sl), device=device)
+                needle_pos = max(1, int(sl * depth))
+                x[0, needle_pos - 1] = needle_key
+                x[0, needle_pos] = needle_val
+
+                # Append query token at the end
+                x[0, -1] = query_token
+
+                with torch.no_grad():
+                    logits = model(x).logits if hasattr(model, "model") else model(x)
+                    pred_token = torch.argmax(logits[0, -1], dim=-1).item()
+
+                is_recalled = (pred_token == needle_val)
+                # Compute ranking or cosine score for continuous evaluation
+                token_logit = logits[0, -1, needle_val].item()
+                results[m_name][sl][f"depth_{int(depth*100)}"] = {
+                    "recalled": is_recalled,
+                    "target_logit": float(token_logit)
+                }
+
+        recalled_cnt = sum(
+            1 for sl in seq_lens for d in depths
+            if results[m_name][sl][f"depth_{int(d*100)}"]["recalled"]
+        )
+        total_cnt = len(seq_lens) * len(depths)
+        print(f"  - {m_name:<22s}: Recalled {recalled_cnt}/{total_cnt} needles across depth/length grid.")
+
+    return results
+
+def run_a6_throughput_memory_benchmark(device="cpu", seq_lens=(256, 1024, 4096), decode_steps=32):
+    """
+    A6: Decode Throughput and Memory Scaling over length.
+    Measures tokens/sec prefill and decode along with peak memory footprint.
+    """
+    print(f"[BENCH A6] Running throughput and memory scaling benchmark ({device}, lengths={seq_lens}, decode={decode_steps})...")
+    set_seed(1234)
+    cfg = get_tiny_config()
+    models, _ = get_model_family(cfg, device)
+    results = {}
+
+    is_cuda = (device == "cuda" and torch.cuda.is_available())
+
+    for m_name, model in models.items():
+        model.eval()
+        results[m_name] = {}
+
+        for sl in seq_lens:
+            x = torch.randint(1, cfg.vocab_size, (1, sl), device=device)
+
+            if is_cuda:
+                torch.cuda.empty_cache()
+                torch.cuda.reset_peak_memory_stats()
+                torch.cuda.synchronize()
+
+            # Warmup
+            with torch.no_grad():
+                _ = model(x[:, :64])
+                if is_cuda:
+                    torch.cuda.synchronize()
+
+            # Measure Prefill
+            t0 = time.perf_counter()
+            with torch.no_grad():
+                out = model(x, use_cache=True) if hasattr(model, "model") else model(x)
+                if is_cuda:
+                    torch.cuda.synchronize()
+            prefill_time = max(1e-6, time.perf_counter() - t0)
+            prefill_tok_per_sec = float(sl / prefill_time)
+
+            # Measure Decode
+            past = out.past_key_values if hasattr(out, "past_key_values") else None
+            decode_token = torch.randint(1, cfg.vocab_size, (1, 1), device=device)
+
+            t0 = time.perf_counter()
+            with torch.no_grad():
+                for _ in range(decode_steps):
+                    if hasattr(model, "model") and past is not None:
+                        step_out = model(decode_token, past_key_values=past, use_cache=True)
+                        past = step_out.past_key_values
+                    else:
+                        _ = model(decode_token)
+                    if is_cuda:
+                        torch.cuda.synchronize()
+            decode_time = max(1e-6, time.perf_counter() - t0)
+            decode_tok_per_sec = float(decode_steps / decode_time)
+
+            peak_mem_mb = float(torch.cuda.max_memory_allocated() / (1024**2)) if is_cuda else 0.0
+
+            results[m_name][sl] = {
+                "prefill_tok_per_sec": prefill_tok_per_sec,
+                "decode_tok_per_sec": decode_tok_per_sec,
+                "peak_mem_mb": peak_mem_mb
+            }
+            print(f"  - {m_name:<22s} [L={sl}]: Prefill={prefill_tok_per_sec:.1f} tok/s, Decode={decode_tok_per_sec:.1f} tok/s, PeakMem={peak_mem_mb:.2f}MB")
+
+    return results

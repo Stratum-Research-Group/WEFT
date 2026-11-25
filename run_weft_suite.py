@@ -17,11 +17,15 @@ from weft_suite.tests_arch import (
     test_b2_prefill_decode_parity,
     test_b3_cache_formats,
     test_b5_exact_recurrence,
-    test_b8_padding_and_batching
+    test_b8_padding_and_batching,
+    test_b13_triton_pytorch_parity,
+    test_b14_recurrent_state_growth
 )
 from weft_suite.tests_bench import (
     run_a1_language_modeling_sweep,
-    run_a2_mqar_benchmark
+    run_a2_mqar_benchmark,
+    run_a3_needle_retrieval_benchmark,
+    run_a6_throughput_memory_benchmark
 )
 from weft_suite.tests_conv import (
     test_c1_format_roundtrip,
@@ -64,6 +68,8 @@ def main():
         ("B3_Cache_Formats", "Track A", "HARD", test_b3_cache_formats, [args.device]),
         ("B5_Exact_Recurrence", "Track A", "HARD", test_b5_exact_recurrence, [args.device]),
         ("B8_Padding_Batching", "Track A", "HARD", test_b8_padding_and_batching, [args.device]),
+        ("B13_Triton_Parity", "Track A", "HARD", test_b13_triton_pytorch_parity, [args.device]),
+        ("B14_State_Growth_Bounds", "Track A", "HARD", test_b14_recurrent_state_growth, [args.device]),
         ("C1_Format_Roundtrip", "Track B", "HARD", test_c1_format_roundtrip, []),
         ("C5_Arch_Labeling", "Track B", "HARD", test_c5_architecture_labeling, []),
         ("RG1_No_Synthetic_Claims", "Track B", "HARD", test_rg1_no_synthetic_benchmark_claims, []),
@@ -123,6 +129,15 @@ def main():
         a2_res = run_a2_mqar_benchmark(args.device)
         with open(os.path.join(run_dir, "A2_MQAR.json"), "w", encoding="utf-8") as f:
             json.dump(a2_res, f, indent=2)
+
+        # A3 & A6 benchmarks in standard / full tiers
+        a3_res = run_a3_needle_retrieval_benchmark(args.device)
+        with open(os.path.join(run_dir, "A3_Needle.json"), "w", encoding="utf-8") as f:
+            json.dump(a3_res, f, indent=2)
+
+        a6_res = run_a6_throughput_memory_benchmark(args.device)
+        with open(os.path.join(run_dir, "A6_Throughput_Memory.json"), "w", encoding="utf-8") as f:
+            json.dump(a6_res, f, indent=2)
 
         # Gate on A2 MQAR:
         # Require WEFT recall and Transformer full attention to beat chance level.

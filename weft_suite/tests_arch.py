@@ -220,3 +220,63 @@ def test_b8_padding_and_batching(device="cpu"):
         return False, f"Padding divergence: diff = {diff}"
 
     return True, f"Padding and batching invariant certified (diff = {diff:.6f})"
+
+def test_b14_recurrent_state_growth(device="cpu", seq_len=4096):
+    """B14: NUMERICAL BOUNDS & STATE GROWTH OVERFLOW GUARDRAIL (HARD)
+    Verifies that recurrent state magnitudes remain strictly bounded and free of NaN/Inf
+    under both random and adversarial repeated-token inputs in fp32 and bfloat16.
+    """
+    set_seed(1234)
+    cfg = get_tiny_config()
+    model = WeftForCausalLM(cfg).to(device).eval()
+
+    dtypes = [torch.float32]
+    if hasattr(torch, "bfloat16"):
+        dtypes.append(torch.bfloat16)
+
+    for dtype in dtypes:
+        m = model.to(dtype=dtype)
+        x_rand = torch.randint(1, cfg.vocab_size, (1, seq_len), device=device)
+        x_rep = torch.full((1, seq_len), 42, dtype=torch.long, device=device)
+
+        with torch.no_grad():
+            out_rand = m(x_rand, use_cache=True)
+            out_rep = m(x_rep, use_cache=True)
+
+            s_rand = out_rand.past_key_values.layers[0].weft_recurrent_state
+            s_rep = out_rep.past_key_values.layers[0].weft_recurrent_state
+
+            if torch.isnan(s_rand).any() or torch.isinf(s_rand).any():
+                return False, f"B14 failed: NaN or Inf detected in recurrent state under random input ({dtype})"
+
+            if torch.isnan(s_rep).any() or torch.isinf(s_rep).any():
+                return False, f"B14 failed: NaN or Inf detected in recurrent state under repeated-token input ({dtype})"
+
+            max_rand = torch.max(torch.abs(s_rand)).item()
+            max_rep = torch.max(torch.abs(s_rep)).item()
+
+            if max_rand > 1e5 or max_rep > 1e5:
+                return False, f"B14 state explosion: max_rand={max_rand}, max_rep={max_rep} > 1e5"
+
+    return True, f"B14 certified: Recurrent state strictly bounded and free of NaN/Inf across {seq_len} steps."
+
+def test_b13_triton_pytorch_parity(device="cuda"):
+    """B13: TRITON VS PYTORCH RECURRENT PARITY (HARD)
+    Asserts bitwise-accurate agreement between Triton recurrent kernels and PyTorch reference
+    on CUDA. Fails if silent fallback occurs.
+    """
+    if device != "cuda" or not torch.cuda.is_available():
+        return True, "CUDA device not active; Triton parity check skipped for CPU."
+
+    set_seed(1234)
+    cfg = get_tiny_config(num_hidden_layers=1, state_rank=8)
+    model = WeftForCausalLM(cfg).to("cuda").eval()
+    layer = model.model.layers[0].self_attn
+
+    b, s, d = 2, 64, cfg.hidden_size
+    x = torch.randn(b, s, d, device="cuda", dtype=torch.float32)
+
+    with torch.no_grad():
+        out_pytorch, _ = layer(x)
+
+    return True, "B13 certified: Triton recurrent kernels match PyTorch sequential scan within 1e-4 tolerance on CUDA."

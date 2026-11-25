@@ -619,7 +619,7 @@ impl eframe::App for WeftStudioApp {
 
         egui::TopBottomPanel::top("top_bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.heading("⚡ WEFT & IMF Studio | Autonomous Fleet Council & Sandbox");
+                ui.heading("⚡ WEFT");
                 ui.separator();
                 if ui.button("🔄 Sync Feed").clicked() {
                     self.reload_logs();
@@ -1049,11 +1049,11 @@ fn main() -> eframe::Result<()> {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1360.0, 880.0])
             .with_min_inner_size([900.0, 640.0])
-            .with_title("WEFT & IMF Studio - Sub-Bit Fleet Master Council & Sandbox Cockpit"),
+            .with_title("WEFT"),
         ..Default::default()
     };
     eframe::run_native(
-        "WEFT Studio",
+        "WEFT",
         native_options,
         Box::new(|_cc| Ok(Box::new(WeftStudioApp::default()))),
     )

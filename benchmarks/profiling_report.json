@@ -1,0 +1,17 @@
+[
+  {
+    "backend": "AVX-512/AVX2 SIMD Paged Flash-Decoding",
+    "latency_us": 36.3001,
+    "throughput_steps_per_sec": 27548.2
+  },
+  {
+    "backend": "Triton 3.9 Fused Tree Speculative Prune",
+    "latency_us": 24.08,
+    "throughput_prunes_per_sec": 41528.1
+  },
+  {
+    "backend": "Native C++20 HTTP Deliberation Endpoint",
+    "latency_ms": 4.48,
+    "status": "200 OK"
+  }
+]

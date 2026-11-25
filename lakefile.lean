@@ -321,5 +321,6 @@ lean_lib «FormalSuite» where
     `«MultiAdapterCompositionBounds»,
     `«CognitiveFlowInvariants»,
     `«EntropyTreeBranchingBounds»,
-    `«ActiveInferenceInvariants»
+    `«ActiveInferenceInvariants»,
+    `«SpeculativeTreeRollbackInvariants»
   ]

@@ -311,5 +311,6 @@ lean_lib «FormalSuite» where
     `«TropicalToricTreeMonodromyInvariants»,
     `«BlockSparseTritonMoEInvariants»,
     `«DerivedSymplecticKVStateRollbackInvariants»,
-    `«NonArchimedeanTreeCompletionInvariants»
+    `«NonArchimedeanTreeCompletionInvariants»,
+    `«SubstantiveComponentInvariants»
   ]

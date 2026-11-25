@@ -1,4 +1,5 @@
 #include <iostream>
+#include "spec_verify.h"
 #include <fstream>
 #include <vector>
 #include <string>
@@ -188,25 +189,63 @@ int main(int argc, char* argv[]) {
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
         } else if (request.find("POST /v1/speculative/verify_tree_stream") != std::string::npos) {
-            std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-cache\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
-            send(client_socket, header.c_str(), header.size(), 0);
-            std::string ev1 = "data: {\"token_id\":100,\"accepted\":true,\"branch\":0}\n\n";
-            send(client_socket, ev1.c_str(), ev1.size(), 0);
-            std::string ev2 = "data: {\"token_id\":205,\"accepted\":true,\"branch\":0}\n\n";
-            send(client_socket, ev2.c_str(), ev2.size(), 0);
-            std::string ev3 = "data: {\"token_id\":304,\"accepted\":true,\"branch\":0}\n\n";
-            send(client_socket, ev3.c_str(), ev3.size(), 0);
-            std::string done = "data: [DONE]\n\n";
-            send(client_socket, done.c_str(), done.size(), 0);
+            std::string b = specv::body_of(request);
+            std::vector<long> draft, target, parents;
+            bool have = specv::get_int_array(b, "draft_tokens", draft) && specv::get_int_array(b, "target_tokens", target);
+            specv::get_int_array(b, "parents", parents);
+            specv::Result r = have ? specv::verify(draft, target, parents) : specv::Result{{}, -1, false, "draft_tokens and target_tokens are required"};
+            if (!r.ok) {
+                std::string body = "{\"error\":\"" + r.error + "\"}\n";
+                std::string resp = "HTTP/1.1 400 Bad Request\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
+                send(client_socket, resp.c_str(), resp.size(), 0);
+            } else {
+                std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-cache\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
+                send(client_socket, header.c_str(), header.size(), 0);
+                for (size_t i = 0; i < r.accepted.size(); i++) {
+                    std::string ev = "data: {\"index\":" + std::to_string(i) + ",\"token_id\":" + std::to_string(r.accepted[i]) + ",\"accepted\":true}\n\n";
+                    send(client_socket, ev.c_str(), ev.size(), MSG_NOSIGNAL);
+                }
+                if (r.diverged_index >= 0) {
+                    std::string ev = "data: {\"index\":" + std::to_string(r.diverged_index) + ",\"accepted\":false,\"target_token\":" + std::to_string(target[r.diverged_index]) + "}\n\n";
+                    send(client_socket, ev.c_str(), ev.size(), MSG_NOSIGNAL);
+                }
+                std::string done = "data: [DONE]\n\n";
+                send(client_socket, done.c_str(), done.size(), MSG_NOSIGNAL);
+            }
             close(client_socket);
         } else if (request.find("POST /v1/speculative/verify_tree_batch") != std::string::npos) {
-            std::string body = "{\"object\":\"speculative_batch_verification\",\"batch_size\":2,\"stream_results\":[{\"stream_id\":0,\"accepted_count\":4,\"accepted_tokens\":[100,205,304,408]},{\"stream_id\":1,\"accepted_count\":3,\"accepted_tokens\":[99,101,102]}],\"status\":\"batch_verified\"}\n";
-            std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+            std::string b = specv::body_of(request);
+            std::vector<std::string> objs = specv::split_stream_objects(b);
+            std::string body; int status = 200;
+            if (objs.empty()) { status = 400; body = "{\"error\":\"streams array missing or empty\"}\n"; }
+            else {
+                std::string results = "[";
+                for (size_t i = 0; i < objs.size(); i++) {
+                    std::vector<long> draft, target, parents, sid;
+                    bool have = specv::get_int_array(objs[i], "draft_tokens", draft) && specv::get_int_array(objs[i], "target_tokens", target);
+                    specv::get_int_array(objs[i], "parents", parents);
+                    size_t sp = objs[i].find("\"stream_id\"");
+                    long stream_id = (sp == std::string::npos) ? (long)i : std::strtol(objs[i].c_str() + objs[i].find(':', sp) + 1, nullptr, 10);
+                    specv::Result r = have ? specv::verify(draft, target, parents) : specv::Result{{}, -1, false, "draft_tokens and target_tokens are required"};
+                    if (i) results += ",";
+                    if (r.ok) results += "{\"stream_id\":" + std::to_string(stream_id) + "," + specv::result_json(r) + "}";
+                    else results += "{\"stream_id\":" + std::to_string(stream_id) + ",\"error\":\"" + r.error + "\"}";
+                }
+                results += "]";
+                body = "{\"object\":\"speculative_batch_verification\",\"batch_size\":" + std::to_string(objs.size()) + ",\"stream_results\":" + results + "}\n";
+            }
+            std::string resp = std::string("HTTP/1.1 ") + (status == 200 ? "200 OK" : "400 Bad Request") + "\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
         } else if (request.find("POST /v1/speculative/verify_tree") != std::string::npos) {
-            std::string body = "{\"object\":\"speculative_verification\",\"accepted_count\":4,\"accepted_tokens\":[100,205,304,408],\"diverged_index\":4,\"status\":\"verified\"}\n";
-            std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+            std::string b = specv::body_of(request);
+            std::vector<long> draft, target, parents;
+            bool have = specv::get_int_array(b, "draft_tokens", draft) && specv::get_int_array(b, "target_tokens", target);
+            specv::get_int_array(b, "parents", parents);
+            specv::Result r = have ? specv::verify(draft, target, parents) : specv::Result{{}, -1, false, "draft_tokens and target_tokens are required"};
+            std::string body = r.ok ? "{\"object\":\"speculative_verification\"," + specv::result_json(r) + "}\n"
+                                    : "{\"error\":\"" + r.error + "\"}\n";
+            std::string resp = std::string("HTTP/1.1 ") + (r.ok ? "200 OK" : "400 Bad Request") + "\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
         } else if (request.find("POST /v1/adapters/unload") != std::string::npos) {

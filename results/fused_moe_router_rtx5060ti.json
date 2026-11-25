@@ -1,0 +1,54 @@
+{
+  "device": "NVIDIA GeForce RTX 5060 Ti",
+  "D": 8192,
+  "E": 128,
+  "C": 16,
+  "method": "cuda events, 200 iters, 30 warmup, fp32",
+  "rows": [
+    {
+      "B": 1,
+      "torch_flat_us": 31.131200790405273,
+      "torch_cluster_us": 139.31103706359863,
+      "triton_flat_us": 184.57231521606445,
+      "triton_cluster_us": 44.58240032196045,
+      "cluster_vs_flat_triton_speedup": 4.14002642036184,
+      "triton_flat_vs_torch_flat_speedup": 0.16866668630104356
+    },
+    {
+      "B": 4,
+      "torch_flat_us": 34.289278984069824,
+      "torch_cluster_us": 152.7735996246338,
+      "triton_flat_us": 192.09951400756836,
+      "triton_cluster_us": 46.612958908081055,
+      "cluster_vs_flat_triton_speedup": 4.12116112144653,
+      "triton_flat_vs_torch_flat_speedup": 0.17849747908638067
+    },
+    {
+      "B": 16,
+      "torch_flat_us": 40.01311779022217,
+      "torch_cluster_us": 209.53760147094727,
+      "triton_flat_us": 227.49744415283203,
+      "triton_cluster_us": 44.7819185256958,
+      "cluster_vs_flat_triton_speedup": 5.080118307622178,
+      "triton_flat_vs_torch_flat_speedup": 0.1758838124060044
+    },
+    {
+      "B": 64,
+      "torch_flat_us": 27.894880771636963,
+      "torch_cluster_us": 208.78351211547852,
+      "triton_flat_us": 421.7300796508789,
+      "triton_cluster_us": 50.845441818237305,
+      "cluster_vs_flat_triton_speedup": 8.29435372316132,
+      "triton_flat_vs_torch_flat_speedup": 0.06614392028837307
+    },
+    {
+      "B": 256,
+      "torch_flat_us": 60.65216064453125,
+      "torch_cluster_us": 694.7137451171875,
+      "triton_flat_us": 1642.7653503417969,
+      "triton_cluster_us": 165.85472106933594,
+      "cluster_vs_flat_triton_speedup": 9.90484527513109,
+      "triton_flat_vs_torch_flat_speedup": 0.03692076937945632
+    }
+  ]
+}

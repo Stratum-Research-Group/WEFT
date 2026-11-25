@@ -1,0 +1,8 @@
+{
+  "test_id": "C1_Format_Roundtrip",
+  "track": "Track B",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.0053670406341552734,
+  "note": "Container format round-trip bit-exact preservation certified."
+}

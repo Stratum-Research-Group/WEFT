@@ -177,6 +177,27 @@ int main(int argc, char* argv[]) {
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
+        } else if (request.find("GET /v1/models") != std::string::npos) {
+            std::string body = "{\"object\":\"list\",\"data\":[{\"id\":\"weft-subbit\",\"object\":\"model\",\"owned_by\":\"stratum\"},{\"id\":\"gemma-4-E2B-it-subbit\",\"object\":\"model\",\"owned_by\":\"stratum\"}]}\n";
+            std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+            send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
+        } else if (request.find("POST /v1/adapters/unload") != std::string::npos) {
+            std::string id = "";
+            size_t id_pos = request.find("\"id\": \"");
+            if (id_pos != std::string::npos) {
+                size_t id_end = request.find("\"", id_pos + 7);
+                id = request.substr(id_pos + 7, id_end - (id_pos + 7));
+            }
+            bool removed = false;
+            if (!id.empty() && loaded_adapters.count(id)) {
+                loaded_adapters.erase(id);
+                removed = true;
+            }
+            std::string body = "{\"status\":\"" + std::string(removed ? "unloaded" : "not_found") + "\",\"id\":\"" + id + "\"}\n";
+            std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+            send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         } else if (request.find("POST /v1/adapters/load") != std::string::npos) {
             std::string id = "micro-adapter-hot";
             size_t id_pos = request.find("\"id\": \"");

@@ -61,3 +61,34 @@ def test_rg7_repo_hygiene_no_root_tarballs():
     if root_tarballs:
         return False, f"Found {len(root_tarballs)} release kit tarballs in root directory!"
     return True, "Repository root is clean of release kit archives."
+
+def test_rg8_release_archive_checksum_integrity():
+    """RG8: Release Archive Hash & Quarantine Guardrail."""
+    archive_dir = "releases/archive"
+    manifest_file = "RELEASE_CHECKSUMS.sha256"
+    if not os.path.exists(manifest_file):
+        return False, f"Missing manifest file: {manifest_file}"
+    if not os.path.exists(archive_dir):
+        return False, f"Missing archive directory: {archive_dir}"
+
+    import hashlib
+    with open(manifest_file, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    verified_count = 0
+    for line in lines:
+        parts = line.strip().split()
+        if len(parts) >= 2:
+            expected_hash = parts[0]
+            fname = os.path.basename(parts[1])
+            fpath = os.path.join(archive_dir, fname)
+            if os.path.exists(fpath):
+                hasher = hashlib.sha256()
+                with open(fpath, "rb") as bf:
+                    while chunk := bf.read(65536):
+                        hasher.update(chunk)
+                if hasher.hexdigest() != expected_hash:
+                    return False, f"Checksum mismatch for {fname} in {archive_dir}!"
+                verified_count += 1
+
+    return True, f"RG8 certified: {verified_count} release archives verified intact against SHA-256 manifest."

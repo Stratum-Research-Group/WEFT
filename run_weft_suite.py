@@ -35,7 +35,8 @@ from weft_suite.tests_regress import (
     test_rg1_no_synthetic_benchmark_claims,
     test_rg3_verify_fast_gate_has_real_checks,
     test_rg4_hardware_accuracy,
-    test_rg7_repo_hygiene_no_root_tarballs
+    test_rg7_repo_hygiene_no_root_tarballs,
+    test_rg8_release_archive_checksum_integrity
 )
 
 def main():
@@ -76,6 +77,7 @@ def main():
         ("RG3_Gate_Active_Checks", "System", "HARD", test_rg3_verify_fast_gate_has_real_checks, []),
         ("RG4_Hardware_Accuracy", "System", "HARD", test_rg4_hardware_accuracy, []),
         ("RG7_Repo_Hygiene", "System", "HARD", test_rg7_repo_hygiene_no_root_tarballs, []),
+        ("RG8_Archive_Integrity", "System", "HARD", test_rg8_release_archive_checksum_integrity, []),
     ]
 
     results = []

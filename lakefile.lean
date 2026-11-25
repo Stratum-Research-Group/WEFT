@@ -287,5 +287,8 @@ lean_lib «FormalSuite» where
     `«VoronoiDelaunayQuantizationInvariants»,
     `«ZeroMemoryAsymptotics»,
     `«ZetaGymInvariants»,
-    `«ZipfTheorems»
+    `«ZipfTheorems»,
+    `«DerivedMotivicToricSparsityInvariants»,
+    `«TropicalHyperplaneSpeculativeTreeInvariants»,
+    `«MotivicGaloisVariableContextRecurrenceInvariants»
   ]

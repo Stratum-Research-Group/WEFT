@@ -1,0 +1,8 @@
+{
+  "test_id": "B8_Padding_Batching",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.006964445114135742,
+  "note": "Padding and batching invariant certified (diff = 0.000000)"
+}

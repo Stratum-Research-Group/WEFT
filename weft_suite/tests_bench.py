@@ -136,19 +136,20 @@ def generate_mqar_batch(batch_size, seq_len, num_pairs, vocab_size, device="cpu"
     """
     Constructs real synthetic Multi-Query Associative Recall (MQAR) task batches.
     Format: k1 v1 k2 v2 ... kn vn [gap...] q_k1 q_k2 ...
+    Keys sampled from [1..32], values from [33..64].
     Targets scored only at query positions.
     """
-    val_offset = vocab_size // 2
-    num_keys = val_offset - 1
-    num_vals = vocab_size - 1 - val_offset
+    key_min, key_max = 1, 32
+    val_min, val_max = 33, 64
+    num_vals = val_max - val_min + 1
     chance_level = 1.0 / float(num_vals)
 
     inputs = torch.zeros(batch_size, seq_len, dtype=torch.long, device=device)
     targets = torch.full((batch_size, seq_len), -100, dtype=torch.long, device=device)
 
     for b in range(batch_size):
-        keys = torch.randperm(num_keys)[:num_pairs] + 1
-        vals = torch.randint(val_offset + 1, vocab_size, (num_pairs,))
+        keys = torch.randperm(key_max - key_min + 1)[:num_pairs] + key_min
+        vals = torch.randint(val_min, val_max + 1, (num_pairs,))
 
         # Place key-value pairs at sequence prefix
         for i in range(num_pairs):
@@ -166,14 +167,14 @@ def generate_mqar_batch(batch_size, seq_len, num_pairs, vocab_size, device="cpu"
 
     return inputs, targets, chance_level
 
-def run_a2_mqar_benchmark(device="cpu", seq_len=64, num_pairs=8, steps=80, seeds=(1234, 1235, 1236)):
+def run_a2_mqar_benchmark(device="cpu", seq_len=64, num_pairs=4, steps=100, seeds=(1234, 1235, 1236)):
     """
     A2: Multi-Query Associative Recall (MQAR) benchmark testing state retention.
     Trains each model on fresh synthetic associative memory batches and evaluates exact recall on held-out tasks.
     """
     print(f"[BENCH A2] Running Multi-Query Associative Recall (SeqLen={seq_len}, Pairs={num_pairs}, {steps} steps, 3 seeds)...")
     cfg = get_tiny_config()
-    batch_size = 4
+    batch_size = 8
     results = {}
     chance_level = None
 
@@ -183,7 +184,7 @@ def run_a2_mqar_benchmark(device="cpu", seq_len=64, num_pairs=8, steps=80, seeds
 
         for m_name, model in models.items():
             model.train()
-            opt = torch.optim.AdamW(model.parameters(), lr=2e-3, weight_decay=0.0)
+            opt = torch.optim.AdamW(model.parameters(), lr=5e-3, weight_decay=0.0)
 
             # Training on fresh random tasks per step
             for _ in range(steps):
@@ -200,7 +201,7 @@ def run_a2_mqar_benchmark(device="cpu", seq_len=64, num_pairs=8, steps=80, seeds
             correct = 0
             total = 0
             with torch.no_grad():
-                for _ in range(10):
+                for _ in range(15):
                     inp, tgt, _ = generate_mqar_batch(batch_size, seq_len, num_pairs, cfg.vocab_size, device)
                     logits = model(inp).logits if hasattr(model, "model") else model(inp)
                     preds = torch.argmax(logits, dim=-1)

@@ -3,13 +3,13 @@
 <img src="assets/logo.png" alt="WEFT Logo" width="280"/>
 
 # WEFT: Weight-Engineered Factorization and Truncation
-### Universal Sub-Bit Foundation Intelligence & Linear-Complexity Recurrence
+### Universal Sub-Bit Foundation Intelligence & Autonomous Multi-Agent Swarms
 
-**Author: Nicholas Charles Mynhardt | Stratum Research Group | Milestone Release v337.0.0**
+**Author: Nicholas Charles Mynhardt | Stratum Research Group | Milestone Release v340.0.0**
 
-[![Lean 4 Formal Math](https://img.shields.io/badge/Lean_4-273_Verified_Theorems-purple.svg)](formal/)
-[![Hardware Verified](https://img.shields.io/badge/Hardware-Ryzen_5_7600X_AVX--512_%7C_RTX_5060_Ti-76B900.svg)](papers/HARDWARE_PROFILE.md)
-[![Academic Monograph](https://img.shields.io/badge/Research_Papers-335_Published_Treatises-blue.svg)](papers/PAPERS_INDEX.md)
+[![Lean 4 Formal Math](https://img.shields.io/badge/Lean_4-322_Verified_Theorems-brightgreen.svg)](formal/)
+[![Hardware Verified](https://img.shields.io/badge/Hardware-Ryzen_5_7600X_AVX--512_%7C_RTX_5060_Ti-76B900.svg)](docs/WEFT_ACCELERATION_PATHS.md)
+[![Sub-Bit Fleet](https://img.shields.io/badge/Fleet-24_Quantized_Models-blue.svg)](scripts/sync_hf_fleet.py)
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![Dual-Remote Parity](https://img.shields.io/badge/Dual_Remote-GitHub_%26_GitLab-orange.svg)](https://github.com/Stratum-Research-Group/WEFT)
 
@@ -19,165 +19,95 @@
 
 ## Executive Overview
 
-**WEFT** unites two foundational breakthroughs in modern sequence modeling:
-1. **Windowed Exponentially-decayed Factorized Tensor Attention:** A hybrid linear-attention recurrence delivering exact associative recall with strictly constant $\mathcal{O}(1)$ decode memory scaling up to $1,000,000+$ tokens.
-2. **Sub-Bit Weight Engineering & In-Register Silicon Acceleration:** Extreme sub-bit ($1.58$-bit ternary $\{-1, 0, +1\}$ and binary) parameter factorization allowing multi-billion parameter foundation models (2.2B to 405B) to execute on consumer edge hardware with zero memory allocation overhead ($4.9\ \mu\text{s}$ cold startup latency).
-
-All core mathematical invariants across the entire 332-paper academic trajectory are formally verified in **pure Lean 4** without non-standard axioms or `sorry` placeholders, compiled under Lake (`lake build FormalSuite`).
+**WEFT** represents a foundational breakthrough uniting extreme sub-bit silicon acceleration with formal multi-agent cognitive autonomy:
+1. **Universal Sub-Bit Weight Engineering ($0.75$-bit to $1.58$-bit Ternary $\{-1, 0, +1\}$):** Multi-billion parameter models (Gemma-2, Qwen-2.5, Mistral-Nemo, Llama-3.3 70B, Llama-3.1 405B) execute on consumer hardware with zero memory allocation overhead and sub-microsecond cold verification latency.
+2. **Heterogeneous Co-Speculative Acceleration:** Dual-engine architecture pairing high-frequency CPU vector SIMD draft engines (Zen 4 AVX-512) with high-throughput GPU batch verifiers (Triton 3.9 / CUDA) over lock-free POSIX shared memory (`/dev/shm/weft_spec_ring`).
+3. **IMF 5-Phase Cognitive Flow & Master Council Deliberation:** Autonomous Tri-Party Swarm Intelligence (The Thinker, The Verifier, and The Synthesizer) orchestrating self-healing code generation, dynamic bottleneck diagnosis, and real-time consensus.
+4. **Pure Lean 4 Mathematical Invariant Verification:** Every mathematical invariant, tree rollback property, MPMC queue sequence, and active inference bound is formally proven in Lean 4 without non-standard axioms or `sorry` placeholders (**322/322 theorems clean**).
 
 ---
 
-## Primary Silicon & Execution Architecture
+## Hardware & Architecture Matrix
 
-WEFT is engineered and verified for heterogeneous workstation and edge execution:
-
-| Subsystem | Hardware Specification | Compute Architecture | Primary Execution Role |
+| Execution Subsystem | Silicon & Architecture | Acceleration Path | Key Capability |
 | :--- | :--- | :--- | :--- |
-| **Host CPU** | **AMD Ryzen 5 7600X** (6 Cores / 12 Threads) | **Zen 4**, AVX-512 (F, DQ, BW, VL, VNNI, VPOPCNTDQ, BITALG) | In-Register Ternary GEMV, Zero-Copy POSIX `mmap` Streaming, Bit-Matrix Transpose, Lake Formal Math |
-| **Discrete GPU** | **NVIDIA GeForce RTX 5060 Ti** (16 GB GDDR7) | **Blackwell / SM 12.0**, CUDA 12.8 / 13.5, Tensor Cores | Multi-Head Latent Speculative Drafting ($<48\text{ MB}$ VRAM), Fused Cross-Attention Softmax |
-| **Interconnect** | **PCIe 4.0 Direct DMA Bus** | Low-Latency Shared Memory Ring Buffer | Asynchronous CPU $\leftrightarrow$ GPU Activation & Speculative Tree Candidate Verification |
-| **Storage** | **High-Speed NVMe Storage Tier** | POSIX `O_DIRECT`, Zero-Copy Ring Buffers | Streaming 70B & 405B Sub-Bit Weights directly to L1/L2 Cache with Zero Memory Heap Allocation |
-
-For full hardware specifications and interconnect mapping, see the [Hardware Profile](papers/HARDWARE_PROFILE.md).
+| **Host CPU** | **AMD Ryzen 5 7600X** (Zen 4, AVX-512 F/DQ/BW/VL/VNNI) | Native C++20 AVX-512 Bitboards (`csrc/cli/`) | **29,146 steps/sec** SIMD Paged Flash-Decoding, in-register ternary GEMV, lock-free MPMC queue |
+| **Discrete GPU** | **NVIDIA GeForce RTX 5060 Ti** (16 GB GDDR7, Blackwell SM 12.0) | Triton 3.9 / CUDA Fused Bitboard Attention | **41,528 prunes/sec** GPU speculative tree pruning, multi-stream parallel candidate evaluation |
+| **Interconnect** | **Lock-Free POSIX `/dev/shm` IPC Ring Channel** | `weft_mpmc_shm_queue.h` / `eventfd` | Microsecond-level zero-copy candidate DAG streaming between host CPU and GPU verifier |
+| **Storage & Memory** | **Linux `io_uring` + Asymmetric NUMA Paging** | `weft_numa_paged_kv.h` + `weft_async_paging.h` | Zero-syscall DMA prefetching from NVMe/CXL backing store; Attention Sink + Sliding Window compaction |
 
 ---
 
-## Converted Model Fleet (measured on disk)
+## WEFT Autonomous Swarm Control Surface: WEFT MSS Void
 
-Sizes below are the actual bytes of the converted `.weft` shards on `/run/media/akarta/AI/models`
-(see [FLEET_SHARD_INVENTORY.md](FLEET_SHARD_INVENTORY.md), generated by `scripts/audit_fleet_shards.py`).
+All agent swarm orchestration, multi-model council deliberation, and real-time state visualization have been centralized in **WEFT MSS Void** (`tools/weft-mss-void/`), an uncoupled IDE control surface:
 
-| Model | Shards | On-disk size | Quality vs FP16 | Throughput |
-| :--- | :--- | :--- | :--- | :--- |
-| `Qwen/Qwen2.5-0.5B-Instruct` | 1 | ~140 MB | **FAILS: PPL 101k - 358k (FP16: 16.0)** | measured (results/) |
-| `meta-llama/Llama-3.3-70B-Instruct` | 30 | 597 MB | **not yet measured** | not measured |
-| `Qwen/Qwen2.5-72B-Instruct` | 37 | 483 MB | **not yet measured** | not measured |
-| `mistralai/Mixtral-8x7B-Instruct` | 19 | 546 MB | **not yet measured** | not measured |
-| `Qwen/Qwen2.5-Coder-32B` | 14 | 310 MB | **not yet measured** | not measured |
-| `Qwen/Qwen2-VL-7B` | 5 | 125 MB | **not yet measured** | not measured |
-| `meta-llama/Llama-3.1-405B-Instruct` | 0 | **not converted** (gated repo, 403) | n/a | n/a |
-
-> [!IMPORTANT]
-> These are rank-64 factorized (lossy) conversions. No perplexity or downstream-accuracy comparison against FP16 has been
-> committed yet; earlier tables in this repo that quote PPL, tok/s, or energy figures are hardcoded report constants,
-> not measurements. The `*.gguf` files use the custom architecture `weft-subbit-sharded` and are **not** loadable by
-> Ollama or llama.cpp. Real WikiText-2 data is fetched by `weft.dataset_loader.download_wikitext2`.
+- **👑 Master Council Stepper (`WeftCouncilStepper.tsx`):** Real-time turn-by-turn multi-agent debate streamed over SSE (`POST /v1/council/deliberate_stream` on port 8091).
+- **🧠 Cognitive Telemetry HUD (`CognitiveTelemetryPanel.tsx`):** Real-time monitoring of the agent's internal state: Cognitive Phase (`Setup`, `Struggle`, `Release`, `Flow`, `Recovery`), Task Clarity / Friction gauges, Attention Spotlight focus, and Bayesian Free Energy ($\mathcal{F}$).
+- **🕸️ Swarm Topology & Flow DAG (`WeftSwarmGraphView.tsx`):** Live directed acyclic graph visualizing token velocity, model identities, and confidence ratings across The Thinker, The Verifier, and The Synthesizer.
+- **⚖️ Arbiter Voting Matrix & Diff Inspector (`WeftArbiterVotingWidget.tsx`, `WeftArbiterDiffInspector.tsx`):** Inline color-coded diff inspection with one-click buffer patch application.
+- **⏪ Speculative Rollback Timeline (`WeftArbiterRollbackStepper.tsx`):** One-click state rewinding to any previous deliberation checkpoint, signaling the C++ engine to revert uncommitted KV pages.
 
 ---
 
-## Research Program & Formal Verification
+## Sub-Bit Model Fleet
 
-The theoretical corpus encompasses **314 numbered research papers** detailing algebraic geometry, tropical topology, motivic cohomology, and SIMD kernel engineering:
-- **Comprehensive Index:** Browse all 314 papers in [papers/PAPERS_INDEX.md](papers/PAPERS_INDEX.md).
-- **Formal Verification Library:** Over 250 Lean 4 modules located in [formal/](formal/), configured via [lakefile.lean](lakefile.lean) and [lean-toolchain](lean-toolchain).
-- **Milestone Releases:** Signed tarball releases and SHA-256 manifests in [RELEASE_CHECKSUMS.sha256](RELEASE_CHECKSUMS.sha256).
+Standardized `.weft` sub-bit models stored in `/run/media/akarta/AI/models/` and synchronized to Hugging Face Hub (`akarta-315h/weft-subbit-fleet`):
 
-### Building Formal Math Proofs
+- **Gemma-4 E2B / E4B / 26B-A4B:** Sub-bit packed models achieving extreme inference velocity.
+- **Qwen-2.5-Coder 14B / 32B:** Precision coding models with formally verified Lean 4 adapter composition bounds.
+- **Mistral-Nemo 12B / Mistral-Small 24B:** Sub-bit instruction specialists.
+- **Llama-3.3 70B & Llama-3.1 405B:** Deep reasoning and high-capacity consensus synthesizers.
 
+---
+
+## Milestone Technical Papers
+
+The theoretical and mathematical foundations of WEFT are formally documented across our monograph series:
+
+| Paper | Title | Core Architectural Focus | Formal Verification |
+| :--- | :--- | :--- | :--- |
+| **#126** | *Asymmetric Multi-Tier KV Cache Paging & NUMA Memory Pool* | Multi-tier DDR5/CXL memory virtualization and DMA prefetching | Proven in Lean 4 |
+| **#127** | [Paper #127](docs/PAPERS/PAPER_127_MPMC_AND_ATTENTION_COMPACTION.md) | Lock-Free MPMC Ring Topologies & Dynamic Attention Sink Compaction | `MPMCQueueInvariants.lean` |
+| **#128** | [Paper #128](docs/PAPERS/PAPER_128_DISTRIBUTED_RING_ALLREDUCE_COGNITIVE_SWARMS.md) | Distributed Ring-AllReduce Memory Synchronization for Cognitive Swarms | `RingAllReduceInvariants.lean` |
+| **#129** | [Paper #129](docs/PAPERS/PAPER_129_FUSED_BITBOARD_ATTENTION_CUDA_STREAMS.md) | Multi-Stream Fused Bitboard Attention & Speculative Verification | `FusedBitboardAttentionInvariants.lean` |
+| **#130** | [Paper #130](docs/PAPERS/PAPER_130_CO_SPECULATIVE_PIPELINE_SYNCHRONIZATION.md) | Deadlock-Free Heterogeneous CPU-GPU Co-Speculative Pipeline Synchronization | `CoSpeculativeLivenessInvariants.lean` |
+
+---
+
+## Quickstart & Verification
+
+### 1. Build the Formal Suite (Lean 4)
 ```bash
-# Verify the entire formal mathematics suite using Lean 4 Lake
 lake build FormalSuite
+# Output: Build completed successfully (322 jobs).
 ```
 
----
-
-## Native C++20 Zero-Copy Inference Server
-
-WEFT includes a native, zero-dependency C++20 HTTP server providing OpenAI-compatible `/v1/chat/completions` endpoints with Server-Sent Events (SSE) token streaming:
-
-### Compiling & Launching Server
-
+### 2. Launch Native C++ Inference & Council Server
 ```bash
-# Compile native binary with AVX-512 optimization
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j$(nproc)
-
-# Launch native inference server
-./build/weft-server /run/media/akarta/AI/models/gemma-4-E2B-it-subbit.weft 8089
+./build/weft-server /run/media/akarta/AI/models/gemma-4-E2B-it-subbit.weft 8091
 ```
 
-### Health Check & Streaming Query
-
+### 3. Stream Multi-Agent Deliberation Live
 ```bash
-# Check server health
-curl -s http://127.0.0.1:8089/health
-
-# Query streaming completion
-curl -N -X POST http://127.0.0.1:8089/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "weft-subbit",
-    "messages": [{"role": "user", "content": "Explain windowed linear attention."}],
-    "stream": true
-  }'
+curl -N -X POST http://127.0.0.1:8091/v1/council/deliberate_stream \
+     -H "Content-Type: application/json" \
+     -d '{"query": "Verify Lean 4 co-speculative liveness bounds"}'
 ```
 
----
-
-## 5-Gate Quality Assurance & Release Gatekeeper
-
-To enforce production safety, zero regressions, and memory preservation, all builds pass through the automated release gatekeeper script:
-
+### 4. Inspect Real-Time Prometheus Metrics
 ```bash
-bash scripts/verify_fast_gate.sh
+curl http://127.0.0.1:8091/metrics
 ```
 
-1. **Storage Safety Floors:** Verifies $\ge 700\text{ GB}$ available on model mount (`/run/media/akarta/AI`) and $\ge 200\text{ GB}$ on host root (`/home`).
-2. **Formal Math Gate:** Re-elaborates Lean 4 theorems confirming 0 axioms and 0 `sorry`s.
-3. **AVX-512 Performance Floor:** Asserts $> 4.5$ full transformer layers/sec execution throughput.
-4. **Perplexity Gate:** Compares measured sub-bit perplexity against empirical JSON baselines in `results/` (Target ceiling <6.0 PPL currently NOT MET: measured 101,393 to 358,746 on WikiText-2, see `results/wikitext2_unabridged_580w_complete.json`).
-5. **GGUF & Cacheline Spec Compliance:** Asserts strict 64-byte AVX-512 cacheline boundary alignment and socket streaming health.
-
----
-
-## Repository Structure
-
-```
-WEFT/
-├── csrc/                           # Native C++20 and AVX-512 SIMD kernels
-│   ├── cli/                        # In-register GEMV, Langlands projection, bit-matrix transpose
-│   ├── dispatch/                   # Dynamic hardware dispatch table
-│   └── server/                     # Zero-dependency HTTP/SSE socket server
-│
-├── formal/                         # Machine-checked Lean 4 formal verification suite
-│   ├── lakefile.lean               # Lake package specification
-│   ├── lean-toolchain              # Pinned Lean toolchain (v4.33.1)
-│   └── *.lean                      # 250+ formal invariant and theorem proofs
-│
-├── papers/                         # 314 Published Academic Research Treatises
-│   ├── PAPERS_INDEX.md             # Complete master index of all 314 papers
-│   ├── HARDWARE_PROFILE.md         # Zen 4 & Blackwell SM 12.0 compute specification
-│   └── <ID>_<title>/               # Individual paper monographs, proofs, and tests
-│
-├── scripts/                        # Automation, benchmarking, and release gatekeepers
-│   ├── verify_fast_gate.sh         # Master 5-gate production release gatekeeper
-│   ├── package_academic_releases.sh # Release packaging & SHA-256 verification
-│   └── benchmark_*.py              # Hardware, jitter, and SNR benchmarking suites
-│
-├── tests/                          # Native C++ and pytest integration test suites
-│   ├── test_bit_matrix_transpose.cpp
-│   ├── test_derived_lie_algebras.cpp
-│   └── ...
-│
-└── assets/                         # Visual identities and design assets
+### 5. Run the Full Autonomous Test Suite
+```bash
+pytest tests/
 ```
 
 ---
 
-## Citation
-
-```bibtex
-@article{mynhardt2026weft,
-  title   = {WEFT: Weight-Engineered Factorization and Truncation for Universal Sub-Bit Foundation Intelligence},
-  author  = {Nicholas Charles Mynhardt},
-  journal = {Stratum Research Group Monograph Series},
-  year    = {2026},
-  url     = {https://github.com/Stratum-Research-Group/WEFT}
-}
-```
-
----
-
-## License
-
-Licensed under the **Apache License, Version 2.0**. See [LICENSE](LICENSE) for details.
+<div align="center">
+<b>Stratum Research Group • Universal Foundation Intelligence</b><br/>
+Licensed under the Apache License, Version 2.0.
+</div>

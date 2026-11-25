@@ -327,5 +327,6 @@ lean_lib «FormalSuite» where
     `«DynamicDepthScalingBounds»,
     `«MPMCQueueInvariants»,
     `«RingAllReduceInvariants»,
-    `«FusedBitboardAttentionInvariants»
+    `«FusedBitboardAttentionInvariants»,
+    `«CoSpeculativeLivenessInvariants»
   ]

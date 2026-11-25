@@ -1,4 +1,4 @@
-# Milestone Paper 271: Asymmetric Tropical Curve Metric Graphs & Jacobian Varieties for Multi-Modal Cross-Attention Alignment
+# Paper 271: Asymmetric Tropical Curve Metric Graphs & Jacobian Varieties for Multi-Modal Cross-Attention Alignment
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

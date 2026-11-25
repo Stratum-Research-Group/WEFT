@@ -1,4 +1,4 @@
-# Asymmetric Voevodsky Motives & Mixed Tate Invariants for Sub-Bit Weight Quantization
+# Paper 174: Asymmetric Voevodsky Motives & Mixed Tate Invariants for Sub-Bit Weight Quantization
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

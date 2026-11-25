@@ -1,4 +1,4 @@
-# Milestone Paper 268: Asymmetric Tropical Convexity & Polytopal Core Allocations for Multi-Tenant KV Cache Isolation
+# Paper 268: Asymmetric Tropical Convexity & Polytopal Core Allocations for Multi-Tenant KV Cache Isolation
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

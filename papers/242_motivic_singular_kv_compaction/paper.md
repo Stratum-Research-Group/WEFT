@@ -1,4 +1,4 @@
-# Asymmetric Motivic Cohomological Operations on Singular Stacks for Zero-Copy KV Compaction
+# Paper 242: Asymmetric Motivic Cohomological Operations on Singular Stacks for Zero-Copy KV Compaction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

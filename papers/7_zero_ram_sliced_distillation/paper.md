@@ -1,5 +1,9 @@
 # Paper 7: Zero-RAM Sliced Frontier Model Distillation: \\ Compressing Gemma 4 into Linear Recurrent Singlets via On-Demand Memory-Mapped Slicing
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

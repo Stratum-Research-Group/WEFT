@@ -1,5 +1,9 @@
 # Paper 24: The Grand Synthesis of WEFT: Mathematical Invariants, Sub-Bit Bitboards, and Edge Co-Processing
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Title:** Paper 24: The Grand Synthesis of WEFT: Mathematical Invariants, Sub-Bit Bitboards, and Edge Co-Processing  
 **Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized (Grand Charter Milestone Report)

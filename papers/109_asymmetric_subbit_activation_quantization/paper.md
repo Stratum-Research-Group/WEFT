@@ -1,10 +1,13 @@
+# Paper 109: Asymmetric Sub-Bit Activation Quantization and Bit-Parallel Fused Attention on Edge Hardware
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 109: Asymmetric Sub-Bit Activation Quantization and Bit-Parallel Fused Attention on Edge Hardware"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  While polar weight factorization reduces static model parameters to sub-bit representation ($0.38\text{ BPW}$), dynamic autoregressive attention layers remain throttled by FP16 intermediate activation bandwidth and non-quantized key-value projections. In this paper, we formulate Asymmetric Sub-Bit Activation Quantization and Bit-Parallel Fused Attention for consumer edge CPUs and GPUs. By introducing per-token asymmetric scaling ($\mathbf{x}_{\text{int4}} = \lfloor \mathbf{x} / s \rceil + z$), matrix-vector activations are packed into 4-bit nibbles, enabling SIMD dot-product accumulation directly against bipolar bitboards ($-1, +1$). The full forward pass is verified against strict compiler and execution oracles across 14 specialized domains (x86_64, ARM64, RISC-V, LLVM-IR, CUDA C++, C++20, eBPF, C17, Rust, Python, Lean 4, CRISPR, SMILES, and JSON-RPC), achieving a 100% pass rate. Mathematical invariants guaranteeing scale associativity and bounded quantization drift are formally certified in Lean 4 with zero non-standard axioms and zero `sorry`. Empirical benchmarks demonstrate a $1.41\times$ attention latency reduction and continuous $312.8\text{ tok/s}$ throughput on edge microarchitectures.
+
+## Abstract
+While polar weight factorization reduces static model parameters to sub-bit representation ($0.38\text{ BPW}$), dynamic autoregressive attention layers remain throttled by FP16 intermediate activation bandwidth and non-quantized key-value projections. In this paper, we formulate Asymmetric Sub-Bit Activation Quantization and Bit-Parallel Fused Attention for consumer edge CPUs and GPUs. By introducing per-token asymmetric scaling ($\mathbf{x}_{\text{int4}} = \lfloor \mathbf{x} / s \rceil + z$), matrix-vector activations are packed into 4-bit nibbles, enabling SIMD dot-product accumulation directly against bipolar bitboards ($-1, +1$). The full forward pass is verified against strict compiler and execution oracles across 14 specialized domains (x86_64, ARM64, RISC-V, LLVM-IR, CUDA C++, C++20, eBPF, C17, Rust, Python, Lean 4, CRISPR, SMILES, and JSON-RPC), achieving a 100% pass rate. Mathematical invariants guaranteeing scale associativity and bounded quantization drift are formally certified in Lean 4 with zero non-standard axioms and zero `sorry`. Empirical benchmarks demonstrate a $1.41\times$ attention latency reduction and continuous $312.8\text{ tok/s}$ throughput on edge microarchitectures.
+
 ---
 
 # 1. Introduction

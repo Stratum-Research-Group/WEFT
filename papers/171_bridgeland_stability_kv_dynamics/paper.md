@@ -1,4 +1,4 @@
-# Asymmetric Bridgeland Stability Conditions & Derived Category KV-Cache Dynamics on Polar Vector Hardware
+# Paper 171: Asymmetric Bridgeland Stability Conditions & Derived Category KV-Cache Dynamics on Polar Vector Hardware
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

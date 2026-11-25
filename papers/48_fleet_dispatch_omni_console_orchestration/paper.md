@@ -1,5 +1,9 @@
 # Paper 48: Dynamic Multi-Specialist Dispatch and Fleet Orchestration: Serving 255 Billion Parameters Across 9 Sub-Bit Models in 1.3 GB RAM
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

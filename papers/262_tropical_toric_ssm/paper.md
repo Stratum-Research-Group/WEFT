@@ -1,4 +1,4 @@
-# Milestone Paper 262: Asymmetric Tropical Toric Ideals & Graded Gröbner Bases for Sparse State-Space (SSM) Recurrence
+# Paper 262: Asymmetric Tropical Toric Ideals & Graded Gröbner Bases for Sparse State-Space (SSM) Recurrence
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

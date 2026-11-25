@@ -1,5 +1,9 @@
 # Paper 75: Multi-Token Register-Reused AVX-512 S-GEMM: Sub-Bit Foundation Matrix Acceleration at 3.9+ TFLOPs/s on Zen 4 Silicon
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 2026*

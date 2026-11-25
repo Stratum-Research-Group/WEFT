@@ -1,5 +1,9 @@
 # Paper 70: The Grand Frontier Synthesis: Unifying 450+ Billion Parameters Across 14 Specialists, 160 Machine-Checked Conjectures, and Zero-Cloud Multimodal Edge Serving
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 23, 2026*

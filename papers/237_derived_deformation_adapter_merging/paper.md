@@ -1,4 +1,4 @@
-# Asymmetric Derived Deformation Theory & Tangent Lie Algebroids for Zero-Shot Adapter Merging
+# Paper 237: Asymmetric Derived Deformation Theory & Tangent Lie Algebroids for Zero-Shot Adapter Merging
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

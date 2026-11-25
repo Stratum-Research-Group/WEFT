@@ -1,5 +1,9 @@
 # Paper 65: Universal Adapter Knowledge Saturation: Persisting 160 Machine-Checked Mathematical Reductions in Factored Sub-Bit Memory Under Continuous Edge Server Co-Execution
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

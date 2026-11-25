@@ -1,4 +1,4 @@
-# Asymmetric Derived Intersection Theory & Virtual Fundamental Classes for Quantum Attention Entanglement
+# Paper 231: Asymmetric Derived Intersection Theory & Virtual Fundamental Classes for Quantum Attention Entanglement
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

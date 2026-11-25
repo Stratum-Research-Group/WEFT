@@ -1,5 +1,9 @@
 # Paper 17: The `.weft` Binary Container Standard
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Title:** The `.weft` Binary Container Standard: Native Sub-Bit Parameter Serialization and In-Memory Execution for Extreme-Scale Models  
 **Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized

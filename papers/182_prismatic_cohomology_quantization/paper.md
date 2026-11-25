@@ -1,4 +1,4 @@
-# Asymmetric Prismatic Cohomology & Breuil-Kisin Prisms for Integral Sub-Bit Quantization Invariants
+# Paper 182: Asymmetric Prismatic Cohomology & Breuil-Kisin Prisms for Integral Sub-Bit Quantization Invariants
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

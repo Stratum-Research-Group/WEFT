@@ -1,4 +1,4 @@
-# Asymmetric Fargues-Fontaine Curves on Perfectoid Fields for Multi-Token Speculative Memory Bundles
+# Paper 221: Asymmetric Fargues-Fontaine Curves on Perfectoid Fields for Multi-Token Speculative Memory Bundles
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

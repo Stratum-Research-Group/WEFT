@@ -1,5 +1,9 @@
 # Paper 35: Dual-Frontier Foundation Compression at Scale: 100% Full Deconstruction of Qwen-2.5-72B into 241 MB at 0.0235 BPW with Verified Low-Rank Hypercube Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group
 *Stratum Research Group*  
 **Date:** November 22, 2026  

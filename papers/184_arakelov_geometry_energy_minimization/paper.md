@@ -1,4 +1,4 @@
-# Asymmetric Arithmetic Chow Groups & Arakelov Height Pairings for Energy-Optimal Edge Inference
+# Paper 184: Asymmetric Arithmetic Chow Groups & Arakelov Height Pairings for Energy-Optimal Edge Inference
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

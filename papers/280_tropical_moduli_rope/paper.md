@@ -1,4 +1,4 @@
-# Milestone Paper 280: Asymmetric Tropical Compactifications & Moduli of Metric Graphs for Dynamic Long-Context RoPE Scaling
+# Paper 280: Asymmetric Tropical Compactifications & Moduli of Metric Graphs for Dynamic Long-Context RoPE Scaling
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

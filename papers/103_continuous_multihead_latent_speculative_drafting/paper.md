@@ -1,10 +1,13 @@
+# Paper 103: Continuous Multi-Head Latent Speculative Drafting on Edge Consumer GPUs
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 103: Continuous Multi-Head Latent Speculative Drafting on Edge Consumer GPUs"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  Heterogeneous edge workstations equipped with fast multi-core CPUs and mid-tier GPUs often underutilize available silicon due to rigid model partitioning. While the CPU excels at streaming memory-mapped sub-bit polar base weights with zero resident heap footprint, the GPU possesses massive SIMD floating-point concurrency ideally suited for parallel speculative token candidate drafting. In this paper, we formulate Continuous Multi-Head Latent Speculative Drafting (C-MLSD). By projecting low-dimensional bottleneck activation vectors into a lightweight GPU-resident drafting tree head ($< 48\text{ MB}$ VRAM), speculative candidate branches of depth $K = 5$ are emitted in under $350\ \mu\text{s}$ on an NVIDIA GeForce RTX 5060 Ti. Candidate token sequences are verified in parallel against the host CPU AVX-512 VPOPCNTDQ target forward pass. We formally prove that verified target distribution invariance is preserved under greedy tree pruning. Empirical evaluation confirms an effective speedup of $2.42\times$ to $3.15\times$ over serial autoregressive CPU decoding.
+
+## Abstract
+Heterogeneous edge workstations equipped with fast multi-core CPUs and mid-tier GPUs often underutilize available silicon due to rigid model partitioning. While the CPU excels at streaming memory-mapped sub-bit polar base weights with zero resident heap footprint, the GPU possesses massive SIMD floating-point concurrency ideally suited for parallel speculative token candidate drafting. In this paper, we formulate Continuous Multi-Head Latent Speculative Drafting (C-MLSD). By projecting low-dimensional bottleneck activation vectors into a lightweight GPU-resident drafting tree head ($< 48\text{ MB}$ VRAM), speculative candidate branches of depth $K = 5$ are emitted in under $350\ \mu\text{s}$ on an NVIDIA GeForce RTX 5060 Ti. Candidate token sequences are verified in parallel against the host CPU AVX-512 VPOPCNTDQ target forward pass. We formally prove that verified target distribution invariance is preserved under greedy tree pruning. Empirical evaluation confirms an effective speedup of $2.42\times$ to $3.15\times$ over serial autoregressive CPU decoding.
+
 ---
 
 # 1. Introduction

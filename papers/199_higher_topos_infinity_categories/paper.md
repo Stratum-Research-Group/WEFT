@@ -1,4 +1,4 @@
-# Asymmetric Higher Topos Theory & $\infty$-Category Descent for Hierarchical Token Flow
+# Paper 199: Asymmetric Higher Topos Theory & ∞-Category Descent for Hierarchical Token Flow
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

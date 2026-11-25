@@ -1,4 +1,4 @@
-# Milestone Paper 270: Asymmetric Derived Lagrangian Intersections & Floer Homology for Non-Equilibrium Weight Update Stability
+# Paper 270: Asymmetric Derived Lagrangian Intersections & Floer Homology for Non-Equilibrium Weight Update Stability
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

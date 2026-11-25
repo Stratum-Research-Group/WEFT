@@ -1,4 +1,4 @@
-# Milestone Paper 258: Asymmetric Derived Ring Spectra & Topological André-Quillen Cohomology for Non-Linear Activation Linearization
+# Paper 258: Asymmetric Derived Ring Spectra & Topological André-Quillen Cohomology for Non-Linear Activation Linearization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

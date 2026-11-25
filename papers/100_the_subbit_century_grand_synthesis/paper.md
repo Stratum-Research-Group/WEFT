@@ -1,4 +1,4 @@
-# Paper 100: The Sub-Bit Century Grand Synthesis: Unified Mathematical Foundations, Physical Hardware Realization, and Asymptotic Optimality of WEFT
+# Paper 100: The Sub-Bit Century: A Grand Synthesis of Polar Matrix Factorization, In-Register Silicon Acceleration, and Formal Memory Invariants
 
 **Nicholas Charles Mynhardt, Stratum Research Group**  
 *research@stratum.org*  

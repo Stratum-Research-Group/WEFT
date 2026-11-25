@@ -1,4 +1,4 @@
-# Milestone Paper 278: Asymmetric Motivic Cohomological Operations on Artin Stacks for Provable Multi-Tenant Privacy Isolation
+# Paper 278: Asymmetric Motivic Cohomological Operations on Artin Stacks for Provable Multi-Tenant Privacy Isolation
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

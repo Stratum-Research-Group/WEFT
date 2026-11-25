@@ -1,4 +1,4 @@
-# Asymmetric Bit-Parallel Non-Linear Activation Functions & Polynomial Remez Approximations on Edge SIMD Silicon
+# Paper 135: Asymmetric Bit-Parallel Non-Linear Activation Functions & Polynomial Remez Approximations on Edge SIMD Silicon
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

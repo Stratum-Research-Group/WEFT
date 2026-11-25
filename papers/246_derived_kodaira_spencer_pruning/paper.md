@@ -1,4 +1,4 @@
-# Asymmetric Derived Stacky Kodaira-Spencer Classes for Dynamic Layer Pruning
+# Paper 246: Asymmetric Derived Stacky Kodaira-Spencer Classes for Dynamic Layer Pruning
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

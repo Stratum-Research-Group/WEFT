@@ -1,5 +1,9 @@
 # Paper 3: From Edge to Hyperscale: Architectural Specifications for 1.04-Trillion Parameter Linear-Recurrent MoE Networks
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

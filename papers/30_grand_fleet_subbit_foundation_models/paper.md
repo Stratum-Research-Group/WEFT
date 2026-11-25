@@ -1,5 +1,9 @@
 # Paper 30: The Grand Fleet of Sub-Bit Foundation Models: Pushing Frontier 70B+ LLMs Below 0.02 BPW with Certified Mathematical Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *Google DeepMind & WEFT Research Initiative*  

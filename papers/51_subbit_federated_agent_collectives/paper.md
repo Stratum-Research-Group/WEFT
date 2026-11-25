@@ -1,5 +1,9 @@
 # Paper 51: Sub-Bit Federated Agent Collectives: Zero-Cloud Co-Execution and Autonomous Goal Synthesis across 10-Model Foundation Fleets
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

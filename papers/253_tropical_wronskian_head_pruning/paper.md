@@ -1,4 +1,4 @@
-# Milestone Paper 253: Asymmetric Tropical Wronskian Determinants & Metric Graph Linear Series for Redundant Attention Head Elimination
+# Paper 253: Asymmetric Tropical Wronskian Determinants & Metric Graph Linear Series for Redundant Attention Head Elimination
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

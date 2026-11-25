@@ -1,5 +1,9 @@
 # Paper 43: Sub-Bit High-Resolution Vision-Language Models: Sub-0.082 BPW Deconstruction of Qwen2-VL-7B with Formally Certified Spatial Rotary Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  

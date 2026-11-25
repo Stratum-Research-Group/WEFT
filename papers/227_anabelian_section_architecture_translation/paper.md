@@ -1,4 +1,4 @@
-# Asymmetric Étale Fundamental Groups & Grothendieck Anabelian Sections for Zero-Shot Architecture Translation
+# Paper 227: Asymmetric Étale Fundamental Groups & Grothendieck Anabelian Sections for Zero-Shot Architecture Translation
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

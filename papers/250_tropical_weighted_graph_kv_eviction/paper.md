@@ -1,4 +1,4 @@
-# Asymmetric Tropical Moduli of Weighted Graphs & Tropical Splitting for Dynamic KV Cache Eviction
+# Paper 250: Asymmetric Tropical Moduli of Weighted Graphs & Tropical Splitting for Dynamic KV Cache Eviction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

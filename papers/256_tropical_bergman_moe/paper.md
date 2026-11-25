@@ -1,4 +1,4 @@
-# Milestone Paper 256: Asymmetric Tropical Hyperplane Arrangements & Bergman Fans for Sparse MoE Expert Selection
+# Paper 256: Asymmetric Tropical Hyperplane Arrangements & Bergman Fans for Sparse MoE Expert Selection
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

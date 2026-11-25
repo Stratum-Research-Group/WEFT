@@ -1,5 +1,9 @@
 # Paper 93: Dynamic CPU ISA Auto-Dispatch, Vectorized MTP Tree Speculation, and Memory-Mapped Execution
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt, Stratum Research Group** • `research@stratum.org`
 
 > **Peer-Review Context & Chronological Evolution:**

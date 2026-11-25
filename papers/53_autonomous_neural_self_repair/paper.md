@@ -1,5 +1,9 @@
 # Paper 53: Autonomous Neural Self-Repair: In-Register Gradient-Free Drift Correction and Bitboard Fault Tolerance in Sub-Bit Foundation Fleets
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

@@ -1,5 +1,9 @@
 # Paper 90: Zero-Mask Sliding-Window Flash-Attention on AMD Zen 4 AVX-512 Architectures
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group*  
 `research@stratum.org`

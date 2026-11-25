@@ -1,4 +1,4 @@
-# Milestone Paper 289: Asymmetric Tropical Toric Degenerations of Flag Varieties for Dynamic Low-Rank KV Cache Factorization
+# Paper 289: Asymmetric Tropical Toric Degenerations of Flag Varieties for Dynamic Low-Rank KV Cache Factorization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

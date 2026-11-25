@@ -1,4 +1,4 @@
-# Asymmetric Prismatic Crystals & Syntomic Cohomology for $p$-Adic Speculative Verification
+# Paper 216: Asymmetric Prismatic Crystals & Syntomic Cohomology for p-Adic Speculative Verification
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

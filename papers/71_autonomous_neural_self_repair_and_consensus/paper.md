@@ -1,5 +1,9 @@
 # Paper 71: Autonomous In-Register Neural Self-Repair and Multi-Agent Consensus: Stochastic Bit-Flip Correction and Consensus Invariants Across Sub-Bit Foundation Fleets
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 23, 2026*

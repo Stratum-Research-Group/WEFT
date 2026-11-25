@@ -1,4 +1,4 @@
-# Asymmetric Motivic Cohomological Hall Algebras & BPS Lie Algebras for Ultra-Dense Token Embedding Compaction
+# Paper 224: Asymmetric Motivic Cohomological Hall Algebras & BPS Lie Algebras for Ultra-Dense Token Embedding Compaction
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

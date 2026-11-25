@@ -1,10 +1,13 @@
+# Paper 105: Zero-Copy Multi-Tenant Micro-Routing on Heterogeneous Silicon
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 105: Zero-Copy Multi-Tenant Micro-Routing on Heterogeneous Silicon"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  Deploying multi-tenant edge foundation intelligence requires serving concurrent user tasks with isolated domain specializations while strictly conserving DRAM and cache hierarchies. In this work, we introduce the Zero-Copy Multi-Tenant Micro-Routing architecture on heterogeneous silicon. Under this framework, immutable sub-bit foundation base weights ($W_0 \in \{-1, +1\}^{d_{\text{out}} \times d_{\text{in}}}$) are memory-mapped into shared virtual memory once across all processes. Multi-tenant specialization is executed via dynamic rank-1 micro-adapters ($\Delta W_k = \alpha_k \mathbf{u}_k \mathbf{v}_k^\top$) routed on a per-request basis through HTTP headers (`X-Weft-Adapter: <id>`). Projections are evaluated via bitboard AVX-512 VPOPCNTDQ acceleration on CPU and asynchronously scheduled through lock-free work-stealing queues. We formally verify that cascaded fixed-point accumulation error remains bounded by $\mathcal{O}(N \cdot \text{LSB})$ with zero non-standard axioms and zero `sorry` in Lean 4. Multi-tenant serving benchmarks demonstrate sub-45 microsecond adapter context switching, zero heap resident memory growth across concurrent worker threads, and linear scaling across diverse foundation architectures.
+
+## Abstract
+Deploying multi-tenant edge foundation intelligence requires serving concurrent user tasks with isolated domain specializations while strictly conserving DRAM and cache hierarchies. In this work, we introduce the Zero-Copy Multi-Tenant Micro-Routing architecture on heterogeneous silicon. Under this framework, immutable sub-bit foundation base weights ($W_0 \in \{-1, +1\}^{d_{\text{out}} \times d_{\text{in}}}$) are memory-mapped into shared virtual memory once across all processes. Multi-tenant specialization is executed via dynamic rank-1 micro-adapters ($\Delta W_k = \alpha_k \mathbf{u}_k \mathbf{v}_k^\top$) routed on a per-request basis through HTTP headers (`X-Weft-Adapter: <id>`). Projections are evaluated via bitboard AVX-512 VPOPCNTDQ acceleration on CPU and asynchronously scheduled through lock-free work-stealing queues. We formally verify that cascaded fixed-point accumulation error remains bounded by $\mathcal{O}(N \cdot \text{LSB})$ with zero non-standard axioms and zero `sorry` in Lean 4. Multi-tenant serving benchmarks demonstrate sub-45 microsecond adapter context switching, zero heap resident memory growth across concurrent worker threads, and linear scaling across diverse foundation architectures.
+
 ---
 
 # 1. Introduction & Motivation

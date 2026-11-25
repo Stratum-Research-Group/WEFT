@@ -1,4 +1,4 @@
-# Milestone Paper 275: Asymmetric Motivic Étale Section Conjectures for Zero-Shot Out-of-Distribution Quantization Drift Detection
+# Paper 275: Asymmetric Motivic Étale Section Conjectures for Zero-Shot Out-of-Distribution Quantization Drift Detection
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

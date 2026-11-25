@@ -1,5 +1,9 @@
 # Paper 62: Sparse Mixture-of-Experts Sub-Bit Deconstruction: Slicing Gemma-4 26B-A4B into 114 MB at 0.0382 BPW with Certified Routing Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

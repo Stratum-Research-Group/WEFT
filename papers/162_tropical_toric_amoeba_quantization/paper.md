@@ -1,4 +1,4 @@
-# Asymmetric Tropical Toric Geometry & Amoeba Projection Quantization on SIMD Silicon
+# Paper 162: Asymmetric Tropical Toric Geometry & Amoeba Projection Quantization on SIMD Silicon
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,10 +1,13 @@
+# Paper 108: Dynamic Rank-1 Micro-Adapter Sparsification and Sub-Vector Dot Product Pruning on Polar Sub-Bit Silicon
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 108: Dynamic Rank-1 Micro-Adapter Sparsification and Sub-Vector Dot Product Pruning on Polar Sub-Bit Silicon"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  While dynamic rank-1 micro-adapters ($\Delta W = \alpha \mathbf{u} \mathbf{v}^\top$) enable sub-millisecond specialist steering on frozen polar foundation models, evaluating multi-adapter linear combinations across wide hidden dimensions ($d_{\text{model}} \ge 4096$) incurs redundant vector arithmetic on near-zero steering components. In this paper, we formulate Dynamic Rank-1 Micro-Adapter Sparsification and Sub-Vector Dot Product Pruning for AVX-512 vector pipelines. By establishing a dynamic thresholding operator $\Pi_\epsilon(\mathbf{v})$ that truncates elements satisfying $|v_i| < \epsilon$, we prune up to $64.2\%$ of input vector multiply-accumulate operations while bounding the total inner product perturbation by $\mathcal{O}(M \cdot \epsilon)$. We formally prove the error bound and monotonic accumulation properties in Lean 4 with zero non-standard axioms and zero `sorry`. Benchmark evaluations across the 161-adapter Frontier Mathematical Suite demonstrate an additional $1.34\times$ speedup during multi-adapter composition passes with zero measurable downstream perplexity degradation.
+
+## Abstract
+While dynamic rank-1 micro-adapters ($\Delta W = \alpha \mathbf{u} \mathbf{v}^\top$) enable sub-millisecond specialist steering on frozen polar foundation models, evaluating multi-adapter linear combinations across wide hidden dimensions ($d_{\text{model}} \ge 4096$) incurs redundant vector arithmetic on near-zero steering components. In this paper, we formulate Dynamic Rank-1 Micro-Adapter Sparsification and Sub-Vector Dot Product Pruning for AVX-512 vector pipelines. By establishing a dynamic thresholding operator $\Pi_\epsilon(\mathbf{v})$ that truncates elements satisfying $|v_i| < \epsilon$, we prune up to $64.2\%$ of input vector multiply-accumulate operations while bounding the total inner product perturbation by $\mathcal{O}(M \cdot \epsilon)$. We formally prove the error bound and monotonic accumulation properties in Lean 4 with zero non-standard axioms and zero `sorry`. Benchmark evaluations across the 161-adapter Frontier Mathematical Suite demonstrate an additional $1.34\times$ speedup during multi-adapter composition passes with zero measurable downstream perplexity degradation.
+
 ---
 
 # 1. Introduction

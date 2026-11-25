@@ -1,4 +1,4 @@
-# Milestone Paper 263: Asymmetric Motivic Galois Groups & Tannakian Categories for Invariant Multi-Modal Cross-Attention Alignment
+# Paper 263: Asymmetric Motivic Galois Groups & Tannakian Categories for Invariant Multi-Modal Cross-Attention Alignment
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

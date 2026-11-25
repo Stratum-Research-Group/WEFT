@@ -1,5 +1,9 @@
 # Paper 59: High-Throughput SIMD Bitboard Counterexample Search: Verifying Arithmetic Conjectures and Trajectory Bounds at 50+ Million Numbers/sec with Lean 4 Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

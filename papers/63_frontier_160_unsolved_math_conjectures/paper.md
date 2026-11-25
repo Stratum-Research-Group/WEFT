@@ -1,5 +1,9 @@
 # Paper 63: Frontier 160: High-Throughput Rigorous Verification and Machine-Checked Conditional Reductions of 160 Open Mathematical Conjectures
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

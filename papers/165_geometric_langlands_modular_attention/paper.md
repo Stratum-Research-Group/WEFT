@@ -1,4 +1,4 @@
-# Asymmetric Geometric Langlands Duality & Hecke Eigensheaf Modular Attention on Polar Hardware
+# Paper 165: Asymmetric Geometric Langlands Duality & Hecke Eigensheaf Modular Attention on Polar Hardware
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

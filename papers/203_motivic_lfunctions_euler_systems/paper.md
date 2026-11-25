@@ -1,4 +1,4 @@
-# Asymmetric Motivic L-Functions & Euler Systems for Optimal Gradient Descent Dynamics
+# Paper 203: Asymmetric Motivic L-Functions & Euler Systems for Optimal Gradient Descent Dynamics
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

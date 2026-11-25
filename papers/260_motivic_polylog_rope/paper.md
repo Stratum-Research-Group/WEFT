@@ -1,4 +1,4 @@
-# Milestone Paper 260: Asymmetric Motivic Polylogarithms & Zagier Conjectures for Ultra-Precise Positional Embedding Dequantization
+# Paper 260: Asymmetric Motivic Polylogarithms & Zagier Conjectures for Ultra-Precise Positional Embedding Dequantization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

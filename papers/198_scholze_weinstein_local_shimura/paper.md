@@ -1,4 +1,4 @@
-# Asymmetric Scholze-Weinstein Moduli of Local Shimura Varieties for Heterogeneous Memory Morphisms
+# Paper 198: Asymmetric Scholze-Weinstein Moduli of Local Shimura Varieties for Heterogeneous Memory Morphisms
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

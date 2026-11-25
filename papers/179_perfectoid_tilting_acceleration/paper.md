@@ -1,4 +1,4 @@
-# Asymmetric Perfectoid Spaces & Tilting Equivalence for Heterogeneous Sub-Bit Hardware Acceleration
+# Paper 179: Asymmetric Perfectoid Spaces & Tilting Equivalence for Heterogeneous Sub-Bit Hardware Acceleration
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

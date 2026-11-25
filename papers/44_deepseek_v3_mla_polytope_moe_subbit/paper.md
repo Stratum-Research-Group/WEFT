@@ -1,5 +1,9 @@
 # Paper 44: Extreme Sub-Bit Compression of 671B Sparse Mixture-of-Experts: Multi-Head Latent Attention Factorization and Certified Polytope Routing in DeepSeek-V3
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  

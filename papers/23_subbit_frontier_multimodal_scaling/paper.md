@@ -1,5 +1,9 @@
 # Paper 23: The Sub-Bit Frontier: Multi-Modal and Extreme-Scale Quantization (12B to 70B)
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Title:** Paper 23: The Sub-Bit Frontier: Multi-Modal and Extreme-Scale Quantization from 12B to 70B Parameters  
 **Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized

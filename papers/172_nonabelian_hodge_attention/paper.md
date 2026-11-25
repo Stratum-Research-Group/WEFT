@@ -1,4 +1,4 @@
-# Asymmetric Non-Abelian Hodge Theory & Hitchin System Rescaling on Polar Vector Hardware
+# Paper 172: Asymmetric Non-Abelian Hodge Theory & Hitchin System Rescaling on Polar Vector Hardware
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

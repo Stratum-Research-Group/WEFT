@@ -1,4 +1,4 @@
-# Asymmetric Cluster Algebras & Grassmannian Seed Mutations for Dynamic Attention Routing
+# Paper 175: Asymmetric Cluster Algebras & Grassmannian Seed Mutations for Dynamic Attention Routing
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

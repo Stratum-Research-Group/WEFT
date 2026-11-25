@@ -1,4 +1,4 @@
-# Asymmetric Atiyah-Singer Index Theory & Topological Obstruction Quantization on Edge Vector Silicon
+# Paper 164: Asymmetric Atiyah-Singer Index Theory & Topological Obstruction Quantization on Edge Vector Silicon
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

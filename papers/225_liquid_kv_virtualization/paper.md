@@ -1,4 +1,4 @@
-# Asymmetric Condensed Liquid Vector Bundles & Pro-Étale Topologies for Context Cache Virtualization
+# Paper 225: Asymmetric Condensed Liquid Vector Bundles & Pro-Étale Topologies for Context Cache Virtualization
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

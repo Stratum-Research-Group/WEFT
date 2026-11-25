@@ -1,5 +1,9 @@
 # Paper 76: Fused Rank-1 SVD Low-Rank Correction with AVX-512 VPOPCNTDQ Operators and Asynchronous Shard Prefetching
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 2026*

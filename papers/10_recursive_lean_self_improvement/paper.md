@@ -1,5 +1,9 @@
 # Paper 10: Recursive Self-Improvement via Kernel-Checked Proofs: Automated Lean 4 Synthesis with SULA Linear Attention
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 
@@ -13,7 +17,7 @@
 
 ## Abstract
 
-Recursive Self-Improvement (RSI) in large language models has historically suffered from reward collapse, hallucinated intermediate reasoning, and sycophantic drift under heuristic feedback. In this work, we demonstrate that coupling autoregressive sequence models with interactive theorem prover kernels provides a zero-noise verifiable reward signal ($R  \0, 1\$) that eliminates reward drift. Leveraging the Lean~4 interactive theorem prover, we construct a closed-loop proof generation, diagnosis, and self-correction architecture. When guided by compiler error traces, our self-correction engine improves formal theorem proving success from a greedy Pass@1 of $20.0%$ to a self-corrected Pass@K of $100.0%$ ($+80.0%$ absolute gain) across algebraic inequalities, discrete topology, and recurrent neural state theorems. We integrate this kernel directly into test-time compute decoding, establishing a reliable pathway toward verified autonomous mathematical reasoning.
+Recursive Self-Improvement (RSI) in large language models has historically suffered from reward collapse, hallucinated intermediate reasoning, and sycophantic drift under heuristic feedback. In this work, we demonstrate that coupling autoregressive sequence models with interactive theorem prover kernels provides a zero-noise verifiable reward signal ($\mathcal{R} \in \{0, 1\}$) that eliminates reward drift. Leveraging the Lean~4 interactive theorem prover, we construct a closed-loop proof generation, diagnosis, and self-correction architecture. When guided by compiler error traces, our self-correction engine improves formal theorem proving success from a greedy Pass@1 of $20.0%$ to a self-corrected Pass@K of $100.0%$ ($+80.0%$ absolute gain) across algebraic inequalities, discrete topology, and recurrent neural state theorems. We integrate this kernel directly into test-time compute decoding, establishing a reliable pathway toward verified autonomous mathematical reasoning.
 
 ## Introduction
 

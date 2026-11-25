@@ -1,4 +1,4 @@
-# Asymmetric Motivic Donaldson-Thomas Invariants & BPS State Counting for Ultra-Dense Bitboard Compaction
+# Paper 206: Asymmetric Motivic Donaldson-Thomas Invariants & BPS State Counting for Ultra-Dense Bitboard Compaction
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

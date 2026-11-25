@@ -1,4 +1,4 @@
-# Asymmetric Donaldson-Thomas Invariants & Moduli Counting for Sub-Bit KV-Cache Compaction
+# Paper 167: Asymmetric Donaldson-Thomas Invariants & Moduli Counting for Sub-Bit KV-Cache Compaction
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

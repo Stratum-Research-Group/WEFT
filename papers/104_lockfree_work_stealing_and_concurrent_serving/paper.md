@@ -1,10 +1,13 @@
+# Paper 104: Lock-Free Multi-Tenant Work-Stealing Concurrency and Zero-Resident Heap Edge Serving in Sub-Bit Polar Architectures
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 104: Lock-Free Multi-Tenant Work-Stealing Concurrency and Zero-Resident Heap Edge Serving in Sub-Bit Polar Architectures"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  Real-world deployment of edge foundation models requires serving multiple concurrent client requests without unbounded thread overhead, context-switching penalties, or heap fragmentation. In this paper, we formulate and implement a multi-threaded work-stealing concurrency architecture for zero-copy memory-mapped sub-bit foundation models. By decoupling incoming HTTP socket connections from execution worker pools, token forward evaluations are dynamically partitioned across available AMD Zen 4 cores with localized vector cache affinity. Worker threads evaluate bit-parallel AVX-512 VPOPCNTDQ linear projections while sharing read-only memory-mapped base parameter buffers. Empirical concurrency testing confirms sustained zero-heap growth under simultaneous high-frequency client streams, delivering $< 15\text{ ms}$ token dispatch latencies across concurrent multi-tenant workloads.
+
+## Abstract
+Real-world deployment of edge foundation models requires serving multiple concurrent client requests without unbounded thread overhead, context-switching penalties, or heap fragmentation. In this paper, we formulate and implement a multi-threaded work-stealing concurrency architecture for zero-copy memory-mapped sub-bit foundation models. By decoupling incoming HTTP socket connections from execution worker pools, token forward evaluations are dynamically partitioned across available AMD Zen 4 cores with localized vector cache affinity. Worker threads evaluate bit-parallel AVX-512 VPOPCNTDQ linear projections while sharing read-only memory-mapped base parameter buffers. Empirical concurrency testing confirms sustained zero-heap growth under simultaneous high-frequency client streams, delivering $< 15\text{ ms}$ token dispatch latencies across concurrent multi-tenant workloads.
+
 ---
 
 # 1. Introduction

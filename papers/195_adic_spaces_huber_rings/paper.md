@@ -1,4 +1,4 @@
-# Asymmetric Adic Spaces & Huber Rings for Non-Archimedean Residual Quantization
+# Paper 195: Asymmetric Adic Spaces & Huber Rings for Non-Archimedean Residual Quantization
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

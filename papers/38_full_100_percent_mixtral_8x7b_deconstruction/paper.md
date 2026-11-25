@@ -1,5 +1,9 @@
 # Paper 38: Sparse MoE Deconstruction at Sub-0.047 BPW: 100% Factorization of Mixtral-8x7B into 260 MB with Certified Polytope Routing Bounds
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  

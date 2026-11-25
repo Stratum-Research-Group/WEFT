@@ -1,4 +1,4 @@
-# Asymmetric Non-Commutative Connes Spectral Triples & Dirac Operator Attention on Polar Accelerators
+# Paper 163: Asymmetric Non-Commutative Connes Spectral Triples & Dirac Operator Attention on Polar Accelerators
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

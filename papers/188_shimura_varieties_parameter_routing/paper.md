@@ -1,4 +1,4 @@
-# Asymmetric Shimura Varieties & Special Point Quantization for Canonical Parameter Routing
+# Paper 188: Asymmetric Shimura Varieties & Special Point Quantization for Canonical Parameter Routing
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

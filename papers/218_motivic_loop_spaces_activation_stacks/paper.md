@@ -1,4 +1,4 @@
-# Asymmetric Motivic Infinite-Loop Spaces & Algebraic K-Theory Spectra for Sub-Bit Activation Stacks
+# Paper 218: Asymmetric Motivic Infinite-Loop Spaces & Algebraic K-Theory Spectra for Sub-Bit Activation Stacks
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

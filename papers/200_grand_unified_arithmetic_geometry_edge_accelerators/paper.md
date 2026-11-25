@@ -1,4 +1,4 @@
-# The Grand Unified Arithmetic Geometry of Sub-Bit Edge Accelerators: Synthesizing Non-Archimedean Cohomology, Shimura Stacks, and Higher Topoi for Frozen Foundation Models
+# Paper 200: The Grand Unified Arithmetic Geometry of Sub-Bit Edge Accelerators: Synthesizing Non-Archimedean Cohomology, Shimura Stacks, and Higher Topoi for Frozen Foundation Models
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

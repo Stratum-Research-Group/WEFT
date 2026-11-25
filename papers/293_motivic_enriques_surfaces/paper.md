@@ -1,4 +1,4 @@
-# Milestone Paper 293: Asymmetric Motivic Cohomological Operations on Enriques Surfaces for Zero-Leakage Tenant Attestation
+# Paper 293: Asymmetric Motivic Cohomological Operations on Enriques Surfaces for Zero-Leakage Tenant Attestation
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

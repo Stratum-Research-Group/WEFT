@@ -1,4 +1,4 @@
-# Asymmetric Derived Azumaya Algebras & Brauer-Manin Topological Obstructions for Zero-Leak Speculative Rollback
+# Paper 230: Asymmetric Derived Azumaya Algebras & Brauer-Manin Topological Obstructions for Zero-Leak Speculative Rollback
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

@@ -1,4 +1,4 @@
-# Asymmetric Tropical Moduli of Curves & Tropical Jacobian Varieties for Multi-Head Attention Routing
+# Paper 229: Asymmetric Tropical Moduli of Curves & Tropical Jacobian Varieties for Multi-Head Attention Routing
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

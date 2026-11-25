@@ -1,10 +1,13 @@
+# Paper 106: Continuous Dynamic Micro-Adapter Fusion and Adaptive In-Register Layer Skipping on Frozen Polar Sub-Bit Foundation Models
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 106: Continuous Dynamic Micro-Adapter Fusion and Adaptive In-Register Layer Skipping on Frozen Polar Sub-Bit Foundation Models"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  Deploying multi-task edge foundation models requires synthesizing orthogonal domain expert capabilities in real time without increasing DRAM usage or incurring multiple memory round-trips. In this paper, we establish the Continuous Dynamic Micro-Adapter Fusion and Adaptive In-Register Layer Skipping architecture on polar sub-bit foundation representations. By formulating multi-adapter combination as an in-register linear superposition ($\mathbf{y} = \mathbf{y}_0 + \sum_k w_k \alpha_k (\mathbf{x} \mathbf{v}_k) \mathbf{u}_k$), multi-specialist reasoning (e.g., combined formal logic and code generation) is evaluated during the base AVX-512 VPOPCNTDQ projection pass in $< 8\ \mu\text{s}$ per layer. Concurrently, we introduce singular-value-directed in-register layer skipping, where layers with spectral singular mass below dynamic threshold $\tau$ are evaluated as identity residual passthroughs. Mathematical invariants guaranteeing bounded omitted energy ($\le L \cdot \tau$) and convex combination non-expansion are formally proven in Lean 4 with zero non-standard axioms and zero `sorry`. Empirical benchmarks across Gemma-2-27B and Qwen-2.5-Coder demonstrate a $1.38\times$ inference speedup with zero heap allocation delta and $< 0.4\%$ downstream perplexity drift.
+
+## Abstract
+Deploying multi-task edge foundation models requires synthesizing orthogonal domain expert capabilities in real time without increasing DRAM usage or incurring multiple memory round-trips. In this paper, we establish the Continuous Dynamic Micro-Adapter Fusion and Adaptive In-Register Layer Skipping architecture on polar sub-bit foundation representations. By formulating multi-adapter combination as an in-register linear superposition ($\mathbf{y} = \mathbf{y}_0 + \sum_k w_k \alpha_k (\mathbf{x} \mathbf{v}_k) \mathbf{u}_k$), multi-specialist reasoning (e.g., combined formal logic and code generation) is evaluated during the base AVX-512 VPOPCNTDQ projection pass in $< 8\ \mu\text{s}$ per layer. Concurrently, we introduce singular-value-directed in-register layer skipping, where layers with spectral singular mass below dynamic threshold $\tau$ are evaluated as identity residual passthroughs. Mathematical invariants guaranteeing bounded omitted energy ($\le L \cdot \tau$) and convex combination non-expansion are formally proven in Lean 4 with zero non-standard axioms and zero `sorry`. Empirical benchmarks across Gemma-2-27B and Qwen-2.5-Coder demonstrate a $1.38\times$ inference speedup with zero heap allocation delta and $< 0.4\%$ downstream perplexity drift.
+
 ---
 
 # 1. Introduction

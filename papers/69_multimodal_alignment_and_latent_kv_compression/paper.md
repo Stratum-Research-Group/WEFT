@@ -1,5 +1,9 @@
 # Paper 69: Unified Multimodal Sub-Bit Serving and Latent KV Compression: Cross-Modal Alignment Invariants and Speculative Verification Across Edge Collectives
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 23, 2026*

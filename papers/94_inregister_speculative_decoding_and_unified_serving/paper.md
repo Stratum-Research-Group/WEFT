@@ -1,5 +1,9 @@
 # Paper 94: End-to-End In-Register Speculative Tree Verification, Subprocess Sandboxing, and Empirical CPU Serving
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt, Stratum Research Group** • `research@stratum.org`
 
 > **Peer-Review Context & Chronological Evolution:**

@@ -1,10 +1,13 @@
+# Paper 102: Asymmetric Int4 Paged KV-Cache Vectorization and Zero-Fragmentation Memory Pools in Sub-Bit Autoregressive Serving
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 102: Asymmetric Int4 Paged KV-Cache Vectorization and Zero-Fragmentation Memory Pools in Sub-Bit Autoregressive Serving"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  Long-context autoregressive decoding on consumer hardware is strictly constrained by key-value (KV) cache memory capacity and bandwidth saturation. While sub-bit model weights remain zero-copy memory-mapped from disk-backed pages, dynamic KV allocations for sequence lengths exceeding 32,768 tokens introduce significant memory pressure and fragmentation. In this paper, we introduce Asymmetric Int4 Paged KV-Cache Vectorization. By packing two 4-bit nibbles per byte, the per-token per-dimension memory footprint is compressed to exactly 0.5 bytes, yielding a $4\times$ reduction over FP16 representations. We present a fused AVX-512 SIMD dequantization kernel that unrolls nibble extraction, affine scale transformation, and zero-point offset correction directly inside vector registers during causal attention accumulation. Empirical benchmarks on AMD Zen 4 architectures demonstrate zero memory fragmentation, over 99.4% attention numerical parity, and sustainable 128k context execution in under 1.8 GB of host RAM.
+
+## Abstract
+Long-context autoregressive decoding on consumer hardware is strictly constrained by key-value (KV) cache memory capacity and bandwidth saturation. While sub-bit model weights remain zero-copy memory-mapped from disk-backed pages, dynamic KV allocations for sequence lengths exceeding 32,768 tokens introduce significant memory pressure and fragmentation. In this paper, we introduce Asymmetric Int4 Paged KV-Cache Vectorization. By packing two 4-bit nibbles per byte, the per-token per-dimension memory footprint is compressed to exactly 0.5 bytes, yielding a $4\times$ reduction over FP16 representations. We present a fused AVX-512 SIMD dequantization kernel that unrolls nibble extraction, affine scale transformation, and zero-point offset correction directly inside vector registers during causal attention accumulation. Empirical benchmarks on AMD Zen 4 architectures demonstrate zero memory fragmentation, over 99.4% attention numerical parity, and sustainable 128k context execution in under 1.8 GB of host RAM.
+
 ---
 
 # 1. Introduction

@@ -1,5 +1,9 @@
 # Paper 95: Orthonormal Latent Manifolds, 32-Byte Aligned GGUF Interchange, and Facet-Margin Routing in Sub-Bit Architectures
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt, Stratum Research Group** • `research@stratum.org`
 
 > **Peer-Review Context & Chronological Evolution:**

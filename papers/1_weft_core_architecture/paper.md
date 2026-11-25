@@ -1,5 +1,9 @@
 # Paper 1: WEFT: Windowed Exponentially-Decayed Factorized Tensor Attention with Formal Machine-Checked Verification
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 
@@ -13,7 +17,7 @@
 
 ## Abstract
 
-Standard Transformers suffer from quadratic computational and memory complexity with respect to context sequence length, resulting in severe bottlenecks when scaling to ultra-long contexts. Linear-attention and recurrent state-space models overcome this limitation with $O(1)$ inference memory, but consistently degrade on high-resolution in-context associative recall tasks. In this paper, we propose **WEFT** (Windowed Exponentially-decayed Factorized Tensor Attention), a hybrid sequence modeling architecture that combines localized sliding-window multi-head attention with a factorized associative linear recurrence. By decoupling history accumulation into a low-rank associative tensor state $S_t  R^H_s × d_h × r$ with learned channel-wise exponential decay $γ  R^d_h$, WEFT retains exact, high-fidelity associative recall ($96.8%$ on Multi-Query Associative Recall) while guaranteeing strictly constant $O(1)$ decode memory up to $1,000,000+$ tokens. Furthermore, we provide machine-checked formal proofs in Lean~4 establishing strict numerical boundedness, non-divergence of the associative state drift under arbitrary sequence lengths, and associative operator equivalence.
+Standard Transformers suffer from quadratic computational and memory complexity with respect to context sequence length, resulting in severe bottlenecks when scaling to ultra-long contexts. Linear-attention and recurrent state-space models overcome this limitation with $O(1)$ inference memory, but consistently degrade on high-resolution in-context associative recall tasks. In this paper, we propose **WEFT** (Windowed Exponentially-decayed Factorized Tensor Attention), a hybrid sequence modeling architecture that combines localized sliding-window multi-head attention with a factorized associative linear recurrence. By decoupling history accumulation into a low-rank associative tensor state $S_t \in \mathbb{R}^{H_s \times d_h \times r}$ with learned channel-wise exponential decay $\gamma \in \mathbb{R}^{d_h}$, WEFT retains exact, high-fidelity associative recall ($96.8%$ on Multi-Query Associative Recall) while guaranteeing strictly constant $O(1)$ decode memory up to $1,000,000+$ tokens. Furthermore, we provide machine-checked formal proofs in Lean~4 establishing strict numerical boundedness, non-divergence of the associative state drift under arbitrary sequence lengths, and associative operator equivalence.
 
 ## Introduction
 

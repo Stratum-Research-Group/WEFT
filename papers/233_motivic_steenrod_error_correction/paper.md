@@ -1,4 +1,4 @@
-# Asymmetric Motivic Cohomological Operations & Steenrod Reduced Powers for Sub-Bit Error Correction
+# Paper 233: Asymmetric Motivic Cohomological Operations & Steenrod Reduced Powers for Sub-Bit Error Correction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

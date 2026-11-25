@@ -1,5 +1,9 @@
 # Paper 27: Sub-Bit Multimodal Foundation Systems: In-Register Cross-Modal Fusion and Lean 4 Verified Invariants on Vision-Language Models
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *Google DeepMind & WEFT Research Initiative*  

@@ -1,5 +1,9 @@
 # Paper 91: Explicit 256-Bit AVX2 + POPCNT Sub-Bit GEMV Acceleration on Non-AVX-512 Microarchitectures
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group*  
 `research@stratum.org`

@@ -1,4 +1,4 @@
-# Asymmetric Derived Loop Spaces & Free Loop Stacks for Multi-Turn Speculative Cache Verification
+# Paper 240: Asymmetric Derived Loop Spaces & Free Loop Stacks for Multi-Turn Speculative Cache Verification
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

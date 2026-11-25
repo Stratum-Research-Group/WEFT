@@ -1,4 +1,4 @@
-# Asymmetric Geometrization of the Local Langlands Correspondence for Spectral Attention Slices
+# Paper 196: Asymmetric Geometrization of the Local Langlands Correspondence for Spectral Attention Slices
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

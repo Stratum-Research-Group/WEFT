@@ -1,4 +1,4 @@
-# Multi-Resolution Spectral KV-Cache Compaction & Wavelet Transform Invariance on Polar Hardware
+# Paper 130: Multi-Resolution Spectral KV-Cache Compaction & Wavelet Transform Invariance on Polar Hardware
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

@@ -1,4 +1,4 @@
-# Asymmetric Multi-Token Parallel Drafting & Orthogonal Gram-Schmidt Basis Pruning on Heterogeneous Vector Clusters
+# Paper 132: Asymmetric Multi-Token Parallel Drafting & Orthogonal Gram-Schmidt Basis Pruning on Heterogeneous Vector Clusters
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

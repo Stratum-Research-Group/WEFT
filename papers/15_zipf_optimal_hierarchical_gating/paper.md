@@ -1,5 +1,9 @@
 # Paper 15: Zipf-Optimal Hierarchical Vocabulary Gating: Provably Bypassing Token Dimension Bottlenecks in Foundation Model Speculation
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

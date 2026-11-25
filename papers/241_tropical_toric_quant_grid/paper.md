@@ -1,4 +1,4 @@
-# Asymmetric Tropical Toric Resolutions & Fan Subdivisions for Non-Uniform Quantization Grids
+# Paper 241: Asymmetric Tropical Toric Resolutions & Fan Subdivisions for Non-Uniform Quantization Grids
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

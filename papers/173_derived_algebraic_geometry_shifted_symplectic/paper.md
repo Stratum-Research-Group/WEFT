@@ -1,4 +1,4 @@
-# Asymmetric Derived Algebraic Geometry & Shifted Symplectic Structures for Transformer Residual Networks
+# Paper 173: Asymmetric Derived Algebraic Geometry & Shifted Symplectic Structures for Transformer Residual Networks
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

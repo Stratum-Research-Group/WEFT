@@ -1,4 +1,4 @@
-# Asymmetric Deligne-Mumford Moduli Stacks & Stable Curve Routing for Speculative Verification
+# Paper 170: Asymmetric Deligne-Mumford Moduli Stacks & Stable Curve Routing for Speculative Verification
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

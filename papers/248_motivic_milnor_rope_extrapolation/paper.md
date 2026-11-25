@@ -1,4 +1,4 @@
-# Asymmetric Motivic Milnor Fibrations & Monodromy Operator Transformations for Rotary Position Embedding (RoPE) Invariance
+# Paper 248: Asymmetric Motivic Milnor Fibrations & Monodromy Operator Transformations for Rotary Position Embedding (RoPE) Invariance
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

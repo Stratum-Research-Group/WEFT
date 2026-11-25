@@ -1,4 +1,4 @@
-# Asymmetric Perfectoid Shimura Varieties & Hodge-Tate Period Maps for Edge Distributed Deconstruction
+# Paper 192: Asymmetric Perfectoid Shimura Varieties & Hodge-Tate Period Maps for Edge Distributed Deconstruction
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,4 +1,4 @@
-# Asymmetric Grothendieck Dessins d'Enfants & Belyi Maps for Compact Bipartite Attention Graph Quantization
+# Paper 176: Asymmetric Grothendieck Dessins d'Enfants & Belyi Maps for Compact Bipartite Attention Graph Quantization
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

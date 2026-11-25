@@ -1,5 +1,9 @@
 # Paper 9: Zero-RAM Multi-Task Distillation: Compressing Specialized Frontier Collections into Linear Associative SULA Networks
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

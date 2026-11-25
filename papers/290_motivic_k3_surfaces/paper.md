@@ -1,4 +1,4 @@
-# Milestone Paper 290: Asymmetric Motivic Cohomological Operations on K3 Surfaces for Hardware Fault-Tolerant Weight Reconstruction
+# Paper 290: Asymmetric Motivic Cohomological Operations on K3 Surfaces for Hardware Fault-Tolerant Weight Reconstruction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

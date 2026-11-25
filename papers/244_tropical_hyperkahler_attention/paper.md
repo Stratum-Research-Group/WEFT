@@ -1,4 +1,4 @@
-# Asymmetric Tropical Hyperkähler Varieties & Metric Ribbon Graphs for Multi-Head Attention Routing
+# Paper 244: Asymmetric Tropical Hyperkähler Varieties & Metric Ribbon Graphs for Multi-Head Attention Routing
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

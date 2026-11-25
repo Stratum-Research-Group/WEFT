@@ -1,4 +1,4 @@
-# Asymmetric Logarithmic Geometry & Tropical Moduli Invariants for Bounded Speculative Verification
+# Paper 187: Asymmetric Logarithmic Geometry & Tropical Moduli Invariants for Bounded Speculative Verification
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

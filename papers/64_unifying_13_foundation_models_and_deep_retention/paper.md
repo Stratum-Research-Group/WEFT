@@ -1,5 +1,9 @@
 # Paper 64: Unifying 430+ Billion Parameters Across 13 Foundation Specialists: Single-Host Co-Execution in Under 1.93 GB RAM with Machine-Checked Adapter Retention
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

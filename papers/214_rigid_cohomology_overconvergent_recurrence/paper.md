@@ -1,4 +1,4 @@
-# Asymmetric Rigid Cohomology & Berthelot Overconvergent F-Isocrystals for Long-Context State Recurrence
+# Paper 214: Asymmetric Rigid Cohomology & Berthelot Overconvergent F-Isocrystals for Long-Context State Recurrence
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

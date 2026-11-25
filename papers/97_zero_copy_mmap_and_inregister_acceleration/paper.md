@@ -1,4 +1,4 @@
-# Paper 97: Zero-Copy Virtual Memory Paging and In-Register Hardware Acceleration for Sub-Bit Foundation Models
+# Paper 97: Native Hardware AVX-512 VPOPCNTDQ Acceleration and Zero-Copy mmap Scaling in Polar Sub-Bit Weight Networks
 
 **Nicholas Charles Mynhardt, Stratum Research Group**  
 *research@stratum.org*  

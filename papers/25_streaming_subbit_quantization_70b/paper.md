@@ -1,5 +1,9 @@
 # Paper 25: Streaming Sharded Sub-Bit Quantization of 70B+ Foundation Models via Polar Joint-ITQ Factorization
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

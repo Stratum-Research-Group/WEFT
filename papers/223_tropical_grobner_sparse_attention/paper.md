@@ -1,4 +1,4 @@
-# Asymmetric Tropical Toric Ideals & Gröbner Bases for Sparse Attention Matrix Factorization
+# Paper 223: Asymmetric Tropical Toric Ideals & Gröbner Bases for Sparse Attention Matrix Factorization
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

@@ -1,4 +1,4 @@
-# Asymmetric Condensed Liquid Vector Spaces & Analytic Topos Theory for Bounded Softmax Normalization
+# Paper 219: Asymmetric Condensed Liquid Vector Spaces & Analytic Topos Theory for Bounded Softmax Normalization
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

@@ -1,4 +1,4 @@
-# Milestone Paper 288: Asymmetric Derived Geometric Langlands Duality & Hecke Eigensheaves for Sub-Bit Representation Alignment
+# Paper 288: Asymmetric Derived Geometric Langlands Duality & Hecke Eigensheaves for Sub-Bit Representation Alignment
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

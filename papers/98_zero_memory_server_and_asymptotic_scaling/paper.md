@@ -1,4 +1,4 @@
-# Paper 98: Zero-Memory Server Architectures and Asymptotic Scaling Limits of Sub-Bit Attention Networks
+# Paper 98: Asymptotic Scaling Limits of Polar Matrix Factorization and Zero-Resident Heap Microservices
 
 **Nicholas Charles Mynhardt, Stratum Research Group**  
 *research@stratum.org*  

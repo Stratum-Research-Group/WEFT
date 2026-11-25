@@ -1,5 +1,9 @@
 # Paper 22: High-Throughput Sub-Bit PagedAttention and Long-Context Scaling
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Title:** Paper 22: High-Throughput Sub-Bit PagedAttention and Long-Context Scaling: Serving 128K Context at 0.54 BPW  
 **Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized

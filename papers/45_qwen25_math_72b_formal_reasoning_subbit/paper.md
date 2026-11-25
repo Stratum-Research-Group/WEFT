@@ -1,5 +1,9 @@
 # Paper 45: Sub-Bit Mathematical Reasoning at Frontier Scale: Sub-0.024 BPW Deconstruction of Qwen2.5-Math-72B with Certified Proof Tree Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  

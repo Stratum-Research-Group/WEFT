@@ -1,4 +1,4 @@
-# Asymmetric Absolute Étale Cohomology & Artin Approximations for Non-Archimedean Weight Quantization Slicing
+# Paper 222: Asymmetric Absolute Étale Cohomology & Artin Approximations for Non-Archimedean Weight Quantization Slicing
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

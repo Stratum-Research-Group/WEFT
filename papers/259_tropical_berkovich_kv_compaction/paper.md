@@ -1,4 +1,4 @@
-# Milestone Paper 259: Asymmetric Tropical Berkovich Spectra & Non-Archimedean Amoebas for Dynamic KV Cache Page Compaction
+# Paper 259: Asymmetric Tropical Berkovich Spectra & Non-Archimedean Amoebas for Dynamic KV Cache Page Compaction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

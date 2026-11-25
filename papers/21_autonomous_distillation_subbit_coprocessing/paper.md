@@ -1,5 +1,9 @@
 # Paper 21: Autonomous Continuous Distillation and Sub-Bit Co-Processing
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Title:** Paper 21: Autonomous Continuous Distillation and Sub-Bit Co-Processing: Closing the Verification Loop on Edge Foundation Models  
 **Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized

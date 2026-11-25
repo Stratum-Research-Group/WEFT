@@ -1,4 +1,4 @@
-# Asymmetric Derived Koszul Duality & Operadic Coalgebras for Zero-Bubble Pipeline Parallelism
+# Paper 252: Asymmetric Derived Koszul Duality & Cobar Complexes for Bubble-Free Pipeline Parallelism
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

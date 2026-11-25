@@ -1,4 +1,4 @@
-# Milestone Paper 282: Asymmetric Derived Calabi-Yau Triality & Mirror Symmetry for Dual-Domain Weight Pruning
+# Paper 282: Asymmetric Derived Calabi-Yau Triality & Mirror Symmetry for Dual-Domain Weight Pruning
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

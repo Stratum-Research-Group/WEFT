@@ -1,5 +1,9 @@
 # Paper 6: Asymmetric Speculative Co-Processing: Accelerating Frontier Transformers via Ultra-Fast Linear-Recurrent Draft Ensembles
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 
@@ -15,7 +19,7 @@
 
 Speculative decoding has emerged as a primary paradigm for accelerating autoregressive generation in Large Language Models (LLMs). However, conventional speculative decoding relies on homogeneous architectural pairings (e.g., small Transformer drafting for a large Transformer), causing the draft model itself to remain memory-bandwidth bound by expanding Key-Value (KV) cache allocations. In this work, we introduce **Asymmetric Speculative Co-Processing**, an asymmetric inference framework pairing an ultra-lightweight, constant-memory linear-recurrent draft engine (**WEFT-2**) with massive frontier target Transformers (e.g., Llama-3.3-70B, Qwen-2.5-72B). 
 
-Because WEFT-2 decouples history accumulation into a factorized associative tensor state ($S_t  R^H_s × d_h × r$) and operates under 2-bit BitNet b1.58 ternary weights with integer addition-only SRAM accumulation, it drafts $γ = 4$ to $8$ tokens ahead at hundreds of tokens per second with strictly $O(1)$ memory overhead ($< 1.8 GB$). The massive target Transformer verifies all candidate tokens in parallel in a single forward pass without altering its target output distribution. Across mathematical reasoning, code generation, and multi-turn conversation benchmarks, Asymmetric Speculation achieves a **3.85$×$ to 4.20$×$ wall-clock speedup** over standard autoregressive decoding while delivering the exact output fidelity of a 70B-parameter frontier model.
+Because WEFT-2 decouples history accumulation into a factorized associative tensor state ($S_t \in \mathbb{R}^{H_s \times d_h \times r}$) and operates under 2-bit BitNet b1.58 ternary weights with integer addition-only SRAM accumulation, it drafts $γ = 4$ to $8$ tokens ahead at hundreds of tokens per second with strictly $O(1)$ memory overhead ($< 1.8 GB$). The massive target Transformer verifies all candidate tokens in parallel in a single forward pass without altering its target output distribution. Across mathematical reasoning, code generation, and multi-turn conversation benchmarks, Asymmetric Speculation achieves a **3.85$×$ to 4.20$×$ wall-clock speedup** over standard autoregressive decoding while delivering the exact output fidelity of a 70B-parameter frontier model.
 
 ## Introduction
 

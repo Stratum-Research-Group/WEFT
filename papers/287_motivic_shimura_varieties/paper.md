@@ -1,4 +1,4 @@
-# Milestone Paper 287: Asymmetric Motivic Cohomological Operations on Shimura Varieties for Zero-Shot Out-of-Vocabulary Token Generalization
+# Paper 287: Asymmetric Motivic Cohomological Operations on Shimura Varieties for Zero-Shot Out-of-Vocabulary Token Generalization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,4 +1,4 @@
-# Milestone Paper 281: Asymmetric Motivic Cohomological Operations on Rigid Analytic Spaces for Non-Volatile Edge Model Checkpointing
+# Paper 281: Asymmetric Motivic Cohomological Operations on Rigid Analytic Spaces for Non-Volatile Edge Model Checkpointing
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

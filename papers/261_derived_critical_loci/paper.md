@@ -1,4 +1,4 @@
-# Milestone Paper 261: Asymmetric Derived Critical Loci & Vanishing Cycles for Sub-Bit Loss Landscape Regularization
+# Paper 261: Asymmetric Derived Critical Loci & Vanishing Cycles for Sub-Bit Loss Landscape Regularization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

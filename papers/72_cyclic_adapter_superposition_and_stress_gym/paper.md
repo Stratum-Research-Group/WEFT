@@ -1,5 +1,9 @@
 # Paper 72: Continuous Cyclic Adapter Superposition: Zero Memory Leakage and Spectral Invariance Across 500+ High-Frequency Transitions in the Frontier 160 Mathematical Gym
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 23, 2026*

@@ -1,5 +1,9 @@
 # Paper 12: Speculative Tree Decoding: Non-Linear Candidate Branching for Maximum Acceleration in Recurrent Co-Processing
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

@@ -1,5 +1,9 @@
 # Paper 37: Fine-Grained MoE Deconstruction at Sub-0.17 BPW: 100% Factorization of DeepSeek-Coder-V2-Lite with Certified Polytope Facet Stability
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  

@@ -1,4 +1,4 @@
-# Milestone Paper 285: Asymmetric Derived Hitchin Fibrations & Spectral Curves for Dynamic KV Cache Eviction
+# Paper 285: Asymmetric Derived Hitchin Fibrations & Spectral Curves for Dynamic KV Cache Eviction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

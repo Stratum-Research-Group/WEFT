@@ -1,4 +1,4 @@
-# Asymmetric Motives of Moduli Spaces of Bundles & Harder-Narasimhan Stratification for Attention Pruning
+# Paper 180: Asymmetric Motives of Moduli Spaces of Bundles & Harder-Narasimhan Stratification for Attention Pruning
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

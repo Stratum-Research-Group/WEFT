@@ -1,5 +1,9 @@
 # Paper 18: Adaptive Spectral Quantization and Sub-Bit Model Serving
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Title:** Adaptive Spectral Quantization and Sub-Bit Model Serving: Scaling Foundation Models to 0.18 BPW via Joint-ITQ and Fused Bitboards  
 **Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized

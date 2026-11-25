@@ -1,4 +1,4 @@
-# Asymmetric Motivic Cohomology & Beilinson Regulator Invariants for Zero-Loss Precision Routing
+# Paper 169: Asymmetric Motivic Cohomology & Beilinson Regulator Invariants for Zero-Loss Precision Routing
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

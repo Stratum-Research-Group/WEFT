@@ -1,4 +1,4 @@
-# Asymmetric Int3/Int2 Mixed-Precision Quantization & Coordinate Lattice Tilings for Extreme Edge KV-Cache Compaction
+# Paper 131: Asymmetric Int3/Int2 Mixed-Precision Quantization & Coordinate Lattice Tilings for Extreme Edge KV-Cache Compaction
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

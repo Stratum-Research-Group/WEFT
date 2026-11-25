@@ -1,4 +1,4 @@
-# Milestone Paper 283: Asymmetric Tropical Toric Fibrations & SYZ Fibrations for Distributed Edge Attention Sharding
+# Paper 283: Asymmetric Tropical Toric Fibrations & SYZ Fibrations for Distributed Edge Attention Sharding
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

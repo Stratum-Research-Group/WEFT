@@ -1,4 +1,4 @@
-# Milestone Paper 254: Asymmetric Motivic $L$-Functions & Beilinson Regulators for Optimal Heterogeneous Sub-Bit Precision Allocation
+# Paper 254: Asymmetric Motivic $L$-Functions & Beilinson Regulators for Optimal Heterogeneous Sub-Bit Precision Allocation
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

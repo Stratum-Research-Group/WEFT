@@ -1,4 +1,4 @@
-# Milestone Paper 277: Asymmetric Tropical Toric Fibers & Amoeba Volumes for Dynamic Layer-Skipping Speculation
+# Paper 277: Asymmetric Tropical Toric Fibers & Amoeba Volumes for Dynamic Layer-Skipping Speculation
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

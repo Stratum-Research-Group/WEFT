@@ -1,4 +1,4 @@
-# Paper 96: Formal Validation, Storage Self-Containment, and Hardware Efficiency in Sub-Bit Factorized Transformers
+# Paper 96: Ground-Truth Empirical Validation, Quality Retention Under Bit-Packed Polar Factorization, and Cross-Family Benchmarking Across Gemma-4 and Mistral
 
 **Nicholas Charles Mynhardt, Stratum Research Group**  
 *research@stratum.org*  

@@ -1,5 +1,9 @@
 # Paper 60: The Complete Sub-Bit Computational Laboratory: Unifying Edge Foundation Inference, High-Throughput SIMD Search, and Machine-Checked Formal Systems (Papers 1–60)
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

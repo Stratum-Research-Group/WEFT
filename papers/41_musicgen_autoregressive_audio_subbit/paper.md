@@ -1,5 +1,9 @@
 # Paper 41: Sub-Bit Generative Music Synthesis: Sub-0.125 BPW Deconstruction of MusicGen with Formally Certified Residual Codebook Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  

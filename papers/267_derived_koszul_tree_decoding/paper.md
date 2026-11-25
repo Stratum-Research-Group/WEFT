@@ -1,4 +1,4 @@
-# Milestone Paper 267: Asymmetric Derived Koszul Duality & Operadic Cobar Complexes for Ultra-Sparse Speculative Tree Decoding
+# Paper 267: Asymmetric Derived Koszul Duality & Operadic Cobar Complexes for Ultra-Sparse Speculative Tree Decoding
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

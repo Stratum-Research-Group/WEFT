@@ -1,4 +1,4 @@
-# Asymmetric Fargues-Fontaine Curves & Vector Bundles for Bounded Context Memory Morphisms
+# Paper 193: Asymmetric Fargues-Fontaine Curves & Vector Bundles for Bounded Context Memory Morphisms
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

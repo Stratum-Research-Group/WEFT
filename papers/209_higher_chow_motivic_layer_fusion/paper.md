@@ -1,4 +1,4 @@
-# Asymmetric Higher Chow Groups & Motivic Spectral Sequences for Zero-Loss Layer Fusion
+# Paper 209: Asymmetric Higher Chow Groups & Motivic Spectral Sequences for Zero-Loss Layer Fusion
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

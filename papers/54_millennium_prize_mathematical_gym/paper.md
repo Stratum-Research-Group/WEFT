@@ -1,5 +1,9 @@
 # Paper 54: The Millennium Prize Gym: Formal Verification of Mathematical Conjectures, Singular Manifolds, and Algebraic Reductions Across Sub-Bit Foundation Fleets
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

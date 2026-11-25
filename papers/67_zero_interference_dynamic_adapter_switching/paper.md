@@ -1,5 +1,9 @@
 # Paper 67: Zero-Interference Dynamic Adapter Switching (ZIDAS): Decoupling Conversational Dialogue and Mathematical Superposition Across 430+ Billion Sub-Bit Parameters
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 23, 2026*

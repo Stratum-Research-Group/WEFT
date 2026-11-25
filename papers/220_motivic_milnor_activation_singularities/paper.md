@@ -1,4 +1,4 @@
-# Asymmetric Motivic Milnor Fibers & Denef-Loeser Motivic Zeta Functions for Non-Linear Activation Singularities
+# Paper 220: Asymmetric Motivic Milnor Fibers & Denef-Loeser Motivic Zeta Functions for Non-Linear Activation Singularities
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

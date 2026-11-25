@@ -1,4 +1,4 @@
-# Asymmetric Motivic Algebraic Cobordism & Landweber Exactness for Continuous Layer Normalization
+# Paper 239: Asymmetric Motivic Algebraic Cobordism & Landweber Exactness for Continuous Layer Normalization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

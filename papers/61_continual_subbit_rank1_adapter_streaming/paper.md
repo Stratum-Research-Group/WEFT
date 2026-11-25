@@ -1,5 +1,9 @@
 # Paper 61: Continual Sub-Bit Knowledge Integration: Streaming In-Register Rank-1 Updates Across Frozen Foundation Fleets with Certified Spectral Stability
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

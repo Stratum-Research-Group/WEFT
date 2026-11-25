@@ -1,4 +1,4 @@
-# Symplectic Momentum-Compacted KV Caching & Fused Polytope Attention on Frozen Polar Models
+# Paper 125: Symplectic Momentum-Compacted KV Caching & Fused Polytope Attention on Frozen Polar Models
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

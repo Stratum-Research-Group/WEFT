@@ -1,10 +1,13 @@
+# Paper 107: Geometric Facet Hashing and Asynchronous Latent Cache Prefetching in Sub-Bit Autoregressive Serving
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 107: Geometric Facet Hashing and Asynchronous Latent Cache Prefetching in Sub-Bit Autoregressive Serving"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  In sub-bit autoregressive foundation model serving, matrix-vector multiplication throughput on modern x86-64 microarchitectures (AMD Zen 4, Intel Sapphire Rapids) is bounded primarily by cache line eviction latencies and DRAM fetch stalls rather than vector arithmetic capacity. In this work, we introduce Geometric Facet Hashing and Asynchronous Latent Cache Prefetching for frozen polar sub-bit architectures. By exploiting the spatial regularity of packed 32-bit bitboard rows ($W_0 \in \{-1, +1\}^{d_{\text{out}} \times d_{\text{in}}}$) and contiguous Int4 paged KV cache blocks, we implement temporal hardware prefetch scheduling via `_mm_prefetch(..., _MM_HINT_T0)` interleaved directly into AVX-512 VPOPCNTDQ reduction loops. Memory prefetch distances are tuned to hide L2/L3 cache misses, achieving a $1.29\times$ reduction in cycle stall penalties. In addition, we formalize the memory invariance of non-temporal prefetching and bitboard XOR reduction in Lean 4, proving zero state divergence and exact arithmetic reproducibility with zero non-standard axioms and zero `sorry`. Empirical benchmarks demonstrate sustained throughput scaling up to $312.8\text{ tok/s}$ with zero memory leaks.
+
+## Abstract
+In sub-bit autoregressive foundation model serving, matrix-vector multiplication throughput on modern x86-64 microarchitectures (AMD Zen 4, Intel Sapphire Rapids) is bounded primarily by cache line eviction latencies and DRAM fetch stalls rather than vector arithmetic capacity. In this work, we introduce Geometric Facet Hashing and Asynchronous Latent Cache Prefetching for frozen polar sub-bit architectures. By exploiting the spatial regularity of packed 32-bit bitboard rows ($W_0 \in \{-1, +1\}^{d_{\text{out}} \times d_{\text{in}}}$) and contiguous Int4 paged KV cache blocks, we implement temporal hardware prefetch scheduling via `_mm_prefetch(..., _MM_HINT_T0)` interleaved directly into AVX-512 VPOPCNTDQ reduction loops. Memory prefetch distances are tuned to hide L2/L3 cache misses, achieving a $1.29\times$ reduction in cycle stall penalties. In addition, we formalize the memory invariance of non-temporal prefetching and bitboard XOR reduction in Lean 4, proving zero state divergence and exact arithmetic reproducibility with zero non-standard axioms and zero `sorry`. Empirical benchmarks demonstrate sustained throughput scaling up to $312.8\text{ tok/s}$ with zero memory leaks.
+
 ---
 
 # 1. Introduction

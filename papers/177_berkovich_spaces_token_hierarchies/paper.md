@@ -1,4 +1,4 @@
-# Asymmetric Rigid Analytic Geometry & Berkovich Spaces for Non-Archimedean Sub-Bit Token Hierarchies
+# Paper 177: Asymmetric Rigid Analytic Geometry & Berkovich Spaces for Non-Archimedean Sub-Bit Token Hierarchies
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

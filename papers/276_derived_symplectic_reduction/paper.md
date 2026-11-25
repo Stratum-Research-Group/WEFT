@@ -1,4 +1,4 @@
-# Milestone Paper 276: Asymmetric Derived Symplectic Reductions & Moment Maps for Gradient-Free Frozen Weight Orthogonalization
+# Paper 276: Asymmetric Derived Symplectic Reductions & Moment Maps for Gradient-Free Frozen Weight Orthogonalization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

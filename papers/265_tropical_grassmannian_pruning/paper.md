@@ -1,4 +1,4 @@
-# Milestone Paper 265: Asymmetric Tropical Grassmannians & Plücker Coordinates for Dynamic Multi-Head Subspace Pruning
+# Paper 265: Asymmetric Tropical Grassmannians & Plücker Coordinates for Dynamic Multi-Head Subspace Pruning
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

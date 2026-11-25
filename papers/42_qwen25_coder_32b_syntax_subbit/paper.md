@@ -1,5 +1,9 @@
 # Paper 42: Extreme Low-Bitrate Coding Specialists: Sub-0.038 BPW Factorization of Qwen2.5-Coder-32B with Formally Certified Abstract Syntax Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 22, 2026  

@@ -1,5 +1,9 @@
 # Paper 2: BitWEFT: Fused SRAM FlashDecoding and 2-Bit Addition-Only GEMMs for Constant-Memory Serving
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

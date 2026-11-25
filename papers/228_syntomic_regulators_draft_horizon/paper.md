@@ -1,4 +1,4 @@
-# Asymmetric Syntomic Regulators & Motivic Beilinson Conjectures for Optimal Speculative Draft Horizon Planning
+# Paper 228: Asymmetric Syntomic Regulators & Motivic Beilinson Conjectures for Optimal Speculative Draft Horizon Planning
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

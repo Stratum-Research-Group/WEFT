@@ -1,4 +1,4 @@
-# Asymmetric Motivic Étale Motives & Voevodsky Triangulated Categories for Exact Sub-Bit Quantization Invariance
+# Paper 251: Asymmetric Motivic Étale Motives & Voevodsky Triangulated Categories for Exact Sub-Bit Quantization Invariance
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

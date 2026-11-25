@@ -1,5 +1,9 @@
 # Paper 16: WEFT Comprehensive Technical Architecture: The Unified Co-Processing Specification Across Native CUDA Kernels, Lean 4 Invariants, and Speculative Tree Systems
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

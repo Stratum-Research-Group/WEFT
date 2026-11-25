@@ -1,4 +1,4 @@
-# Asymmetric Symplectic Cohomology & Floer Homology for Long-Horizon State Preservation on Edge Accelerators
+# Paper 161: Asymmetric Symplectic Cohomology & Floer Homology for Long-Horizon State Preservation on Edge Accelerators
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

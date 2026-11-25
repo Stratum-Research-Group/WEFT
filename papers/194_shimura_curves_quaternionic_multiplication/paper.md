@@ -1,4 +1,4 @@
-# Asymmetric Shimura Curves & Quaternionic Multiplication for Low-Bit Arithmetic Topology
+# Paper 194: Asymmetric Shimura Curves & Quaternionic Multiplication for Low-Bit Arithmetic Topology
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

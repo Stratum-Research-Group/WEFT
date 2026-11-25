@@ -1,4 +1,4 @@
-# Milestone Paper 255: Asymmetric Derived Intersection Homology & Perverse Sheaf Micro-Local Attention Routing
+# Paper 255: Asymmetric Derived Intersection Homology & Perverse Sheaf Micro-Local Attention Routing
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

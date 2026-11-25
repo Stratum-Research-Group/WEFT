@@ -1,5 +1,9 @@
 # Paper 36: Sub-Bit Mathematical Provers at Scale: 100% Full Deconstruction of Goedel-Prover-V2-32B into 155 MB at 0.038 BPW with Certified Formal Invariants
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *Stratum Research Group*  

@@ -1,4 +1,4 @@
-# Asymmetric Absolute Galois Groups & Grothendieck's Dessins d'Enfants for Bipartite Attention Permutations
+# Paper 210: Asymmetric Absolute Galois Groups & Grothendieck's Dessins d'Enfants for Bipartite Attention Permutations
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

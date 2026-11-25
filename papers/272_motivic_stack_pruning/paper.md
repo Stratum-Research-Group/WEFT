@@ -1,4 +1,4 @@
-# Milestone Paper 272: Asymmetric Motivic Cohomological Operations on Deligne-Mumford Stacks for Fault-Tolerant Activation Pruning
+# Paper 272: Asymmetric Motivic Cohomological Operations on Deligne-Mumford Stacks for Fault-Tolerant Activation Pruning
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

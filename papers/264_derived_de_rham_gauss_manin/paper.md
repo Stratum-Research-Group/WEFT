@@ -1,4 +1,4 @@
-# Milestone Paper 264: Asymmetric Derived De Rham Cohomology & Gauss-Manin Connections for Continuous Learning Weight Invariance
+# Paper 264: Asymmetric Derived De Rham Cohomology & Gauss-Manin Connections for Continuous Learning Weight Invariance
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

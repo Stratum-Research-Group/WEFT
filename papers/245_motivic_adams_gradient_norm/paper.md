@@ -1,4 +1,4 @@
-# Asymmetric Motivic Adams Operations & Algebraic K-Theory for Exact Layer Gradient Normalization
+# Paper 245: Asymmetric Motivic Adams Operations & Algebraic K-Theory for Exact Layer Gradient Normalization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

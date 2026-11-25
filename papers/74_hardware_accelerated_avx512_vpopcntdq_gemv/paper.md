@@ -1,5 +1,9 @@
 # Paper 74: Hardware-Accelerated AVX-512 VPOPCNTDQ Bitboard GEMV: Sub-Bit Foundation Matrix Multiplication at Silicon Bandwidth Limits on Zen 4 Architectures
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 2026*

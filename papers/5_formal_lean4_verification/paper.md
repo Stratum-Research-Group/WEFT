@@ -1,5 +1,9 @@
 # Paper 5: Formal Verification of Deep Neural Network State Operators: Machine-Checked Proofs of Singlet Uncrossing and Linear Recurrence Boundedness in Lean 4
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 
@@ -29,7 +33,7 @@ s(p, q) =  1 & if  p = 0, q = 1 \\ -1 & if  p = 1, q = 0 \\ 0 & otherwise
 
 [Singlet Uncrossing Identity]
 
-For all Boolean configurations $(x, y, u, v)  \0, 1\^4$:
+For all Boolean configurations $(x, y, u, v) \in \{0, 1\}^4$:
 
 X_1(x, y, u, v) = I_1(x, y, u, v) - s(x, y)  s(u, v)
 

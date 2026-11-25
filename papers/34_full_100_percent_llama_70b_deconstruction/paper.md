@@ -1,5 +1,9 @@
 # Paper 34: 100% Full Foundation Model Deconstruction: Compressing Llama-3.3-70B into 231 MB at 0.0232 BPW with Certified Linear Complexity
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group
 **Date:** November 22, 2026  
 **Artifact Directory:** [papers/34_full_100_percent_llama_70b_deconstruction/](file:///home/akarta/Projects/0.WiP/Weft/papers/34_full_100_percent_llama_70b_deconstruction/)

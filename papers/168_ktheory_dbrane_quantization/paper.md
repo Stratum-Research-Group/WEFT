@@ -1,4 +1,4 @@
-# Asymmetric K-Theory & D-Brane Charge Quantization on Polar Vector Hardware
+# Paper 168: Asymmetric K-Theory & D-Brane Charge Quantization on Polar Vector Hardware
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

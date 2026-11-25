@@ -1,4 +1,4 @@
-# Asymmetric Flash-Decompression & Paged KV-Cache Vector Streaming on Heterogeneous SIMD Accelerators
+# Paper 124: Asymmetric Flash-Decompression & Paged KV-Cache Vector Streaming on Heterogeneous SIMD Accelerators
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

@@ -1,5 +1,9 @@
 # Paper 66: Benchmarking Sub-Bit Foundation Architectures Against the Open-Source Ecosystem: Pareto Frontier Evaluation of WEFT vs. llama.cpp, BitNet.cpp, AutoGPTQ, and vLLM
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

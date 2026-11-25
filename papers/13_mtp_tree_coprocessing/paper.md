@@ -1,5 +1,9 @@
 # Paper 13: Ultra-Fast Speculative Tree Co-Processing: Unifying Multi-Token Prediction and Formally Verified Causal Masking
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

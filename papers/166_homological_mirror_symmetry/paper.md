@@ -1,4 +1,4 @@
-# Asymmetric Homological Mirror Symmetry & Kontsevich Invariants for Cross-Attention Geometries
+# Paper 166: Asymmetric Homological Mirror Symmetry & Kontsevich Invariants for Cross-Attention Geometries
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,5 +1,9 @@
 # Paper 52: Zero-Cloud Foundation Inference: Asynchronous Multi-Protocol API Serving Across Sub-Bit Foundation Collectives
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

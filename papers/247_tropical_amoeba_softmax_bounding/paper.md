@@ -1,4 +1,4 @@
-# Asymmetric Tropical Toric Resolutions & Amoeba Boundaries for Attention Logit Softmax Bounding
+# Paper 247: Asymmetric Tropical Toric Resolutions & Amoeba Boundaries for Attention Logit Softmax Bounding
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

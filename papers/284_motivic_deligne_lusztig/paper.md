@@ -1,4 +1,4 @@
-# Milestone Paper 284: Asymmetric Motivic Cohomological Operations on Deligne-Lusztig Varieties for Fault-Tolerant Redundant KV Storage
+# Paper 284: Asymmetric Motivic Cohomological Operations on Deligne-Lusztig Varieties for Fault-Tolerant Redundant KV Storage
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,4 +1,4 @@
-# Asymmetric Arithmetic Quantum Field Theory & Chern-Simons Cohomology for Non-Abelian Attention Gauges
+# Paper 201: Asymmetric Arithmetic Quantum Field Theory & Chern-Simons Cohomology for Non-Abelian Attention Gauges
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

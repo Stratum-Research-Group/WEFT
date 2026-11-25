@@ -1,4 +1,4 @@
-# Milestone Paper 286: Asymmetric Tropical Toric Boundary Divisors & Logarithmic Geometry for Non-Linear Activation Linearization
+# Paper 286: Asymmetric Tropical Toric Boundary Divisors & Logarithmic Geometry for Non-Linear Activation Linearization
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

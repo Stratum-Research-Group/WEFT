@@ -1,4 +1,4 @@
-# Asymmetric Motivic Donaldson-Thomas Invariants on Calabi-Yau 4-Folds for 4-Bit Ternary Tensor Packing
+# Paper 226: Asymmetric Motivic Donaldson-Thomas Invariants on Calabi-Yau 4-Folds for 4-Bit Ternary Tensor Packing
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

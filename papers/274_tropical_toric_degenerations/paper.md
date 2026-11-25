@@ -1,4 +1,4 @@
-# Milestone Paper 274: Asymmetric Tropical Toric Degenerations & Polyhedral Complexes for Real-Time KV Cache Compaction
+# Paper 274: Asymmetric Tropical Toric Degenerations & Polyhedral Complexes for Real-Time KV Cache Compaction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

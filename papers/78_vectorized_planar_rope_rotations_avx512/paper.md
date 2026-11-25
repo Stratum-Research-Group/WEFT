@@ -1,5 +1,9 @@
 # Paper 78: Vectorized Planar Rotary Embeddings (RoPE) and Unified AVX-512 Sub-Bit Silicon Kernels
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 2026*

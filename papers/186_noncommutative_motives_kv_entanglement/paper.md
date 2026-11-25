@@ -1,4 +1,4 @@
-# Asymmetric Non-Commutative Motives & Calabi-Yau Triangulated Categories for KV-Cache Entanglement Pruning
+# Paper 186: Asymmetric Non-Commutative Motives & Calabi-Yau Triangulated Categories for KV-Cache Entanglement Pruning
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

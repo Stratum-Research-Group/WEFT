@@ -1,5 +1,9 @@
 # Paper 68: Streaming Shard SVD Factorization: Sequential Polar Bitboard Compression under Constant Storage Floor Invariants and Higher-Dimensional SO(n) Rotations
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 23, 2026*

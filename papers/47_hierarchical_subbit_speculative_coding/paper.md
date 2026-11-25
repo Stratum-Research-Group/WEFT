@@ -1,5 +1,9 @@
 # Paper 47: Hierarchical Sub-Bit Speculative Coding: Zero-RAM Multi-Scale Verification of 14B and 32B Code Specialists
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

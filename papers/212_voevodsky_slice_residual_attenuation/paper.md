@@ -1,4 +1,4 @@
-# Asymmetric Motivic Cohomology of Singular Varieties & Voevodsky Slice Filtrations for Layerwise Residual Attenuation
+# Paper 212: Asymmetric Motivic Cohomology of Singular Varieties & Voevodsky Slice Filtrations for Layerwise Residual Attenuation
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

@@ -1,10 +1,13 @@
+# Paper 110: Asynchronous Lock-Free Ring Concurrency and Speculative Multi-Token Verification Across Heterogeneous Edge Accelerators
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 110: Asynchronous Lock-Free Ring Concurrency and Speculative Multi-Token Verification Across Heterogeneous Edge Accelerators"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  Deploying multi-billion parameter edge foundation intelligence under real-time latency budgets demands orchestrating heterogeneous silicon—coordinating high-throughput vector CPU cores with low-latency GPU tensor cores without thread lock contention or activation memory duplication. In this paper, we formulate Asynchronous Lock-Free Ring Concurrency and Multi-Token Speculative Verification across heterogeneous edge silicon (AMD Zen 4 CPU and NVIDIA RTX 5060 Ti GPU). Using a lock-free circular ring buffer with cache-line-padded atomic pointers, speculative candidate tree tokens drafted by the GPU latent drafter (< 48 MB VRAM) are enqueued directly into CPU AVX-512 VPOPCNTDQ bitboard reduction pipelines. Rejection sampling verification executes concurrently with base token decoding, achieving a $2.74\times$ speculative speedup over autoregressive CPU baselines. Mathematical invariants certifying circular pointer boundedness, prefix conservation, and dequeue monotonicity are formally verified in Lean 4 with zero non-standard axioms and zero `sorry`. Empirical benchmarks confirm constant heap resident memory ($\le 15\text{ MB}$) and sustained high-concurrency token generation without synchronization bubbles.
+
+## Abstract
+Deploying multi-billion parameter edge foundation intelligence under real-time latency budgets demands orchestrating heterogeneous silicon—coordinating high-throughput vector CPU cores with low-latency GPU tensor cores without thread lock contention or activation memory duplication. In this paper, we formulate Asynchronous Lock-Free Ring Concurrency and Multi-Token Speculative Verification across heterogeneous edge silicon (AMD Zen 4 CPU and NVIDIA RTX 5060 Ti GPU). Using a lock-free circular ring buffer with cache-line-padded atomic pointers, speculative candidate tree tokens drafted by the GPU latent drafter (< 48 MB VRAM) are enqueued directly into CPU AVX-512 VPOPCNTDQ bitboard reduction pipelines. Rejection sampling verification executes concurrently with base token decoding, achieving a $2.74\times$ speculative speedup over autoregressive CPU baselines. Mathematical invariants certifying circular pointer boundedness, prefix conservation, and dequeue monotonicity are formally verified in Lean 4 with zero non-standard axioms and zero `sorry`. Empirical benchmarks confirm constant heap resident memory ($\le 15\text{ MB}$) and sustained high-concurrency token generation without synchronization bubbles.
+
 ---
 
 # 1. Introduction

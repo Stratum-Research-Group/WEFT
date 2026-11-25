@@ -1,4 +1,4 @@
-# Milestone Paper 279: Asymmetric Derived Hyperkähler Reductions & Quiver Varieties for Sub-Bit MoE Routing Stability
+# Paper 279: Asymmetric Derived Hyperkähler Reductions & Quiver Varieties for Sub-Bit MoE Routing Stability
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

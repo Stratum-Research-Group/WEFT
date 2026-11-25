@@ -1,4 +1,4 @@
-# Asymmetric Tannakian Categories & Motivic Galois Groups for Global Activation Gauge Invariance
+# Paper 191: Asymmetric Tannakian Categories & Motivic Galois Groups for Global Activation Gauge Invariance
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

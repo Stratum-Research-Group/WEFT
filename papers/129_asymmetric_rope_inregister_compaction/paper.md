@@ -1,4 +1,4 @@
-# Asymmetric Rotary Position Embedding (RoPE) In-Register Compaction & Polar Coordinate Invariance on Sub-Bit Hardware
+# Paper 129: Asymmetric Rotary Position Embedding (RoPE) In-Register Compaction & Polar Coordinate Invariance on Sub-Bit Hardware
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

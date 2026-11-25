@@ -1,4 +1,4 @@
-# Asymmetric $p$-Adic Uniformization of Shimura Curves & Čerednik-Drinfeld Theorems for Rigid Attention Codebooks
+# Paper 208: Asymmetric p-Adic Uniformization of Shimura Curves & Čerednik-Drinfeld Theorems for Rigid Attention Codebooks
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

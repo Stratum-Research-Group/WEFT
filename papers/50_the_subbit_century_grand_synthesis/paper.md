@@ -1,5 +1,9 @@
 # Paper 50: The Sub-Bit Century: Foundations, Mathematical Proofs, and Edge Deployments of Universal Sub-Bit Foundation Intelligence (Papers 1–50)
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

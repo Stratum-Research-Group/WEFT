@@ -1,4 +1,4 @@
-# Asymmetric Diamonds & v-Topologies for Bounded Speculative Branching
+# Paper 197: Asymmetric Diamonds & v-Topologies for Bounded Speculative Branching
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

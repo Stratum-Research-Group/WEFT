@@ -1,4 +1,4 @@
-# Asymmetric Arithmetic Intersection Theory on Deligne-Mumford Stacks for Cross-Attention Normalization
+# Paper 207: Asymmetric Arithmetic Intersection Theory on Deligne-Mumford Stacks for Cross-Attention Normalization
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

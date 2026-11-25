@@ -1,4 +1,4 @@
-# Milestone Paper 269: Asymmetric Motivic Cohomological Operations & Steenrod Powers for Fault-Tolerant Edge Weight Recovery
+# Paper 269: Asymmetric Motivic Cohomological Operations & Steenrod Powers for Fault-Tolerant Edge Weight Recovery
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

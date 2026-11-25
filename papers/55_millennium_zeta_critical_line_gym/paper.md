@@ -1,5 +1,9 @@
 # Paper 55: The Riemann Zeta Gym: Machine-Checking Critical Line Zeros, Weil Positivity, and Odlyzko GUE Spectral Correlation Bounds in Lean 4
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

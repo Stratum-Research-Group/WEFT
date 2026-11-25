@@ -1,4 +1,4 @@
-# Milestone Paper 273: Asymmetric Derived Azumaya Algebras & Brauer Groups for Secure Multi-Party Quantized Weight Sharing
+# Paper 273: Asymmetric Derived Azumaya Algebras & Brauer Groups for Secure Multi-Party Quantized Weight Sharing
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

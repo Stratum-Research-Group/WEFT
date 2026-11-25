@@ -1,5 +1,9 @@
 # Paper 58: Formal Conditional Reductions of Frontier Unsolved Conjectures: Machine-Checked Deductive Implications, Barrier Obstructions, and Bounded Verifiers
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

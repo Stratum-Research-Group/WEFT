@@ -1,4 +1,4 @@
-# Asymmetric Derived Fiber Products & Tor-Spectral Sequences for Zero-Loss Multimodal Embedding Fusion
+# Paper 249: Asymmetric Derived Fiber Products & Tor-Spectral Sequences for Zero-Loss Multimodal Embedding Fusion
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,4 +1,4 @@
-# Asymmetric Motivic Homotopy Spheres & Stable Stem Projections for Ultra-Sparse Feedforward Routing
+# Paper 234: Asymmetric Motivic Homotopy Spheres & Stable Stem Projections for Ultra-Sparse Feedforward Routing
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

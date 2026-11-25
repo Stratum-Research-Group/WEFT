@@ -1,4 +1,4 @@
-# Milestone Paper 257: Asymmetric Motivic Cohomological Hall Algebras (COHA) & BPS States for Exact FlashAttention KV Fusion
+# Paper 257: Asymmetric Motivic Cohomological Hall Algebras (COHA) & BPS States for Exact FlashAttention KV Fusion
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

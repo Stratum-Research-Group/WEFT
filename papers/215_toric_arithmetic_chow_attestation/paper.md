@@ -1,4 +1,4 @@
-# Asymmetric Arithmetic Chow Rings on Toric Stacks for Non-Archimedean Weight Attestation
+# Paper 215: Asymmetric Arithmetic Chow Rings on Toric Stacks for Non-Archimedean Weight Attestation
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

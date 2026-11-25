@@ -1,4 +1,4 @@
-# Asymmetric Condensed Mathematics & Liquid Tensor Spaces for Bounded Context Retrieval
+# Paper 183: Asymmetric Condensed Mathematics & Liquid Tensor Spaces for Bounded Context Retrieval
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

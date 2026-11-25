@@ -1,5 +1,9 @@
 # Paper 77: Masked Ternary AVX-512 Popcount Operators: 1.58-Bit Sparsity and Hardware Invariants on Zen 4 Silicon
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 2026*

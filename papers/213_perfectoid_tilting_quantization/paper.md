@@ -1,4 +1,4 @@
-# Asymmetric Perfectoid Rings & Tilting Equivalence for Heterogeneous Cross-Precision Quantization
+# Paper 213: Asymmetric Perfectoid Rings & Tilting Equivalence for Heterogeneous Cross-Precision Quantization
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

@@ -1,4 +1,4 @@
-# Asymmetric Relative Anabelian Geometry & Section Conjectures for Cross-Layer Semantic Preservation
+# Paper 205: Asymmetric Relative Anabelian Geometry & Section Conjectures for Cross-Layer Semantic Preservation
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

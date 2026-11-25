@@ -1,4 +1,4 @@
-# Asymmetric Tropical Toric Degenerations & Berkovich Skeleta for Dynamic Sub-Bit KV Eviction
+# Paper 235: Asymmetric Tropical Toric Degenerations & Berkovich Skeleta for Dynamic Sub-Bit KV Eviction
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

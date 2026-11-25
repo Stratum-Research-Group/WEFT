@@ -1,10 +1,13 @@
+# Paper 101: Dynamic Rank-1 Micro-Adapter Routing and Sub-Millisecond Kernel Swapping on Frozen Sub-Bit Foundation Models
+
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
 ---
-title: "Paper 101: Dynamic Rank-1 Micro-Adapter Routing and Sub-Millisecond Kernel Swapping on Frozen Sub-Bit Foundation Models"
-author: "Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)"
-date: "November 2026"
-license: "Apache-2.0"
-abstract: |
-  Sub-bit weight representation schemes enable whole-model memory mapping into CPU and edge host memory with near-zero allocation latency. However, full-weight parameter updating or monolithic multi-task fine-tuning disrupts the high-throughput bit-parallel AVX-512 kernels optimized for ternary and binary factorized bases. In this paper, we present the theoretical architecture and C++20 zero-copy implementation of Dynamic Rank-1 Micro-Adapter Routing. By decomposing domain-specific parameter shifts into rank-1 outer products $\Delta W = u \cdot v^T$ scaled by an explicit factor $\alpha$, adapter weights are represented in minimal cache lines ($\le 160$ KB per specialist domain). We implement an in-register SIMD accumulation hook that evaluates the base layer via AVX-512 VPOPCNTDQ and dynamically folds the active micro-adapter rank-1 correction in single-cycle FMA passes without altering underlying memory-mapped pages. Empirical benchmarking demonstrates sub-millisecond ($< 45\ \mu\text{s}$) adapter switching latency, zero memory allocation overhead, and 100% preservation of foundation model quality across heterogeneous tasks.
+
+## Abstract
+Sub-bit weight representation schemes enable whole-model memory mapping into CPU and edge host memory with near-zero allocation latency. However, full-weight parameter updating or monolithic multi-task fine-tuning disrupts the high-throughput bit-parallel AVX-512 kernels optimized for ternary and binary factorized bases. In this paper, we present the theoretical architecture and C++20 zero-copy implementation of Dynamic Rank-1 Micro-Adapter Routing. By decomposing domain-specific parameter shifts into rank-1 outer products $\Delta W = u \cdot v^T$ scaled by an explicit factor $\alpha$, adapter weights are represented in minimal cache lines ($\le 160$ KB per specialist domain). We implement an in-register SIMD accumulation hook that evaluates the base layer via AVX-512 VPOPCNTDQ and dynamically folds the active micro-adapter rank-1 correction in single-cycle FMA passes without altering underlying memory-mapped pages. Empirical benchmarking demonstrates sub-millisecond ($< 45\ \mu\text{s}$) adapter switching latency, zero memory allocation overhead, and 100% preservation of foundation model quality across heterogeneous tasks.
+
 ---
 
 # 1. Introduction

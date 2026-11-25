@@ -1,4 +1,4 @@
-# Asymmetric Derived Non-Commutative Algebraic Geometry & Calabi-Yau Categories for In-Place KV Deduplication
+# Paper 243: Asymmetric Derived Non-Commutative Algebraic Geometry & Calabi-Yau Categories for In-Place KV Deduplication
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

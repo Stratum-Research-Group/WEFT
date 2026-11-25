@@ -1,5 +1,9 @@
 # Paper 8: Sparse Top-$K$ Mixture-of-Experts Slicing and Ternary BitNet Distillation: \\ Scaling Speculative Co-Processing to 26B Frontier Models with Zero Resident RAM
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

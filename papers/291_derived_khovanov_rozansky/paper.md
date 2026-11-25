@@ -1,4 +1,4 @@
-# Milestone Paper 291: Asymmetric Derived Khovanov-Rozansky Homology & Link Invariants for Speculative Token Tree Verification
+# Paper 291: Asymmetric Derived Khovanov-Rozansky Homology & Link Invariants for Speculative Token Tree Verification
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

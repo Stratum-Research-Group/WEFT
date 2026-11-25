@@ -1,4 +1,4 @@
-# Asymmetric Tropical Moduli of Toric Curves & Tropical Convexity for Multi-Task KV Partitioning
+# Paper 232: Asymmetric Tropical Moduli of Toric Curves & Tropical Convexity for Multi-Task KV Partitioning
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,4 +1,4 @@
-# Milestone Paper 266: Asymmetric Motivic Spectra & Slice Filtration for Zero-Shot Precision Quantization Schedules
+# Paper 266: Asymmetric Motivic Spectra & Slice Filtration for Zero-Shot Precision Quantization Schedules
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

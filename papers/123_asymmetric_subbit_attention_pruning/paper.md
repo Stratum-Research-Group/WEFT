@@ -1,4 +1,4 @@
-# Asymmetric Sub-Bit Attention Pruning & Dynamic Sparsification in Multi-Turn Agentic Workflows
+# Paper 123: Asymmetric Sub-Bit Attention Pruning & Dynamic Sparsification in Multi-Turn Agentic Workflows
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

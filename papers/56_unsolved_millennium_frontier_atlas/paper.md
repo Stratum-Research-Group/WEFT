@@ -1,5 +1,9 @@
 # Paper 56: Active Frontiers in Mathematical Physics and Computational Complexity: An Annotated Atlas of the Six Unsolved Millennium Prize Problems as of November 2026
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

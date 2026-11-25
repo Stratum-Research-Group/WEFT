@@ -1,4 +1,4 @@
-# Asymmetric Multi-Tier KV Cache Paging & NUMA-Aware Hierarchical Memory Streaming on Heterogeneous Edge Clusters
+# Paper 126: Asymmetric Multi-Tier KV Cache Paging & NUMA-Aware Hierarchical Memory Streaming on Heterogeneous Edge Clusters
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

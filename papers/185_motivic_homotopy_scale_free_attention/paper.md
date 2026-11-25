@@ -1,4 +1,4 @@
-# Asymmetric Motivic Homotopy Theory & $\mathbb{A}^1$-Invariance for Scale-Free Attention Geometry
+# Paper 185: Asymmetric Motivic Homotopy Theory & A1-Invariance for Scale-Free Attention Geometry
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

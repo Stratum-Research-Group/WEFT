@@ -1,4 +1,4 @@
-# Asymmetric Étale Motives & $\ell$-Adic Weight Filtrations for Hierarchical Attention Dequantization
+# Paper 189: Asymmetric Étale Motives & ℓ-Adic Weight Filtrations for Hierarchical Attention Dequantization
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

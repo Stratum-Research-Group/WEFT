@@ -1,4 +1,4 @@
-# Asymmetric Multi-Token Entropy-Guided Dynamic KV-Cache Compaction & Adaptive Precision Allocation on Polar Foundation Models
+# Paper 136: Asymmetric Multi-Token Entropy-Guided Dynamic KV-Cache Compaction & Adaptive Precision Allocation on Polar Foundation Models
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

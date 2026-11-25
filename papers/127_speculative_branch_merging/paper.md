@@ -1,4 +1,4 @@
-# Asymmetric Speculative Branch Merging & Dynamic Multi-Token Verification on Edge Vector Silicon
+# Paper 127: Asymmetric Speculative Branch Merging & Dynamic Multi-Token Verification on Edge Vector Silicon
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

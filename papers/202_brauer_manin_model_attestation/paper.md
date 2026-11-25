@@ -1,4 +1,4 @@
-# Asymmetric Brauer-Manin Obstructions & Adelic Reciprocity for Cryptographic Model Attestation
+# Paper 202: Asymmetric Brauer-Manin Obstructions & Adelic Reciprocity for Cryptographic Model Attestation
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

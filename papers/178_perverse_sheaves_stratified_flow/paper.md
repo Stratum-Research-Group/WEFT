@@ -1,4 +1,4 @@
-# Asymmetric Perverse Sheaves & Decomposition Theorem for Stratified Activation Flow
+# Paper 178: Asymmetric Perverse Sheaves & Decomposition Theorem for Stratified Activation Flow
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

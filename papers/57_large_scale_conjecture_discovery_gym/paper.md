@@ -1,5 +1,9 @@
 # Paper 57: Automated Discovery and Stepwise Resolution of 2,000 Open Mathematical Conjectures: Inductive Proof Synthesis and Stepwise Search Invariants in Lean 4
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

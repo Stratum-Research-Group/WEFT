@@ -1,4 +1,4 @@
-# Paper 99: High-Throughput Zero-Copy Microservices and Machine-Checked Asymptotic Scaling Limits
+# Paper 99: Unified Zero-Copy Microservice Architectures, Interactive Web Streaming, and Formal Asymptotic Invariants
 
 **Nicholas Charles Mynhardt, Stratum Research Group**  
 *research@stratum.org*  

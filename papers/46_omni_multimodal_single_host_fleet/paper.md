@@ -1,5 +1,9 @@
 # Paper 46: The One-Gigabyte Frontier: Universal Sub-Bit Deconstruction and Single-Host Co-Execution of an 8-Model Multimodal Fleet
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Authors:** Nicholas Charles Mynhardt  
 *Stratum Research Group • research@stratum.org*  
 **Date:** November 23, 2026  

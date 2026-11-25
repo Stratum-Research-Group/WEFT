@@ -1,5 +1,9 @@
 # Paper 20: The Unified Sub-Bit Foundation Operating System
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Title:** Paper 20: The Unified Sub-Bit Foundation Operating System: Architecture, In-Memory Kernels, and Cluster Serving at 0.18–1.58 BPW  
 **Authors:** Nicholas Charles Mynhardt, The WEFT Architectural Consortium
 **Status:** Complete & Standardized (Milestone 20 Canonical Report)

@@ -1,4 +1,4 @@
-# Asymmetric Speculative Verification over Hierarchical Prefix Tries with Fused In-Register Softmax Pruning
+# Paper 134: Asymmetric Speculative Verification over Hierarchical Prefix Tries with Fused In-Register Softmax Pruning
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

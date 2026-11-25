@@ -1,4 +1,4 @@
-# Asymmetric Tropical Toric Varieties & Amoeba Projections for Memory-Constrained Sparsity Bounds
+# Paper 211: Asymmetric Tropical Toric Varieties & Amoeba Projections for Memory-Constrained Sparsity Bounds
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

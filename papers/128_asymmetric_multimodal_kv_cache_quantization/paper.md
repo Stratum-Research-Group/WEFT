@@ -1,4 +1,4 @@
-# Asymmetric Multi-Modal KV-Cache Quantization & Cross-Attention Compaction in Omnimodal Foundation Models
+# Paper 128: Asymmetric Multi-Modal KV-Cache Quantization & Cross-Attention Compaction in Omnimodal Foundation Models
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
 **Contact:** research@stratum.org  

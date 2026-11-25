@@ -1,4 +1,4 @@
-# Asymmetric Derived Symplectic Geometry & Shifted Poisson Structures for Momentum-Conserving Optimizer Updates
+# Paper 236: Asymmetric Derived Symplectic Geometry & Shifted Poisson Structures for Momentum-Conserving Optimizer Updates
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

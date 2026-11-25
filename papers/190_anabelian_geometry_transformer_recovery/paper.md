@@ -1,4 +1,4 @@
-# Asymmetric Absolute Anabelian Geometry & Reconstruction Algorithms for Edge Transformer Recovery
+# Paper 190: Asymmetric Absolute Anabelian Geometry & Reconstruction Algorithms for Edge Transformer Recovery
 
 **Authors:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

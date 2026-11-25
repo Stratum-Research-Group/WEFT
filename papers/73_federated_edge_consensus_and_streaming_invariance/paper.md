@@ -1,5 +1,9 @@
 # Paper 73: Federated Multi-Agent Edge Consensus and Streaming Invariance
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*  
 *November 2026*

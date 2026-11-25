@@ -1,5 +1,9 @@
 # Paper 11: Provably Sound Speculative Co-Processing: Eliminating Acceleration Reversal via Formally Verified Adaptive Entropy Gating in Lean 4
 
+**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**License:** Apache-2.0  
+
+
 **Nicholas Charles Mynhardt**  
 *Stratum Research Group • research@stratum.org*
 

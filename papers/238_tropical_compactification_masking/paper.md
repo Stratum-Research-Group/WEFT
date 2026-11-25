@@ -1,4 +1,4 @@
-# Asymmetric Tropical Compactifications & Wonderful Compactifications for Sparse Attention Masking
+# Paper 238: Asymmetric Tropical Compactifications & Wonderful Compactifications for Sparse Attention Masking
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

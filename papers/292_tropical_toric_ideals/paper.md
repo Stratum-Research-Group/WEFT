@@ -1,4 +1,4 @@
-# Milestone Paper 292: Asymmetric Tropical Toric Ideals & Graded Betti Numbers for Activation Bit-Slicing Schedules
+# Paper 292: Asymmetric Tropical Toric Ideals & Graded Betti Numbers for Activation Bit-Slicing Schedules
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  

@@ -1,4 +1,4 @@
-# Asymmetric Arithmetic Equivariant Chow Rings & Localization Theorems for Multi-Device Gradient Routing
+# Paper 217: Asymmetric Arithmetic Equivariant Chow Rings & Localization Theorems for Multi-Device Gradient Routing
 
 **Nicholas Charles Mynhardt**  
 Stratum Research Group • `research@stratum.org`  

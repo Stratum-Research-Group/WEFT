@@ -333,5 +333,6 @@ lean_lib «FormalSuite» where
     `«OnlineSoftmaxStability»,
     `«MultiAgentDebateConvergence»,
     `«SpeculativeAcceptanceBounds»,
-    `«RectifiedFlowInvariants»
+    `«RectifiedFlowInvariants»,
+    `«MetricDistanceInvariants»
   ]

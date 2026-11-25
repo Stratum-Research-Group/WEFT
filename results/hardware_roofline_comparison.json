@@ -1,0 +1,20 @@
+{
+  "workload": {
+    "B": 1,
+    "K": 3584,
+    "N": 18944,
+    "rank": 64,
+    "iterations": 50
+  },
+  "cpu_ryzen_7600x": {
+    "giga_ops_per_second": 7.349140744194639,
+    "latency_microseconds": 392.37022399902344,
+    "elapsed_seconds": 0.019618511199951172
+  },
+  "gpu_rtx_5060_ti": {
+    "giga_ops_per_second": 25.072822060483436,
+    "latency_microseconds": 115.00835418701172,
+    "elapsed_seconds": 0.005750417709350586,
+    "speedup_vs_cpu": 3.411667150379369
+  }
+}

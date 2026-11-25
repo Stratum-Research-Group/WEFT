@@ -11,6 +11,7 @@ struct WeftTreeTopology {
     size_t depth;
     size_t breadth;
     size_t total_nodes;
+    float effective_temperature;
     std::vector<int32_t> parent_indices; // Parent index for each tree node
 };
 
@@ -31,23 +32,27 @@ public:
         return h;
     }
 
-    // Adaptively build tree topology based on entropy H and temperature T
+    // Adaptively build tree topology based on entropy H and temperature T with continuous non-linear scaling
     WeftTreeTopology build_topology(float entropy, float temperature = 1.0f) {
         WeftTreeTopology topo;
-        float effective_entropy = entropy * std::max(0.1f, temperature);
+        float safe_temp = std::max(0.01f, std::min(temperature, 2.5f));
+        topo.effective_temperature = safe_temp;
 
-        if (effective_entropy < 0.5f) {
-            // Low-entropy regime (Code, Math, Logic): Deep Linear Chain
+        // Dynamic scaling factor: Higher temp magnifies entropy spread; Low temp freezes into single greedy beam
+        float effective_entropy = entropy * safe_temp;
+
+        if (safe_temp <= 0.15f || effective_entropy < 0.45f) {
+            // Greedy / Deterministic regime (Formal math, verified code): Deep Linear Chain (Breadth = 1)
             topo.depth = std::min(budget, static_cast<size_t>(8));
             topo.breadth = 1;
-        } else if (effective_entropy < 1.5f) {
-            // Medium-entropy regime: Balanced Tree
+        } else if (effective_entropy < 1.4f) {
+            // Balanced cognitive flow: 4-deep multi-branch tree
             topo.depth = 4;
-            topo.breadth = budget / topo.depth;
+            topo.breadth = std::max(static_cast<size_t>(1), budget / topo.depth);
         } else {
-            // High-entropy regime (Creative, Dialogue): Broad Exploration Bush
+            // High-entropy exploration (Brainstorming, speculative creative paths): Wide 2-deep bush
             topo.depth = 2;
-            topo.breadth = budget / topo.depth;
+            topo.breadth = std::max(static_cast<size_t>(1), budget / topo.depth);
         }
 
         topo.total_nodes = std::min(budget, topo.depth * topo.breadth);

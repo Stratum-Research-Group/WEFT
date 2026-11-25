@@ -11,6 +11,8 @@
 #include <memory>
 #include <cstring>
 #include <cassert>
+#include <thread>
+#include <chrono>
 
 namespace weft {
 
@@ -35,7 +37,7 @@ struct NUMAPageDescriptor {
 class WeftNUMAPagedKVPool {
 public:
     explicit WeftNUMAPagedKVPool(size_t total_pages = 256, uint8_t local_node = 0)
-        : total_pages_(total_pages), local_node_(local_node) {
+        : total_pages_(total_pages), local_node_(local_node), daemon_running_(false) {
         pages_.resize(total_pages_);
         for (size_t i = 0; i < total_pages_; ++i) {
             pages_[i].page_id = static_cast<uint32_t>(i);
@@ -44,6 +46,10 @@ public:
             pages_[i].access_counter = 0;
             std::memset(pages_[i].data, 0, NUMAPageDescriptor::PAGE_SIZE_BYTES);
         }
+    }
+
+    ~WeftNUMAPagedKVPool() {
+        stop_migration_daemon();
     }
 
     // Access page and record access heat
@@ -85,6 +91,40 @@ public:
         return demoted;
     }
 
+    // Decay access counters across all pages (exponential decay)
+    void decay_access_counters(uint8_t decay_factor = 1) {
+        for (auto& page : pages_) {
+            if (page.access_counter > decay_factor) {
+                page.access_counter -= decay_factor;
+            } else {
+                page.access_counter = 0;
+            }
+        }
+    }
+
+    // Start background autonomous NUMA page migration & eviction daemon
+    void start_migration_daemon(uint8_t cold_threshold = 10, uint8_t remote_node = 1, uint32_t interval_ms = 100) {
+        if (daemon_running_.load()) return;
+        daemon_running_.store(true);
+        daemon_thread_ = std::thread([this, cold_threshold, remote_node, interval_ms]() {
+            while (daemon_running_.load()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
+                decay_access_counters(1);
+                evict_cold_pages(cold_threshold, remote_node);
+            }
+        });
+    }
+
+    // Stop background daemon cleanly
+    void stop_migration_daemon() {
+        if (daemon_running_.load()) {
+            daemon_running_.store(false);
+            if (daemon_thread_.joinable()) {
+                daemon_thread_.join();
+            }
+        }
+    }
+
     // Count pages by tier
     void get_tier_counts(size_t& out_hot, size_t& out_cold) const {
         out_hot = 0;
@@ -99,6 +139,8 @@ private:
     size_t total_pages_;
     uint8_t local_node_;
     std::vector<NUMAPageDescriptor> pages_;
+    std::atomic<bool> daemon_running_;
+    std::thread daemon_thread_;
 };
 
 } // namespace weft

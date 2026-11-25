@@ -319,5 +319,6 @@ lean_lib «FormalSuite» where
     `«TitansMemoryInvariants»,
     `«SpeculativeTreeEquivalence»,
     `«MultiAdapterCompositionBounds»,
-    `«CognitiveFlowInvariants»
+    `«CognitiveFlowInvariants»,
+    `«EntropyTreeBranchingBounds»
   ]

@@ -177,6 +177,11 @@ int main(int argc, char* argv[]) {
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
+        } else if (request.find("GET /v1/models/1t/sharded_stream") != std::string::npos) {
+            std::string body = "{\"model\":\"weft-frontier-1.04T-moe\",\"total_shards\":16,\"chunk_size_kb\":292.4,\"status\":\"streaming_ready\",\"format\":\"weft-subbit\"}\n";
+            std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+            send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         } else if (request.find("GET /v1/models") != std::string::npos) {
             std::string body = "{\"object\":\"list\",\"data\":[{\"id\":\"weft-subbit\",\"object\":\"model\",\"owned_by\":\"stratum\"},{\"id\":\"gemma-4-E2B-it-subbit\",\"object\":\"model\",\"owned_by\":\"stratum\"}]}\n";
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;

@@ -25,3 +25,7 @@ formal:
 gate:
 	@echo "[GATE] Running Full QA Gatekeeper..."
 	bash scripts/verify_fast_gate.sh
+
+suite-smoke:
+	@echo "[SUITE] Executing WEFT Benchmark & Test Suite (Smoke Tier)..."
+	.venv/bin/python run_weft_suite.py --tier smoke --device cpu

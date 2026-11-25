@@ -1,0 +1,8 @@
+{
+  "test_id": "RG1_No_Synthetic_Claims",
+  "track": "Track B",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.0002200603485107422,
+  "note": "No synthetic 'zero-degradation' claims detected."
+}

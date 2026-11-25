@@ -10,6 +10,7 @@ Executes 100% offline in CPU registers across 134B active parameters in < 150 ms
 
 import time
 from typing import Dict, Any
+from weft.cognitive_flow import CognitiveStateMachine, CognitivePhase
 
 class MultiAgentCouncil:
     def __init__(self):
@@ -21,16 +22,20 @@ class MultiAgentCouncil:
 
     def deliberate_consensus(self, query: str) -> Dict[str, Any]:
         t0 = time.perf_counter()
+        flow = CognitiveStateMachine(query)
+        flow.advance_phase() # To struggle
         
         # Step 1: The Thinker (DeepSeek-R1-32B)
         t_think = time.perf_counter()
         thought_plan = f"Hypothesis on '{query}': Deconstruct into core invariants, examine boundary states, and formulate preliminary reduction."
         think_time_ms = round((time.perf_counter() - t_think + 0.012) * 1000, 2)
+        flow.advance_phase() # To release
         
         # Step 2: The Verifier (Qwen2.5-Coder-32B)
         t_ver = time.perf_counter()
         verification_report = f"Audit Report: Tested boundary conditions for '{query}'. 0 logical contradictions discovered. Formal invariants satisfied."
         ver_time_ms = round((time.perf_counter() - t_ver + 0.015) * 1000, 2)
+        flow.advance_phase() # To flow
         
         # Step 3: The Synthesizer (Llama-3.3-70B)
         t_syn = time.perf_counter()
@@ -40,6 +45,7 @@ class MultiAgentCouncil:
             f"The final resolution harmonizes analytical precision with conversational clarity across 134 Billion co-resident parameters."
         )
         syn_time_ms = round((time.perf_counter() - t_syn + 0.018) * 1000, 2)
+        flow.advance_phase() # To recovery
         
         total_time_ms = round((time.perf_counter() - t0 + 0.045) * 1000, 2)
         

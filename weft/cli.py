@@ -265,6 +265,11 @@ def main():
     eval_parser.add_argument("--model", "-m", type=str, required=True, help="Path to .weft model")
     eval_parser.add_argument("--samples", "-s", type=int, default=10, help="Number of layers to sample")
 
+    # Sync-HF
+    sync_parser = subparsers.add_parser("sync-hf", help="Synchronize model fleet to Hugging Face Hub")
+    sync_parser.add_argument("--repo-id", default="akarta-315h/weft-subbit-fleet", help="Target Hugging Face repository ID")
+    sync_parser.add_argument("--dry-run", action="store_true", help="Perform dry run without uploading")
+
     args = parser.parse_args()
 
     if args.command == "inspect":
@@ -277,6 +282,10 @@ def main():
         chat_interactive(args.model, args.device)
     elif args.command == "eval":
         evaluate_model(args.model, args.samples)
+    elif args.command == "sync-hf":
+        import subprocess
+        dry_flag = "--dry-run" if args.dry_run else ""
+        subprocess.run(f"python scripts/sync_hf_fleet.py --repo-id {args.repo_id} {dry_flag}", shell=True)
 
 
 if __name__ == "__main__":

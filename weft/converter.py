@@ -47,11 +47,14 @@ def factorize_linear_layer(
     num_paths: int = 2,
     itq_iterations: int = 10,
     certify_intervals: bool = False,
+    hessian_diag: Optional[torch.Tensor] = None,
 ):
     """
     Factorizes a dense 2D weight matrix W into a WeftSubBitLinear module with LittleBit-2 Joint-ITQ.
     Decomposes W (m x n) into dual-path LittleBit-2 factors:
     W_approx = sum_p diag(h_p) @ (U_b,p @ diag(l_p) @ V_b,p^T) @ diag(g_p)
+    If hessian_diag (n,) is provided, weights the channel-wise scale normalization g_p
+    by empirical activation salience: g_salient = sqrt(diag(H)) * g.
     If certify_intervals is True, validates the reconstruction error using mpmath interval arithmetic.
     """
     m, n = W.shape
@@ -60,7 +63,6 @@ def factorize_linear_layer(
     # Estimate spectral decay and allocate rank
     gamma = estimate_spectral_decay(W)
     if adaptive_rank:
-        # Higher decay (gamma > 0.6) allows smaller rank; slower decay requires larger rank
         rank_mult = max(0.5, min(2.0, 0.6 / gamma))
         rank = int(round(base_rank * rank_mult / 32.0) * 32)
         rank = max(1, min(min(m, n), rank))
@@ -78,8 +80,14 @@ def factorize_linear_layer(
     residual = W.clone().float()
 
     for p in range(num_paths):
-        # 1. Channel-wise scale normalization
-        g = torch.norm(residual, dim=0, keepdim=True).clamp_min(1e-5)  # (1, n)
+        # 1. Channel-wise scale normalization with optional Hessian-weighted salience
+        raw_g = torch.norm(residual, dim=0, keepdim=True).clamp_min(1e-5)  # (1, n)
+        if hessian_diag is not None:
+            salience = torch.sqrt(torch.abs(hessian_diag).unsqueeze(0).clamp_min(1e-6)).to(device)
+            g = raw_g * salience
+        else:
+            g = raw_g
+
         h = torch.norm(residual / g, dim=1, keepdim=True).clamp_min(1e-5)  # (m, 1)
 
         normed = (residual / g) / h  # (m, n)

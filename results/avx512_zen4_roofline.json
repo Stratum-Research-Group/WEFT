@@ -1,0 +1,8 @@
+{
+  "cpu": "AMD Ryzen 5 7600X (Zen 4, AVX-512)",
+  "iterations": 100,
+  "processed_weights": 838860800,
+  "elapsed_seconds": 0.110548,
+  "giga_ops_per_second": 15.1763,
+  "bandwidth_gb_per_sec": 0.948522
+}

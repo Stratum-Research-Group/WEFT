@@ -644,6 +644,12 @@ impl eframe::App for WeftStudioApp {
                                         ui.horizontal(|ui| {
                                             ui.strong(&log.entry_type);
                                             ui.label(format!("Step #{} • {}", log.step_index, log.created_at));
+                                            if let Some(content) = &log.content {
+                                                if ui.small_button("⏩ Fork into WEFT Chat").clicked() {
+                                                    self.chat_input = format!("Continuing from Antigravity Step #{}: {}", log.step_index, content);
+                                                    self.selected_tab = 0;
+                                                }
+                                            }
                                         });
                                         if let Some(content) = &log.content {
                                             ui.monospace(content);
@@ -670,6 +676,12 @@ impl eframe::App for WeftStudioApp {
                                         ui.horizontal(|ui| {
                                             ui.strong(&log.entry_type);
                                             ui.label(format!("Step #{} • {}", log.step_index, log.created_at));
+                                            if let Some(content) = &log.content {
+                                                if ui.small_button("⏩ Fork into IMF Chat").clicked() {
+                                                    self.chat_input = format!("Continuing from IMF Step #{}: {}", log.step_index, content);
+                                                    self.selected_tab = 0;
+                                                }
+                                            }
                                         });
                                         if let Some(content) = &log.content {
                                             ui.monospace(content);

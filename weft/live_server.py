@@ -26,7 +26,12 @@ app.add_middleware(
 )
 
 HUB = os.path.expanduser("~/.cache/huggingface/hub")
-model_path = glob.glob(f"{HUB}/models--Qwen--Qwen2.5-Coder-0.5B/snapshots/*")[0]
+# Use Qwen2.5-0.5B-Instruct for conversational alignment
+instruct_paths = glob.glob(f"{HUB}/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/*")
+if instruct_paths:
+    model_path = instruct_paths[0]
+else:
+    model_path = glob.glob(f"{HUB}/models--Qwen--Qwen2.5-Coder-0.5B/snapshots/*")[0]
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"[*] Loading live model weights from: {model_path} onto {device}...")

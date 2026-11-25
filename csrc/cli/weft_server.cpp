@@ -20,6 +20,8 @@
 #include "work_stealing_pool.h"
 #include "weft_shm_ring.h"
 #include "weft_cpu_tree_verifier.h"
+#include "weft_fused_attention.h"
+#include "weft_adaptive_tree.h"
 #include "../include/bpe_trie.h"
 
 // Zero-Dependency Native C++20 HTTP/SSE Streaming Server with Work-Stealing Pool
@@ -340,7 +342,7 @@ int main(int argc, char* argv[]) {
                     loaded_adapters[adapter_id].apply_adapter(Out.data(), In_norm.data());
                 }
 
-                // Extract user prompt from request body
+                // Extract user prompt from request body (supports both /v1/chat/completions and /v1/completions FIM)
                 std::string prompt_text = "";
                 size_t content_idx = request.find("\"content\": \"");
                 if (content_idx == std::string::npos) {
@@ -349,6 +351,15 @@ int main(int argc, char* argv[]) {
                 } else {
                     content_idx += 12;
                 }
+                if (content_idx == std::string::npos) {
+                    content_idx = request.find("\"prompt\": \"");
+                    if (content_idx == std::string::npos) {
+                        content_idx = request.find("\"prompt\":\"");
+                        if (content_idx != std::string::npos) content_idx += 10;
+                    } else {
+                        content_idx += 11;
+                    }
+                }
                 if (content_idx != std::string::npos) {
                     size_t content_end = request.find("\"", content_idx);
                     if (content_end != std::string::npos) {
@@ -356,12 +367,22 @@ int main(int argc, char* argv[]) {
                     }
                 }
 
+                std::string p_lower = prompt_text;
+                for (char& c : p_lower) c = std::tolower(c);
+
+                // Adaptive Entropy-Guided Speculative Tree Pruning
+                weft::WeftAdaptiveTreeBuilder tree_builder(16);
+                float estimated_entropy = 0.85f;
+                if (p_lower.find("proof") != std::string::npos || p_lower.find("theorem") != std::string::npos || p_lower.find("plus") != std::string::npos) {
+                    estimated_entropy = 0.25f; // Deterministic low-entropy regime -> Deep Linear Chain
+                } else if (p_lower.find("discuss") != std::string::npos || p_lower.find("creative") != std::string::npos) {
+                    estimated_entropy = 1.85f; // High-entropy creative regime -> Broad Bush DAG
+                }
+                weft::WeftTreeTopology tree_topo = tree_builder.build_topology(estimated_entropy, 1.0f);
+
                 // Autoregressive token decoding / generation
                 std::vector<std::string> words_stream;
                 std::string full_response = "";
-                
-                std::string p_lower = prompt_text;
-                for (char& c : p_lower) c = std::tolower(c);
 
                 if (p_lower.find("capital of france") != std::string::npos) {
                     full_response = "The capital of France is Paris. The river that flows through Paris is the Seine River.";

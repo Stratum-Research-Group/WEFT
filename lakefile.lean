@@ -316,5 +316,6 @@ lean_lib «FormalSuite» where
     `«MasterCouncilConsensusInvariants»,
     `«CouncilConvergenceInvariants»,
     `«VocabularyProjectionInvariants»,
-    `«TitansMemoryInvariants»
+    `«TitansMemoryInvariants»,
+    `«SpeculativeTreeEquivalence»
   ]

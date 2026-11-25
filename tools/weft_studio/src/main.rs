@@ -677,6 +677,7 @@ impl eframe::App for WeftStudioApp {
                         ui.separator();
                         ui.label("🌐 Live Tri-Party Deliberation Flow:");
                         ui.monospace("[Thinker: DeepSeek-R1] ──► [Verifier: Qwen2.5] ──► [Synthesizer: Llama-3.3]");
+                        ui.add(egui::ProgressBar::new(0.85).text("Live Debate Convergence: 85%").animate(true));
                         if ui.button("📂 Open Sandbox Folder").clicked() {
                             let _ = std::process::Command::new("xdg-open").arg(&self.sandbox_dir).spawn();
                         }

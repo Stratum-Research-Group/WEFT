@@ -329,5 +329,6 @@ lean_lib «FormalSuite» where
     `«RingAllReduceInvariants»,
     `«FusedBitboardAttentionInvariants»,
     `«CoSpeculativeLivenessInvariants»,
-    `«RoPEOrthogonalityInvariants»
+    `«RoPEOrthogonalityInvariants»,
+    `«OnlineSoftmaxStability»
   ]

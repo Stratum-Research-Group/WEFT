@@ -1,6 +1,6 @@
 # Paper 242: Asymmetric Motivic Cohomological Operations on Singular Stacks for Zero-Copy KV Compaction
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XIII: Arithmetic Geometry & Shimura Varieties for Deterministic Sharding  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -46,8 +46,6 @@ The native C++ header `csrc/cli/weft_motivic_singular_kv_compaction.h` provides:
 - Vectorized persistence evaluation and bitmask compaction using AVX-512 comparison instructions (`_mm512_cmp_ps_mask`).
 - In-register KV cache page filtering without heap reallocation.
 - Unit verification executed via `tests/test_motivic_singular_kv_compaction.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

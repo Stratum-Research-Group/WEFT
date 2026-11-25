@@ -1,6 +1,6 @@
 # Paper 227: Asymmetric Étale Fundamental Groups & Grothendieck Anabelian Sections for Zero-Shot Architecture Translation
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -41,8 +41,6 @@ The parameter translation kernel maps channels across architectures in register:
 1. **Section Composition Invariance:** The projection of a section composed with the structural map is the identity: $p \circ s = \mathrm{id}$.
 2. **Homomorphism Preserving Degree:** Parameter dimension transformations preserve non-negativity.
 3. **Identity Section Vanishing Defect:** The identity architecture translation introduces zero parameter defect.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

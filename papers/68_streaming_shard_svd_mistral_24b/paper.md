@@ -1,6 +1,6 @@
 # Paper 68: Streaming Shard SVD Factorization: Sequential Polar Bitboard Compression under Constant Storage Floor Invariants and Higher-Dimensional SO(n) Rotations
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VI: 450B Parameter Expansion & Dynamic Adapter Switching  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  

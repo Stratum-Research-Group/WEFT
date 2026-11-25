@@ -1,6 +1,6 @@
 # Paper 244: Asymmetric Tropical Hyperkähler Varieties & Metric Ribbon Graphs for Multi-Head Attention Routing
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XIII: Arithmetic Geometry & Shimura Varieties for Deterministic Sharding  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -46,8 +46,6 @@ The native C++ header `csrc/cli/weft_tropical_hyperkahler_attention.h` provides:
 - Vectorized 4D quaternionic rotation of query vectors using AVX-512 FMA (`_mm512_fmadd_ps`).
 - In-register orthogonal head projection without memory reallocation.
 - Unit verification executed via `tests/test_tropical_hyperkahler_attention.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

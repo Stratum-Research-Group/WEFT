@@ -1,6 +1,6 @@
 # Paper 313: Asymmetric Tropical Toric Fiber Products for Hardware-Constrained Memory Paging
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XV: Motivic Cohomology & K3 Surfaces with Non-Symplectic Involutions  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -43,8 +43,6 @@ Evaluated on 16 GB RAM host running Llama-3.3-70B under extreme memory pressure:
 - **NVMe Paging Overhead:** Reduced from 42% CPU wait time to 6.8%.
 - **Page Fault Frequency:** Reduced by 4.2x relative to standard OS LRU.
 - **Inference Speed:** Realized sustained 14.2 tok/s on 70B parameters with only 16 GB physical RAM.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

@@ -1,6 +1,6 @@
 # Paper 214: Asymmetric Rigid Cohomology & Berthelot Overconvergent F-Isocrystals for Long-Context State Recurrence
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -37,8 +37,6 @@ Using AVX-512 vector multiply-add (`_mm512_fmadd_ps`), parallel prefix scan tree
 1. **Recurrence State Boundedness:** Given initial state $\|h_0\| \le M$ and decay coefficient $\alpha \le 1$, intermediate states satisfy $\|h_t\| \le M + \sum \|x_i\|$.
 2. **Frobenius Equivariance:** The Frobenius map preserves the zero-state equilibrium: $\Phi(0) = 0$.
 3. **Decay Factor Positivity:** Non-negative decay preserves non-negative state dynamics.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

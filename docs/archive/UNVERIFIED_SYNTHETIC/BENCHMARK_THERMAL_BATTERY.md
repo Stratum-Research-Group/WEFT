@@ -1,3 +1,6 @@
+> [!WARNING]
+> **SYNTHETIC, NOT MEASURED**: The contents of this document were generated from synthetic scripts or constant assumptions and do not represent measured empirical hardware evaluations. See results/*.json for measured data.
+
 # WEFT Edge Battery Discharge & Thermal Throttle Prediction Report
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)

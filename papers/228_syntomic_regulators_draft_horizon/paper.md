@@ -1,6 +1,6 @@
 # Paper 228: Asymmetric Syntomic Regulators & Motivic Beilinson Conjectures for Optimal Speculative Draft Horizon Planning
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -44,8 +44,6 @@ The SIMD planning engine processes draft probabilities in parallel:
 1. **Draft Horizon Non-Negativity:** The optimal drafting horizon satisfies $K^* \ge 0$.
 2. **Regulator Accumulation Monotonicity:** Cumulative log-volume is monotonically increasing with sequence length.
 3. **Threshold Invariance:** Zero volume requirement halts drafting immediately ($K^* = 0$).
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

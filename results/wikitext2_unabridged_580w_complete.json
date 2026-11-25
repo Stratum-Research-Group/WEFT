@@ -1,0 +1,43 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "protocol": "wikitext-2-raw test, '\\n\\n'-joined, non-overlapping windows",
+  "seqlen": 1024,
+  "weft_config": {
+    "base_rank": 64,
+    "num_paths": 2,
+    "itq_iterations": 3,
+    "kept_fp16": [
+      "embed_tokens",
+      "lm_head",
+      "norms"
+    ]
+  },
+  "fp16": {
+    "windows": 292,
+    "predicted_tokens": 298716,
+    "mean_nll": 2.7730122076622057,
+    "ppl": 16.006777201680563,
+    "seconds": 12.31701111793518
+  },
+  "weft": {
+    "windows": 292,
+    "predicted_tokens": 298716,
+    "mean_nll": 12.79037069019989,
+    "ppl": 358746.28485586867,
+    "seconds": 11.922782897949219
+  },
+  "quantization": {
+    "linear_layers_replaced": 168,
+    "linear_params": 357826560,
+    "effective_bits_per_weight": 0.4423706501831502,
+    "relative_frobenius_error": 0.8548810570402384,
+    "quantize_seconds": 40.78451943397522
+  },
+  "ppl_delta": 358730.278078667,
+  "ppl_ratio": 22412.149574881547,
+  "env": {
+    "torch": "2.15.0+cu132",
+    "device": "NVIDIA GeForce RTX 5060 Ti",
+    "python": "3.12.14"
+  }
+}

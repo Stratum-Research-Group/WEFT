@@ -1,6 +1,6 @@
 # Paper 237: Asymmetric Derived Deformation Theory & Tangent Lie Algebroids for Zero-Shot Adapter Merging
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -46,8 +46,6 @@ The native C++ header `csrc/cli/weft_derived_deformation_adapter.h` provides:
 - Vectorized computation of the commutator correction $[A_1, A_2]$ using AVX-512 FMA (`_mm512_fmadd_ps` and `_mm512_fnmadd_ps`).
 - In-register second-order BCH adapter fusion without allocating dynamic intermediate matrices.
 - Unit verification executed via `tests/test_derived_deformation_adapter.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

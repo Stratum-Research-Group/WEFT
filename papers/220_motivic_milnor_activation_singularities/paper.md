@@ -1,6 +1,6 @@
 # Paper 220: Asymmetric Motivic Milnor Fibers & Denef-Loeser Motivic Zeta Functions for Non-Linear Activation Singularities
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -43,8 +43,6 @@ The kernel processes 16 activation channels simultaneously:
 1. **Arc Truncation Monotonicity:** Truncation degree $n_1 \le n_2$ guarantees order containment.
 2. **Motivic Weight Boundedness:** The normalized arc weight satisfies $0 \le w \le 1$.
 3. **Smooth Origin Convergence:** At exact zero, the motivic Milnor weight converges to identity.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

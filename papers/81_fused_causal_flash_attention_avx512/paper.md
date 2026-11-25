@@ -1,6 +1,6 @@
 # Paper 81: Fused Causal Flash-Attention and In-Register Triangular Masking on AMD Zen 4 Silicon
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -55,8 +55,6 @@ Evaluated on an AMD Ryzen 5 7600X (Zen 4) 6-core processor:
 
 ### 5. Conclusion
 Fused causal Flash-Attention completes native in-register attention acceleration for autoregressive models, providing an efficient foundation for sub-bit LLM generation.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

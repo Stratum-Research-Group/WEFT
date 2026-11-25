@@ -1,6 +1,6 @@
 # Paper 238: Asymmetric Tropical Compactifications & Wonderful Compactifications for Sparse Attention Masking
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -46,8 +46,6 @@ The native C++ header `csrc/cli/weft_tropical_compactification_mask.h` provides:
 - Vectorized boundary distance projection using AVX-512 floating-point comparisons (`_mm512_cmp_ps_mask`).
 - Direct generation of packed bitmasks (`__mmask16`) without allocating intermediate boolean buffers.
 - Unit verification executed via `tests/test_tropical_compactification_mask.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

@@ -1,6 +1,6 @@
 # Paper 86: Paged Int4 Sub-Byte KV-Cache Flash-Attention with In-Register SIMD Dequantization on AMD Zen 4 Silicon
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -68,8 +68,6 @@ All theorems are formally verified under standard Lean 4 with 0 axioms and 0 `so
 Running `test_avx512_paged_int4_kv_flash_attention_mathematical_soundness` in `tests/test_avx512_gemv.py` demonstrates:
 - **Numerical Agreement**: $\Delta_{\max} < 5.0 \times 10^{-7}$ against full-precision reference implementations.
 - **Memory Footprint**: Cuts memory consumption from 2.0 bytes/element (FP16) to 0.5 bytes/element (Int4), yielding a $4\times$ memory reduction with zero paging fragmentation.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

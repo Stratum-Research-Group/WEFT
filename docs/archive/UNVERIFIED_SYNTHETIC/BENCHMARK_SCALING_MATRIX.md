@@ -1,3 +1,6 @@
+> [!WARNING]
+> **SYNTHETIC, NOT MEASURED**: The contents of this document were generated from synthetic scripts or constant assumptions and do not represent measured empirical hardware evaluations. See results/*.json for measured data.
+
 # WEFT Sub-Bit Model Latency vs Throughput Scaling Matrix
 
 | Model (Parameters) | TTFT (Batch 1) | Throughput (B=1) | Throughput (B=4) | Throughput (B=16) |

@@ -1,6 +1,6 @@
 # Paper 225: Asymmetric Condensed Liquid Vector Bundles & Pro-Étale Topologies for Context Cache Virtualization
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -40,8 +40,6 @@ Using AVX-512 vector bit shifts (`_mm512_slli_epi32`, `_mm512_srli_epi32`), 16 s
 1. **Virtual Address Monotonicity:** Token index ordering preserves memory block bounds.
 2. **Page Capacity Strictness:** Total tokens stored never exceed page allocation bounds.
 3. **Empty Cache Vanishing:** An unallocated virtual cache consumes zero active pages.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

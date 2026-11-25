@@ -1,6 +1,6 @@
 # Paper 221: Asymmetric Fargues-Fontaine Curves on Perfectoid Fields for Multi-Token Speculative Memory Bundles
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -44,8 +44,6 @@ $$\mu_i = \frac{d_i}{r_i}$$
 1. **Rank Positivity:** Speculative vector bundles have rank $r \ge 1$.
 2. **Slope Monotonicity:** Pruning threshold monotonicity preserves higher-confidence branches.
 3. **Zero Degree Slope:** A degree 0 hypothesis evaluated at positive rank has slope 0.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

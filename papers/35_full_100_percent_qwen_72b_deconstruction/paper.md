@@ -1,6 +1,6 @@
 # Paper 35: Dual-Frontier Foundation Compression at Scale: 100% Full Deconstruction of Qwen-2.5-72B into 241 MB at 0.0235 BPW with Verified Low-Rank Hypercube Invariants
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase III: Sharded 70B+ Foundation Model Deconstruction  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  

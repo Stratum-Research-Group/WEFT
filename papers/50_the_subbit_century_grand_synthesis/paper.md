@@ -1,6 +1,6 @@
 # Paper 50: The Sub-Bit Century: Foundations, Mathematical Proofs, and Edge Deployments of Universal Sub-Bit Foundation Intelligence (Papers 1–50)
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase IV: Single-Host Multimodal Fleet in 1.36 GB RAM  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  

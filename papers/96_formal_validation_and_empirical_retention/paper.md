@@ -1,6 +1,6 @@
 # Paper 96: Ground-Truth Empirical Validation, Quality Retention Under Bit-Packed Polar Factorization, and Cross-Family Benchmarking Across Gemma-4 and Mistral
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VIII: Clifford Spinors & Non-Abelian Gauge Invariants  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  

@@ -1,6 +1,6 @@
 # Paper 209: Asymmetric Higher Chow Groups & Motivic Spectral Sequences for Zero-Loss Layer Fusion
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XI: Octonion Division Algebras & Non-Associative Latent States  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -41,8 +41,6 @@ Verified in pure Lean 4:
 1. **Chain Complex Nilpotence:** $\partial^2 = 0$ for simplicial face boundaries.
 2. **Convex Fusion Non-Negativity:** For non-negative layer weights $\alpha, \beta \ge 0$, the merged norm satisfies triangle bounds.
 3. **Identity Layer Invariance:** Merging identical cycles leaves the motivic cohomology class invariant.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

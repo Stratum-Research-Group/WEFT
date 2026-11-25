@@ -1,6 +1,6 @@
 # Paper 210: Asymmetric Absolute Galois Groups & Grothendieck's Dessins d'Enfants for Bipartite Attention Permutations
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XI: Octonion Division Algebras & Non-Associative Latent States  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -43,8 +43,6 @@ In sub-bit attention decoding, multi-head token positions are mapped directly on
 1. **Euler Characteristic Conservation:** For any connected dessin with $V_0, V_1, F, E \in \mathbb{N}$ satisfying $V_0 + V_1 + F \ge E$, $\chi = (V_0 + V_1 + F) - E \ge 0$ for genus $g \le 1$.
 2. **Edge Degree Non-Degeneracy:** Total incident edge sum across black and white vertices equals $2E$.
 3. **Permutation Cycle Orthogonality:** $\sigma_\infty \sigma_1 \sigma_0 = \mathrm{id}_E$.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

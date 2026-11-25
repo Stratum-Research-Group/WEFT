@@ -1,6 +1,6 @@
 # Paper 230: Asymmetric Derived Azumaya Algebras & Brauer-Manin Topological Obstructions for Zero-Leak Speculative Rollback
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -41,8 +41,6 @@ Executes rollback operations in single-cycle instruction pipelines:
 1. **Rollback Pointer Invariance:** Committing and subsequently rolling back $k$ tokens restores the exact initial pointer.
 2. **Obstruction Cancellation:** Inverting an obstruction class yields the neutral unit element.
 3. **Pointer Capacity Non-Negativity:** The active cache pointer is always strictly $\le$ capacity.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

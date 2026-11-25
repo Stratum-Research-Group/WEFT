@@ -1,6 +1,6 @@
 # Paper 215: Asymmetric Arithmetic Chow Rings on Toric Stacks for Non-Archimedean Weight Attestation
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -40,8 +40,6 @@ The attestation verification is integrated into memory-mapped layer initializati
 1. **Arithmetic Degree Additivity:** $\widehat{\mathrm{deg}}(Z_1 + Z_2) = \widehat{\mathrm{deg}}(Z_1) + \widehat{\mathrm{deg}}(Z_2)$.
 2. **Cycle Consistency:** Legitimate identical cycles produce identical attestation hashes.
 3. **Tamper Sensitivity:** If $Z_1 \ne Z_2$, $\widehat{\mathrm{deg}}(Z_1 - Z_2) \ne 0$ for non-degenerate configurations.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

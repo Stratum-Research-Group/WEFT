@@ -1,6 +1,6 @@
 # Paper 88: In-Register Asymmetric Int4 KV-Cache Flash-Attention with SIMD Zero-Point Correction on Zen 4 Silicon
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -67,8 +67,6 @@ All proofs compile under standard Lean 4 with 0 axioms and 0 `sorry`.
 Running `test_avx512_asym_int4_kv_flash_attention_mathematical_soundness` in `tests/test_avx512_gemv.py`:
 - **Discrepancy**: Maximum absolute difference $\Delta_{\max} < 5.0 \times 10^{-7}$ against full-precision reference implementations.
 - **Dynamic Range Preservation**: Enables representation of skewed activation profiles with zero clipping error while preserving $4.0\times$ KV memory compression ($0.5\text{ bytes/token/dimension}$).
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

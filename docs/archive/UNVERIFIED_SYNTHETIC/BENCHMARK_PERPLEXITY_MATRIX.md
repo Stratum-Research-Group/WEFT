@@ -1,3 +1,6 @@
+> [!WARNING]
+> **SYNTHETIC, NOT MEASURED**: The contents of this document were generated from synthetic scripts or constant assumptions and do not represent measured empirical hardware evaluations. See results/*.json for measured data.
+
 # WEFT Sub-Bit Foundation Model Zero-Degradation Perplexity Matrix
 
 **Evaluation Corpus:** WikiText-2 Test Set (512-token context strides)
@@ -13,4 +16,4 @@
 | **Llama-3.1-405B-Instruct-SubBit** | Llama-Ultra | 405.8B | 5.18 | 6.00 | `CERTIFIED` |
 
 > [!NOTE]
-> All converted models pass the strict zero-regression quality gate: $\text{PPL} \le 6.00$.
+> All converted models pass the strict zero-regression quality gate: $	ext{PPL} \le 6.00$.

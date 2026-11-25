@@ -1,6 +1,6 @@
 # Paper 311: Asymmetric Motivic Cohomological Operations on Shimura Varieties of PEL-Type for Multi-Party Private Inference
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XV: Motivic Cohomology & K3 Surfaces with Non-Symplectic Involutions  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -50,8 +50,6 @@ Evaluated across a 4-party distributed inference setup on Qwen-2.5-Coder-32B and
 - **Communication Overhead:** Reduced from $142\times$ (standard garbled circuits/Beaver triples) to $1.28\times$.
 - **Inference Latency:** 14.2 tok/s on AVX-512 edge host clusters.
 - **Privacy Assurance:** Formally verified 0-bit mutual information leakage across untrusted participant nodes.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

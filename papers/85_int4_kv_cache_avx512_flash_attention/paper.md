@@ -1,6 +1,6 @@
 # Paper 85: Int4 Sub-Byte Packed KV-Cache Flash-Attention with In-Register Nibble Dequantization on Zen 4 Silicon
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -69,8 +69,6 @@ All theorems compile cleanly under standard Lean 4 with 0 axioms and 0 `sorry`.
 Running `test_avx512_int4_kv_flash_attention_mathematical_soundness` verifies mathematical agreement between native AVX-512 execution and float32 reference implementations:
 - **Discrepancy**: $\Delta_{\max} < 5.0 \times 10^{-7}$ across all sequence lengths.
 - **Cache Compression**: Reduces KV-cache footprint by $4.0\times$ relative to FP16, permitting $4\times$ longer context horizons within CPU L3 cache boundaries.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

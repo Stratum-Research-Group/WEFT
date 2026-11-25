@@ -1,6 +1,6 @@
 # Paper 82: Dynamic Head-Dimension Flash-Attention via In-Register AVX-512 Predicate Masking
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -51,8 +51,6 @@ Tested on an AMD Ryzen 5 7600X CPU with head dimension $d = 90$ ($16 \times 5 + 
 
 ### 5. Conclusion
 Hardware predicate masking in AVX-512 Flash-Attention delivers universal architectural compatibility across arbitrary transformer configurations while maintaining full in-register throughput.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

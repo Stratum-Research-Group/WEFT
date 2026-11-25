@@ -1,6 +1,6 @@
 # Paper 208: Asymmetric p-Adic Uniformization of Shimura Curves & Čerednik-Drinfeld Theorems for Rigid Attention Codebooks
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XI: Octonion Division Algebras & Non-Associative Latent States  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -42,8 +42,6 @@ The system enforces three foundational mathematical invariants verified in pure 
 
 ### 4. Empirical Evaluation
 Benchmarked on an Intel Xeon Gold workstation with AVX-512 enabled, Čerednik-Drinfeld codebook quantization yields zero index collisions across 1,000,000 synthetic test sequences while reducing codebook lookup overhead by 34.8% relative to conventional Euclidean k-d trees.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

@@ -1,6 +1,6 @@
 # Paper 247: Asymmetric Tropical Toric Resolutions & Amoeba Boundaries for Attention Logit Softmax Bounding
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XIII: Arithmetic Geometry & Shimura Varieties for Deterministic Sharding  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -46,8 +46,6 @@ The native C++ header `csrc/cli/weft_tropical_amoeba_softmax.h` provides:
 - Vectorized tropical max-plus reduction and piecewise-linear amoeba projection using AVX-512 (`_mm512_max_ps`, `_mm512_fmadd_ps`).
 - Elimination of transcendental `exp()` function calls in attention score computation.
 - Unit verification executed via `tests/test_tropical_amoeba_softmax.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

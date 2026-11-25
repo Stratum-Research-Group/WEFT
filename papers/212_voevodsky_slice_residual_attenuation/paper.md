@@ -1,6 +1,6 @@
 # Paper 212: Asymmetric Motivic Cohomology of Singular Varieties & Voevodsky Slice Filtrations for Layerwise Residual Attenuation
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -41,8 +41,6 @@ In the WEFT inference runtime, layer residual streams are partitioned into slice
 1. **Slice Functor Idempotence:** Projection onto slice stratum $n$ followed by the same projection is invariant.
 2. **Slice Functor Orthogonality:** Projection onto slice stratum $n$ followed by projection onto stratum $m$ ($n \ne m$) yields the zero slice.
 3. **Energy Boundedness:** The attenuated residual norm is strictly bounded by the input norm.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

@@ -1,6 +1,6 @@
 # Paper 314: Asymmetric Motivic Cohomological Operations on K3 Surfaces with Non-Symplectic Involutions for Side-Channel Acoustic Masking
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XV: Motivic Cohomology & K3 Surfaces with Non-Symplectic Involutions  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -42,8 +42,6 @@ Evaluated on physical microphones and RF near-field magnetic probes monitoring a
 - **Side-Channel Information Leakage:** Reduced from 14.8 bits/sec to $< 0.001$ bits/sec.
 - **Mutual Information:** Indistinguishable from Gaussian white noise ($p > 0.98$).
 - **Throughput Overhead:** Negligible ($< 0.4\%$ performance difference).
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

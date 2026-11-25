@@ -1,6 +1,6 @@
 # Paper 232: Asymmetric Tropical Moduli of Toric Curves & Tropical Convexity for Multi-Task KV Partitioning
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -45,8 +45,6 @@ The native C++ header `csrc/cli/weft_tropical_convexity_kv.h` provides:
 - Vectorized max-plus evaluation using `_mm512_max_ps` and `_mm512_add_ps`.
 - Zero-allocation partitioning table generator for concurrent tenant contexts.
 - Unit verification executed via `tests/test_tropical_convexity_kv.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

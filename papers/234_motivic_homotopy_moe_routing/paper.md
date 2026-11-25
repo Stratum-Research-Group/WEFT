@@ -1,6 +1,6 @@
 # Paper 234: Asymmetric Motivic Homotopy Spheres & Stable Stem Projections for Ultra-Sparse Feedforward Routing
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -46,8 +46,6 @@ The native C++ header `csrc/cli/weft_motivic_homotopy_moe.h` provides:
 - Vectorized computation of the motivic Hopf projection using AVX-512 FMA (`_mm512_fmadd_ps`).
 - In-register top-$k$ expert selection using vector comparison masks without dynamic memory allocations.
 - Unit verification executed via `tests/test_motivic_homotopy_moe.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

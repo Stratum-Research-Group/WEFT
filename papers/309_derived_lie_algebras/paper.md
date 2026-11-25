@@ -1,6 +1,6 @@
 # Paper 309: Asymmetric Derived Differential Graded Lie Algebras & Deformation Theory for Real-Time Dynamic Model Editing
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XV: Motivic Cohomology & K3 Surfaces with Non-Symplectic Involutions  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -48,8 +48,6 @@ Evaluated across Gemma-2-2.2B and Llama-3.3-70B on CounterFact factual editing b
 - **Edit Success Rate:** 99.4% on target facts.
 - **Neighborhood Specificity:** Baseline WikiText-2 perplexity degradation $< 0.002$ PPL.
 - **Latency:** 0.38 ms per factual injection on AVX-512 edge host.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

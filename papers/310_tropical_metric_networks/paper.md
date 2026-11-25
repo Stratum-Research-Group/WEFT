@@ -1,6 +1,6 @@
 # Paper 310: Asymmetric Tropical Moduli of Metric Networks for Decentralized Peer-to-Peer Attention Sharding
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XV: Motivic Cohomology & K3 Surfaces with Non-Symplectic Involutions  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -48,8 +48,6 @@ Evaluated on a heterogeneous testbed of 16 edge devices (ARM Cortex-A78, Intel C
 - **P2P Attention Latency:** Reduced from 82.4 ms to 23.1 ms (3.56x speedup over naive ring-allreduce).
 - **Network Congestion:** 0 packets dropped; variance of link utilization lowered by 74.2%.
 - **Memory Footprint:** Routing table requires $< 16\text{ KB}$ per node.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

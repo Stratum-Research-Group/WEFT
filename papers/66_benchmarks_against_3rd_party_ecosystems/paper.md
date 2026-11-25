@@ -1,6 +1,6 @@
 # Paper 66: Benchmarking Sub-Bit Foundation Architectures Against the Open-Source Ecosystem: Pareto Frontier Evaluation of WEFT vs. llama.cpp, BitNet.cpp, AutoGPTQ, and vLLM
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VI: 450B Parameter Expansion & Dynamic Adapter Switching  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  

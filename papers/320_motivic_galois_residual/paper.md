@@ -1,6 +1,6 @@
 # Paper 320: Motivic Galois Representations of Transformer Residual Streams
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XVI: Derived Motivic Galois Groups & Tropical Toric Degenerations  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -25,8 +25,6 @@ Transformer residual streams aggregate representations across successive attenti
    $$\operatorname{Tr}(\operatorname{Frob}_p \mid x_{\ell}) = \sum_{i=1}^d \lambda_i(p)$$
 3. **Bounded Deviation Under Sub-Bit Factorization:**
    $$|\operatorname{Tr}(\operatorname{Frob}_p \mid \hat{x}_\ell) - \operatorname{Tr}(\operatorname{Frob}_p \mid x_\ell)| \le \epsilon_{\text{galois}}$$
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

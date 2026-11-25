@@ -1,6 +1,6 @@
 # Paper 248: Asymmetric Motivic Milnor Fibrations & Monodromy Operator Transformations for Rotary Position Embedding (RoPE) Invariance
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XIII: Arithmetic Geometry & Shimura Varieties for Deterministic Sharding  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -48,8 +48,6 @@ The native C++ header `csrc/cli/weft_motivic_milnor_rope.h` provides:
 - Vectorized 2D cyclotomic rotary embedding rotation using AVX-512 FMA (`_mm512_fmadd_ps` and `_mm512_fnmadd_ps`).
 - In-register rotation without calculating trigonometric transcendentals at runtime.
 - Unit verification executed via `tests/test_motivic_milnor_rope.cpp`.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

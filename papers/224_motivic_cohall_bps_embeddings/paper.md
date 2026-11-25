@@ -1,6 +1,6 @@
 # Paper 224: Asymmetric Motivic Cohomological Hall Algebras & BPS Lie Algebras for Ultra-Dense Token Embedding Compaction
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -40,8 +40,6 @@ Using AVX-512 vector multiply-add (`_mm512_fmadd_ps`), vocabulary tokens are syn
 1. **Dimension Vector Additivity:** $\mathrm{dim}(\mathbf{d}_1 \star \mathbf{d}_2) = \mathrm{dim}(\mathbf{d}_1) + \mathrm{dim}(\mathbf{d}_2)$.
 2. **BPS State Positivity:** State dimensions satisfy $\dim(M) \ge 0$.
 3. **Unit Element Invariance:** Convolution with the trivial zero-dimensional representation preserves the generator identically.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

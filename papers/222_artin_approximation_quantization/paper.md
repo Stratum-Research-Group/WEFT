@@ -1,6 +1,6 @@
 # Paper 222: Asymmetric Absolute Étale Cohomology & Artin Approximations for Non-Archimedean Weight Quantization Slicing
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -42,8 +42,6 @@ The SIMD algebraic slicing engine computes polynomial approximations in register
 1. **Henselian Root Boundedness:** The difference between the algebraic root and the target value satisfies $\|y - \hat{y}\| \le \epsilon$.
 2. **Valuation Non-Negativity:** Valuation of approximation residuals is non-negative.
 3. **Exact Root Annihilation:** If $F(x, y) = 0$, residual error is identically 0.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

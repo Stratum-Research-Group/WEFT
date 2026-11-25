@@ -1,0 +1,29 @@
+{
+  "processor": "AMD Ryzen 5 7600X (6C/12T)",
+  "benchmarks": [
+    {
+      "tier": "L1 Cache",
+      "size_kb": 16,
+      "bandwidth_gbps": 54.8365,
+      "gflops": 9.81338
+    },
+    {
+      "tier": "L2 Cache",
+      "size_kb": 256,
+      "bandwidth_gbps": 112.122,
+      "gflops": 20.0649
+    },
+    {
+      "tier": "L3 Cache",
+      "size_kb": 8192,
+      "bandwidth_gbps": 171.45,
+      "gflops": 30.6822
+    },
+    {
+      "tier": "DDR5 Main Memory",
+      "size_kb": 65536,
+      "bandwidth_gbps": 32.3708,
+      "gflops": 5.79298
+    }
+  ]
+}

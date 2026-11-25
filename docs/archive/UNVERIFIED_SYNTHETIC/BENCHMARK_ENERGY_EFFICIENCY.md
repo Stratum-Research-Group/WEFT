@@ -1,3 +1,6 @@
+> [!WARNING]
+> **SYNTHETIC, NOT MEASURED**: The contents of this document were generated from synthetic scripts or constant assumptions and do not represent measured empirical hardware evaluations. See results/*.json for measured data.
+
 # WEFT Edge Energy Consumption & Joules-per-Token Benchmark Report
 
 **Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)
@@ -23,4 +26,4 @@
 
 - **Sub-Bit Energy Efficiency:** 1.58-bit ternary popcount arithmetic cuts DRAM memory transaction energy by 78.4% compared to standard FP16 execution.
 - **Edge Battery Autonomy:** A standard 50Wh laptop or edge drone battery delivers **nearly 12 hours of continuous generation** with Gemma-2.2B (over 1.6M tokens).
-- **MoE Power Advantage:** Mixtral-8x7B achieves $890.1$ mJ/token compared to $1445.3$ mJ/token on 32B dense models, demonstrating a $1.62\times$ energy efficiency advantage from sparse expert routing.
+- **MoE Power Advantage:** Mixtral-8x7B achieves $890.1$ mJ/token compared to $1445.3$ mJ/token on 32B dense models, demonstrating a $1.62	imes$ energy efficiency advantage from sparse expert routing.

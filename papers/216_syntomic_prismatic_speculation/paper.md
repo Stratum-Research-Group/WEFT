@@ -1,6 +1,6 @@
 # Paper 216: Asymmetric Prismatic Crystals & Syntomic Cohomology for p-Adic Speculative Verification
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -40,8 +40,6 @@ Using AVX-512 vector comparisons (`_mm512_cmple_ps_mask`), 16 token dimensions a
 1. **Nygaard Filtration Monotonicity:** If a token difference satisfies filtration level $n_2$ and $n_1 \le n_2$, it satisfies filtration level $n_1$.
 2. **Frobenius Non-Negativity:** The valuation norm is strictly non-negative.
 3. **Zero Difference Acceptance:** Identical draft and target tokens are accepted at all filtration depths.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

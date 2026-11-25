@@ -1,6 +1,6 @@
 # Paper 318: Derived Motivic Hodge Structures for Multi-Level Tensor Quantization
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XVI: Derived Motivic Galois Groups & Tropical Toric Degenerations  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -26,8 +26,6 @@ Low-rank factorization of deep neural network weights inherently constructs an a
    $$F^{p+1} H \subseteq F^p H$$
 3. **Quantization Error Bound:** The relative Frobenius error satisfies:
    $$\|W - \hat{W}\|_F \le \sum_{p > p_{\max}} h^{p, k-p} \sigma_{p}$$
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

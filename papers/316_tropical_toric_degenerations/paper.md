@@ -1,6 +1,6 @@
 # Paper 316: Tropical Toric Degenerations for Transformer State Compression
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XVI: Derived Motivic Galois Groups & Tropical Toric Degenerations  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -25,8 +25,6 @@ Maintaining large context windows in transformer architectures incurs significan
    $$\dim(\operatorname{Trop}(X)) = d$$
 3. **Bounded Polyhedral Approximation Error:** The distance between the continuous activation vector $x$ and the retracted tropical fan coordinate $\pi_\Sigma(x)$ satisfies:
    $$\|x - \pi_\Sigma(x)\|_\infty \le \Delta_{\text{fan}}$$
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

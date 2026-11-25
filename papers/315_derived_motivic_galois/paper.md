@@ -1,6 +1,6 @@
 # Paper 315: Derived Motivic Galois Groups for Algebraic Weight Tensors
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XVI: Derived Motivic Galois Groups & Tropical Toric Degenerations  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -34,8 +34,6 @@ Let $\mathcal{DM}(k)$ be Voevodsky's derived category of motives over a number f
 ### 2. AVX-512 Galois-Invariant Operator Compression
 
 We formulate a vectorized AVX-512 kernel that exploits the reductive root system of $\mathbf{G}_{\operatorname{red}}$ to perform algebraic weight compaction with zero numerical drift in the primary eigenspaces.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

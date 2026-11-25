@@ -1,6 +1,6 @@
 # Paper 213: Asymmetric Perfectoid Rings & Tilting Equivalence for Heterogeneous Cross-Precision Quantization
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -40,8 +40,6 @@ The numerical engine implements tilting conversion directly in 512-bit vector re
 1. **Valuation Multiplicativity:** $|x \cdot y| = |x| \cdot |y|$ on tilted elements.
 2. **Sharp Mapping Consistency:** Mapping a tilted element through its sharp projection preserves the ground valuation.
 3. **Kernel Ideality:** Zero elements map strictly to zero under the Fontaine evaluation $\theta$.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

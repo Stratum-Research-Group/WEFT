@@ -1,6 +1,6 @@
 # Paper 223: Asymmetric Tropical Toric Ideals & Gröbner Bases for Sparse Attention Matrix Factorization
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -41,8 +41,6 @@ The sparse execution engine computes matrix-vector projections:
 1. **Monomial Degree Boundedness:** The degree of the reduced term is bounded by the original term degree.
 2. **Division Termination:** Monomial reduction strictly terminates in finite steps.
 3. **Monomial Support Positivity:** Monomial support indices are non-negative.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

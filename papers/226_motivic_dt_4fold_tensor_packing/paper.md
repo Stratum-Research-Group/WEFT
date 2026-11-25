@@ -1,6 +1,6 @@
 # Paper 226: Asymmetric Motivic Donaldson-Thomas Invariants on Calabi-Yau 4-Folds for 4-Bit Ternary Tensor Packing
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -43,8 +43,6 @@ Evaluates matrix-vector dot products across packed 4-bit nibbles:
 1. **Virtual Degree Additivity:** The virtual degree of independent cycle sums is strictly additive.
 2. **Orientation Non-Degeneracy:** The virtual cycle evaluation is well-defined and integer-valued.
 3. **Zero Cycle Invariance:** The trivial cycle has virtual degree 0.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

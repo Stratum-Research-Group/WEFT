@@ -1,6 +1,6 @@
 # Paper 84: Int8 Quantized KV-Cache Flash-Attention with In-Register SIMD Dequantization on Zen 4 Silicon
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -65,8 +65,6 @@ Tested on an AMD Ryzen 5 7600X CPU with $B=2, Q=4, K=32, D=64$:
 
 ### 5. Conclusion
 In-register Int8 KV-cache dequantization eliminates memory bandwidth saturation during long-context decode on host silicon, completing a memory-efficient sub-bit inference pipeline.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

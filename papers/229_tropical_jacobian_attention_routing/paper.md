@@ -1,6 +1,6 @@
 # Paper 229: Asymmetric Tropical Moduli of Curves & Tropical Jacobian Varieties for Multi-Head Attention Routing
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -43,8 +43,6 @@ The SIMD routing engine computes discrete flows across 16 channels simultaneousl
 1. **Flow Conservation:** Net cycle flow around closed loops in the metric graph vanishes identically.
 2. **Metric Distance Symmetry:** Distance between graph vertices satisfies $d(u, v) = d(v, u)$.
 3. **Zero Potential Flow Vanishing:** Constant potential yields zero routing flow.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

@@ -1,6 +1,6 @@
 # Paper 312: Asymmetric Derived Koszul Duality & Operads for Unified Multi-Modal Activation Composition
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XV: Motivic Cohomology & K3 Surfaces with Non-Symplectic Involutions  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -42,8 +42,6 @@ Evaluated across Qwen-2-VL-7B and multi-modal edge encoders:
 - **Zero Modality Suppression:** Cross-modal retrieval accuracy increased by 11.4%.
 - **Sub-Bit Inference Speed:** 38.2 tok/s on AVX-512 edge host.
 - **Formally Verified:** Zero homological obstruction proved in Lean 4.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

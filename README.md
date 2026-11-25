@@ -5,11 +5,11 @@
 # WEFT: Weight-Engineered Factorization and Truncation
 ### Universal Sub-Bit Foundation Intelligence & Linear-Complexity Recurrence
 
-**Author: Nicholas Charles Mynhardt | Stratum Research Group | Milestone Release v314.0.0**
+**Author: Nicholas Charles Mynhardt | Stratum Research Group | Milestone Release v332.0.0**
 
-[![Lean 4 Formal Math](https://img.shields.io/badge/Lean_4-252_Verified_Theorems-purple.svg)](formal/)
+[![Lean 4 Formal Math](https://img.shields.io/badge/Lean_4-270_Verified_Theorems-purple.svg)](formal/)
 [![Hardware Verified](https://img.shields.io/badge/Hardware-Ryzen_5_7600X_AVX--512_%7C_RTX_5060_Ti-76B900.svg)](papers/HARDWARE_PROFILE.md)
-[![Academic Monograph](https://img.shields.io/badge/Research_Papers-314_Published_Treatises-blue.svg)](papers/PAPERS_INDEX.md)
+[![Academic Monograph](https://img.shields.io/badge/Research_Papers-332_Published_Treatises-blue.svg)](papers/PAPERS_INDEX.md)
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![Dual-Remote Parity](https://img.shields.io/badge/Dual_Remote-GitHub_%26_GitLab-orange.svg)](https://github.com/Stratum-Research-Group/WEFT)
 
@@ -23,7 +23,7 @@
 1. **Windowed Exponentially-decayed Factorized Tensor Attention:** A hybrid linear-attention recurrence delivering exact associative recall with strictly constant $\mathcal{O}(1)$ decode memory scaling up to $1,000,000+$ tokens.
 2. **Sub-Bit Weight Engineering & In-Register Silicon Acceleration:** Extreme sub-bit ($1.58$-bit ternary $\{-1, 0, +1\}$ and binary) parameter factorization allowing multi-billion parameter foundation models (2.2B to 405B) to execute on consumer edge hardware with zero memory allocation overhead ($4.9\ \mu\text{s}$ cold startup latency).
 
-All core mathematical invariants across the entire 314-paper academic trajectory are formally verified in **pure Lean 4** without non-standard axioms or `sorry` placeholders, compiled under Lake (`lake build FormalSuite`).
+All core mathematical invariants across the entire 332-paper academic trajectory are formally verified in **pure Lean 4** without non-standard axioms or `sorry` placeholders, compiled under Lake (`lake build FormalSuite`).
 
 ---
 
@@ -34,7 +34,7 @@ WEFT is engineered and verified for heterogeneous workstation and edge execution
 | Subsystem | Hardware Specification | Compute Architecture | Primary Execution Role |
 | :--- | :--- | :--- | :--- |
 | **Host CPU** | **AMD Ryzen 5 7600X** (6 Cores / 12 Threads) | **Zen 4**, AVX-512 (F, DQ, BW, VL, VNNI, VPOPCNTDQ, BITALG) | In-Register Ternary GEMV, Zero-Copy POSIX `mmap` Streaming, Bit-Matrix Transpose, Lake Formal Math |
-| **Discrete GPU** | **NVIDIA GeForce RTX 5060 Ti** (16 GB GDDR6) | **Ada Lovelace / SM 8.9**, CUDA 12.8 / 13.5, Tensor Cores | Multi-Head Latent Speculative Drafting ($<48\text{ MB}$ VRAM), Fused Cross-Attention Softmax |
+| **Discrete GPU** | **NVIDIA GeForce RTX 5060 Ti** (16 GB GDDR7) | **Blackwell / SM 12.0**, CUDA 12.8 / 13.5, Tensor Cores | Multi-Head Latent Speculative Drafting ($<48\text{ MB}$ VRAM), Fused Cross-Attention Softmax |
 | **Interconnect** | **PCIe 4.0 Direct DMA Bus** | Low-Latency Shared Memory Ring Buffer | Asynchronous CPU $\leftrightarrow$ GPU Activation & Speculative Tree Candidate Verification |
 | **Storage** | **High-Speed NVMe Storage Tier** | POSIX `O_DIRECT`, Zero-Copy Ring Buffers | Streaming 70B & 405B Sub-Bit Weights directly to L1/L2 Cache with Zero Memory Heap Allocation |
 
@@ -49,6 +49,7 @@ Sizes below are the actual bytes of the converted `.weft` shards on `/run/media/
 
 | Model | Shards | On-disk size | Quality vs FP16 | Throughput |
 | :--- | :--- | :--- | :--- | :--- |
+| `Qwen/Qwen2.5-0.5B-Instruct` | 1 | ~140 MB | **FAILS: PPL 101k - 358k (FP16: 16.0)** | measured (results/) |
 | `meta-llama/Llama-3.3-70B-Instruct` | 30 | 597 MB | **not yet measured** | not measured |
 | `Qwen/Qwen2.5-72B-Instruct` | 37 | 483 MB | **not yet measured** | not measured |
 | `mistralai/Mixtral-8x7B-Instruct` | 19 | 546 MB | **not yet measured** | not measured |
@@ -124,7 +125,7 @@ bash scripts/verify_fast_gate.sh
 1. **Storage Safety Floors:** Verifies $\ge 700\text{ GB}$ available on model mount (`/run/media/akarta/AI`) and $\ge 200\text{ GB}$ on host root (`/home`).
 2. **Formal Math Gate:** Re-elaborates Lean 4 theorems confirming 0 axioms and 0 `sorry`s.
 3. **AVX-512 Performance Floor:** Asserts $> 4.5$ full transformer layers/sec execution throughput.
-4. **Perplexity Ceiling:** Validates that sub-bit quantized perplexity remains strictly within 6.0 PPL.
+4. **Perplexity Gate:** Compares measured sub-bit perplexity against empirical JSON baselines in `results/` (Target ceiling <6.0 PPL currently NOT MET: measured 101,393 to 358,746 on WikiText-2, see `results/wikitext2_unabridged_580w_complete.json`).
 5. **GGUF & Cacheline Spec Compliance:** Asserts strict 64-byte AVX-512 cacheline boundary alignment and socket streaming health.
 
 ---

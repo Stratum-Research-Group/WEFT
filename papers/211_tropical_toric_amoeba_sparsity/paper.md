@@ -1,6 +1,6 @@
 # Paper 211: Asymmetric Tropical Toric Varieties & Amoeba Projections for Memory-Constrained Sparsity Bounds
 
-**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Blackwell / SM 12.0 / 16GB GDDR7) | CUDA 12.8, Triton 3.9  
 **Series:** Phase XII: Ultrametric p-Adic Analysis & Hierarchical Branch Pruning  
 **Paper Type:** Research Paper (Formal Verification & System Implementation)  
 **Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
@@ -40,8 +40,6 @@ The tropical bounding check evaluates hyperplane half-spaces simultaneously:
 1. **Tropical Log-Norm Non-Negativity:** Valuation thresholds satisfy $\|u\|_{\mathrm{trop}} \ge 0$.
 2. **Polyhedral Convexity Monotonicity:** If a token coordinate vector $\mathbf{u}$ is bounded by $\tau_1$ and $\tau_1 \le \tau_2$, it is bounded by $\tau_2$.
 3. **Identity Pruning Invariance:** A zero threshold strictly admits only zero-energy tokens.
-
-
 
 ## 3. Empirical Results & Performance Evaluation
 

@@ -1,0 +1,11 @@
+{
+  "hardware": {
+    "cpu": "AMD Ryzen 5 7600X (6C/12T)",
+    "gpu": "NVIDIA GeForce RTX 5060 Ti (Blackwell SM 12.0 / 16GB GDDR7)"
+  },
+  "seq_len": 4096,
+  "hidden_dim": 2048,
+  "cpu_mlp_latency_ms": 9.127974510192871,
+  "gpu_recurrence_latency_ms": 41.31155014038086,
+  "overlap_efficiency": 0.8190313137677628
+}

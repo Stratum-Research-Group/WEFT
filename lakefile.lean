@@ -293,5 +293,8 @@ lean_lib «FormalSuite» where
     `«MotivicGaloisVariableContextRecurrenceInvariants»,
     `«MotivicGaloisDualPathHybridInvariants»,
     `«TropicalToricSpeculativeVerificationInvariants»,
-    `«DerivedKoszulOperadScanInvariants»
+    `«DerivedKoszulOperadScanInvariants»,
+    `«TropicalToricMultiHeadRecurrenceInvariants»,
+    `«MotivicGaloisSpeculativePruningInvariants»,
+    `«DerivedKoszulWeightNormalizationInvariants»
   ]

@@ -326,5 +326,6 @@ lean_lib «FormalSuite» where
     `«MultiHeadBitboardEquivalence»,
     `«DynamicDepthScalingBounds»,
     `«MPMCQueueInvariants»,
-    `«RingAllReduceInvariants»
+    `«RingAllReduceInvariants»,
+    `«FusedBitboardAttentionInvariants»
   ]

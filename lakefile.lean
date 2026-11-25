@@ -330,5 +330,6 @@ lean_lib «FormalSuite» where
     `«FusedBitboardAttentionInvariants»,
     `«CoSpeculativeLivenessInvariants»,
     `«RoPEOrthogonalityInvariants»,
-    `«OnlineSoftmaxStability»
+    `«OnlineSoftmaxStability»,
+    `«MultiAgentDebateConvergence»
   ]

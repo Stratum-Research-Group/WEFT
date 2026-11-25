@@ -202,6 +202,9 @@ lean formal/MotivicStackPruningInvariants.lean
 lean formal/DerivedAzumayaAlgebrasInvariants.lean
 lean formal/TropicalToricDegenerationsInvariants.lean
 lean formal/MotivicSectionConjectureInvariants.lean
+lean formal/DerivedSymplecticReductionInvariants.lean
+lean formal/TropicalToricFibersInvariants.lean
+lean formal/MotivicArtinStackPrivacyInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

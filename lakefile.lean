@@ -322,5 +322,6 @@ lean_lib «FormalSuite» where
     `«CognitiveFlowInvariants»,
     `«EntropyTreeBranchingBounds»,
     `«ActiveInferenceInvariants»,
-    `«SpeculativeTreeRollbackInvariants»
+    `«SpeculativeTreeRollbackInvariants»,
+    `«MultiHeadBitboardEquivalence»
   ]

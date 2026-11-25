@@ -324,5 +324,6 @@ lean_lib «FormalSuite» where
     `«ActiveInferenceInvariants»,
     `«SpeculativeTreeRollbackInvariants»,
     `«MultiHeadBitboardEquivalence»,
-    `«DynamicDepthScalingBounds»
+    `«DynamicDepthScalingBounds»,
+    `«MPMCQueueInvariants»
   ]

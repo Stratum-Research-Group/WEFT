@@ -22,6 +22,7 @@
 #include "weft_cpu_tree_verifier.h"
 #include "weft_fused_attention.h"
 #include "weft_adaptive_tree.h"
+#include "weft_sliding_attention.h"
 #include "../include/bpe_trie.h"
 
 // Zero-Dependency Native C++20 HTTP/SSE Streaming Server with Work-Stealing Pool

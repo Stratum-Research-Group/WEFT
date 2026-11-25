@@ -7,9 +7,9 @@
 
 **Author: Nicholas Charles Mynhardt | Stratum Research Group | Milestone Release v332.0.0**
 
-[![Lean 4 Formal Math](https://img.shields.io/badge/Lean_4-270_Verified_Theorems-purple.svg)](formal/)
+[![Lean 4 Formal Math](https://img.shields.io/badge/Lean_4-273_Verified_Theorems-purple.svg)](formal/)
 [![Hardware Verified](https://img.shields.io/badge/Hardware-Ryzen_5_7600X_AVX--512_%7C_RTX_5060_Ti-76B900.svg)](papers/HARDWARE_PROFILE.md)
-[![Academic Monograph](https://img.shields.io/badge/Research_Papers-332_Published_Treatises-blue.svg)](papers/PAPERS_INDEX.md)
+[![Academic Monograph](https://img.shields.io/badge/Research_Papers-335_Published_Treatises-blue.svg)](papers/PAPERS_INDEX.md)
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![Dual-Remote Parity](https://img.shields.io/badge/Dual_Remote-GitHub_%26_GitLab-orange.svg)](https://github.com/Stratum-Research-Group/WEFT)
 

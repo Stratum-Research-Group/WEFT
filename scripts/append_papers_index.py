@@ -16,7 +16,7 @@ for line in lines:
 print(f"Max ID currently in index: {max_id}")
 
 new_entries = []
-for p_id in range(max_id + 1, 333):
+for p_id in range(max_id + 1, 336):
     pattern = f"papers/{p_id}_*/paper.md"
     matches = glob.glob(pattern)
     if not matches:

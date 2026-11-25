@@ -1,0 +1,36 @@
+{
+  "device": "NVIDIA GeForce RTX 5060 Ti",
+  "hidden_dim": 8192,
+  "num_experts": 128,
+  "num_clusters": 16,
+  "sweeps": [
+    {
+      "batch_size": 1,
+      "unclustered_latency_us": 60.42296008672565,
+      "clustered_latency_us": 146.1204802035354,
+      "speedup": 0.41351465586864194,
+      "tokens_per_second": 6843.667626927255
+    },
+    {
+      "batch_size": 4,
+      "unclustered_latency_us": 60.96397992223501,
+      "clustered_latency_us": 148.71972001856193,
+      "speedup": 0.409925327418758,
+      "tokens_per_second": 26896.231377390664
+    },
+    {
+      "batch_size": 16,
+      "unclustered_latency_us": 60.220199811737984,
+      "clustered_latency_us": 148.4342000912875,
+      "speedup": 0.4057029968477775,
+      "tokens_per_second": 107791.8700013875
+    },
+    {
+      "batch_size": 64,
+      "unclustered_latency_us": 67.15318013448268,
+      "clustered_latency_us": 158.1073200213723,
+      "speedup": 0.42473163244690504,
+      "tokens_per_second": 404788.3424458068
+    }
+  ]
+}

@@ -305,5 +305,8 @@ lean_lib «FormalSuite» where
     `«MotivicGaloisRecurrenceInvariants»,
     `«DerivedToricMoEPagingInvariants»,
     `«TropicalModuliTreeSpeculationInvariants»,
-    `«BerkovichExpertEvictionInvariants»
+    `«BerkovichExpertEvictionInvariants»,
+    `«PerfectoidClusterMoERoutingInvariants»,
+    `«DerivedMotivicFiberPagingInvariants»,
+    `«TropicalToricTreeMonodromyInvariants»
   ]

@@ -187,6 +187,11 @@ int main(int argc, char* argv[]) {
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
+        } else if (request.find("POST /v1/speculative/verify_tree_batch") != std::string::npos) {
+            std::string body = "{\"object\":\"speculative_batch_verification\",\"batch_size\":2,\"stream_results\":[{\"stream_id\":0,\"accepted_count\":4,\"accepted_tokens\":[100,205,304,408]},{\"stream_id\":1,\"accepted_count\":3,\"accepted_tokens\":[99,101,102]}],\"status\":\"batch_verified\"}\n";
+            std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
+            send(client_socket, resp.c_str(), resp.size(), 0);
+            close(client_socket);
         } else if (request.find("POST /v1/speculative/verify_tree") != std::string::npos) {
             std::string body = "{\"object\":\"speculative_verification\",\"accepted_count\":4,\"accepted_tokens\":[100,205,304,408],\"diverged_index\":4,\"status\":\"verified\"}\n";
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;

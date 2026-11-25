@@ -13,7 +13,8 @@ def get_environment_info(device_name="cpu"):
     dirty = False
     try:
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-        dirty = bool(subprocess.check_output(["git", "status", "--porcelain"], text=True).strip())
+        # Track modifications to tracked files only (ignoring untracked files)
+        dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "-uno"], text=True).strip())
     except Exception:
         pass
 

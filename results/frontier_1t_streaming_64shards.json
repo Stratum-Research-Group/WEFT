@@ -1,0 +1,14 @@
+{
+  "model": "weft-frontier-1.04T-moe",
+  "num_shards": 64,
+  "elapsed_seconds": 18.926980403004563,
+  "latency_per_shard_ms": 295.7340687969463,
+  "total_converted_mb": 18.275310516357422,
+  "throughput_mb_s": 0.9655692628844434,
+  "start_rss_mb": 728.4765625,
+  "peak_rss_mb": 777.92578125,
+  "rss_drift_mb": 49.44921875,
+  "storage_ai_start_gb": 770.4172973632812,
+  "storage_ai_end_gb": 770.3992233276367,
+  "storage_floor_preserved": true
+}

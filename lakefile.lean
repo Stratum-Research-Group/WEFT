@@ -308,5 +308,8 @@ lean_lib «FormalSuite» where
     `«BerkovichExpertEvictionInvariants»,
     `«PerfectoidClusterMoERoutingInvariants»,
     `«DerivedMotivicFiberPagingInvariants»,
-    `«TropicalToricTreeMonodromyInvariants»
+    `«TropicalToricTreeMonodromyInvariants»,
+    `«BlockSparseTritonMoEInvariants»,
+    `«DerivedSymplecticKVStateRollbackInvariants»,
+    `«NonArchimedeanTreeCompletionInvariants»
   ]

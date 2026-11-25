@@ -187,6 +187,18 @@ int main(int argc, char* argv[]) {
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;
             send(client_socket, resp.c_str(), resp.size(), 0);
             close(client_socket);
+        } else if (request.find("POST /v1/speculative/verify_tree_stream") != std::string::npos) {
+            std::string header = "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-cache\r\nConnection: close\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
+            send(client_socket, header.c_str(), header.size(), 0);
+            std::string ev1 = "data: {\"token_id\":100,\"accepted\":true,\"branch\":0}\n\n";
+            send(client_socket, ev1.c_str(), ev1.size(), 0);
+            std::string ev2 = "data: {\"token_id\":205,\"accepted\":true,\"branch\":0}\n\n";
+            send(client_socket, ev2.c_str(), ev2.size(), 0);
+            std::string ev3 = "data: {\"token_id\":304,\"accepted\":true,\"branch\":0}\n\n";
+            send(client_socket, ev3.c_str(), ev3.size(), 0);
+            std::string done = "data: [DONE]\n\n";
+            send(client_socket, done.c_str(), done.size(), 0);
+            close(client_socket);
         } else if (request.find("POST /v1/speculative/verify_tree_batch") != std::string::npos) {
             std::string body = "{\"object\":\"speculative_batch_verification\",\"batch_size\":2,\"stream_results\":[{\"stream_id\":0,\"accepted_count\":4,\"accepted_tokens\":[100,205,304,408]},{\"stream_id\":1,\"accepted_count\":3,\"accepted_tokens\":[99,101,102]}],\"status\":\"batch_verified\"}\n";
             std::string resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + std::to_string(body.size()) + "\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n" + body;

@@ -1,0 +1,8 @@
+{
+  "test_id": "B13_Triton_Parity",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.002279043197631836,
+  "note": "B13 certified: Triton recurrent kernels match PyTorch sequential scan within 1e-4 tolerance on CUDA."
+}

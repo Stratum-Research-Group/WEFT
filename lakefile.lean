@@ -296,5 +296,8 @@ lean_lib «FormalSuite» where
     `«DerivedKoszulOperadScanInvariants»,
     `«TropicalToricMultiHeadRecurrenceInvariants»,
     `«MotivicGaloisSpeculativePruningInvariants»,
-    `«DerivedKoszulWeightNormalizationInvariants»
+    `«DerivedKoszulWeightNormalizationInvariants»,
+    `«DerivedToricActivationQuantizationInvariants»,
+    `«MotivicGaloisTreeAcceptanceInvariants»,
+    `«TropicalHyperplaneAttentionPagingInvariants»
   ]

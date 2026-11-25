@@ -1,0 +1,8 @@
+{
+  "test_id": "RG8_Archive_Integrity",
+  "track": "System",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.02048492431640625,
+  "note": "RG8 certified: 70 release archives verified intact against SHA-256 manifest."
+}

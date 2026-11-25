@@ -1,0 +1,16 @@
+{
+  "timestamp_utc": "2026-11-25T15:36:21.799588+00:00",
+  "git_commit": "03cc973c5f967c974b301816d9e3cb03b46721a4",
+  "git_commit_short": "03cc973",
+  "git_dirty": true,
+  "python_version": "3.12.14",
+  "torch_version": "2.15.0+cu132",
+  "cuda_available": true,
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5060 Ti",
+    "compute_capability": "12.0",
+    "total_memory_gb": 15.52874755859375,
+    "device_count": 1
+  },
+  "device": "cuda"
+}

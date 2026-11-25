@@ -1,0 +1,87 @@
+{
+  "M1_WEFT_Hybrid": {
+    "256": {
+      "prefill_tok_per_sec": 184048.990875307,
+      "decode_tok_per_sec": 1022.9804568065664,
+      "peak_mem_mb": 39.29833984375
+    },
+    "1024": {
+      "prefill_tok_per_sec": 776056.8200815195,
+      "decode_tok_per_sec": 1037.9766796785698,
+      "peak_mem_mb": 42.16650390625
+    },
+    "4096": {
+      "prefill_tok_per_sec": 937935.2919751602,
+      "decode_tok_per_sec": 1033.869934827207,
+      "peak_mem_mb": 53.00146484375
+    }
+  },
+  "M2_WEFT_LocalOnly": {
+    "256": {
+      "prefill_tok_per_sec": 249990.96640673917,
+      "decode_tok_per_sec": 1327.1147495345801,
+      "peak_mem_mb": 43.36572265625
+    },
+    "1024": {
+      "prefill_tok_per_sec": 897209.1017573512,
+      "decode_tok_per_sec": 1344.408514823685,
+      "peak_mem_mb": 42.11474609375
+    },
+    "4096": {
+      "prefill_tok_per_sec": 1385733.1749081542,
+      "decode_tok_per_sec": 1338.0953354049966,
+      "peak_mem_mb": 52.71142578125
+    }
+  },
+  "M3_WEFT_StateOnly": {
+    "256": {
+      "prefill_tok_per_sec": 238356.60608896863,
+      "decode_tok_per_sec": 1042.3470766921996,
+      "peak_mem_mb": 43.61669921875
+    },
+    "1024": {
+      "prefill_tok_per_sec": 914066.9883117232,
+      "decode_tok_per_sec": 997.3542062639085,
+      "peak_mem_mb": 42.46728515625
+    },
+    "4096": {
+      "prefill_tok_per_sec": 1707789.53654848,
+      "decode_tok_per_sec": 997.7355456364369,
+      "peak_mem_mb": 53.44677734375
+    }
+  },
+  "M4_Transformer_Full": {
+    "256": {
+      "prefill_tok_per_sec": 279844.72670332005,
+      "decode_tok_per_sec": 1205.1146118827744,
+      "peak_mem_mb": 43.40478515625
+    },
+    "1024": {
+      "prefill_tok_per_sec": 958891.2846518283,
+      "decode_tok_per_sec": 1190.2294217544277,
+      "peak_mem_mb": 41.05224609375
+    },
+    "4096": {
+      "prefill_tok_per_sec": 1283769.0661587154,
+      "decode_tok_per_sec": 1076.2599090545718,
+      "peak_mem_mb": 47.45361328125
+    }
+  },
+  "M5_Transformer_Window": {
+    "256": {
+      "prefill_tok_per_sec": 234138.91704756982,
+      "decode_tok_per_sec": 877.9080635310683,
+      "peak_mem_mb": 43.59619140625
+    },
+    "1024": {
+      "prefill_tok_per_sec": 822449.6671884529,
+      "decode_tok_per_sec": 908.0507783529508,
+      "peak_mem_mb": 44.06787109375
+    },
+    "4096": {
+      "prefill_tok_per_sec": 451123.9769209843,
+      "decode_tok_per_sec": 844.1725081268182,
+      "peak_mem_mb": 173.51611328125
+    }
+  }
+}

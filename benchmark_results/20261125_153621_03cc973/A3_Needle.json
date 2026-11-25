@@ -1,0 +1,222 @@
+{
+  "M1_WEFT_Hybrid": {
+    "512": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": -0.08634045720100403
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.3177480697631836
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.1535673886537552
+      }
+    },
+    "1024": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": -0.2891075909137726
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.2731618285179138
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": -0.3466356694698334
+      }
+    },
+    "2048": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": -0.22127360105514526
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.16425906121730804
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.2062300741672516
+      }
+    }
+  },
+  "M2_WEFT_LocalOnly": {
+    "512": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.14968188107013702
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.12908919155597687
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.06195555254817009
+      }
+    },
+    "1024": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.30665597319602966
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.4557494819164276
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.34732669591903687
+      }
+    },
+    "2048": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.14037543535232544
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.32808566093444824
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.21616226434707642
+      }
+    }
+  },
+  "M3_WEFT_StateOnly": {
+    "512": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.23864512145519257
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.12286092340946198
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.02345605380833149
+      }
+    },
+    "1024": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.18772846460342407
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.15682630240917206
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.14725352823734283
+      }
+    },
+    "2048": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.11747310310602188
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.04733847454190254
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.04896990582346916
+      }
+    }
+  },
+  "M4_Transformer_Full": {
+    "512": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.12330233305692673
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.1258118748664856
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.11561227589845657
+      }
+    },
+    "1024": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.12323746085166931
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.12165617942810059
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.14118756353855133
+      }
+    },
+    "2048": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.1307569295167923
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.14691989123821259
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.131316676735878
+      }
+    }
+  },
+  "M5_Transformer_Window": {
+    "512": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.10327396541833878
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.11510176956653595
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.14986956119537354
+      }
+    },
+    "1024": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": 0.06568703055381775
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.06961949914693832
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.22322829067707062
+      }
+    },
+    "2048": {
+      "depth_10": {
+        "recalled": false,
+        "target_logit": -0.016617311164736748
+      },
+      "depth_50": {
+        "recalled": false,
+        "target_logit": 0.06616964936256409
+      },
+      "depth_90": {
+        "recalled": false,
+        "target_logit": 0.06992879509925842
+      }
+    }
+  }
+}

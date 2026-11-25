@@ -1,0 +1,258 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "num_prompts": 50,
+  "seed": 42,
+  "max_new_tokens": 16,
+  "comparisons": [
+    {
+      "prompt": "The capital of France is",
+      "fp16": "The capital of France is Paris. It was founded in 789 AD by Charlemagne,",
+      "weft_subbit": "The capital of France is ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "In mathematics, Euler's identity states that",
+      "fp16": "In mathematics, Euler's identity states that e^(i\u03c0) + 1 = 0. This equation is a",
+      "weft_subbit": "In mathematics, Euler's identity states that\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The primary function of mitochondria is",
+      "fp16": "The primary function of mitochondria is to:\nA. Synthesize proteins\nB. Synthesize lipids\nC",
+      "weft_subbit": "The primary function of mitochondria is ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "Python is an interpreted, high-level, general-purpose programming language that",
+      "fp16": "Python is an interpreted, high-level, general-purpose programming language that was created by Guido van Rossum and first released in 199",
+      "weft_subbit": "Python is an interpreted, high-level, general-purpose programming language that\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Photosynthesis is the biological process by which",
+      "fp16": "Photosynthesis is the biological process by which plants, algae and some bacteria convert light energy into chemical energy stored in glucose.",
+      "weft_subbit": "Photosynthesis is the biological process by which\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The theory of general relativity was developed by",
+      "fp16": "The theory of general relativity was developed by Albert Einstein in the 1920s. It is a theory that",
+      "weft_subbit": "The theory of general relativity was developed by ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "To reverse a linked list in computer science,",
+      "fp16": "To reverse a linked list in computer science, we need to find the middle node of the linked list and then reverse it.",
+      "weft_subbit": "To reverse a linked list in computer science, (\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The speed of light in a vacuum is approximately",
+      "fp16": "The speed of light in a vacuum is approximately 3.0 x 10^8 m/s. If an object",
+      "weft_subbit": "The speed of light in a vacuum is approximately\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "An electric current flowing through a conductor produces",
+      "fp16": "An electric current flowing through a conductor produces an emf, which is proportional to the rate of change of magnetic flux.",
+      "weft_subbit": "An electric current flowing through a conductor produces\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "DNA is composed of four nucleotide bases:",
+      "fp16": "DNA is composed of four nucleotide bases: adenine (A), cytosine (C), guanine (G),",
+      "weft_subbit": "DNA is composed of four nucleotide bases: ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "Machine learning algorithms build a mathematical model based on",
+      "fp16": "Machine learning algorithms build a mathematical model based on data, and then use the model to make predictions. The following is an example",
+      "weft_subbit": "Machine learning algorithms build a mathematical model based on\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e"
+    },
+    {
+      "prompt": "The Roman Empire was founded by",
+      "fp16": "The Roman Empire was founded by Julius Caesar in 508 BC. The empire lasted for over a thousand",
+      "weft_subbit": "The Roman Empire was founded by\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Water has a chemical formula of",
+      "fp16": "Water has a chemical formula of H2O. The molecular weight of water is 18.01",
+      "weft_subbit": "Water has a chemical formula of\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e"
+    },
+    {
+      "prompt": "Newton's second law of motion states that force is equal to",
+      "fp16": "Newton's second law of motion states that force is equal to mass times acceleration. If a car accelerates from rest, its velocity increases at",
+      "weft_subbit": "Newton's second law of motion states that force is equal to\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "A prime number is defined as a natural number that",
+      "fp16": "A prime number is defined as a natural number that has no positive divisors other than 1 and itself. Consider the sequence of",
+      "weft_subbit": "A prime number is defined as a natural number that\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a"
+    },
+    {
+      "prompt": "The solar system consists of the Sun and",
+      "fp16": "The solar system consists of the Sun and its planets. The average distance between the Sun and the Earth is approximately 1",
+      "weft_subbit": "The solar system consists of the Sun and ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "In economics, supply and demand is a model of",
+      "fp16": "In economics, supply and demand is a model of how the quantity of goods or services supplied by producers and the quantity demanded by consumers",
+      "weft_subbit": "In economics, supply and demand is a model of\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The process of cellular mitosis results in",
+      "fp16": "The process of cellular mitosis results in the production of two daughter cells with identical genetic material. Is this statement true or",
+      "weft_subbit": "The process of cellular mitosis results in\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Quantum mechanics is a fundamental theory in physics that provides",
+      "fp16": "Quantum mechanics is a fundamental theory in physics that provides a framework for understanding the behavior of matter and energy at the atomic and subatomic",
+      "weft_subbit": "Quantum mechanics is a fundamental theory in physics that providesteenteenteenteenteenteenteenteenteenteenteenteenteenteenteenteen"
+    },
+    {
+      "prompt": "The human heart is composed of four chambers:",
+      "fp16": "The human heart is composed of four chambers: the left ventricle, right ventricle, left atrium, and",
+      "weft_subbit": "The human heart is composed of four chambers: ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "A binary search algorithm has a time complexity of",
+      "fp16": "A binary search algorithm has a time complexity of O(log n). If the input array is sorted, what can be said about",
+      "weft_subbit": "A binary search algorithm has a time complexity of ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "The boiling point of pure water at sea level is",
+      "fp16": "The boiling point of pure water at sea level is 100 degrees Celsius. If the temperature increases by 5 degrees Celsius",
+      "weft_subbit": "The boiling point of pure water at sea level is ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "The United Nations was established following",
+      "fp16": "The United Nations was established following the end of World War II. The UN is a specialized agency of the United",
+      "weft_subbit": "The United Nations was established following\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Thermodynamics is the branch of physics that deals with",
+      "fp16": "Thermodynamics is the branch of physics that deals with energy and heat transfer. It studies how energy can be transformed from one form to",
+      "weft_subbit": "Thermodynamics is the branch of physics that deals with\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The Pythagorean theorem applies to right-angled triangles and states that",
+      "fp16": "The Pythagorean theorem applies to right-angled triangles and states that the square of the length of the hypotenuse (the side opposite the right",
+      "weft_subbit": "The Pythagorean theorem applies to right-angled triangles and states that\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Artificial neural networks are computing systems inspired by",
+      "fp16": "Artificial neural networks are computing systems inspired by the structure and function of the human brain. They consist of a large number of",
+      "weft_subbit": "Artificial neural networks are computing systems inspired by\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a"
+    },
+    {
+      "prompt": "The law of conservation of energy states that energy cannot be",
+      "fp16": "The law of conservation of energy states that energy cannot be created or destroyed, only transformed from one form to another. This means that the",
+      "weft_subbit": "The law of conservation of energy states that energy cannot be\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "A database transaction must satisfy ACID properties, which stand for",
+      "fp16": "A database transaction must satisfy ACID properties, which stand for:\nAtomicity (Atomicity), Consistency (Consistency), Isolation (",
+      "weft_subbit": "A database transaction must satisfy ACID properties, which stand for ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "The Earth rotates on its axis once every",
+      "fp16": "The Earth rotates on its axis once every 24 hours, which is approximately 360 degrees. If the",
+      "weft_subbit": "The Earth rotates on its axis once every\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Photosynthetic organisms convert carbon dioxide and water into",
+      "fp16": "Photosynthetic organisms convert carbon dioxide and water into glucose and oxygen. Which of the following statements is incorrect?\nA. The energy",
+      "weft_subbit": "Photosynthetic organisms convert carbon dioxide and water into\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The Renaissance was a cultural movement that began in",
+      "fp16": "The Renaissance was a cultural movement that began in Italy and spread to other parts of Europe. It is characterized by the revival of",
+      "weft_subbit": "The Renaissance was a cultural movement that began in ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "In object-oriented programming, encapsulation is the concept of",
+      "fp16": "In object-oriented programming, encapsulation is the concept of hiding the internal details of an object and exposing only the necessary public interface. This",
+      "weft_subbit": "In object-oriented programming, encapsulation is the concept of\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70\u5b70"
+    },
+    {
+      "prompt": "The atomic number of an element corresponds to the number of",
+      "fp16": "The atomic number of an element corresponds to the number of protons in its nucleus. The atomic number is also known as the ____.",
+      "weft_subbit": "The atomic number of an element corresponds to the number of\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "A Turing machine is a mathematical model of computation that",
+      "fp16": "A Turing machine is a mathematical model of computation that can simulate any other Turing machine. Consider the following scenario: A student, Alice",
+      "weft_subbit": "A Turing machine is a mathematical model of computation that\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a\u6b8a"
+    },
+    {
+      "prompt": "The Pacific Ocean is the largest and",
+      "fp16": "The Pacific Ocean is the largest and most extensive body of water on Earth. It covers an area of 51",
+      "weft_subbit": "The Pacific Ocean is the largest and ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "Graph theory is the study of mathematical structures used to model",
+      "fp16": "Graph theory is the study of mathematical structures used to model and analyze complex systems. It deals with graphs, which are collections of vertices (",
+      "weft_subbit": "Graph theory is the study of mathematical structures used to model\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The Industrial Revolution began in Great Britain during the",
+      "fp16": "The Industrial Revolution began in Great Britain during the 18th century. The Industrial Revolution was a period of rapid industrialization",
+      "weft_subbit": "The Industrial Revolution began in Great Britain during the\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Enzymes act as biological catalysts by",
+      "fp16": "Enzymes act as biological catalysts by lowering the activation energy of chemical reactions. Which of the following statements is incorrect?\n",
+      "weft_subbit": "Enzymes act as biological catalysts by\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "TCP/IP is a suite of communication protocols used to",
+      "fp16": "TCP/IP is a suite of communication protocols used to transmit data over the Internet. It consists of four layers: Application Layer, Transport",
+      "weft_subbit": "TCP/IP is a suite of communication protocols used to\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The square root of 144 is",
+      "fp16": "The square root of 144 is ____\nA. \u00b112\nB. -12\nC.",
+      "weft_subbit": "The square root of 144 is ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "The Great Wall of China was primarily built to",
+      "fp16": "The Great Wall of China was primarily built to protect which region?\nA. The Yellow River Basin\nB. The Yangt",
+      "weft_subbit": "The Great Wall of China was primarily built to ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "A hash table provides average-case time complexity of",
+      "fp16": "A hash table provides average-case time complexity of O(1) for insertions, deletions and lookups. However,",
+      "weft_subbit": "A hash table provides average-case time complexity of ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "Electromagnetic radiation travels in the form of",
+      "fp16": "Electromagnetic radiation travels in the form of waves. The speed of electromagnetic waves is 3 x 10^8",
+      "weft_subbit": "Electromagnetic radiation travels in the form of\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The human brain contains approximately eighty-six billion",
+      "fp16": "The human brain contains approximately eighty-six billion neurons, each of which is connected to other neurons through synapses. These connections",
+      "weft_subbit": "The human brain contains approximately eighty-six billion\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e"
+    },
+    {
+      "prompt": "Plate tectonics is the scientific theory describing the large-scale motion of",
+      "fp16": "Plate tectonics is the scientific theory describing the large-scale motion of the Earth's crust. It explains how the continents move around the Earth, and",
+      "weft_subbit": "Plate tectonics is the scientific theory describing the large-scale motion of\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "A group in abstract algebra is a set equipped with a binary operation that satisfies",
+      "fp16": "A group in abstract algebra is a set equipped with a binary operation that satisfies certain properties. Consider the group \\( G \\) defined by the elements \\( \\",
+      "weft_subbit": "A group in abstract algebra is a set equipped with a binary operation that satisfies\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e"
+    },
+    {
+      "prompt": "The Magna Carta was agreed to by King John of England in",
+      "fp16": "The Magna Carta was agreed to by King John of England in 1215. It is the first written document that outlines a legal",
+      "weft_subbit": "The Magna Carta was agreed to by King John of England in ( ( ( ( ( ( ( ( ( ( ( ( ( ( ( ("
+    },
+    {
+      "prompt": "The fundamental theorem of calculus establishes a relationship between",
+      "fp16": "The fundamental theorem of calculus establishes a relationship between the derivative and integral. The Fundamental Theorem of Calculus states that if f",
+      "weft_subbit": "The fundamental theorem of calculus establishes a relationship between\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "Chlorophyll is the pigment responsible for",
+      "fp16": "Chlorophyll is the pigment responsible for photosynthesis in plants. It absorbs light energy and uses it to produce energy that",
+      "weft_subbit": "Chlorophyll is the pigment responsible for\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af\u65af"
+    },
+    {
+      "prompt": "The Fibonacci sequence is defined such that each number is the sum of",
+      "fp16": "The Fibonacci sequence is defined such that each number is the sum of the two preceding ones, starting with 0 and 1. Consider a sequence",
+      "weft_subbit": "The Fibonacci sequence is defined such that each number is the sum of\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e\u7f6e"
+    }
+  ]
+}

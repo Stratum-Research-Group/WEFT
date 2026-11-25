@@ -1,0 +1,74 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "fp16_ppl": 22.44749641418457,
+  "eval_tokens": 8176,
+  "eval_windows": 16,
+  "sweep": [
+    {
+      "rank": 64,
+      "paths": 1,
+      "desc": "0.22 bpw (Rank 64, 1 Path)",
+      "ppl": 113374.8046875,
+      "mean_nll": 11.638454011741683,
+      "quant_seconds": 22.73920726776123
+    },
+    {
+      "rank": 64,
+      "paths": 2,
+      "desc": "0.44 bpw (Rank 64, 2 Paths)",
+      "ppl": 693570.9375,
+      "mean_nll": 13.449608610567514,
+      "quant_seconds": 35.45520544052124
+    },
+    {
+      "rank": 128,
+      "paths": 1,
+      "desc": "0.45 bpw (Rank 128, 1 Path)",
+      "ppl": 107119.703125,
+      "mean_nll": 11.58170254403131,
+      "quant_seconds": 24.149139642715454
+    },
+    {
+      "rank": 256,
+      "paths": 1,
+      "desc": "0.89 bpw (Rank 256, 1 Path)",
+      "ppl": 159913.375,
+      "mean_nll": 11.982387475538161,
+      "quant_seconds": 25.862590312957764
+    },
+    {
+      "rank": 512,
+      "paths": 1,
+      "desc": "1.79 bpw (Rank 512, 1 Path)",
+      "ppl": 141434.03125,
+      "mean_nll": 11.85958904109589,
+      "quant_seconds": 32.15342473983765
+    }
+  ],
+  "rtn_baselines": [
+    {
+      "name": "RTN 4-bit (Symmetric)",
+      "bits": 4,
+      "ppl": 54.03347396850586,
+      "mean_nll": 3.9896037181996085
+    },
+    {
+      "name": "RTN 3-bit (Symmetric)",
+      "bits": 3,
+      "ppl": 192397.59375,
+      "mean_nll": 12.167318982387476
+    },
+    {
+      "name": "RTN 2-bit (Symmetric)",
+      "bits": 2,
+      "ppl": 22467788.0,
+      "mean_nll": 16.927592954990214
+    },
+    {
+      "name": "Ternary 1.58-bit (BitNet)",
+      "bits": 1.58,
+      "ppl": 264427.65625,
+      "mean_nll": 12.4853228962818
+    }
+  ]
+}

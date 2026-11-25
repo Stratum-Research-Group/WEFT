@@ -1,0 +1,8 @@
+{
+  "test_id": "RG4_Hardware_Accuracy",
+  "track": "System",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 1.430511474609375e-05,
+  "note": "Hardware profile correctly documents Blackwell SM 12.0 GDDR7."
+}

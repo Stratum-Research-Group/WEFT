@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 Master Test Runner for the WEFT Architecture Benchmark & Test Suite (v3).
-Usage:
-    run_weft_suite.py [--track A|B|all] [--tier smoke|standard|full] [--device cpu|cuda] [--out benchmark_results]
+Runs Track A (Architecture), Track B (Converter), and System Gates.
 """
 
 import os
@@ -19,6 +18,14 @@ from weft_suite.tests_arch import (
     test_b3_cache_formats,
     test_b5_exact_recurrence,
     test_b8_padding_and_batching
+)
+from weft_suite.tests_bench import (
+    run_a1_language_modeling_sweep,
+    run_a2_mqar_benchmark
+)
+from weft_suite.tests_conv import (
+    test_c1_format_roundtrip,
+    test_c5_architecture_labeling
 )
 from weft_suite.tests_regress import (
     test_rg1_no_synthetic_benchmark_claims,
@@ -50,12 +57,15 @@ def main():
     print(f"  Commit:   {env_info['git_commit_short']} (dirty={env_info['git_dirty']})")
     print("=" * 70)
 
+    # Core gates
     tests_to_run = [
         ("B1_Causality", "Track A", "HARD", test_b1_causality, [args.device]),
         ("B2_Prefill_Decode_Parity", "Track A", "HARD", test_b2_prefill_decode_parity, [args.device]),
         ("B3_Cache_Formats", "Track A", "HARD", test_b3_cache_formats, [args.device]),
         ("B5_Exact_Recurrence", "Track A", "HARD", test_b5_exact_recurrence, [args.device]),
         ("B8_Padding_Batching", "Track A", "HARD", test_b8_padding_and_batching, [args.device]),
+        ("C1_Format_Roundtrip", "Track B", "HARD", test_c1_format_roundtrip, []),
+        ("C5_Arch_Labeling", "Track B", "HARD", test_c5_architecture_labeling, []),
         ("RG1_No_Synthetic_Claims", "Track B", "HARD", test_rg1_no_synthetic_benchmark_claims, []),
         ("RG3_Gate_Active_Checks", "System", "HARD", test_rg3_verify_fast_gate_has_real_checks, []),
         ("RG4_Hardware_Accuracy", "System", "HARD", test_rg4_hardware_accuracy, []),
@@ -94,6 +104,18 @@ def main():
 
         with open(os.path.join(run_dir, f"{test_id}.json"), "w", encoding="utf-8") as f:
             json.dump(test_record, f, indent=2)
+
+    # If tier is standard or full, run benchmarks
+    if args.tier in ["standard", "full"]:
+        print("\n--- Running Track A Benchmarks ---")
+        steps = 100 if args.tier == "standard" else 500
+        a1_res = run_a1_language_modeling_sweep(args.device, steps=steps)
+        with open(os.path.join(run_dir, "A1_LM_Sweep.json"), "w", encoding="utf-8") as f:
+            json.dump(a1_res, f, indent=2)
+
+        a2_res = run_a2_mqar_benchmark(args.device)
+        with open(os.path.join(run_dir, "A2_MQAR.json"), "w", encoding="utf-8") as f:
+            json.dump(a2_res, f, indent=2)
 
     # Generate SUMMARY.md
     summary_path = os.path.join(run_dir, "SUMMARY.md")

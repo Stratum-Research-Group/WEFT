@@ -1,0 +1,8 @@
+{
+  "test_id": "RG7_Repo_Hygiene",
+  "track": "System",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 9.822845458984375e-05,
+  "note": "Repository root is clean of release kit archives."
+}

@@ -1,0 +1,7 @@
+{
+  "M1_WEFT_Hybrid": 1.0,
+  "M2_WEFT_LocalOnly": 1.0,
+  "M3_WEFT_StateOnly": 1.0,
+  "M4_Transformer_Full": 1.0,
+  "M5_Transformer_Window": 0.5
+}

@@ -1,0 +1,8 @@
+{
+  "test_id": "B5_Exact_Recurrence",
+  "track": "Track A",
+  "gate_type": "HARD",
+  "status": "PASS",
+  "duration_seconds": 0.0017852783203125,
+  "note": "Global path recurrence formulation matches mathematical definition."
+}

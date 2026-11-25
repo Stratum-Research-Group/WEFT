@@ -318,5 +318,6 @@ lean_lib «FormalSuite» where
     `«VocabularyProjectionInvariants»,
     `«TitansMemoryInvariants»,
     `«SpeculativeTreeEquivalence»,
-    `«MultiAdapterCompositionBounds»
+    `«MultiAdapterCompositionBounds»,
+    `«CognitiveFlowInvariants»
   ]

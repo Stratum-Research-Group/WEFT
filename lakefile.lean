@@ -314,5 +314,6 @@ lean_lib «FormalSuite» where
     `«NonArchimedeanTreeCompletionInvariants»,
     `«SubstantiveComponentInvariants»,
     `«MasterCouncilConsensusInvariants»,
-    `«CouncilConvergenceInvariants»
+    `«CouncilConvergenceInvariants»,
+    `«VocabularyProjectionInvariants»
   ]

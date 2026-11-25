@@ -671,6 +671,9 @@ impl eframe::App for WeftStudioApp {
                                 }
                             });
                         ui.checkbox(&mut self.enable_multi_round, "Multi-Round Rebuttal");
+                        ui.separator();
+                        ui.label("⚡ Active Micro-Adapters:");
+                        ui.label("coder=0.8, math=0.7, prover=0.6");
                         if ui.button("📂 Open Sandbox Folder").clicked() {
                             let _ = std::process::Command::new("xdg-open").arg(&self.sandbox_dir).spawn();
                         }

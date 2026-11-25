@@ -38,19 +38,21 @@ def generate_qwen_vl_subbit_descriptor(output_path, certificate_path):
         "model_name": "Qwen-2.5-VL-7B-Instruct-SubBit",
         "parameters": "7.6B (Vision-Language)",
         "vision_projector": "Patch14-CrossAttention",
-        "bits_per_weight": 1.58,
-        "compression_ratio": "10.1x",
+        "target_bits_per_weight": 1.58,
+        "projected_compression_ratio": "10.1x",
         "format": "WEFT_MULTIMODAL_V1",
         "alignment_bytes": 64,
         "simd_target": "AVX-512",
+        "note": "DESCRIPTOR ONLY. This file is a 64-byte header plus a 4 KB placeholder payload; no model weights were converted. Size/ratio fields prefixed projected_ are parameter-count arithmetic, not measured artifacts.",
+        "actual_file_bytes": os.path.getsize(output_path),
         "author": "Nicholas Charles Mynhardt, Stratum Research Group",
-        "status": "CERTIFIED_VALID"
+        "status": "DESCRIPTOR_ONLY_NOT_CONVERTED"
     }
 
     with open(certificate_path, "w") as f:
         json.dump(certificate, f, indent=2)
 
-    print(f"[PASS] Multimodal Model descriptor generated: {output_path}")
+    print(f"[PASS] Multimodal Model DESCRIPTOR (placeholder, not converted weights) generated: {output_path}")
     print(f"[PASS] Quality certificate generated: {certificate_path}")
 
 if __name__ == "__main__":

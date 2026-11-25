@@ -1,0 +1,22 @@
+{
+  "duration_seconds": 3,
+  "cpu_rapl": {
+    "sensor": "/sys/class/powercap/intel-rapl:0/energy_uj",
+    "status": "PERMISSION_DENIED_ROOT_REQUIRED",
+    "note": "Requires root or CAP_SYS_RAWIO to read /sys/class/powercap/*/energy_uj directly."
+  },
+  "gpu_telemetry": {
+    "before": {
+      "power_draw_w": 26.96,
+      "power_limit_w": 180.0,
+      "temp_c": 46.82,
+      "status": "MEASURED"
+    },
+    "after": {
+      "power_draw_w": 26.85,
+      "power_limit_w": 180.0,
+      "temp_c": 46.57,
+      "status": "MEASURED"
+    }
+  }
+}

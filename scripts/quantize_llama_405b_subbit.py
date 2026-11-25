@@ -37,23 +37,25 @@ def generate_405b_subbit_descriptor(output_path, certificate_path):
     certificate = {
         "model_name": "Llama-3.1-405B-Instruct-SubBit",
         "parameters": "405.8B",
-        "bits_per_weight": 1.58,
-        "compression_ratio": "10.1x",
+        "target_bits_per_weight": 1.58,
+        "projected_compression_ratio": "10.1x",
         "sharding_protocol": "SYZ-8x-Distributed-TP",
         "num_distributed_shards": 8,
-        "size_per_shard_gb": 10.15,
-        "total_size_gb": 81.2,
+        "projected_size_per_shard_gb": 10.15,
+        "projected_total_size_gb": 81.2,
         "format": "WEFT_ULTRASCALE_V1",
         "alignment_bytes": 64,
         "simd_target": "AVX-512",
+        "note": "DESCRIPTOR ONLY. This file is a 64-byte header plus a 4 KB placeholder payload; no model weights were converted. Size/ratio fields prefixed projected_ are parameter-count arithmetic, not measured artifacts.",
+        "actual_file_bytes": os.path.getsize(output_path),
         "author": "Nicholas Charles Mynhardt, Stratum Research Group",
-        "status": "CERTIFIED_VALID"
+        "status": "DESCRIPTOR_ONLY_NOT_CONVERTED"
     }
 
     with open(certificate_path, "w") as f:
         json.dump(certificate, f, indent=2)
 
-    print(f"[PASS] 405B Model descriptor generated: {output_path}")
+    print(f"[PASS] 405B Model DESCRIPTOR (placeholder, not converted weights) generated: {output_path}")
     print(f"[PASS] Quality certificate generated: {certificate_path}")
 
 if __name__ == "__main__":

@@ -3,6 +3,8 @@ Cross-Model Speculative Verification Cascade (CMSV) - Analytical Simulator & Ben
 Provides theoretical speedup modeling, binomial acceptance simulation, and empirical performance projections
 for pairing fast sub-bit draft models (e.g. Qwen2.5-Coder-7B) with frontier target foundation models (e.g. Llama-3.3-70B).
 Execution Mode: SIMULATION_AND_THEORETICAL_HARNESS
+NOTE: acceptance below is an ASSUMED parameter (binomial p=0.82), NOT a measurement.
+For measured acceptance from real draft/target logits use weft/acceptance_measure.py.
 """
 
 import time

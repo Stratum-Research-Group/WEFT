@@ -35,19 +35,21 @@ def generate_32b_subbit_descriptor(output_path, certificate_path):
     certificate = {
         "model_name": "Qwen-2.5-Coder-32B-Instruct-SubBit",
         "parameters": "32.5B",
-        "bits_per_weight": 1.58,
-        "compression_ratio": "10.1x",
+        "target_bits_per_weight": 1.58,
+        "projected_compression_ratio": "10.1x",
         "format": "WEFT_SUBBIT_V2",
         "alignment_bytes": 64,
         "simd_target": "AVX-512",
+        "note": "DESCRIPTOR ONLY. This file is a 64-byte header plus a 4 KB placeholder payload; no model weights were converted. Size/ratio fields prefixed projected_ are parameter-count arithmetic, not measured artifacts.",
+        "actual_file_bytes": os.path.getsize(output_path),
         "author": "Nicholas Charles Mynhardt, Stratum Research Group",
-        "status": "CERTIFIED_VALID"
+        "status": "DESCRIPTOR_ONLY_NOT_CONVERTED"
     }
 
     with open(certificate_path, "w") as f:
         json.dump(certificate, f, indent=2)
 
-    print(f"[PASS] Model descriptor generated: {output_path}")
+    print(f"[PASS] Model DESCRIPTOR (placeholder, not converted weights) generated: {output_path}")
     print(f"[PASS] Quality certificate generated: {certificate_path}")
 
 if __name__ == "__main__":

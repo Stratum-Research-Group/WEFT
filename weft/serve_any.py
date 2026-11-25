@@ -59,11 +59,22 @@ class UniversalSubBitModel(nn.Module):
 
     def generate_step(self, token_ids: torch.Tensor, top_k: int = 50) -> torch.Tensor:
         """
-        Executes a forward generation step through available sub-bit layers:
-        1. Embeds tokens using 'model.embed_tokens.weight'
-        2. Passes through layer 0 MLP gate/up projections if available
-        3. Projects back to vocabulary space and returns greedy next token ID
+        STRUCTURAL SMOKE TEST ONLY - NOT THE MODEL'S REAL COMPUTATION.
+
+        This step uses only the LAST token id, builds a hand-made one-hot
+        pseudo-embedding (not the embedding table), runs layer-0 MLP only, and
+        reuses the embedding weight as the output head. Attention, norms and
+        layers 1..N-1 play no role, so the output is NOT a language-model
+        prediction and must never be used to claim output quality.
+        Its purpose is to exercise shard loading and the sub-bit linear path.
         """
+        import warnings
+        warnings.warn(
+            "UniversalSubBitModel.generate_step is a structural smoke test, not a faithful "
+            "transformer forward pass; do not use its output for quality claims.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
         device = token_ids.device
         embed = self.get_layer("model.embed_tokens.weight")
         if embed is None:

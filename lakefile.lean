@@ -315,5 +315,6 @@ lean_lib «FormalSuite» where
     `«SubstantiveComponentInvariants»,
     `«MasterCouncilConsensusInvariants»,
     `«CouncilConvergenceInvariants»,
-    `«VocabularyProjectionInvariants»
+    `«VocabularyProjectionInvariants»,
+    `«TitansMemoryInvariants»
   ]

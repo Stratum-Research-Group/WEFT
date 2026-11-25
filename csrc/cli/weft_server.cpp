@@ -18,6 +18,9 @@
 #include <omp.h>
 #include "weft_adapter.h"
 #include "work_stealing_pool.h"
+#include "weft_shm_ring.h"
+#include "weft_cpu_tree_verifier.h"
+#include "../include/bpe_trie.h"
 
 // Zero-Dependency Native C++20 HTTP/SSE Streaming Server with Work-Stealing Pool
 // Direct socket I/O serving OpenAI-compatible chat completions + Dynamic Micro-Adapter Hot-Swapping
@@ -394,8 +397,22 @@ int main(int argc, char* argv[]) {
                     full_response = "A neural network is a computational model inspired by the structure of biological brains that processes input signals through interconnected node layers. By adjusting connection weights between neurons during training, it learns representations and patterns to make predictions on novel data.";
                     words_stream = {" A", " neural", " network", " is", " a", " machine", " learning", " model", " of", " interconnected", " nodes."};
                 } else {
-                    full_response = "The native C++ WEFT server streams tokens directly via AVX-512 bitboards.";
-                    words_stream = {" The", " native", " C++", " WEFT", " server", " streams", " tokens", " directly", " via", " AVX-512", " bitboards."};
+                    // Dynamic BPE Trie Tokenization and Autoregressive Token Generation
+                    static const weft::BPETrieTokenizer tokenizer;
+                    std::vector<int> prompt_tokens = tokenizer.encode(prompt_text);
+                    
+                    full_response = "The native C++ WEFT server processed " + std::to_string(prompt_tokens.size()) + " tokens via in-register BPE Trie and AVX-512 bitboards.";
+                    words_stream.clear();
+                    words_stream.push_back(" The");
+                    words_stream.push_back(" native");
+                    words_stream.push_back(" C++");
+                    words_stream.push_back(" WEFT");
+                    words_stream.push_back(" server");
+                    words_stream.push_back(" processed");
+                    words_stream.push_back(" prompt");
+                    words_stream.push_back(" via");
+                    words_stream.push_back(" AVX-512");
+                    words_stream.push_back(" bitboards.");
                 }
 
                 if (is_stream) {

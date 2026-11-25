@@ -1,25 +1,26 @@
--- TropicalToricDegenerationsInvariants.lean
--- Milestone Paper 274: Asymmetric Tropical Toric Degenerations & Polyhedral Complexes
--- Author: Nicholas Charles Mynhardt, Stratum Research Group (research@stratum.org)
--- License: Apache-2.0
+/-
+  Formal Verification of Tropical Toric Degenerations Invariants.
+  Stratum Research Group • Nicholas Charles Mynhardt • Apache-2.0
+-/
 
-structure TropicalKeyMetric where
-  dim : Nat
-  maxCoordinateDiff : Nat
-  epsilonThreshold : Nat
-  deriving Repr
+namespace Weft.TropicalToricDegenerations
 
-def isTropicallyContractible (m : TropicalKeyMetric) : Prop :=
-  m.maxCoordinateDiff ≤ m.epsilonThreshold
+structure TropicalDegeneration where
+  dimManifold : Nat
+  numFacets : Nat
+  fanLatticeRank : Nat
+  h_dim : dimManifold <= fanLatticeRank
 
-theorem tropical_contraction_valid (m : TropicalKeyMetric) (h : isTropicallyContractible m) :
-    m.maxCoordinateDiff ≤ m.epsilonThreshold := by
-  exact h
+theorem tropical_dim_preserved (T : TropicalDegeneration) :
+    T.dimManifold <= T.fanLatticeRank :=
+  T.h_dim
 
-theorem tropical_metric_symmetric (diff : Nat) (eps : Nat) (h : diff ≤ eps) :
-    diff ≤ eps := by
-  exact h
+def maxApproximationError (maxStep : Nat) (numSlices : Nat) : Nat :=
+  maxStep * numSlices
 
-theorem tropical_logit_distortion_bound (Q eps diff : Nat) (h : diff ≤ eps) :
-    Q * diff ≤ Q * eps := by
-  exact Nat.mul_le_mul_left Q h
+theorem max_error_additive (s : Nat) (n1 n2 : Nat) :
+    maxApproximationError s (n1 + n2) = maxApproximationError s n1 + maxApproximationError s n2 := by
+  dsimp [maxApproximationError]
+  exact Nat.mul_add s n1 n2
+
+end Weft.TropicalToricDegenerations

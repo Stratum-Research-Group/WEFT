@@ -29,7 +29,8 @@ This document tracks all frontier and specialized foundation models deconstructe
 | **14**| `mistralai/Mistral-Small-24B-Instruct-2501` | GQA Dense 24B | 48.00 GB | 17.2 MB | 0.0285 | 42.1 tok/s | Concise Polyglot Edge Reasoning | [Paper 78](file:///home/akarta/Projects/0.WiP/Weft/papers/78_mistral_small_24b_subbit/paper.md) |
 | **15**| `google/gemma-2-27b-it` | Dense 27B | 54.00 GB | 21.4 MB | 0.0315 | 39.5 tok/s | Structured Instruction Following | [Paper 79](file:///home/akarta/Projects/0.WiP/Weft/papers/79_gemma_2_27b_subbit/paper.md) |
 | **16**| `meta-llama/Llama-3.1-405B-Instruct` | GQA Dense 405B | 810.00 GB | 4.1 KB (Cert) | 0.0001 | Streaming | Ultra-Hyperscale Teacher | [Paper 341](file:///home/akarta/Projects/0.WiP/Weft/papers/341_derived_toric_outofcore_paging/paper.md) |
-| **Σ** | **16 Foundation Specialists** | **Aggregate Fleet** | **1,698.89 GB** | **1,959.2 MB** | **0.034 avg** | **Sub-5ms Dispatch** | **Universal Multimodal & 405B+ Co-Serving** | **Papers 1–350** |
+| **17**| `weft/weft-frontier-1.04T-moe` | Sparse MoE 1.04T (128 exp) | 1,930.48 GB | 6,177.5 MB | 0.0384 | Streaming | Hyperscale Frontier Sparse MoE | [Paper 354](file:///home/akarta/Projects/0.WiP/Weft/papers/354_frontier_1t_tensor_sharding/paper.md) |
+| **Σ** | **17 Foundation Specialists** | **Aggregate Fleet** | **3,629.37 GB** | **8,136.7 MB** | **0.035 avg** | **Sub-5ms Dispatch** | **Universal Multimodal & 1.04T+ Co-Serving** | **Papers 1–354** |
 
 ---
 

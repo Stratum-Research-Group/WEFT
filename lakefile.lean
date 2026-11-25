@@ -334,5 +334,6 @@ lean_lib «FormalSuite» where
     `«MultiAgentDebateConvergence»,
     `«SpeculativeAcceptanceBounds»,
     `«RectifiedFlowInvariants»,
-    `«MetricDistanceInvariants»
+    `«MetricDistanceInvariants»,
+    `«NewtonSchulzOrthogonality»
   ]

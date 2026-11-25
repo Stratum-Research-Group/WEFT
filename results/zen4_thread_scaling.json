@@ -1,0 +1,12 @@
+{
+  "cpu": "AMD Ryzen 5 7600X (6C/12T)",
+  "tokens": 2048,
+  "scaling": [
+    {"threads": 1, "elapsed_seconds": 0.00209036, "speedup": 1},
+    {"threads": 2, "elapsed_seconds": 0.00177049, "speedup": 1.18067},
+    {"threads": 4, "elapsed_seconds": 0.0016798, "speedup": 1.24442},
+    {"threads": 6, "elapsed_seconds": 0.0660919, "speedup": 0.0316281},
+    {"threads": 8, "elapsed_seconds": 0.0618016, "speedup": 0.0338238},
+    {"threads": 12, "elapsed_seconds": 0.636959, "speedup": 0.00328179}
+  ]
+}

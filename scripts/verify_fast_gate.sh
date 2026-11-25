@@ -253,6 +253,9 @@ lean formal/MotivicGaloisDeformationsInvariants.lean
 lean formal/DerivedMotivicDeRhamWittInvariants.lean
 lean formal/TropicalToricFibrationsInvariants.lean
 lean formal/MotivicGaloisTannakianInvariants.lean
+lean formal/DerivedMotivicIntersectionKTheoryInvariants.lean
+lean formal/TropicalToricStratificationsInvariants.lean
+lean formal/MotivicGaloisCohomologyInvariants.lean
 echo "[PASS] Lean 4 Theorems verified (Zero non-standard axioms, Zero sorry)."
 
 # 3. Test Native AVX-512 Zero-Copy mmap Latency

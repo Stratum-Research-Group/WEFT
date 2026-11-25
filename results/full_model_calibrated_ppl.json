@@ -1,0 +1,11 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "calibrated_layers": 168,
+  "calibration_tokens": 512,
+  "calibration_seconds": 21.46102547645569,
+  "eval_windows": 16,
+  "eval_tokens": 8176,
+  "mean_nll": 12.768590998043052,
+  "calibrated_ppl": 351017.34375,
+  "device": "cuda:0"
+}

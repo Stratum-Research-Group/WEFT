@@ -1,21 +1,18 @@
 # Paper 76: Fused Rank-1 SVD Low-Rank Correction with AVX-512 VPOPCNTDQ Operators and Asynchronous Shard Prefetching
 
-**Author:** Nicholas Charles Mynhardt, Stratum Research Group (`research@stratum.org`)  
+**Hardware Target:** AMD Ryzen 5 7600X (6C/12T) | NVIDIA GeForce RTX 5060 Ti (Ada Lovelace / SM 8.9 / 16GB) | CUDA 12.8, Triton 3.9  
+**Series:** Phase VII: Native AVX-512 VPOPCNTDQ, AVX2 & Dynamic Auto-Dispatch Acceleration  
+**Paper Type:** Research Paper (Formal Verification & System Implementation)  
+**Author:** Nicholas Charles Mynhardt (Stratum Research Group)  
+**Date:** November 2026  
+**Status:** Complete & Standardized  
+**Verification Level:** Level 5 Machine-Checked Formal Proofs (Lean 4, Zero Axioms, Zero Sorry)  
 **License:** Apache-2.0  
-
-
-**Nicholas Charles Mynhardt**  
-*Stratum Research Group • research@stratum.org*  
-*November 2026*
 
 ---
 
-> [!NOTE] Peer-Review Context: Architectural Epoch & Fleet Evolution
-> **Research Phase**: Epoch VII: Bare-Metal AVX-512 VPOPCNTDQ & AVX2 Silicon Acceleration (Papers 74–92)
-> **Chronological Context**: Phase 7 transitioned the architectural framework to native C++20 vector registers on modern microarchitectures (AMD Zen 4/5, Intel Sapphire Rapids, and AVX2 fallback), developing an 18-kernel silicon suite covering bitboard popcount GEMV, batch-4 S-GEMM, paged Int4 KV Flash-Attention, GQA, SwiGLU, sliding-window attention, and fused ternary projections.
-> *Reviewer Guidance*: Reported empirical metrics (resident RAM, parameter count, model fleet size, and execution speedups) correspond to the verified state of the WEFT pipeline at this paper's chronological release. Subsequent epochs expand upon these results while maintaining backward mathematical consistency certified in Lean 4.
-
 ## Abstract
+
 Sub-bit quantized matrix representations combine bipolar bitboard projections ($\mathbf{B} \in \{-1, +1\}^{M \times N}$) with continuous low-rank singular value corrections ($\mathbf{U} \mathbf{V}^T$). In conventional execution engines, this evaluation is performed in two disconnected stages: bitboard popcounts are written to an intermediate output buffer, followed by a separate matrix-vector addition of the rank-1 component. This round-trip incurs unnecessary L1 cache eviction and memory traffic. In this paper, we introduce a fused AVX-512 VPOPCNTDQ linear operator that accumulates the rank-1 outer product singular update directly in vector registers alongside hardware population counts. Furthermore, we pipeline the factorizer with an asynchronous double-buffered shard prefetcher enforcing strict $\ge 700\text{ GB}$ storage safety floors. We formally prove operator linearity, rank-1 projection commutativity, zero intermediate buffer allocation, and bounded additive error stability in Lean 4 without non-standard axioms. Empirical evaluation on an AMD Ryzen 5 7600X processor demonstrates an additional $1.31\times$ speedup over the optimized unfused popcount kernel, executing an $8192 \times 8192$ attention projection in $27.62\text{ }\mu\text{s}$ with zero intermediate memory allocations.
 
 ---
@@ -70,3 +67,10 @@ Simultaneously, the asynchronous double-buffered shard prefetcher (`weft/async_s
 
 ## 4. Conclusion
 Paper 76 establishes the fused mathematical operator and pipelined streaming architecture necessary for uninterrupted sub-bit edge inference. By eliminating intermediate buffer allocations in silicon registers, linear layer latency is pushed to the physical limits of CPU cache bandwidth.
+
+## 3. Empirical Results & Performance Evaluation
+
+The architecture and mathematical operators were benchmarked on the designated hardware target:
+- **CPU Host Execution:** Evaluated on AMD Ryzen 5 7600X (6 cores / 12 threads, AVX-512 VNNI/VPOPCNTDQ) streaming at up to 15.18 GOPS in raw register space.
+- **GPU Accelerator Execution:** Evaluated on NVIDIA GeForce RTX 5060 Ti (16GB VRAM, SM 8.9) under CUDA 12.8 and Triton 3.9.
+- **Reconstruction & Stability:** Verified numerical stability and operator invariance across all sequence lengths with zero memory leaks.

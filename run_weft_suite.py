@@ -113,9 +113,26 @@ def main():
         with open(os.path.join(run_dir, "A1_LM_Sweep.json"), "w", encoding="utf-8") as f:
             json.dump(a1_res, f, indent=2)
 
+        # Gate on A1: All models must successfully train (final loss < ln(vocab) - 0.2)
+        ln_v = 5.549
+        for m_k, s_v in a1_res.items():
+            if s_v["mean_val_loss"] > ln_v - 0.2:
+                print(f"[FAIL] A1 gate failure: {m_k} val loss {s_v['mean_val_loss']:.4f} did not train below {ln_v - 0.2:.4f}")
+                hard_failed += 1
+
         a2_res = run_a2_mqar_benchmark(args.device)
         with open(os.path.join(run_dir, "A2_MQAR.json"), "w", encoding="utf-8") as f:
             json.dump(a2_res, f, indent=2)
+
+    # Determine honest verdict
+    if hard_failed > 0:
+        verdict = f"HARD GATES FAILED ({hard_failed} failures)"
+    elif args.tier == "smoke":
+        verdict = "SMOKE PASS (tiny CPU, not an empirical claim)"
+    elif env_info.get("git_dirty", False):
+        verdict = f"STANDARD PASS (DIRTY TREE - {args.device})"
+    else:
+        verdict = f"STANDARD TIER PASSED (Clean {env_info['git_commit_short']}, {args.device})"
 
     # Generate SUMMARY.md
     summary_path = os.path.join(run_dir, "SUMMARY.md")
@@ -125,14 +142,14 @@ def main():
         f.write(f"- **Timestamp (UTC):** `{env_info['timestamp_utc']}`\n")
         f.write(f"- **Git Commit:** `{env_info['git_commit']}` (dirty={env_info['git_dirty']})\n")
         f.write(f"- **Tier:** `{args.tier}` | **Track:** `{args.track}` | **Device:** `{args.device}`\n")
-        f.write(f"- **Verdict:** **{'ALL GATES PASSED' if hard_failed == 0 else 'HARD GATES FAILED'}**\n\n")
+        f.write(f"- **Verdict:** **{verdict}**\n\n")
         f.write("| Test ID | Track | Gate Type | Status | Duration (s) | Notes |\n")
         f.write("| :--- | :--- | :--- | :--- | :--- | :--- |\n")
         for r in results:
             f.write(f"| `{r['test_id']}` | {r['track']} | {r['gate_type']} | **{r['status']}** | {r['duration_seconds']:.2f}s | {r['note']} |\n")
 
     print("\n" + "=" * 70)
-    print(f"  SUITE RUN COMPLETE. Verdict: {'ALL GATES PASSED' if hard_failed == 0 else 'HARD GATES FAILED'}")
+    print(f"  SUITE RUN COMPLETE. Verdict: {verdict}")
     print(f"  Summary saved to {summary_path}")
     print("=" * 70)
 

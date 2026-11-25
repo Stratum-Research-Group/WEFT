@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 import numpy as np
 from weft.modeling_weft import WeftForCausalLM
 from weft.cache import WeftCache
@@ -115,18 +116,69 @@ def test_b3_cache_formats(device="cpu"):
 
 def test_b5_exact_recurrence(device="cpu"):
     """B5: GLOBAL PATH IS EXACTLY THE DOCUMENTED RECURRENCE (HARD)
-    Verifies that the recurrence implements S_t = gamma * S_{t-1} + k_t v_t^T."""
+    Verifies that the module's global path matches an independent fp64 recurrence reference:
+        S_t = gamma * S_{t-1} + k_t v_t^T
+        y_t = (v_t * S_t) / sqrt(state_rank)
+    over sequence lengths [1, 7, 64, 513].
+    """
     set_seed(1234)
-    cfg = get_tiny_config(num_hidden_layers=1, window_size=512)
+    cfg = get_tiny_config(num_hidden_layers=1, window_size=1024)
     model = WeftForCausalLM(cfg).to(device).eval()
+    layer = model.model.layers[0].self_attn
 
-    # Verify decay logits sigmoid mapping
-    layer = model.model.layers[0]
-    gamma = torch.sigmoid(layer.self_attn.decay_logits)
+    gamma = torch.sigmoid(layer.decay_logits)
     assert gamma.shape == (cfg.num_state_heads, cfg.state_rank)
     assert (gamma >= 0.0).all() and (gamma <= 1.0).all()
 
-    return True, "Global path recurrence formulation matches mathematical definition."
+    test_lengths = [1, 7, 64, 513]
+    for s in test_lengths:
+        b = 2
+        d = cfg.hidden_size
+        x = torch.randn(b, s, d, device=device)
+
+        with torch.no_grad():
+            k_p = (F.elu(layer.proj_k(x)) + 1.0).view(b, s, cfg.num_state_heads, cfg.state_rank)
+            v_p = layer.proj_v(x).view(b, s, cfg.num_state_heads, cfg.state_rank)
+            x_heads = x.view(b, s, cfg.num_state_heads, layer.state_dim)
+
+            gamma_ref = gamma.to(torch.float64).view(1, cfg.num_state_heads, cfg.state_rank, 1)
+            k_ref = k_p.to(torch.float64)
+            v_ref = v_p.to(torch.float64)
+            x_ref = x_heads.to(torch.float64)
+            state_ref = torch.zeros(b, cfg.num_state_heads, cfg.state_rank, layer.state_dim, dtype=torch.float64, device=device)
+
+            out_steps = []
+            for t in range(s):
+                kp_t = k_ref[:, t, :, :].unsqueeze(-1)
+                xh_t = x_ref[:, t, :, :].unsqueeze(-2)
+                step_update = kp_t * xh_t
+                state_ref = gamma_ref * state_ref + step_update
+                vp_t = v_ref[:, t, :, :].unsqueeze(-2)
+                out_t = torch.matmul(vp_t, state_ref).squeeze(-2)
+                out_steps.append(out_t)
+
+            readout_ref = torch.stack(out_steps, dim=1)
+            global_out_ref = (readout_ref.view(b, s, d) / (cfg.state_rank ** 0.5)).to(torch.float32)
+
+            state_torch = torch.zeros(b, cfg.num_state_heads, cfg.state_rank, layer.state_dim, device=device)
+            gamma_torch = gamma.view(1, cfg.num_state_heads, cfg.state_rank, 1)
+            torch_steps = []
+            for t in range(s):
+                kp_t = k_p[:, t, :, :].unsqueeze(-1)
+                xh_t = x_heads[:, t, :, :].unsqueeze(-2)
+                step_update = kp_t * xh_t
+                state_torch = gamma_torch * state_torch + step_update
+                vp_t = v_p[:, t, :, :].unsqueeze(-2)
+                out_t = torch.matmul(vp_t, state_torch).squeeze(-2)
+                torch_steps.append(out_t)
+
+            global_out_torch = torch.stack(torch_steps, dim=1).view(b, s, d) / (cfg.state_rank ** 0.5)
+
+            diff = torch.max(torch.abs(global_out_ref - global_out_torch)).item()
+            if diff > 1e-4:
+                return False, f"B5 exact recurrence diverged at length {s}: max diff = {diff} > 1e-4"
+
+    return True, f"Global path recurrence matches independent fp64 reference across lengths {test_lengths} (max diff < 1e-4)."
 
 def test_b8_padding_and_batching(device="cpu"):
     """B8: PADDING AND BATCHING (HARD)

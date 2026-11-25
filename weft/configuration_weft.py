@@ -45,6 +45,8 @@ class WeftConfig(PretrainedConfig):
         eos_token_id: int = 50256,
         tie_word_embeddings: bool = True,
         use_cache: bool = True,
+        global_path: str = "on",
+        local_path: str = "on",
         **kwargs,
     ):
         super().__init__(
@@ -98,3 +100,5 @@ class WeftConfig(PretrainedConfig):
         self.max_position_embeddings = max_position_embeddings
         self.rms_norm_eps = rms_norm_eps
         self.initializer_range = initializer_range
+        self.global_path = global_path
+        self.local_path = local_path

@@ -41,7 +41,7 @@ def test_c1_format_roundtrip():
     return True, "Container format round-trip bit-exact preservation certified."
 
 def test_c5_architecture_labeling():
-    """C5: Track B results JSON must explicitly label architecture as 'transformer_converted'."""
+    """C5: Track B results JSON must explicitly label architecture as 'transformer_converted' (read-only check)."""
     benchmark_file = "results/wikitext2_unabridged_580w_complete.json"
     if not os.path.exists(benchmark_file):
         return True, "Baseline file not found, skipped."
@@ -49,9 +49,7 @@ def test_c5_architecture_labeling():
     with open(benchmark_file, "r") as f:
         d = json.load(f)
 
-    if "architecture" not in d:
-        d["architecture"] = "transformer_converted"
-        with open(benchmark_file, "w") as f:
-            json.dump(d, f, indent=2)
+    if d.get("architecture") != "transformer_converted":
+        return False, f"File {benchmark_file} missing required 'architecture': 'transformer_converted' label."
 
     return True, "Track B results verified with 'transformer_converted' architecture label."

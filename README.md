@@ -5,7 +5,7 @@
 # WEFT: Weight-Engineered Factorization and Truncation
 ### Universal Sub-Bit Foundation Intelligence & Linear-Complexity Recurrence
 
-**Author: Nicholas Charles Mynhardt | Stratum Research Group | Milestone Release v332.0.0**
+**Author: Nicholas Charles Mynhardt | Stratum Research Group | Milestone Release v337.0.0**
 
 [![Lean 4 Formal Math](https://img.shields.io/badge/Lean_4-273_Verified_Theorems-purple.svg)](formal/)
 [![Hardware Verified](https://img.shields.io/badge/Hardware-Ryzen_5_7600X_AVX--512_%7C_RTX_5060_Ti-76B900.svg)](papers/HARDWARE_PROFILE.md)
@@ -146,7 +146,7 @@ WEFT/
 │
 ├── papers/                         # 314 Published Academic Research Treatises
 │   ├── PAPERS_INDEX.md             # Complete master index of all 314 papers
-│   ├── HARDWARE_PROFILE.md         # Zen 4 & Ada Lovelace compute specification
+│   ├── HARDWARE_PROFILE.md         # Zen 4 & Blackwell SM 12.0 compute specification
 │   └── <ID>_<title>/               # Individual paper monographs, proofs, and tests
 │
 ├── scripts/                        # Automation, benchmarking, and release gatekeepers

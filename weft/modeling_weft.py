@@ -227,6 +227,8 @@ class WeftAttention(nn.Module):
                 d_model=self.hidden_size,
                 d_mem=getattr(config, "titans_mem_dim", 64),
             )
+        self.global_path = getattr(config, "global_path", "on")
+        self.local_path = getattr(config, "local_path", "on")
         self.out_proj = nn.Linear(self.hidden_size, self.hidden_size, bias=False)
 
     def forward(
@@ -354,24 +356,54 @@ class WeftAttention(nn.Module):
 
         k_len = k_local.shape[-2]
 
-        # Single causal sliding-window attention operator across all modes
-        if s == 1 and k_len <= self.window_size and attention_mask is None:
-            # Optimal decode fast-path: all k_len tokens precede or are current query token
-            local_out = F.scaled_dot_product_attention(q, k_local, v_local, is_causal=False)
+        if self.local_path == "off":
+            local_out = torch.zeros(b, s, d, device=hidden_states.device, dtype=hidden_states.dtype)
         else:
-            local_out = _chunked_sliding_window_sdpa(
-                q=q,
-                k=k_local,
-                v=v_local,
-                window_size=self.window_size,
-                past_len=past_len,
-                attention_mask=attention_mask,
-                chunk_size=1024,
-            )
+            # Single causal sliding-window attention operator across all modes
+            if s == 1 and k_len <= self.window_size and attention_mask is None:
+                # Optimal decode fast-path: all k_len tokens precede or are current query token
+                local_out = F.scaled_dot_product_attention(q, k_local, v_local, is_causal=False)
+            else:
+                local_out = _chunked_sliding_window_sdpa(
+                    q=q,
+                    k=k_local,
+                    v=v_local,
+                    window_size=self.window_size,
+                    past_len=past_len,
+                    attention_mask=attention_mask,
+                    chunk_size=1024,
+                )
 
-        local_out = local_out.transpose(1, 2).contiguous().view(b, s, d)
+            local_out = local_out.transpose(1, 2).contiguous().view(b, s, d)
 
         # 2. Multi-Head Gated Low-Rank Recurrence
+        if self.global_path == "off":
+            global_out = torch.zeros(b, s, d, device=hidden_states.device, dtype=hidden_states.dtype)
+            last_state = None
+            next_titans_state = None
+            if s == 1 and recurrent_state is not None:
+                if is_hf_cache and use_cache:
+                    next_past = past_state
+                else:
+                    k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
+                    v_stored = v_local[:, :, -self.max_cached:, :] if v_local.shape[-2] > self.max_cached else v_local
+                    next_kv = (k_stored, v_stored, past_len + 1) if use_cache else None
+                    next_past = (None, next_kv, None) if use_cache else None
+                output = self.out_proj(local_out + global_out)
+                return output, next_past
+            else:
+                if is_hf_cache and use_cache:
+                    next_past = past_state
+                elif use_cache:
+                    k_stored = k_local[:, :, -self.max_cached:, :] if k_local.shape[-2] > self.max_cached else k_local
+                    v_stored = v_local[:, :, -self.max_cached:, :] if v_local.shape[-2] > self.max_cached else v_local
+                    next_kv = (k_stored, v_stored, past_len + s)
+                    next_past = (None, next_kv, None)
+                else:
+                    next_past = None
+                output = self.out_proj(local_out + global_out)
+                return output, next_past
+
         gamma = torch.sigmoid(self.decay_logits)
         k_p = (F.elu(self.proj_k(hidden_states)) + 1.0).view(b, s, self.num_state_heads, self.state_rank)
         v_p = self.proj_v(hidden_states).view(b, s, self.num_state_heads, self.state_rank)

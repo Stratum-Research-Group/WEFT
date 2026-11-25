@@ -328,5 +328,6 @@ lean_lib «FormalSuite» where
     `«MPMCQueueInvariants»,
     `«RingAllReduceInvariants»,
     `«FusedBitboardAttentionInvariants»,
-    `«CoSpeculativeLivenessInvariants»
+    `«CoSpeculativeLivenessInvariants»,
+    `«RoPEOrthogonalityInvariants»
   ]

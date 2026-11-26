@@ -413,5 +413,6 @@ lean_lib «FormalSuite» where
     `«ParoxysmalDyskinesiaInvariants»,
     `«UnifiedNeuromodulationInvariants»,
     `«FibrinogenShedInvariants»,
-    `«BbbTightJunctionInvariants»
+    `«BbbTightJunctionInvariants»,
+    `«S1MicroclottingInvariants»
   ]

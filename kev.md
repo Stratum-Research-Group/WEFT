@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #407, Papers #177 through #216).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #408, Papers #177 through #217).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #407) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #408) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (407 jobs).`
+- `Build completed successfully (408 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -639,6 +639,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_bbb_tight_junction.cpp -o build/weft_bench
 
 ---
 
+### Cycle v340.86.0: Systemic Vascular Microclotting Under SARS-CoV-2 S1 Spike & SHED-CM Secretome Invariants (Target #408, Paper #217)
+```bash
+# 1. Run SARS-CoV-2 S1 microclotting and SHED rescue simulation
+.venv/bin/python scripts/sim_s1_microclotting.py
+
+# 2. Compile and run AVX2 S1 microclotting microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_s1_microclotting.cpp -o build/weft_bench_s1_microclotting
+./build/weft_bench_s1_microclotting
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_s1_microclotting.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -682,3 +697,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftUnifiedNeuromodulationHUD.tsx` (Multi-Modal Biomarker Fusion, Closed-Loop Proportional DBS & Autonomous Rescue Gate)
 - `WeftFibrinogenShedHUD.tsx` (SHED-CM Chaperone Shielding, Fibrinogen-Aβ Epitope Masking & Mac-1 Suppression Gate)
 - `WeftBbbTightJunctionHUD.tsx` (Pericyte-Endothelial Tie2 Phosphorylation, Claudin-5/Occludin Assembly & TEER Restoration Gate)
+- `WeftS1MicroclottingHUD.tsx` (SARS-CoV-2 S1 Spike-Fibrinogen Amyloid Microclots, ULVWF Multimerization & SHED Rescue Gate)

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #400, Papers #177 through #209).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #401, Papers #177 through #210).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #400) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #401) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (400 jobs).`
+- `Build completed successfully (401 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -534,6 +534,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_huntington_chorea.cpp -o build/weft_bench_
 
 ---
 
+### Cycle v340.79.0: Amyotrophic Lateral Sclerosis (ALS) Corticomotoneuronal Excitotoxicity & Renshaw Recurrent Disinhibition Invariants (Target #401, Paper #210)
+```bash
+# 1. Run ALS excitotoxicity & Renshaw recurrent disinhibition simulation
+.venv/bin/python scripts/sim_als_excitotoxicity.py
+
+# 2. Compile and run AVX2 ALS excitotoxicity microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_als_excitotoxicity.cpp -o build/weft_bench_als_excitotoxicity
+./build/weft_bench_als_excitotoxicity
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_als_excitotoxicity.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -570,3 +585,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftStriatalCholinergicDystoniaHUD.tsx` (ChI Hyper-Rebound & Agonist-Antagonist Co-Contraction Gate)
 - `WeftAdaptiveDBSClosedLoopHUD.tsx` (aDBS Phase-Specific Desynchronization & Beta Burst Truncation Gate)
 - `WeftHuntingtonChoreaHUD.tsx` (Striatal D2-SPN Collapse, GPe Disinhibition & Chorea Intrusion Gate)
+- `WeftAlsCorticomotoneuronalHUD.tsx` (Astrocytic EAAT2 Loss, Motoneuronal Runaway Firing & Renshaw Recurrent Disinhibition Gate)

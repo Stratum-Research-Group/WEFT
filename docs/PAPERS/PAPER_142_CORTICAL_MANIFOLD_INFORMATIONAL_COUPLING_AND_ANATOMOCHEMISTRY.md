@@ -1,6 +1,6 @@
 # Comparative Paper: Higher-Dimensional Manifold Integration in Cortical informational Compute, Phase-Oscillatory Coupling, and Anatomochemical Constraints
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt, Kevin W. McCairn, Ph.D. & Antigravity Autonomous Systems Group**  
 *Stratum Research Group • Theoretical Neurobiology & Informational Geometry Series*  
 *Date: November 2026 • Verified under Physical & Anatomochemical Boundary Principles*
 

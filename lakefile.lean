@@ -397,5 +397,6 @@ lean_lib «FormalSuite» where
     `«BasalForebrainAChInvariants»,
     `«LateralHabenulaInvariants»,
     `«VTADopaminePlasticityInvariants»,
-    `«NeuromodulatorySynthesisInvariants»
+    `«NeuromodulatorySynthesisInvariants»,
+    `«ThalamicReticularFilteringInvariants»
   ]

@@ -381,5 +381,6 @@ lean_lib «FormalSuite» where
     `«TactileSlipGripAdaptationInvariants»,
     `«DentatoThalamicSynchronizationInvariants»,
     `«SubthalamicHyperdirectStopInvariants»,
-    `«ParietalCoordinateTransformInvariants»
+    `«ParietalCoordinateTransformInvariants»,
+    `«ReticulospinalPosturalInvariants»
   ]

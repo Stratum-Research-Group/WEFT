@@ -408,5 +408,6 @@ lean_lib «FormalSuite» where
     `«AdaptiveDBSInvariants»,
     `«HuntingtonChoreaInvariants»,
     `«AlsExcitotoxicityInvariants»,
-    `«EssentialTremorInvariants»
+    `«EssentialTremorInvariants»,
+    `«AlzheimerGammaInvariants»
   ]

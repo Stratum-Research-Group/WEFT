@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #402, Papers #177 through #211).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #403, Papers #177 through #212).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #402) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #403) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (402 jobs).`
+- `Build completed successfully (403 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -564,6 +564,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_essential_tremor.cpp -o build/weft_bench_e
 
 ---
 
+### Cycle v340.81.0: Alzheimer’s Disease Corticocortical Gamma Uncoupling & Parvalbumin Hypoactivity Invariants (Target #403, Paper #212)
+```bash
+# 1. Run Alzheimer corticocortical gamma & PV hypoactivity simulation
+.venv/bin/python scripts/sim_alzheimer_gamma.py
+
+# 2. Compile and run AVX2 Alzheimer gamma microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_alzheimer_gamma.cpp -o build/weft_bench_alzheimer_gamma
+./build/weft_bench_alzheimer_gamma
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_alzheimer_gamma.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -602,3 +617,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftHuntingtonChoreaHUD.tsx` (Striatal D2-SPN Collapse, GPe Disinhibition & Chorea Intrusion Gate)
 - `WeftAlsCorticomotoneuronalHUD.tsx` (Astrocytic EAAT2 Loss, Motoneuronal Runaway Firing & Renshaw Recurrent Disinhibition Gate)
 - `WeftEssentialTremorHUD.tsx` (Inferior Olivary Pacemaking, DRT Hyper-Oscillation & Hand Tremor Gate)
+- `WeftAlzheimerGammaHUD.tsx` (PV Interneuron Nav1.1 Hypofunction, Cortical Gamma Uncoupling & Sensory Rescue Gate)

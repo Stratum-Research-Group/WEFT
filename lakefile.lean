@@ -403,5 +403,6 @@ lean_lib «FormalSuite» where
     `«ZonaIncertaInvariants»,
     `«VLPAGSurvivalInvariants»,
     `«LHOrexinArousalInvariants»,
-    `«ElectrophysiologicalDiseasePredictionInvariants»
+    `«ElectrophysiologicalDiseasePredictionInvariants»,
+    `«StriatalCholinergicDystoniaInvariants»
   ]

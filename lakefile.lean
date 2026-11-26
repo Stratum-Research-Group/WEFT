@@ -342,5 +342,6 @@ lean_lib «FormalSuite» where
     `«BitboardOccupancyInvariants»,
     `«ModulationIndexInvariants»,
     `«STDPConvergenceInvariants»,
-    `«BasalGangliaAttractorInvariants»
+    `«BasalGangliaAttractorInvariants»,
+    `«ThalamocorticalBurstInvariants»
   ]

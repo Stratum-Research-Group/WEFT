@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #386, Papers #177 through #195).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #387, Papers #177 through #196).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #386) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #387) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (386 jobs).`
+- `Build completed successfully (387 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -324,6 +324,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_lc_ne_modulation.cpp -o build/weft_bench_l
 
 ---
 
+### Cycle v340.65.0: Dorsal Raphe Serotonin (5-HT) Waiting Patience & Impulsivity Threshold Invariants (Target #387, Paper #196)
+```bash
+# 1. Run dorsal raphe 5-HT patience and delay discounting simulation
+.venv/bin/python scripts/sim_dorsal_raphe_5ht.py
+
+# 2. Compile and run AVX2 5-HT temporal discounting microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_dorsal_raphe_5ht.cpp -o build/weft_bench_dorsal_raphe_5ht
+./build/weft_bench_dorsal_raphe_5ht
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_dorsal_raphe_5ht.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -346,3 +361,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftPPNLocomotorHUD.tsx` (PPN Locomotor CPG Phase Gating & Freezing of Gait)
 - `WeftCnFEscapeHUD.tsx` (CnF High-Speed Locomotor Escape & Gallop Bifurcation)
 - `WeftLCNEModulationHUD.tsx` (Locus Coeruleus Noradrenergic Gain & Yerkes-Dodson Arousal)
+- `WeftDorsalRaphe5HTHUD.tsx` (Dorsal Raphe Serotonin Waiting Patience & Impulsivity Threshold)

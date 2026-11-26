@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #416, Papers #177 through #225).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #417, Papers #177 through #226).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #416) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #417) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (416 jobs).`
+- `Build completed successfully (417 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -774,6 +774,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_btb_extravasation.cpp -o build/weft_bench_
 
 ---
 
+### Cycle v340.95.0: Dural Meningeal Lymphatic Drainage & Deep Cervical Clearance Invariants (Target #417, Paper #226)
+```bash
+# 1. Run meningeal lymphatic drainage simulation
+.venv/bin/python scripts/sim_meningeal_lymphatics.py
+
+# 2. Compile and run AVX2 lymphatic microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_meningeal_lymphatics.cpp -o build/weft_bench_meningeal_lymphatics
+./build/weft_bench_meningeal_lymphatics
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_meningeal_lymphatics.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -826,3 +841,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftOpcDifferentiationHUD.tsx` (OPC Migration, GPR17 Downregulation, MBP Compaction & Saltatory Velocity Gate)
 - `WeftPresynapticMitochondriaHUD.tsx` (Drp1/Mfn2 Ratio, Delta Psi_m, Synaptosomal ATP & mPTP Gate)
 - `WeftBtbExtravasationHUD.tsx` (Blood-Tumor Barrier IFP Decompression, Starling J_v Flux & FUS Nanocarrier Gate)
+- `WeftMeningealLymphaticHUD.tsx` (Meningeal Lymphatic Velocity, dCLN Efflux & Tau/Amyloid Clearance Gate)

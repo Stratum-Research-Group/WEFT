@@ -422,5 +422,6 @@ lean_lib «FormalSuite» where
     `«EndothelialShearStressInvariants»,
     `«OpcDifferentiationInvariants»,
     `«MitochondrialDynamicsInvariants»,
-    `«BtbExtravasationInvariants»
+    `«BtbExtravasationInvariants»,
+    `«MeningealLymphaticsInvariants»
   ]

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #413, Papers #177 through #222).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #414, Papers #177 through #223).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #413) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #414) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (413 jobs).`
+- `Build completed successfully (414 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -729,6 +729,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_shear_stress.cpp -o build/weft_bench_shear
 
 ---
 
+### Cycle v340.92.0: OPC Differentiation & Saltatory Conduction Velocity Invariants (Target #414, Paper #223)
+```bash
+# 1. Run OPC differentiation simulation
+.venv/bin/python scripts/sim_opc_differentiation.py
+
+# 2. Compile and run AVX2 OPC microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_opc_differentiation.cpp -o build/weft_bench_opc_differentiation
+./build/weft_bench_opc_differentiation
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_opc_differentiation.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -778,3 +793,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftNeurovascularCouplingHUD.tsx` (Astrocytic Endfoot Ca2+ Transients, BK_Ca/Kir2.1 Vasomotion & Functional Hyperemia Gate)
 - `WeftPericyteNoReflowHUD.tsx` (Capillary Pericyte Contraction, RBC Entrapment & SHED Tie2/cAMP Reflow Rescue Gate)
 - `WeftShearStressMechanotransductionHUD.tsx` (Endothelial Glycocalyx Shear Sensing, eNOS Ser1177 Phos & NO Output Gate)
+- `WeftOpcDifferentiationHUD.tsx` (OPC Migration, GPR17 Downregulation, MBP Compaction & Saltatory Velocity Gate)

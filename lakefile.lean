@@ -359,5 +359,6 @@ lean_lib «FormalSuite» where
     `«NeocorticalSchemaInvariants»,
     `«PrefrontalWMBistabilityInvariants»,
     `«StriatalActionSelectionInvariants»,
-    `«PPNLocomotorGatingInvariants»
+    `«PPNLocomotorGatingInvariants»,
+    `«InferiorOlivePhaseLockInvariants»
   ]

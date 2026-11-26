@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #388, Papers #177 through #197).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #389, Papers #177 through #198).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #388) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #389) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (388 jobs).`
+- `Build completed successfully (389 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -354,6 +354,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_basal_forebrain_ach.cpp -o build/weft_benc
 
 ---
 
+### Cycle v340.67.0: Lateral Habenula (LHb) Anti-Reward Circuitry & Midbrain Dopaminergic Pause Invariants (Target #389, Paper #198)
+```bash
+# 1. Run lateral habenula negative RPE and dopamine pause simulation
+.venv/bin/python scripts/sim_lateral_habenula.py
+
+# 2. Compile and run AVX2 LHb anti-reward microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_lateral_habenula.cpp -o build/weft_bench_lateral_habenula
+./build/weft_bench_lateral_habenula
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_lateral_habenula.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -378,3 +393,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftLCNEModulationHUD.tsx` (Locus Coeruleus Noradrenergic Gain & Yerkes-Dodson Arousal)
 - `WeftDorsalRaphe5HTHUD.tsx` (Dorsal Raphe Serotonin Waiting Patience & Impulsivity Threshold)
 - `WeftBasalForebrainAChHUD.tsx` (Basal Forebrain Cholinergic Attentional Gating & Cue Detection)
+- `WeftLateralHabenulaHUD.tsx` (Lateral Habenula Anti-Reward Signaling & Dopaminergic Pause)

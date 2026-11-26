@@ -1,92 +1,109 @@
+"""Triton 3.9 GPU kernel for fused Lateral Habenula (LHb) anti-reward and dopamine pause computation.
+
+Computes batched negative reward prediction errors, LHb burst activation,
+RMTg GABAergic transmission, and VTA dopaminergic pause gating.
 """
-WEFT Fused Lateral Habenula Aversion & Dopaminergic Dip Kernel (Triton 3.9).
-Milestone Paper #154 Series.
-Models:
-1. Negative Reward Prediction Error and Aversive Input to Lateral Habenula (LHb):
-   I_lhb = max(0.0, -RPE * beta_rpe) + I_aversive
-2. Disynaptic GABAergic inhibition via RMTg onto midbrain SNc/VTA Dopamine:
-   DA_out = clamp(DA_base + alpha_da * RPE - gamma_rmtg * I_lhb, 0.0, 1.0)
-directly in GPU SRAM registers.
-"""
+
 import torch
 import triton
 import triton.language as tl
-import math
+
 
 @triton.jit
 def _fused_lateral_habenula_kernel(
-    rpe_ptr,        # [B] reward prediction errors (can be negative)
-    aversive_ptr,   # [B, N] direct aversive / pain inputs
-    lhb_out_ptr,    # [B, N] output LHb burst activation
-    da_out_ptr,     # [B] output midbrain dopamine firing rate
-    da_base: tl.constexpr,     # baseline tonic dopamine e.g. 0.50
-    beta_rpe: tl.constexpr,    # sensitivity to negative RPE e.g. 1.50
-    gamma_rmtg: tl.constexpr,  # RMTg inhibitory clamp e.g. 0.40
-    N_TOTAL: tl.constexpr
+    exp_reward_ptr,
+    act_outcome_ptr,
+    stress_ptr,
+    tonic_base_ptr,
+    out_nrpe_ptr,
+    out_lhb_ptr,
+    out_rmtg_ptr,
+    out_da_ptr,
+    c_nrpe,
+    c_stress,
+    c_rmtg_base,
+    c_rmtg_slope,
+    c_da_slope,
+    da_max,
+    n_elements,
+    BLOCK_SIZE: tl.constexpr,
 ):
-    pid = tl.program_id(0)
-    if pid >= N_TOTAL:
-        return
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
 
-    rpe = tl.load(rpe_ptr + 0).to(tl.float32)
-    aversive = tl.load(aversive_ptr + pid).to(tl.float32)
+    # Load inputs
+    exp_rew = tl.load(exp_reward_ptr + offsets, mask=mask, other=0.0)
+    act_out = tl.load(act_outcome_ptr + offsets, mask=mask, other=0.0)
+    stress = tl.load(stress_ptr + offsets, mask=mask, other=0.0)
+    base = tl.load(tonic_base_ptr + offsets, mask=mask, other=8.0)
 
-    # Negative RPE triggers LHb bursting
-    rpe_loss = 0.0
-    if rpe < 0.0:
-        rpe_loss = -rpe * beta_rpe
+    # Negative RPE = max(0.0, exp_rew - act_out)
+    diff = exp_rew - act_out
+    nrpe = tl.maximum(0.0, diff)
 
-    lhb_act = rpe_loss + aversive * 0.8
-    if lhb_act > 10.0:
-        lhb_act = 10.0
+    # LHb Firing Rate = base + c_nrpe * nrpe + c_stress * stress
+    lhb_rate = base + c_nrpe * nrpe + c_stress * stress
 
-    # Dopamine suppression via RMTg
-    # DA = clamp(DA_base + (rpe > 0 ? rpe*0.5 : 0) - gamma_rmtg * lhb_act, 0.0, 1.0)
-    da = da_base
-    if rpe > 0.0:
-        da = da + rpe * 0.5
-    da = da - gamma_rmtg * lhb_act
-    if da < 0.0:
-        da = 0.0
-    if da > 1.0:
-        da = 1.0
+    # RMTg GABA = c_rmtg_base + c_rmtg_slope * lhb_rate
+    rmtg_gaba = c_rmtg_base + c_rmtg_slope * lhb_rate
 
-    tl.store(lhb_out_ptr + pid, lhb_act.to(tl.float16))
-    if pid == 0:
-        tl.store(da_out_ptr + 0, da.to(tl.float16))
+    # VTA DA = max(0.0, da_max - c_da_slope * (rmtg_gaba - 10.0))
+    rmtg_delta = rmtg_gaba - 10.0
+    da_raw = da_max - c_da_slope * rmtg_delta
+    da_rate = tl.maximum(0.0, da_raw)
 
-def apply_lateral_habenula_triton(
-    rpe: torch.Tensor,
-    aversive: torch.Tensor,
-    lhb_out: torch.Tensor,
-    da_out: torch.Tensor,
-    da_base: float = 0.50,
-    beta_rpe: float = 1.50,
-    gamma_rmtg: float = 0.40
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """Evaluates LHb anti-reward dynamics on GPU."""
-    assert rpe.is_cuda and aversive.is_cuda
-    N_TOTAL = aversive.numel()
-    grid = (N_TOTAL,)
+    # Store results
+    tl.store(out_nrpe_ptr + offsets, nrpe, mask=mask)
+    tl.store(out_lhb_ptr + offsets, lhb_rate, mask=mask)
+    tl.store(out_rmtg_ptr + offsets, rmtg_gaba, mask=mask)
+    tl.store(out_da_ptr + offsets, da_rate, mask=mask)
+
+
+def launch_fused_lateral_habenula(
+    expected_reward: torch.Tensor,
+    actual_outcome: torch.Tensor,
+    aversive_stress: torch.Tensor,
+    tonic_baseline: torch.Tensor,
+    c_nrpe: float = 0.45,
+    c_stress: float = 0.35,
+    c_rmtg_base: float = 5.0,
+    c_rmtg_slope: float = 0.85,
+    c_da_slope: float = 0.075,
+    da_max: float = 5.0,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Launch Triton fused lateral habenula anti-reward and dopamine pause kernel."""
+    assert expected_reward.is_contiguous()
+    assert actual_outcome.is_contiguous()
+    assert aversive_stress.is_contiguous()
+    assert tonic_baseline.is_contiguous()
+
+    n_elements = expected_reward.numel()
+    out_nrpe = torch.empty_like(expected_reward)
+    out_lhb = torch.empty_like(expected_reward)
+    out_rmtg = torch.empty_like(expected_reward)
+    out_da = torch.empty_like(expected_reward)
+
+    grid = lambda meta: (triton.cdiv(n_elements, meta["BLOCK_SIZE"]),)
+
     _fused_lateral_habenula_kernel[grid](
-        rpe, aversive, lhb_out, da_out,
-        da_base=float(da_base),
-        beta_rpe=float(beta_rpe),
-        gamma_rmtg=float(gamma_rmtg),
-        N_TOTAL=N_TOTAL
+        expected_reward,
+        actual_outcome,
+        aversive_stress,
+        tonic_baseline,
+        out_nrpe,
+        out_lhb,
+        out_rmtg,
+        out_da,
+        c_nrpe,
+        c_stress,
+        c_rmtg_base,
+        c_rmtg_slope,
+        c_da_slope,
+        da_max,
+        n_elements,
+        BLOCK_SIZE=1024,
     )
-    return lhb_out, da_out
 
-def compute_habenular_step(
-    rpe: float,
-    aversive: float,
-    da_base: float = 0.50,
-    beta_rpe: float = 1.50,
-    gamma_rmtg: float = 0.40
-) -> tuple[float, float]:
-    """Analytical CPU evaluation of LHb activation and DA dip."""
-    rpe_loss = -rpe * beta_rpe if rpe < 0.0 else 0.0
-    lhb_act = min(10.0, rpe_loss + aversive * 0.8)
-    da = da_base + (rpe * 0.5 if rpe > 0.0 else 0.0) - gamma_rmtg * lhb_act
-    da_clamped = max(0.0, min(1.0, da))
-    return lhb_act, da_clamped
+    return out_nrpe, out_lhb, out_rmtg, out_da

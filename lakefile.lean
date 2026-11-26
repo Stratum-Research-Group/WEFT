@@ -394,5 +394,6 @@ lean_lib «FormalSuite» where
     `«CnFEscapeLocomotionInvariants»,
     `«LCNEGainModulationInvariants»,
     `«DorsalRapheSerotoninInvariants»,
-    `«BasalForebrainAChInvariants»
+    `«BasalForebrainAChInvariants»,
+    `«LateralHabenulaInvariants»
   ]

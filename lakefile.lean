@@ -340,5 +340,6 @@ lean_lib «FormalSuite» where
     `«GQAHeadPartitionInvariants»,
     `«EntropyDivergenceInvariants»,
     `«BitboardOccupancyInvariants»,
-    `«ModulationIndexInvariants»
+    `«ModulationIndexInvariants»,
+    `«STDPConvergenceInvariants»
   ]

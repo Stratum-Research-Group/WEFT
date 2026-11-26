@@ -371,5 +371,6 @@ lean_lib «FormalSuite» where
     `«GolgiTendonOrganForceInvariants»,
     `«CrossedExtensorReflexInvariants»,
     `«VestibulospinalToneInvariants»,
-    `«ReticulospinalAPATimingInvariants»
+    `«ReticulospinalAPATimingInvariants»,
+    `«RubrospinalVelocityInvariants»
   ]

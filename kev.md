@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #390, Papers #177 through #199).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #391, Papers #177 through #200).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #390) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #391) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (390 jobs).`
+- `Build completed successfully (391 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -384,6 +384,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_vta_dopamine_plasticity.cpp -o build/weft_
 
 ---
 
+### Milestone Cycle v340.69.0: Central Neuromodulatory Convergence & Multi-Transmitter Motor Arbitration (Target #391, Milestone Paper #200)
+```bash
+# 1. Run 5-axis neuromodulatory convergence simulation
+.venv/bin/python scripts/sim_neuromodulatory_synthesis.py
+
+# 2. Compile and run AVX2 5-transmitter synthesis microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_neuromodulatory_synthesis.cpp -o build/weft_bench_neuromodulatory_synthesis
+./build/weft_bench_neuromodulatory_synthesis
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_neuromodulatory_synthesis.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -410,3 +425,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftBasalForebrainAChHUD.tsx` (Basal Forebrain Cholinergic Attentional Gating & Cue Detection)
 - `WeftLateralHabenulaHUD.tsx` (Lateral Habenula Anti-Reward Signaling & Dopaminergic Pause)
 - `WeftVTADopaminePlasticityHUD.tsx` (VTA Dopaminergic Three-Factor Synaptic Plasticity & Trace Consolidation)
+- `WeftNeuromodulatorySynthesisHUD.tsx` (Grand 5-Axis Neuromodulatory Convergence & Multi-Transmitter Synthesis)

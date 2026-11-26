@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #393, Papers #177 through #202).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #394, Papers #177 through #203).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #393) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #394) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (393 jobs).`
+- `Build completed successfully (394 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -429,6 +429,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_claustrum_synchronization.cpp -o build/wef
 
 ---
 
+### Cycle v340.72.0: Zona Incerta (ZI) Visceromotor Integration & Binge Feeding Gating Invariants (Target #394, Paper #203)
+```bash
+# 1. Run Zona Incerta visceromotor integration simulation
+.venv/bin/python scripts/sim_zona_incerta.py
+
+# 2. Compile and run AVX2 Zona Incerta visceromotor gate microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_zona_incerta.cpp -o build/weft_bench_zona_incerta
+./build/weft_bench_zona_incerta
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_zona_incerta.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -458,3 +473,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftNeuromodulatorySynthesisHUD.tsx` (Grand 5-Axis Neuromodulatory Convergence & Multi-Transmitter Synthesis)
 - `WeftThalamicReticularHUD.tsx` (Thalamic Reticular Cross-Modal Attentional Filter & Burst-Tonic Gate)
 - `WeftClaustrumSynchronizationHUD.tsx` (Claustrum Cortical Synchronization & Salience Switching Gate)
+- `WeftZonaIncertaHUD.tsx` (Zona Incerta Visceromotor Gate & Binge Feeding Attractor)

@@ -399,5 +399,6 @@ lean_lib «FormalSuite» where
     `«VTADopaminePlasticityInvariants»,
     `«NeuromodulatorySynthesisInvariants»,
     `«ThalamicReticularFilteringInvariants»,
-    `«ClaustrumSynchronizationInvariants»
+    `«ClaustrumSynchronizationInvariants»,
+    `«ZonaIncertaInvariants»
   ]

@@ -356,5 +356,6 @@ lean_lib «FormalSuite» where
     `«CA3AttractorCompletionInvariants»,
     `«CA1SequenceReadoutInvariants»,
     `«SubiculumReplayGatingInvariants»,
-    `«NeocorticalSchemaInvariants»
+    `«NeocorticalSchemaInvariants»,
+    `«PrefrontalWMBistabilityInvariants»
   ]

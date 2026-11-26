@@ -379,5 +379,6 @@ lean_lib «FormalSuite» where
     `«SpinalPresynapticPADInvariants»,
     `«SMAMotorSequenceChunkingInvariants»,
     `«TactileSlipGripAdaptationInvariants»,
-    `«DentatoThalamicSynchronizationInvariants»
+    `«DentatoThalamicSynchronizationInvariants»,
+    `«SubthalamicHyperdirectStopInvariants»
   ]

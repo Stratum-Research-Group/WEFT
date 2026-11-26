@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #394, Papers #177 through #203).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #395, Papers #177 through #204).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #394) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #395) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (394 jobs).`
+- `Build completed successfully (395 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -444,6 +444,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_zona_incerta.cpp -o build/weft_bench_zona_
 
 ---
 
+### Cycle v340.73.0: Ventrolateral Periaqueductal Gray (vlPAG) Freezing vs Fight/Flight Action Selection Invariants (Target #395, Paper #204)
+```bash
+# 1. Run vlPAG freezing vs dlPAG escape simulation
+.venv/bin/python scripts/sim_vlpag_survival.py
+
+# 2. Compile and run AVX2 vlPAG defense arbitration microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_vlpag_survival.cpp -o build/weft_bench_vlpag_survival
+./build/weft_bench_vlpag_survival
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_vlpag_survival.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -474,3 +489,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftThalamicReticularHUD.tsx` (Thalamic Reticular Cross-Modal Attentional Filter & Burst-Tonic Gate)
 - `WeftClaustrumSynchronizationHUD.tsx` (Claustrum Cortical Synchronization & Salience Switching Gate)
 - `WeftZonaIncertaHUD.tsx` (Zona Incerta Visceromotor Gate & Binge Feeding Attractor)
+- `WeftVLPAGSurvivalHUD.tsx` (vlPAG Freezing vs dlPAG Flight Escape Survival Gate)

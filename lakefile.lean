@@ -400,5 +400,6 @@ lean_lib «FormalSuite» where
     `«NeuromodulatorySynthesisInvariants»,
     `«ThalamicReticularFilteringInvariants»,
     `«ClaustrumSynchronizationInvariants»,
-    `«ZonaIncertaInvariants»
+    `«ZonaIncertaInvariants»,
+    `«VLPAGSurvivalInvariants»
   ]

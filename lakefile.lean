@@ -344,5 +344,6 @@ lean_lib «FormalSuite» where
     `«STDPConvergenceInvariants»,
     `«BasalGangliaAttractorInvariants»,
     `«ThalamocorticalBurstInvariants»,
-    `«ThetaPhasePrecessionInvariants»
+    `«ThetaPhasePrecessionInvariants»,
+    `«CerebellarInversionInvariants»
   ]

@@ -354,5 +354,6 @@ lean_lib «FormalSuite» where
     `«LateralHabenulaAversionInvariants»,
     `«DentateGyrusOrthogonalizationInvariants»,
     `«CA3AttractorCompletionInvariants»,
-    `«CA1SequenceReadoutInvariants»
+    `«CA1SequenceReadoutInvariants»,
+    `«SubiculumReplayGatingInvariants»
   ]

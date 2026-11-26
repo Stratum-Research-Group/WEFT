@@ -355,5 +355,6 @@ lean_lib «FormalSuite» where
     `«DentateGyrusOrthogonalizationInvariants»,
     `«CA3AttractorCompletionInvariants»,
     `«CA1SequenceReadoutInvariants»,
-    `«SubiculumReplayGatingInvariants»
+    `«SubiculumReplayGatingInvariants»,
+    `«NeocorticalSchemaInvariants»
   ]

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #415, Papers #177 through #224).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #416, Papers #177 through #225).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #415) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #416) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (415 jobs).`
+- `Build completed successfully (416 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -759,6 +759,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_mitochondrial_dynamics.cpp -o build/weft_b
 
 ---
 
+### Cycle v340.94.0: Blood-Tumor Barrier (BTB) Heterogeneity & Convective Extravasation Invariants (Target #416, Paper #225)
+```bash
+# 1. Run BTB extravasation simulation
+.venv/bin/python scripts/sim_btb_extravasation.py
+
+# 2. Compile and run AVX2 BTB microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_btb_extravasation.cpp -o build/weft_bench_btb_extravasation
+./build/weft_bench_btb_extravasation
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_btb_extravasation.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -810,3 +825,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftShearStressMechanotransductionHUD.tsx` (Endothelial Glycocalyx Shear Sensing, eNOS Ser1177 Phos & NO Output Gate)
 - `WeftOpcDifferentiationHUD.tsx` (OPC Migration, GPR17 Downregulation, MBP Compaction & Saltatory Velocity Gate)
 - `WeftPresynapticMitochondriaHUD.tsx` (Drp1/Mfn2 Ratio, Delta Psi_m, Synaptosomal ATP & mPTP Gate)
+- `WeftBtbExtravasationHUD.tsx` (Blood-Tumor Barrier IFP Decompression, Starling J_v Flux & FUS Nanocarrier Gate)

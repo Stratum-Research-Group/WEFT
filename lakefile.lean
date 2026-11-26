@@ -350,5 +350,6 @@ lean_lib «FormalSuite» where
     `«ClaustrocorticalSalienceInvariants»,
     `«MacroConnectomeStabilityInvariants»,
     `«CorticothalamicFeedbackInvariants»,
-    `«AmygdalarConditioningInvariants»
+    `«AmygdalarConditioningInvariants»,
+    `«LateralHabenulaAversionInvariants»
   ]

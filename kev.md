@@ -279,6 +279,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_stn_gpe_beta.cpp -o build/weft_bench_stn_g
 
 ---
 
+### Cycle v340.62.0: Pedunculopontine Nucleus (PPN) & Spinal Locomotor CPG (Target #384, Paper #193)
+```bash
+# 1. Run PPN locomotor initiation and Freezing of Gait simulation
+.venv/bin/python scripts/sim_ppn_locomotor_gating.py
+
+# 2. Compile and run AVX2 PPN locomotor CPG cadence microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_ppn_locomotor_cpg.cpp -o build/weft_bench_ppn_locomotor_cpg
+./build/weft_bench_ppn_locomotor_cpg
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_ppn_locomotor.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -298,3 +313,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftStriatalDopamineHUD.tsx` (D1/D2 Opponent Action Selection)
 - `WeftNigrothalamicDisinhibitionHUD.tsx` (SNr Disinhibition & Thalamic Rebound)
 - `WeftGPeArkypallidalHUD.tsx` (GPe Prototypic vs Arkypallidal Stopping & Beta Resonance)
+- `WeftPPNLocomotorHUD.tsx` (PPN Locomotor CPG Phase Gating & Freezing of Gait)

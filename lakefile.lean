@@ -425,5 +425,6 @@ lean_lib «FormalSuite» where
     `«BtbExtravasationInvariants»,
     `«MeningealLymphaticsInvariants»,
     `«ThalamocorticalSoPacInvariants»,
-    `«VagalAntiInflammatoryInvariants»
+    `«VagalAntiInflammatoryInvariants»,
+    `«MicroglialPruningInvariants»
   ]

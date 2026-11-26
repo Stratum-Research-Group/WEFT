@@ -375,5 +375,6 @@ lean_lib «FormalSuite» where
     `«RubrospinalVelocityInvariants»,
     `«TectospinalSaccadeInvariants»,
     `«CorticospinalFractionationInvariants»,
-    `«GraspAffordanceInvariants»
+    `«GraspAffordanceInvariants»,
+    `«SpinalPresynapticPADInvariants»
   ]

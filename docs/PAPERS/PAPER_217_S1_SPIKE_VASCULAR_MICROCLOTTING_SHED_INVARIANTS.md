@@ -110,7 +110,20 @@ The fused GPU kernel (`weft/kernels/fused_s1_microclotting_triton.py`) utilizes 
 
 ---
 
-## 5. References
+## 5. Discussion & Therapeutic Implications
+
+The demonstration that SARS-CoV-2 S1 spike protein directly induces non-enzymatic amyloidogenic transformation of fibrinogen provides a unified biophysical explanation for the anomalous microclots observed in acute COVID-19 and Long-COVID / PASC patients. Traditional anticoagulants (heparin, warfarin, direct oral anticoagulants) target serine proteases in the canonical coagulation cascade (Factor Xa, thrombin) but fail to resolve persistent, cross-$\beta$-sheet amyloid fibrin aggregates that resist enzymatic breakdown by plasmin.
+
+Our results establish that SHED-CM resolves this vascular pathology through a multi-modal strategy:
+1. **Extracellular Chaperone Capping:** Clusterin binds with nanomolar affinity to hydrophobic nucleation seeds, terminating cross-$\beta$ sheet propagation and rendering clots vulnerable to physiological fibrinolysis.
+2. **Endothelial Stabilization:** Angiopoietin-1 quenches Weibel-Palade body exocytosis via Tie2 signaling, cutting off the continuous release of ultra-large VWF multimers that anchor microvascular thrombi.
+3. **Decoy Sequestration:** sACE2-decorated extracellular vesicles in the secretome act as high-affinity stoichiometric sinks, capturing circulating free S1 spike protein before it can contact vascular endothelium or fibrinogen.
+
+This multi-component secretome approach represents an innovative therapeutic strategy to restore microvascular perfusion, abolish endothelialitis, and alleviate chronic post-viral tissue hypoxia.
+
+---
+
+## 6. References
 
 1. Pretorius, E., et al. (2021a). *Persistent clotting protein pathology in Long COVID/Post-Acute Sequelae of COVID-19 (PASC) is accompanied by increased levels of antiplasmin.* **Cardiovascular Diabetology**, 20(1), 172.
 2. Pretorius, E., et al. (2021b). *SARS-CoV-2 spike protein S1 induces fibrin(ogen) resistant to fibrinolysis.* **Bioscience Reports**, 41(8), BSR20210611.

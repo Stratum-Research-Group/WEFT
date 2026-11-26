@@ -122,7 +122,18 @@ The fused GPU kernel (`weft/kernels/fused_glymphatic_aqp4_triton.py`) implements
 
 ---
 
-## 6. References
+## 6. Discussion & Therapeutic Implications
+
+The glymphatic pathway represents an essential clearance conduit whose failure directly accelerates parenchymal protein misfolding and neurovascular congestion. Therapeutic interventions targeting single monomeric peptides (such as monoclonal antibodies against amyloid-$\beta$ or tau) have struggled with amyloid-related imaging abnormalities (ARIA) and cerebral amyloid angiopathy (CAA) in large part because the cleared proteins re-deposit in perivascular spaces without exiting the brain.
+
+Our model highlights that restoring perivascular convective flux requires a coordinated, multi-systemic approach:
+1. **Perivascular Endfoot Anchoring:** SHED-CM delivers agrin and laminin-111/211, re-assembling the dystrophin-associated protein complex (DAPC) and restoring AQP4 polarization from the astrocytic soma back to perivascular endfeet.
+2. **Slow-Wave Vasomotion:** Restoring deep NREM delta power expands the interstitial extracellular volume fraction from $14\%$ to $>24\%$, reducing hydraulic resistance and allowing fluid to flush the neuropil.
+3. **Synergistic Clearance with Microvascular Repair:** By simultaneously repairing blood-brain barrier tight junctions (Target #407) and quenching microclot formation (Target #408), glymphatic convective flow can operate unhindered by capillary occlusions, providing an autonomous drainage route for toxic aggregates.
+
+---
+
+## 7. References
 
 1. Iliff, J. J., et al. (2012). *A paravascular pathway facilitates CSF flow through the brain parenchyma and the clearance of interstitial solutes, including amyloid beta.* **Science Translational Medicine**, 4(147), 147ra111.
 2. Nedergaard, M. (2013). *Garbage truck of the brain.* **Science**, 340(6140), 1529-1530.

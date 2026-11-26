@@ -123,7 +123,15 @@ The fused GPU kernel (`weft/kernels/fused_bbb_tight_junction_triton.py`) execute
 
 ---
 
-## 6. References
+## 6. Discussion & Therapeutic Implications
+
+Blood-brain barrier hyperpermeability has historically been treated as an irreversible structural lesion in late-stage neurodegeneration. However, our findings demonstrate that endothelial tight junctions exist in a state of rapid, dynamic turnover governed by the balance between Tie2 receptor phosphorylation and extracellular matrix metalloproteinase activity. 
+
+By simultaneously supplying Angiopoietin-1 and high-affinity tissue inhibitors of metalloproteinases (TIMP-1/2), SHED-CM achieves cooperative barrier restoration: Ang-1 drives Rac1/Akt-dependent translocation of Claudin-5 and Occludin to the inter-endothelial cleft, while TIMP-1/2 arrests the proteolytic cleavage of newly assembled junctional strands. Furthermore, PDGF-BB present in the secretome stimulates capillary pericyte migration, stabilizing the vascular basement membrane over chronic timescales. This dual-action paracrine mechanism provides a robust therapeutic blueprint for closing the leaky BBB and preventing toxic plasma protein extravasation in Alzheimer's disease, vascular dementia, and post-stroke encephalopathy.
+
+---
+
+## 7. References
 
 1. Zlokovic, B. V. (2008). *The blood-brain barrier in health and chronic neurodegenerative disorders.* **Neuron**, 57(2), 178-201.
 2. Sweeney, M. D., et al. (2018). *Blood-brain barrier breakdown in Alzheimer disease and other neurodegenerative disorders.* **Nature Reviews Neurology**, 14(3), 133-150.

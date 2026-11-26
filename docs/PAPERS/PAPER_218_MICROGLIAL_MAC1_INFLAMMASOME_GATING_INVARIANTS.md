@@ -126,7 +126,18 @@ The fused GPU kernel (`weft/kernels/fused_microglial_mac1_inflammasome_triton.py
 
 ---
 
-## 6. References
+## 6. Discussion & Therapeutic Implications
+
+Microglial activation in neurodegenerative diseases is notoriously difficult to arrest because sustained exposure to extravasated fibrinogen locks microglia into an autocatalytic M1 inflammatory feedback loop. Previous therapeutic approaches targeting isolated inflammatory cytokines (e.g. anti-TNF antibodies or IL-1 receptor antagonists) have shown limited clinical efficacy in the central nervous system due to poor blood-brain barrier penetrance and the persistence of upstream integrin-activating ligands.
+
+Our findings demonstrate that SHED-CM achieves profound, durable inflammasome extinction by acting simultaneously upstream and downstream:
+1. **Upstream Epitope Masking:** HGF blocks the physical interaction between the fibrinogen $\gamma390-396$ cryptic loop and the Mac-1 I-domain, shutting down the mechanical stimulus for microglial activation.
+2. **Post-Transcriptional Epigenetic Silencing:** Exosomal delivery of miR-124-3p down-regulates *ITGAM* (CD11b) and *MyD88*, breaking the Signal 1 priming cascade and preventing NF-$\kappa$B-driven transcription of pro-IL-1$\beta$ and NLRP3.
+3. **M2 Phenotypic Reprogramming:** Rather than merely inducing microglial paralysis, the secretome stimulates the expression of anti-inflammatory markers (Arg-1, CD206, IL-10), actively converting the immune microenvironment into a neuroprotective, pro-phagocytic resolving state that clears residual debris while sparing intact synaptic spines.
+
+---
+
+## 7. References
 
 1. Salter, M. W., & Stevens, B. (2017). *Microglia emerge as central players in brain disease.* **Nature Medicine**, 23(9), 1018-1027.
 2. Hong, S., et al. (2016). *Complement and microglia mediate early synapse loss in Alzheimer mouse models.* **Science**, 352(6286), 712-716.

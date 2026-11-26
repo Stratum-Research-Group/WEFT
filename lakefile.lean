@@ -383,5 +383,6 @@ lean_lib «FormalSuite» where
     `«SubthalamicHyperdirectStopInvariants»,
     `«ParietalCoordinateTransformInvariants»,
     `«ReticulospinalPosturalInvariants»,
-    `«VORRetinalSlipInvariants»
+    `«VORRetinalSlipInvariants»,
+    `«CerebellarVORAdaptationInvariants»
   ]

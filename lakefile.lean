@@ -401,5 +401,6 @@ lean_lib «FormalSuite» where
     `«ThalamicReticularFilteringInvariants»,
     `«ClaustrumSynchronizationInvariants»,
     `«ZonaIncertaInvariants»,
-    `«VLPAGSurvivalInvariants»
+    `«VLPAGSurvivalInvariants»,
+    `«LHOrexinArousalInvariants»
   ]

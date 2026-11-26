@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #395, Papers #177 through #204).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #396, Papers #177 through #205).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #395) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #396) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (395 jobs).`
+- `Build completed successfully (396 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -459,6 +459,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_vlpag_survival.cpp -o build/weft_bench_vlp
 
 ---
 
+### Cycle v340.74.0: Lateral Hypothalamus (LH) Orexin/Hypocretin Arousal & Muscle Tone Gating Invariants (Target #396, Paper #205)
+```bash
+# 1. Run LH orexin arousal and cataplexy prevention simulation
+.venv/bin/python scripts/sim_lh_orexin.py
+
+# 2. Compile and run AVX2 LH orexin muscle tone microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_lh_orexin.cpp -o build/weft_bench_lh_orexin
+./build/weft_bench_lh_orexin
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_lh_orexin.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -490,3 +505,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftClaustrumSynchronizationHUD.tsx` (Claustrum Cortical Synchronization & Salience Switching Gate)
 - `WeftZonaIncertaHUD.tsx` (Zona Incerta Visceromotor Gate & Binge Feeding Attractor)
 - `WeftVLPAGSurvivalHUD.tsx` (vlPAG Freezing vs dlPAG Flight Escape Survival Gate)
+- `WeftLHOrexinArousalHUD.tsx` (LH Orexin Arousal & Muscle Tone Stabilizer)

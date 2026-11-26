@@ -398,5 +398,6 @@ lean_lib «FormalSuite» where
     `«LateralHabenulaInvariants»,
     `«VTADopaminePlasticityInvariants»,
     `«NeuromodulatorySynthesisInvariants»,
-    `«ThalamicReticularFilteringInvariants»
+    `«ThalamicReticularFilteringInvariants»,
+    `«ClaustrumSynchronizationInvariants»
   ]

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #392, Papers #177 through #201).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #393, Papers #177 through #202).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #392) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #393) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (392 jobs).`
+- `Build completed successfully (393 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -414,6 +414,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_thalamic_reticular_filtering.cpp -o build/
 
 ---
 
+### Cycle v340.71.0: Claustrum Cortical Synchronization & Salience Switching Invariants (Target #393, Paper #202)
+```bash
+# 1. Run claustrum cortical synchronization and salience switching simulation
+.venv/bin/python scripts/sim_claustrum_synchronization.py
+
+# 2. Compile and run AVX2 claustrum salience gating microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_claustrum_synchronization.cpp -o build/weft_bench_claustrum_synchronization
+./build/weft_bench_claustrum_synchronization
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_claustrum_synchronization.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -442,3 +457,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftVTADopaminePlasticityHUD.tsx` (VTA Dopaminergic Three-Factor Synaptic Plasticity & Trace Consolidation)
 - `WeftNeuromodulatorySynthesisHUD.tsx` (Grand 5-Axis Neuromodulatory Convergence & Multi-Transmitter Synthesis)
 - `WeftThalamicReticularHUD.tsx` (Thalamic Reticular Cross-Modal Attentional Filter & Burst-Tonic Gate)
+- `WeftClaustrumSynchronizationHUD.tsx` (Claustrum Cortical Synchronization & Salience Switching Gate)

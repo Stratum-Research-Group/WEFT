@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #411, Papers #177 through #220).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #412, Papers #177 through #221).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #411) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #412) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (411 jobs).`
+- `Build completed successfully (412 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -699,6 +699,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_neurovascular_coupling.cpp -o build/weft_b
 
 ---
 
+### Cycle v340.90.0: Pericyte Capillary Constriction & Ischemic No-Reflow Invariants (Target #412, Paper #221)
+```bash
+# 1. Run pericyte capillary constriction and no-reflow simulation
+.venv/bin/python scripts/sim_pericyte_no_reflow.py
+
+# 2. Compile and run AVX2 pericyte microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_pericyte_no_reflow.cpp -o build/weft_bench_pericyte_no_reflow
+./build/weft_bench_pericyte_no_reflow
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_pericyte_no_reflow.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -746,3 +761,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftMicroglialMac1InflammasomeHUD.tsx` (Microglial Mac-1 Ligation, NLRP3 ASC Speck Assembly & SHED miR-124 M2 Resolution Gate)
 - `WeftGlymphaticAqp4HUD.tsx` (Astrocytic Endfoot AQP4 Polarized Water Transport, NREM Vasomotion & Glymphatic Flush Gate)
 - `WeftNeurovascularCouplingHUD.tsx` (Astrocytic Endfoot Ca2+ Transients, BK_Ca/Kir2.1 Vasomotion & Functional Hyperemia Gate)
+- `WeftPericyteNoReflowHUD.tsx` (Capillary Pericyte Contraction, RBC Entrapment & SHED Tie2/cAMP Reflow Rescue Gate)

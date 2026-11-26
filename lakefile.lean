@@ -372,5 +372,6 @@ lean_lib «FormalSuite» where
     `«CrossedExtensorReflexInvariants»,
     `«VestibulospinalToneInvariants»,
     `«ReticulospinalAPATimingInvariants»,
-    `«RubrospinalVelocityInvariants»
+    `«RubrospinalVelocityInvariants»,
+    `«TectospinalSaccadeInvariants»
   ]

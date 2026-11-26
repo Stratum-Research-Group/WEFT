@@ -346,5 +346,6 @@ lean_lib «FormalSuite» where
     `«ThalamocorticalBurstInvariants»,
     `«ThetaPhasePrecessionInvariants»,
     `«CerebellarInversionInvariants»,
-    `«NeuromodulatoryGainInvariants»
+    `«NeuromodulatoryGainInvariants»,
+    `«ClaustrocorticalSalienceInvariants»
   ]

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #387, Papers #177 through #196).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #388, Papers #177 through #197).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #387) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #388) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (387 jobs).`
+- `Build completed successfully (388 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -339,6 +339,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_dorsal_raphe_5ht.cpp -o build/weft_bench_d
 
 ---
 
+### Cycle v340.66.0: Basal Forebrain Acetylcholine (BF-ACh) Attention Cue Detection & Expected Uncertainty Invariants (Target #388, Paper #197)
+```bash
+# 1. Run basal forebrain ACh attentional gating simulation
+.venv/bin/python scripts/sim_basal_forebrain_ach.py
+
+# 2. Compile and run AVX2 ACh attentional gating microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_basal_forebrain_ach.cpp -o build/weft_bench_basal_forebrain_ach
+./build/weft_bench_basal_forebrain_ach
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_basal_forebrain_ach.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -362,3 +377,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftCnFEscapeHUD.tsx` (CnF High-Speed Locomotor Escape & Gallop Bifurcation)
 - `WeftLCNEModulationHUD.tsx` (Locus Coeruleus Noradrenergic Gain & Yerkes-Dodson Arousal)
 - `WeftDorsalRaphe5HTHUD.tsx` (Dorsal Raphe Serotonin Waiting Patience & Impulsivity Threshold)
+- `WeftBasalForebrainAChHUD.tsx` (Basal Forebrain Cholinergic Attentional Gating & Cue Detection)

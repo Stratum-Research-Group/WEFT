@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #385, Papers #177 through #194).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #386, Papers #177 through #195).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #385) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #386) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (385 jobs).`
+- `Build completed successfully (386 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -309,6 +309,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_cnf_escape_locomotion.cpp -o build/weft_be
 
 ---
 
+### Cycle v340.64.0: Locus Coeruleus Norepinephrine (LC-NE) Gain Modulation & Yerkes-Dodson Arousal Invariants (Target #386, Paper #195)
+```bash
+# 1. Run LC-NE arousal regime and cortical gain simulation
+.venv/bin/python scripts/sim_lc_ne_modulation.py
+
+# 2. Compile and run AVX2 LC-NE cortical gain microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_lc_ne_modulation.cpp -o build/weft_bench_lc_ne_modulation
+./build/weft_bench_lc_ne_modulation
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_lc_ne_modulation.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -330,3 +345,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftGPeArkypallidalHUD.tsx` (GPe Prototypic vs Arkypallidal Stopping & Beta Resonance)
 - `WeftPPNLocomotorHUD.tsx` (PPN Locomotor CPG Phase Gating & Freezing of Gait)
 - `WeftCnFEscapeHUD.tsx` (CnF High-Speed Locomotor Escape & Gallop Bifurcation)
+- `WeftLCNEModulationHUD.tsx` (Locus Coeruleus Noradrenergic Gain & Yerkes-Dodson Arousal)

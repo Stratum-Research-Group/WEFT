@@ -391,5 +391,6 @@ lean_lib «FormalSuite» where
     `«NigrothalamicGateInvariants»,
     `«GPeArkypallidalInvariants»,
     `«PPNLocomotorCPGInvariants»,
-    `«CnFEscapeLocomotionInvariants»
+    `«CnFEscapeLocomotionInvariants»,
+    `«LCNEGainModulationInvariants»
   ]

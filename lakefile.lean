@@ -338,5 +338,6 @@ lean_lib «FormalSuite» where
     `«NewtonSchulzOrthogonality»,
     `«DNAComplementarityInvariants»,
     `«GQAHeadPartitionInvariants»,
-    `«EntropyDivergenceInvariants»
+    `«EntropyDivergenceInvariants»,
+    `«BitboardOccupancyInvariants»
   ]

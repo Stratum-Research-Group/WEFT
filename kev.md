@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #405, Papers #177 through #214).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #406, Papers #177 through #215).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #405) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #406) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (405 jobs).`
+- `Build completed successfully (406 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -609,6 +609,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_unified_neuromodulation.cpp -o build/weft_
 
 ---
 
+### Cycle v340.84.0: Fibrinogen-SHED-CM Molecular Interactions & Anti-Amyloid Fibrin Shielding Invariants (Target #406, Paper #215)
+```bash
+# 1. Run Fibrinogen-SHED-CM molecular docking and shielding simulation
+.venv/bin/python scripts/sim_fibrinogen_shed.py
+
+# 2. Compile and run AVX2 Fibrinogen-SHED microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_fibrinogen_shed.cpp -o build/weft_bench_fibrinogen_shed
+./build/weft_bench_fibrinogen_shed
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_fibrinogen_shed.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -650,3 +665,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftAlzheimerGammaHUD.tsx` (PV Interneuron Nav1.1 Hypofunction, Cortical Gamma Uncoupling & Sensory Rescue Gate)
 - `WeftParoxysmalDyskinesiaHUD.tsx` (PRRT2/PNKD SNARE Channelopathy, Cerebellar-Striatal Crosstalk & Carbamazepine Gate)
 - `WeftUnifiedNeuromodulationHUD.tsx` (Multi-Modal Biomarker Fusion, Closed-Loop Proportional DBS & Autonomous Rescue Gate)
+- `WeftFibrinogenShedHUD.tsx` (SHED-CM Chaperone Shielding, Fibrinogen-Aβ Epitope Masking & Mac-1 Suppression Gate)

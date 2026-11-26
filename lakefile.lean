@@ -337,5 +337,6 @@ lean_lib «FormalSuite» where
     `«MetricDistanceInvariants»,
     `«NewtonSchulzOrthogonality»,
     `«DNAComplementarityInvariants»,
-    `«GQAHeadPartitionInvariants»
+    `«GQAHeadPartitionInvariants»,
+    `«EntropyDivergenceInvariants»
   ]

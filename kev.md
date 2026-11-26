@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #398, Papers #177 through #207).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #399, Papers #177 through #208).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #398) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #399) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (398 jobs).`
+- `Build completed successfully (399 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -504,6 +504,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_striatal_cholinergic.cpp -o build/weft_ben
 
 ---
 
+### Cycle v340.77.0: Adaptive Closed-Loop DBS (aDBS): Phase-Specific Desynchronization & Beta-Burst Truncation Invariants (Target #399, Paper #208)
+```bash
+# 1. Run adaptive closed-loop aDBS simulation
+.venv/bin/python scripts/sim_adaptive_dbs.py
+
+# 2. Compile and run AVX2 aDBS closed-loop microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_adaptive_dbs.cpp -o build/weft_bench_adaptive_dbs
+./build/weft_bench_adaptive_dbs
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_adaptive_dbs.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -538,3 +553,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftLHOrexinArousalHUD.tsx` (LH Orexin Arousal & Muscle Tone Stabilizer)
 - `WeftElectrophysiologicalDiseasePredictionHUD.tsx` (LFP Beta Power, PAC & 1/f Spectral Tilt Predictive Biomarker Gate)
 - `WeftStriatalCholinergicDystoniaHUD.tsx` (ChI Hyper-Rebound & Agonist-Antagonist Co-Contraction Gate)
+- `WeftAdaptiveDBSClosedLoopHUD.tsx` (aDBS Phase-Specific Desynchronization & Beta Burst Truncation Gate)

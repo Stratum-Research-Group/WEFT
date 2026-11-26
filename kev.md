@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #383, Papers #177 through #192).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #385, Papers #177 through #194).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #383) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #385) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (383 jobs).`
+- `Build completed successfully (385 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -294,6 +294,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_ppn_locomotor_cpg.cpp -o build/weft_bench_
 
 ---
 
+### Cycle v340.63.0: Cuneiform Nucleus (CnF) Locomotor Escape & Asymmetric Gait Bifurcations (Target #385, Paper #194)
+```bash
+# 1. Run CnF escape locomotion and gait bifurcation simulation
+.venv/bin/python scripts/sim_cnf_escape_locomotion.py
+
+# 2. Compile and run AVX2 CnF escape kinematics microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_cnf_escape_locomotion.cpp -o build/weft_bench_cnf_escape_locomotion
+./build/weft_bench_cnf_escape_locomotion
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_cnf_escape_locomotion.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -314,3 +329,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftNigrothalamicDisinhibitionHUD.tsx` (SNr Disinhibition & Thalamic Rebound)
 - `WeftGPeArkypallidalHUD.tsx` (GPe Prototypic vs Arkypallidal Stopping & Beta Resonance)
 - `WeftPPNLocomotorHUD.tsx` (PPN Locomotor CPG Phase Gating & Freezing of Gait)
+- `WeftCnFEscapeHUD.tsx` (CnF High-Speed Locomotor Escape & Gallop Bifurcation)

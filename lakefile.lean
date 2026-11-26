@@ -390,5 +390,6 @@ lean_lib «FormalSuite» where
     `«StriatalDopamineRPEInvariants»,
     `«NigrothalamicGateInvariants»,
     `«GPeArkypallidalInvariants»,
-    `«PPNLocomotorCPGInvariants»
+    `«PPNLocomotorCPGInvariants»,
+    `«CnFEscapeLocomotionInvariants»
   ]

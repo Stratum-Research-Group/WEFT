@@ -353,5 +353,6 @@ lean_lib «FormalSuite» where
     `«AmygdalarConditioningInvariants»,
     `«LateralHabenulaAversionInvariants»,
     `«DentateGyrusOrthogonalizationInvariants»,
-    `«CA3AttractorCompletionInvariants»
+    `«CA3AttractorCompletionInvariants»,
+    `«CA1SequenceReadoutInvariants»
   ]

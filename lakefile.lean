@@ -395,5 +395,6 @@ lean_lib «FormalSuite» where
     `«LCNEGainModulationInvariants»,
     `«DorsalRapheSerotoninInvariants»,
     `«BasalForebrainAChInvariants»,
-    `«LateralHabenulaInvariants»
+    `«LateralHabenulaInvariants»,
+    `«VTADopaminePlasticityInvariants»
   ]

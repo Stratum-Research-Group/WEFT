@@ -405,5 +405,6 @@ lean_lib «FormalSuite» where
     `«LHOrexinArousalInvariants»,
     `«ElectrophysiologicalDiseasePredictionInvariants»,
     `«StriatalCholinergicDystoniaInvariants»,
-    `«AdaptiveDBSInvariants»
+    `«AdaptiveDBSInvariants»,
+    `«HuntingtonChoreaInvariants»
   ]

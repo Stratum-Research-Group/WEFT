@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #403, Papers #177 through #212).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #404, Papers #177 through #213).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #403) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #404) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (403 jobs).`
+- `Build completed successfully (404 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -579,6 +579,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_alzheimer_gamma.cpp -o build/weft_bench_al
 
 ---
 
+### Cycle v340.82.0: Paroxysmal Dyskinesia & Channelopathy: Cerebellar-Basal Ganglia Crosstalk Invariants (Target #404, Paper #213)
+```bash
+# 1. Run Paroxysmal Dyskinesia cerebellar-striatal simulation
+.venv/bin/python scripts/sim_paroxysmal_dyskinesia.py
+
+# 2. Compile and run AVX2 Paroxysmal Dyskinesia microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_paroxysmal_dyskinesia.cpp -o build/weft_bench_paroxysmal_dyskinesia
+./build/weft_bench_paroxysmal_dyskinesia
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_paroxysmal_dyskinesia.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -618,3 +633,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftAlsCorticomotoneuronalHUD.tsx` (Astrocytic EAAT2 Loss, Motoneuronal Runaway Firing & Renshaw Recurrent Disinhibition Gate)
 - `WeftEssentialTremorHUD.tsx` (Inferior Olivary Pacemaking, DRT Hyper-Oscillation & Hand Tremor Gate)
 - `WeftAlzheimerGammaHUD.tsx` (PV Interneuron Nav1.1 Hypofunction, Cortical Gamma Uncoupling & Sensory Rescue Gate)
+- `WeftParoxysmalDyskinesiaHUD.tsx` (PRRT2/PNKD SNARE Channelopathy, Cerebellar-Striatal Crosstalk & Carbamazepine Gate)

@@ -415,5 +415,6 @@ lean_lib «FormalSuite» where
     `«FibrinogenShedInvariants»,
     `«BbbTightJunctionInvariants»,
     `«S1MicroclottingInvariants»,
-    `«MicroglialMac1InflammasomeInvariants»
+    `«MicroglialMac1InflammasomeInvariants»,
+    `«GlymphaticAqp4Invariants»
   ]

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #409, Papers #177 through #218).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #410, Papers #177 through #219).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #409) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #410) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (409 jobs).`
+- `Build completed successfully (410 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -669,6 +669,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_microglial_mac1_inflammasome.cpp -o build/
 
 ---
 
+### Cycle v340.88.0: Glymphatic Convective Flux & Aquaporin-4 (AQP4) Polarized Perivascular Clearance Invariants (Target #410, Paper #219)
+```bash
+# 1. Run Glymphatic flux and AQP4 clearance simulation
+.venv/bin/python scripts/sim_glymphatic_aqp4.py
+
+# 2. Compile and run AVX2 Glymphatic AQP4 microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_glymphatic_aqp4.cpp -o build/weft_bench_glymphatic_aqp4
+./build/weft_bench_glymphatic_aqp4
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_glymphatic_aqp4.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -714,3 +729,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftBbbTightJunctionHUD.tsx` (Pericyte-Endothelial Tie2 Phosphorylation, Claudin-5/Occludin Assembly & TEER Restoration Gate)
 - `WeftS1MicroclottingHUD.tsx` (SARS-CoV-2 S1 Spike-Fibrinogen Amyloid Microclots, ULVWF Multimerization & SHED Rescue Gate)
 - `WeftMicroglialMac1InflammasomeHUD.tsx` (Microglial Mac-1 Ligation, NLRP3 ASC Speck Assembly & SHED miR-124 M2 Resolution Gate)
+- `WeftGlymphaticAqp4HUD.tsx` (Astrocytic Endfoot AQP4 Polarized Water Transport, NREM Vasomotion & Glymphatic Flush Gate)

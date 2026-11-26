@@ -410,5 +410,6 @@ lean_lib «FormalSuite» where
     `«AlsExcitotoxicityInvariants»,
     `«EssentialTremorInvariants»,
     `«AlzheimerGammaInvariants»,
-    `«ParoxysmalDyskinesiaInvariants»
+    `«ParoxysmalDyskinesiaInvariants»,
+    `«UnifiedNeuromodulationInvariants»
   ]

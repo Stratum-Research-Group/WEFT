@@ -85,10 +85,11 @@ def verify_formal_suite():
         "AlsExcitotoxicityInvariants.lean",
         "EssentialTremorInvariants.lean",
         "AlzheimerGammaInvariants.lean",
-        "ParoxysmalDyskinesiaInvariants.lean"
+        "ParoxysmalDyskinesiaInvariants.lean",
+        "UnifiedNeuromodulationInvariants.lean"
     ]
 
-    print("Auditing Co-Authored Synaptic & Motor Biology Formal Targets (Targets #368 - #404):")
+    print("Auditing Co-Authored Synaptic & Motor Biology Formal Targets (Targets #368 - #405):")
     for t in neuro_coauthored_targets:
         full_p = os.path.join(formal_dir, t)
         if not os.path.exists(full_p):
@@ -120,7 +121,7 @@ def verify_formal_suite():
     print("  -> Base Lean 4 Core: v4.33.1 (Official)")
     print("  -> Verified Namespaces: Weft.Formal.*")
     print("  -> Mathlib Core Tactics: omega, simp, split, dsimp, revert, constructor, decide")
-    print("  -> Axiom-Free Guarantee: Verified across all newly instantiated neurobiology targets (#368 - #404)")
+    print("  -> Axiom-Free Guarantee: Verified across all newly instantiated neurobiology targets (#368 - #405)")
     print("=" * 80)
     print("AUTOMATED VERIFICATION PIPELINE COMPLETED: 100% OPERATIONAL")
     print("=" * 80)

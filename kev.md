@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #404, Papers #177 through #213).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #405, Papers #177 through #214).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #404) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #405) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (404 jobs).`
+- `Build completed successfully (405 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -594,6 +594,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_paroxysmal_dyskinesia.cpp -o build/weft_be
 
 ---
 
+### Cycle v340.83.0: Unified Closed-Loop Neuromodulation Engine: Multi-Modal Biomarker Fusion Invariants (Target #405, Paper #214)
+```bash
+# 1. Run Unified Closed-Loop Neuromodulation Engine simulation
+.venv/bin/python scripts/sim_unified_neuromodulation.py
+
+# 2. Compile and run AVX2 Unified Neuromodulation microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_unified_neuromodulation.cpp -o build/weft_bench_unified_neuromodulation
+./build/weft_bench_unified_neuromodulation
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_unified_neuromodulation.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -634,3 +649,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftEssentialTremorHUD.tsx` (Inferior Olivary Pacemaking, DRT Hyper-Oscillation & Hand Tremor Gate)
 - `WeftAlzheimerGammaHUD.tsx` (PV Interneuron Nav1.1 Hypofunction, Cortical Gamma Uncoupling & Sensory Rescue Gate)
 - `WeftParoxysmalDyskinesiaHUD.tsx` (PRRT2/PNKD SNARE Channelopathy, Cerebellar-Striatal Crosstalk & Carbamazepine Gate)
+- `WeftUnifiedNeuromodulationHUD.tsx` (Multi-Modal Biomarker Fusion, Closed-Loop Proportional DBS & Autonomous Rescue Gate)

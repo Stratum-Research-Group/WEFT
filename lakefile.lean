@@ -341,5 +341,6 @@ lean_lib «FormalSuite» where
     `«EntropyDivergenceInvariants»,
     `«BitboardOccupancyInvariants»,
     `«ModulationIndexInvariants»,
-    `«STDPConvergenceInvariants»
+    `«STDPConvergenceInvariants»,
+    `«BasalGangliaAttractorInvariants»
   ]

@@ -1,6 +1,6 @@
 # Technical Paper #132: Online Softmax Numerical Bounds and Dynamic Sub-Bit KV-Cache Eviction
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt**  
 *Stratum Research Group • WEFT Technical Report Series*  
 *Date: November 2026 • Verified under Lean 4 Formal Suite (Target #324)*
 

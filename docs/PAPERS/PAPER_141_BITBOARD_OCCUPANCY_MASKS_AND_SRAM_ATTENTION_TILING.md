@@ -1,6 +1,6 @@
 # Technical Paper #141: Bitboard Occupancy Masks and Branchless SRAM Attention Tiling
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt**  
 *Stratum Research Group • WEFT Technical Report Series*  
 *Date: November 2026 • Verified under Lean 4 Formal Suite (Target #333)*
 

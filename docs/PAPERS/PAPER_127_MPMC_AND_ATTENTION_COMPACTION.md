@@ -1,6 +1,7 @@
 # Milestone Technical Paper #127: Lock-Free MPMC Ring Topologies & Dynamic Attention Sink Compaction for Continuous Sub-Bit Swarms
 
-**Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • WEFT Technical Report Series*  
 **Affiliation:** Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  
 **Verification:** Lean 4 Formal Suite (319 Theorems Clean, Zero Axioms, Zero `sorry`)  

@@ -1,6 +1,6 @@
 # Technical Paper #136: Biomolecular Co-Folding Under Sub-Bit Quantization and Metric Distance Invariants
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt**  
 *Stratum Research Group • WEFT Technical Report Series*  
 *Date: November 2026 • Verified under Lean 4 Formal Suite (Target #328)*
 

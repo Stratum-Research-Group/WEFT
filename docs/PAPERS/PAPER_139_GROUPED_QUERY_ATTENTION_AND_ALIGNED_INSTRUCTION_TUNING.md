@@ -1,6 +1,6 @@
 # Technical Paper #139: Grouped-Query Attention Memory Bounds and Post-Pretraining Aligned Evaluation
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt**  
 *Stratum Research Group • WEFT Technical Report Series*  
 *Date: November 2026 • Verified under Lean 4 Formal Suite (Target #331)*
 

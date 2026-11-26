@@ -1,6 +1,7 @@
 # Milestone Technical Paper #129: Multi-Stream Fused Bitboard Attention & Speculative Verification over Sub-Bit Neural Weights
 
-**Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • WEFT Technical Report Series*  
 **Affiliation:** Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  
 **Verification:** Lean 4 Formal Suite (321 Theorems Clean, Zero Axioms, Zero `sorry`)  

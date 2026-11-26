@@ -1,6 +1,6 @@
 # WEFT Formal Suite: Verified Mathematical Invariants for Sub-Bit LLM Architectures
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt**  
 *Stratum Research Group • Monograph & Specification Series*  
 *Verified under Lean 4 Formal Suite (`lake build FormalSuite` — 332 Clean Targets, 0 Sorry, 0 Non-Standard Axioms)*  
 *Current Release: v340.10.0 • Date: November 2026*

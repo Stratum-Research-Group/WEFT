@@ -1,6 +1,7 @@
 # Milestone Technical Paper #131: Test-Time Titans Fast-Weights & Associative Memory Recall for Autonomous Swarms
 
-**Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • WEFT Technical Report Series*  
 **Affiliation:** Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  
 **Verification:** Lean 4 Formal Suite (323 Theorems Clean, Zero Axioms, Zero `sorry`)  

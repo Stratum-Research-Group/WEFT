@@ -1,6 +1,6 @@
 # Technical Paper #140: On-Device Knowledge Distillation Bounds and Vectorized Nucleus Sampling
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt**  
 *Stratum Research Group • WEFT Technical Report Series*  
 *Date: November 2026 • Verified under Lean 4 Formal Suite (Target #332)*
 

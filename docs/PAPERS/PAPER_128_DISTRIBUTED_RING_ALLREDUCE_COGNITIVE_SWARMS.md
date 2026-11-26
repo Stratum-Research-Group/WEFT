@@ -1,6 +1,7 @@
 # Milestone Technical Paper #128: Distributed Ring-AllReduce Memory Synchronization for Multi-Agent Cognitive Swarms
 
-**Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • WEFT Technical Report Series*  
 **Affiliation:** Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  
 **Verification:** Lean 4 Formal Suite (320 Theorems Clean, Zero Axioms, Zero `sorry`)  

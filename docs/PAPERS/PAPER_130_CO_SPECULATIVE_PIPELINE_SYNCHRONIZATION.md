@@ -1,6 +1,7 @@
 # Milestone Technical Paper #130: Deadlock-Free Heterogeneous CPU-GPU Co-Speculative Pipeline Synchronization
 
-**Authors:** Nicholas Charles Mynhardt, Stratum Research Group  
+**Nicholas Charles Mynhardt**  
+*Stratum Research Group • WEFT Technical Report Series*  
 **Affiliation:** Stratum Research Group (`research@stratum.org`)  
 **License:** Apache-2.0  
 **Verification:** Lean 4 Formal Suite (322 Theorems Clean, Zero Axioms, Zero `sorry`)  

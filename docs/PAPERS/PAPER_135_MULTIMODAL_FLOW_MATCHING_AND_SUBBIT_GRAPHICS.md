@@ -1,6 +1,6 @@
 # Technical Paper #135: SOTA 2026 Multimodal Rectified Flow DiT & STEM Foundation Model Sub-Bit Execution
 
-**Nicholas Charles Mynhardt & Antigravity Autonomous Systems Group**  
+**Nicholas Charles Mynhardt**  
 *Stratum Research Group • WEFT Technical Report Series*  
 *Date: November 2026 • Verified under Lean 4 Formal Suite (Target #327)*
 

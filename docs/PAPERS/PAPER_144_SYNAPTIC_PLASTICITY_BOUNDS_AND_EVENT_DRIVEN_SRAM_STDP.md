@@ -2,7 +2,7 @@
 ## Synaptic Plasticity Bounds, Event-Driven SRAM STDP, and Basal Ganglia-Gated Cortical Manifold Selection
 
 **Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.**  
-*Stratum Research Group • WEFT Autonomous Systems Laboratory*  
+*Stratum Research Group • Theoretical Neurobiology & Synaptic Plasticity Series*  
 *November 2026*
 
 ---

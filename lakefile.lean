@@ -377,5 +377,6 @@ lean_lib «FormalSuite» where
     `«CorticospinalFractionationInvariants»,
     `«GraspAffordanceInvariants»,
     `«SpinalPresynapticPADInvariants»,
-    `«SMAMotorSequenceChunkingInvariants»
+    `«SMAMotorSequenceChunkingInvariants»,
+    `«TactileSlipGripAdaptationInvariants»
   ]

@@ -361,5 +361,6 @@ lean_lib «FormalSuite» where
     `«StriatalActionSelectionInvariants»,
     `«PPNLocomotorGatingInvariants»,
     `«InferiorOlivePhaseLockInvariants»,
-    `«CerebellarGranuleOrthogonalizationInvariants»
+    `«CerebellarGranuleOrthogonalizationInvariants»,
+    `«DCNReboundDisinhibitionInvariants»
   ]

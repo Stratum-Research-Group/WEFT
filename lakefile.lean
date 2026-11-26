@@ -363,5 +363,6 @@ lean_lib «FormalSuite» where
     `«InferiorOlivePhaseLockInvariants»,
     `«CerebellarGranuleOrthogonalizationInvariants»,
     `«DCNReboundDisinhibitionInvariants»,
-    `«CerebellarLTDConvergenceInvariants»
+    `«CerebellarLTDConvergenceInvariants»,
+    `«ForwardInternalModelInvariants»
   ]

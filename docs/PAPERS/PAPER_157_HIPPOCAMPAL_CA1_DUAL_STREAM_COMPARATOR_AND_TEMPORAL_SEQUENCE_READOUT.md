@@ -89,3 +89,13 @@ In `scripts/sim_ca1_sequence_readout.py`, we evaluated episodic sequence readout
 By coupling Schaffer collateral auto-associative recall with direct temporoammonic sensory validation under theta-phase scheduling, hippocampal subfield CA1 provides an optimal computational architecture for temporal sequence readout and novelty arbitration.
 
 All components, kernels, formal proofs, and interactive HUDs are integrated into WEFT monorepo release **Cycle v340.26.0**.
+
+---
+
+## References
+
+1. Hasselmo, M. E., Bodelón, C., & Wyble, B. P. (2002). A proposed function for hippocampal theta rhythm: separate phases of encoding and retrieval enhance reversal of prior learning. *Neural Computation*, 14(4), 793-817.
+2. Colgin, L. L., Denninger, T., Fyhn, M., Hafting, T., Bonnevie, T., Jensen, O., ... & Moser, E. I. (2009). Frequency of gamma oscillations routes flow of information in the hippocampus. *Nature*, 462(7271), 353-357.
+3. Lisman, J. E., & Grace, A. A. (2005). The hippocampal-VTA loop: controlling the entry of information into long-term memory. *Neuron*, 46(5), 703-713.
+4. Kumaran, D., & Maguire, E. A. (2006). An unexpected sequence of events: mismatch detection in the human hippocampus. *PLoS Biology*, 4(12), e424.
+5. Schomburg, E. W., Fernández-Ruiz, A., Mizuseki, K., Berényi, A., Anastassiou, C. A., Koch, C., & Buzsáki, G. (2014). Theta phase segregation of input-specific gamma patterns in entorhinal-hippocampal networks. *Neuron*, 84(2), 470-485.

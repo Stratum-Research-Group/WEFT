@@ -91,3 +91,13 @@ All proofs build cleanly with 0 axioms and 0 `sorry` statements.
 ## 5. Conclusion
 
 Amygdalar valence gating grounds cognitive manifolds in biological survival. By coupling fast associative LTP in the BLA with active prefrontal ITC GABAergic inhibition during extinction, the brain dynamically balances threat detection with flexible safety appraisal.
+
+---
+
+## References
+
+1. LeDoux, J. E. (2000). Emotion circuits in the brain. *Annual Review of Neuroscience*, 23(1), 155-184.
+2. Quirk, G. J., & Mueller, D. (2008). Neural mechanisms of extinction learning and retrieval. *Neuropsychopharmacology*, 33(1), 56-72.
+3. Janak, P. H., & Tye, K. M. (2015). From circuits to behaviour in the amygdala. *Nature*, 517(7534), 284-292.
+4. Tovote, P., Fadok, J. P., & Lüthi, A. (2015). Neuronal circuits for fear and anxiety. *Nature Reviews Neuroscience*, 16(6), 317-331.
+5. Milad, M. R., & Quirk, G. J. (2002). Neurons in medial prefrontal cortex signal memory for fear extinction. *Nature*, 420(6911), 70-74.

@@ -96,3 +96,13 @@ All proofs compile under Lean 4 with 0 axioms and 0 `sorry` statements.
 ## 5. Conclusion
 
 The Dentate Gyrus functions as the brain's biological hash expansion engine. Through high-dimensional perforant divergence and hilar feedback winner-take-all sparsity, the hippocampal formation orthogonalizes episodic memories, allowing discrete experiences to be recorded without catastrophic cross-talk.
+
+---
+
+## References
+
+1. Marr, D. (1971). Simple memory: a theory for archicortex. *Philosophical Transactions of the Royal Society of London. B, Biological Sciences*, 262(841), 23-81.
+2. Treves, A., & Rolls, E. T. (1992). Computational constraints suggest the need for two distinct input systems to the hippocampal CA3 network. *Hippocampus*, 2(2), 189-199.
+3. Leutgeb, J. K., Leutgeb, S., Moser, M. B., & Moser, E. I. (2007). Pattern separation in the dentate gyrus and CA3 of the hippocampus. *Science*, 315(5814), 961-966.
+4. Bakker, A., Kirwan, C. B., Miller, M., & Stark, C. E. (2008). Pattern separation in the human hippocampal CA3 and dentate gyrus. *Science*, 319(5870), 1640-1642.
+5. Yassa, M. A., & Stark, C. E. (2011). Pattern separation in the hippocampus. *Trends in Neurosciences*, 34(10), 515-525.

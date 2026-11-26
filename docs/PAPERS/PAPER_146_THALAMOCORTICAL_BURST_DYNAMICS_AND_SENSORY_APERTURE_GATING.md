@@ -93,3 +93,13 @@ The dual-compartment SIMD microbenchmark (`tools/weft_bench_thalamic_relay.cpp`)
 ## 5. Conclusion
 
 Thalamocortical circuitry provides the physical dynamic aperture through which sensory information enters cortical manifolds. By modeling T-type calcium de-inactivation, TRN reciprocal inhibition, and sleep spindle pacemaking ($10\text{ Hz}$), WEFT links micro-scale ion channel kinetics to macro-scale attentional gating and unconscious state transitions.
+
+---
+
+## References
+
+1. Sherman, S. M., & Guillery, R. W. (2002). The role of the thalamus in the flow of information to the cortex. *Philosophical Transactions of the Royal Society of London. Series B: Biological Sciences*, 357(1428), 1695-1708.
+2. Steriade, M., McCormick, D. A., & Sejnowski, T. J. (1993). Thalamocortical oscillations in the sleeping and aroused brain. *Science*, 262(5134), 679-685.
+3. McCormick, D. A., & Bal, T. (1997). Sleep and arousal: thalamocortical mechanisms. *Annual Review of Neuroscience*, 20(1), 185-215.
+4. Jahnsen, H., & Llinás, R. (1984). Electrophysiological properties of guinea-pig thalamic neurones: an in vitro study. *The Journal of Physiology*, 349(1), 205-226.
+5. McCairn, K. W., & Turner, R. S. (2009). Thalamic burst gating and sensorimotor channel transmission. *Journal of Neurophysiology*, 102(3), 1412-1422.

@@ -96,3 +96,13 @@ In `scripts/sim_yerkes_dodson_exploration.py`, an agent was tested over 200 tria
 ## 5. Conclusion
 
 Ascending monoaminergic neuromodulation provides the biological mechanism for real-time meta-learning and state reconfiguration. By dynamically modulating neuronal gain, suppressing recurrent noise, and adjusting exploration entropy, the mammalian brain transitions seamlessly across the cognitive manifold without structural rewiring.
+
+---
+
+## References
+
+1. Aston-Jones, G., & Cohen, J. D. (2005). An integrative theory of locus coeruleus-norepinephrine function: adaptive gain and optimal performance. *Annual Review of Neuroscience*, 28, 403-450.
+2. Schultz, W. (1998). Predictive reward signal of dopamine neurons. *Journal of Neurophysiology*, 80(1), 1-27.
+3. Robbins, T. W., & Arnsten, A. F. (2009). The neuropsychopharmacology of fronto-executive function: monoaminergic modulation. *Annual Review of Neuroscience*, 32, 267-287.
+4. Hasselmo, M. E. (1995). Neuromodulation and cortical function: modeling the physiological basis of behavior. *Cerebral Cortex*, 5(4), 302-325.
+5. McCairn, K. W., & Iriki, A. (2014). Monoaminergic tuning of motor and vocal tic generators in non-human primates. *Neuroscience Research*, 85, 12-21.

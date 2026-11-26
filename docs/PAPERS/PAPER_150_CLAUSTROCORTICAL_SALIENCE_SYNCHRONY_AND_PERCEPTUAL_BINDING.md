@@ -99,3 +99,13 @@ With Milestone Paper #150, the biophysical architecture of biological intelligen
 - **Claustrocortical Binding (Paper #150):** Global salience synchronization and perceptual binding.
 
 Every operational link is anchored in verified anatomochemistry, hardware-accelerated kernels, SIMD microbenchmarks, and machine-checked Lean 4 formal invariants.
+
+---
+
+## References
+
+1. Crick, F. C., & Koch, C. (2005). What is the function of the claustrum?. *Philosophical Transactions of the Royal Society B: Biological Sciences*, 360(1458), 1271-1279.
+2. Atlan, G., Terem, A., Peretz-Rivlin, N., Groysman, M., & Citri, A. (2018). The claustrum supports resilience to distraction. *Current Biology*, 28(17), 2752-2762.
+3. Goll, Y., Atlan, G., & Citri, A. (2015). Attention, claustrum, and circuits: what is the brain's spotlight of attention?. *Frontiers in Systems Neuroscience*, 9, 88.
+4. Jackson, J., Karnani, M. M., Zemelman, B. V., Burdakov, D., & Lee, A. K. (2018). Inhibitory control of prefrontal cortex by the claustrum. *Neuron*, 99(5), 1029-1039.
+5. Smythies, J., Edelstein, L., & Ramachandran, V. (2012). Hypotheses relating to the function of the claustrum. *Frontiers in Integrative Neuroscience*, 6, 53.

@@ -85,3 +85,13 @@ Compiled cleanly under Lean 4 with 0 axioms and 0 `sorry` statements.
 ## 6. Conclusion
 
 Theta phase precession and sharp-wave ripple replay provide the biophysical bridge converting macroscopic continuous behavior into microscopic millisecond-scale synaptic plasticity. This formalization integrates temporal sequence compression into the WEFT biological architecture without non-local assumptions.
+
+---
+
+## References
+
+1. O'Keefe, J., & Recce, M. L. (1993). Phase relationship between hippocampal place units and the EEG theta rhythm. *Hippocampus*, 3(3), 317-330.
+2. Skaggs, W. E., McNaughton, B. L., Wilson, M. A., & Barnes, C. A. (1996). Theta phase precession in hippocampal neuronal populations and the compression of temporal sequences. *Hippocampus*, 6(2), 149-172.
+3. Wilson, M. A., & McNaughton, B. L. (1994). Reactivation of hippocampal ensemble memories during sleep. *Science*, 265(5172), 676-679.
+4. Lee, A. K., & Wilson, M. A. (2002). Memory of sequential experience in the hippocampus during slow-wave sleep. *Neuron*, 36(6), 1183-1194.
+5. Foster, D. J., & Wilson, M. A. (2006). Reverse replay of behavioural sequences in hippocampal place cells during the awake state. *Nature*, 440(7084), 680-683.

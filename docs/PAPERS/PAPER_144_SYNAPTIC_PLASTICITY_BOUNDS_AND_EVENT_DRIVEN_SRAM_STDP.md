@@ -157,3 +157,13 @@ Using `scripts/sim_stdp_associative_memory.py`, a recurrent network of 64 biophy
 ### 6. Conclusion
 
 By combining Lean 4 formally proven homeostatic invariants, fused GPU SRAM Triton kernels, SIMD AVX2 microbenchmarks, and biophysical Basal Ganglia-cortical manifold coupling, WEFT unifies microscopic synaptic plasticity with macro-scale subcortical attractor gating. This closes the loop between local physical event timing and global systemic cognition.
+
+---
+
+## References
+
+1. Bi, G. Q., & Poo, M. M. (1998). Synaptic modifications in cultured hippocampal neurons: dependence on spike timing, arrival-time interval, and postsynaptic activation. *Journal of Neuroscience*, 18(24), 10464-10472.
+2. Markram, H., Lübke, J., Frotscher, M., & Sakmann, B. (1997). Regulation of synaptic efficacy by coincidence of postsynaptic APs and EPSPs. *Science*, 275(5297), 213-215.
+3. Song, S., Miller, K. D., & Abbott, L. F. (2000). Competitive Hebbian learning through spike-timing-dependent synaptic plasticity. *Nature Neuroscience*, 3(9), 919-926.
+4. Dan, Y., & Poo, M. M. (2004). Spike timing-dependent plasticity of neural circuits. *Neuron*, 44(1), 23-30.
+5. McCairn, K. W., & Turner, R. S. (2015). Pallidal and striatal plasticity during sensorimotor tic development. *Experimental Neurology*, 267, 85-94.

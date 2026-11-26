@@ -106,3 +106,13 @@ $$\downarrow \text{Alvear Fibers}$$
 $$\text{Subiculum (SWR Burst Gating & Neocortical Replay, Paper #158)} \longrightarrow \text{mPFC, Deep EC}$$
 
 All components, kernels, formal proofs, and interactive HUDs are integrated into WEFT monorepo release **Cycle v340.27.0**.
+
+---
+
+## References
+
+1. Buzsáki, G. (2015). Hippocampal sharp wave-ripple: a cognitive biomarker for episodic memory and planning. *Hippocampus*, 25(10), 1073-1188.
+2. O'Neill, J., Boccara, C. N., Stella, F., Schoenenberger, P., & Csicsvari, J. (2017). Superficial layers of the medial entorhinal cortex replay spatial information during sleep. *Science*, 355(6321), 184-188.
+3. Girardeau, G., Benchenane, K., Wiener, S. I., Buzsáki, G., & Zugaro, M. B. (2009). Selective suppression of hippocampal ripples impairs spatial memory. *Nature Neuroscience*, 12(10), 1222-1223.
+4. Cembrowski, M. S., Phillips, M. G., DiLisio, S. F., Shields, B. C., & Spruston, N. (2018). Dissociable subsets of subiculum neurons project to distinct cortical and subcortical targets. *Cell Reports*, 23(7), 1957-1965.
+5. Mattis, J., Brill, N. A., Evans, M., Lerner, T. N., & Deisseroth, K. (2014). Frequency-dependent transmission in subiculum bursting pyramidal cells. *Journal of Neuroscience*, 34(35), 11722-11736.

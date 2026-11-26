@@ -106,3 +106,13 @@ All proofs build with 0 axioms and 0 `sorry`s.
 ## 5. Conclusion
 
 The cerebellum functions as a high-speed predictive error-inversion engine. Through heterosynaptic parallel fiber LTD and DCN disinhibition, the motor nervous system overcomes biological conduction latency to achieve precision forward control.
+
+---
+
+## References
+
+1. Marr, D. (1969). A theory of cerebellar cortex. *The Journal of Physiology*, 202(2), 437-470.
+2. Albus, J. S. (1971). A theory of cerebellar function. *Mathematical Biosciences*, 10(1-2), 25-61.
+3. Ito, M. (1982). Cerebellar control of the vestibulo-ocular reflex—around the flocculus hypothesis. *Annual Review of Neuroscience*, 5(1), 275-296.
+4. Wolpert, D. M., Miall, R. C., & Kawato, M. (1998). Internal models in the cerebellum. *Trends in Cognitive Sciences*, 2(9), 338-347.
+5. Raymond, J. L., & Medina, J. F. (2018). Computational principles of cerebellar learning. *Annual Review of Neuroscience*, 41, 233-253.

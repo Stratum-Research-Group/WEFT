@@ -96,3 +96,13 @@ All proofs compile under Lean 4 with 0 axioms and 0 `sorry` statements.
 ## 5. Conclusion
 
 Layer VI corticothalamic feedback demonstrates that biological perception is inherently active and bidirectional. By combining center $\text{mGluR}_1$ facilitation with disynaptic TRN surround inhibition, the cortex shapes its own sensory inputs before they ascend the cortical hierarchy, ensuring robust perceptual focus and invariant contrast tuning.
+
+---
+
+## References
+
+1. Sillito, A. M., Jones, H. E., Gerstein, G. L., & West, D. C. (1994). Feature-linked synchrony among cortical neurons is promoted by subcortical feedback. *Nature*, 369(6480), 479-482.
+2. Mease, R. A., Sumser, A., Sakmann, B., & Groh, A. (2016). Corticothalamic frequency tuning in the somatosensory system. *Journal of Neuroscience*, 36(44), 11210-11220.
+3. Briggs, F., & Usrey, W. M. (2008). Corticothalamic feedback and sensory processing. *Current Opinion in Neurobiology*, 18(4), 385-390.
+4. Sherman, S. M. (2016). Thalamus plays a central role in ongoing cortical functioning. *Nature Neuroscience*, 19(4), 533-541.
+5. Guo, Z. V., Inagaki, H. K., Daie, K., Druckmann, S., Gerfen, C. R., & Svoboda, K. (2017). Maintenance of persistent activity in a frontal thalamocortical loop. *Nature*, 545(7653), 181-186.

@@ -102,3 +102,13 @@ Even when **$80\%$** of the original sensory cue is masked to zero, recurrent co
 CA3 auto-associative recurrent dynamics complement the dentate gyrus's pattern separation mechanism. Together, DG and CA3 form an optimal episodic memory storage and retrieval cascade: DG separates sensory overlap to prevent catastrophic interference, while CA3 recurrent collaterals complete occluded cues into high-fidelity episodic recall.
 
 All kernels, simulations, formal proofs, and interactive HUD components are integrated into WEFT monorepo release **Cycle v340.25.0**.
+
+---
+
+## References
+
+1. Hopfield, J. J. (1982). Neural networks and physical systems with emergent collective computational abilities. *Proceedings of the National Academy of Sciences*, 79(8), 2554-2558.
+2. Rolls, E. T. (2013). The mechanisms for pattern completion and pattern separation in the hippocampus. *Frontiers in Systems Neuroscience*, 7, 74.
+3. Nakazawa, K., Quirk, M. C., Chitwood, R. A., Watanabe, M., Yeckel, M. F., Sun, L. D., ... & Tonegawa, S. (2002). Requirement for hippocampal CA3 NMDA receptors in associative memory recall. *Science*, 297(5579), 211-218.
+4. Guzman, S. J., Schlögl, A., Frotscher, M., & Jonas, P. (2016). Synaptic mechanisms of pattern completion in the hippocampal CA3 network. *Science*, 353(6304), 1117-1123.
+5. Knierim, J. J., & Neunuebel, J. P. (2016). Tracking the flow of spatial information through the hippocampal formation. *Nature Reviews Neuroscience*, 17(9), 557-572.

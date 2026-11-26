@@ -358,5 +358,6 @@ lean_lib «FormalSuite» where
     `«SubiculumReplayGatingInvariants»,
     `«NeocorticalSchemaInvariants»,
     `«PrefrontalWMBistabilityInvariants»,
-    `«StriatalActionSelectionInvariants»
+    `«StriatalActionSelectionInvariants»,
+    `«PPNLocomotorGatingInvariants»
   ]

@@ -335,5 +335,6 @@ lean_lib «FormalSuite» where
     `«SpeculativeAcceptanceBounds»,
     `«RectifiedFlowInvariants»,
     `«MetricDistanceInvariants»,
-    `«NewtonSchulzOrthogonality»
+    `«NewtonSchulzOrthogonality»,
+    `«DNAComplementarityInvariants»
   ]

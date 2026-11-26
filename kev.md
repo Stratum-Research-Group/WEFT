@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #406, Papers #177 through #215).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #407, Papers #177 through #216).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #406) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #407) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (406 jobs).`
+- `Build completed successfully (407 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -624,6 +624,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_fibrinogen_shed.cpp -o build/weft_bench_fi
 
 ---
 
+### Cycle v340.85.0: Blood-Brain Barrier (BBB) Endothelial Tight-Junction Restoration & Pericyte Tie2 Signaling Invariants (Target #407, Paper #216)
+```bash
+# 1. Run BBB tight-junction and Tie2 restoration simulation
+.venv/bin/python scripts/sim_bbb_tight_junction.py
+
+# 2. Compile and run AVX2 BBB tight-junction microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_bbb_tight_junction.cpp -o build/weft_bench_bbb_tight_junction
+./build/weft_bench_bbb_tight_junction
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_bbb_tight_junction.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -666,3 +681,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftParoxysmalDyskinesiaHUD.tsx` (PRRT2/PNKD SNARE Channelopathy, Cerebellar-Striatal Crosstalk & Carbamazepine Gate)
 - `WeftUnifiedNeuromodulationHUD.tsx` (Multi-Modal Biomarker Fusion, Closed-Loop Proportional DBS & Autonomous Rescue Gate)
 - `WeftFibrinogenShedHUD.tsx` (SHED-CM Chaperone Shielding, Fibrinogen-Aβ Epitope Masking & Mac-1 Suppression Gate)
+- `WeftBbbTightJunctionHUD.tsx` (Pericyte-Endothelial Tie2 Phosphorylation, Claudin-5/Occludin Assembly & TEER Restoration Gate)

@@ -412,5 +412,6 @@ lean_lib «FormalSuite» where
     `«AlzheimerGammaInvariants»,
     `«ParoxysmalDyskinesiaInvariants»,
     `«UnifiedNeuromodulationInvariants»,
-    `«FibrinogenShedInvariants»
+    `«FibrinogenShedInvariants»,
+    `«BbbTightJunctionInvariants»
   ]

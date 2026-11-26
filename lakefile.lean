@@ -366,5 +366,6 @@ lean_lib «FormalSuite» where
     `«CerebellarLTDConvergenceInvariants»,
     `«ForwardInternalModelInvariants»,
     `«SpinalReciprocalInhibitionInvariants»,
-    `«NMJQuantalSafetyFactorInvariants»
+    `«NMJQuantalSafetyFactorInvariants»,
+    `«MonosynapticStretchReflexInvariants»
   ]

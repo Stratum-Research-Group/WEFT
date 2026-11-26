@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #396, Papers #177 through #205).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #397, Papers #177 through #206).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #396) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #397) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (396 jobs).`
+- `Build completed successfully (397 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -474,6 +474,21 @@ g++ -O3 -mavx2 -mfma tools/weft_bench_lh_orexin.cpp -o build/weft_bench_lh_orexi
 
 ---
 
+### Cycle v340.75.0: Electrophysiological Disease State Prediction: LFP Beta Resonance, PAC & 1/f Spectral Tilt Invariants (Target #397, Paper #206)
+```bash
+# 1. Run electrophysiological disease state prediction simulation
+.venv/bin/python scripts/sim_disease_prediction.py
+
+# 2. Compile and run AVX2 electrophysiological disease prediction microbenchmark
+g++ -O3 -mavx2 -mfma tools/weft_bench_disease_prediction.cpp -o build/weft_bench_disease_prediction
+./build/weft_bench_disease_prediction
+
+# 3. Execute Pytest regression tests
+.venv/bin/pytest tests/test_disease_prediction.py
+```
+
+---
+
 ## 4. Real-Time Interactive Visual HUDs (WEFT MSS Void)
 
 All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbench/contrib/void/browser/react/src/sidebar-tsx/`:
@@ -506,3 +521,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftZonaIncertaHUD.tsx` (Zona Incerta Visceromotor Gate & Binge Feeding Attractor)
 - `WeftVLPAGSurvivalHUD.tsx` (vlPAG Freezing vs dlPAG Flight Escape Survival Gate)
 - `WeftLHOrexinArousalHUD.tsx` (LH Orexin Arousal & Muscle Tone Stabilizer)
+- `WeftElectrophysiologicalDiseasePredictionHUD.tsx` (LFP Beta Power, PAC & 1/f Spectral Tilt Predictive Biomarker Gate)

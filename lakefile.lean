@@ -402,5 +402,6 @@ lean_lib «FormalSuite» where
     `«ClaustrumSynchronizationInvariants»,
     `«ZonaIncertaInvariants»,
     `«VLPAGSurvivalInvariants»,
-    `«LHOrexinArousalInvariants»
+    `«LHOrexinArousalInvariants»,
+    `«ElectrophysiologicalDiseasePredictionInvariants»
   ]

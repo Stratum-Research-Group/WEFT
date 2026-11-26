@@ -418,5 +418,6 @@ lean_lib «FormalSuite» where
     `«MicroglialMac1InflammasomeInvariants»,
     `«GlymphaticAqp4Invariants»,
     `«NeurovascularCouplingInvariants»,
-    `«PericyteNoReflowInvariants»
+    `«PericyteNoReflowInvariants»,
+    `«EndothelialShearStressInvariants»
   ]

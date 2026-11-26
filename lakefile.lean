@@ -364,5 +364,6 @@ lean_lib «FormalSuite» where
     `«CerebellarGranuleOrthogonalizationInvariants»,
     `«DCNReboundDisinhibitionInvariants»,
     `«CerebellarLTDConvergenceInvariants»,
-    `«ForwardInternalModelInvariants»
+    `«ForwardInternalModelInvariants»,
+    `«SpinalReciprocalInhibitionInvariants»
   ]

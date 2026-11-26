@@ -385,5 +385,6 @@ lean_lib «FormalSuite» where
     `«ReticulospinalPosturalInvariants»,
     `«VORRetinalSlipInvariants»,
     `«CerebellarVORAdaptationInvariants»,
-    `«SaccadicBurstGatingInvariants»
+    `«SaccadicBurstGatingInvariants»,
+    `«NeuralIntegratorInvariants»
   ]

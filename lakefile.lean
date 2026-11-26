@@ -343,5 +343,6 @@ lean_lib «FormalSuite» where
     `«ModulationIndexInvariants»,
     `«STDPConvergenceInvariants»,
     `«BasalGangliaAttractorInvariants»,
-    `«ThalamocorticalBurstInvariants»
+    `«ThalamocorticalBurstInvariants»,
+    `«ThetaPhasePrecessionInvariants»
   ]

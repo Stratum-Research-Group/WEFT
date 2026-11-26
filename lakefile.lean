@@ -420,5 +420,6 @@ lean_lib «FormalSuite» where
     `«NeurovascularCouplingInvariants»,
     `«PericyteNoReflowInvariants»,
     `«EndothelialShearStressInvariants»,
-    `«OpcDifferentiationInvariants»
+    `«OpcDifferentiationInvariants»,
+    `«MitochondrialDynamicsInvariants»
   ]

@@ -95,10 +95,11 @@ def verify_formal_suite():
         "NeurovascularCouplingInvariants.lean",
         "PericyteNoReflowInvariants.lean",
         "EndothelialShearStressInvariants.lean",
-        "OpcDifferentiationInvariants.lean"
+        "OpcDifferentiationInvariants.lean",
+        "MitochondrialDynamicsInvariants.lean"
     ]
 
-    print("Auditing Co-Authored Synaptic & Motor Biology Formal Targets (Targets #368 - #414):")
+    print("Auditing Co-Authored Synaptic & Motor Biology Formal Targets (Targets #368 - #415):")
     for t in neuro_coauthored_targets:
         full_p = os.path.join(formal_dir, t)
         if not os.path.exists(full_p):

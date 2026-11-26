@@ -339,5 +339,6 @@ lean_lib «FormalSuite» where
     `«DNAComplementarityInvariants»,
     `«GQAHeadPartitionInvariants»,
     `«EntropyDivergenceInvariants»,
-    `«BitboardOccupancyInvariants»
+    `«BitboardOccupancyInvariants»,
+    `«ModulationIndexInvariants»
   ]

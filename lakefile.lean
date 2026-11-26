@@ -349,5 +349,6 @@ lean_lib «FormalSuite» where
     `«NeuromodulatoryGainInvariants»,
     `«ClaustrocorticalSalienceInvariants»,
     `«MacroConnectomeStabilityInvariants»,
-    `«CorticothalamicFeedbackInvariants»
+    `«CorticothalamicFeedbackInvariants»,
+    `«AmygdalarConditioningInvariants»
   ]

@@ -388,5 +388,6 @@ lean_lib «FormalSuite» where
     `«SaccadicBurstGatingInvariants»,
     `«NeuralIntegratorInvariants»,
     `«StriatalDopamineRPEInvariants»,
-    `«NigrothalamicGateInvariants»
+    `«NigrothalamicGateInvariants»,
+    `«GPeArkypallidalInvariants»
   ]

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #418, Papers #177 through #227).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #419, Papers #177 through #228).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #418) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #419) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (418 jobs).`
+- `Build completed successfully (419 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -858,3 +858,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftBtbExtravasationHUD.tsx` (Blood-Tumor Barrier IFP Decompression, Starling J_v Flux & FUS Nanocarrier Gate)
 - `WeftMeningealLymphaticHUD.tsx` (Meningeal Lymphatic Velocity, dCLN Efflux & Tau/Amyloid Clearance Gate)
 - `WeftThalamocorticalSoPacHUD.tsx` (Slow-Wave Upstate Phase, TRN Spindle Amplitude & PLV Coupling Gate)
+- `WeftVagalAntiInflammatoryHUD.tsx` (Splenic ACh Release, alpha7nAChR Binding, STAT3 Phos & NF-kB Suppression Gate)

@@ -352,5 +352,6 @@ lean_lib «FormalSuite» where
     `«CorticothalamicFeedbackInvariants»,
     `«AmygdalarConditioningInvariants»,
     `«LateralHabenulaAversionInvariants»,
-    `«DentateGyrusOrthogonalizationInvariants»
+    `«DentateGyrusOrthogonalizationInvariants»,
+    `«CA3AttractorCompletionInvariants»
   ]

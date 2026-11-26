@@ -423,5 +423,6 @@ lean_lib «FormalSuite» where
     `«OpcDifferentiationInvariants»,
     `«MitochondrialDynamicsInvariants»,
     `«BtbExtravasationInvariants»,
-    `«MeningealLymphaticsInvariants»
+    `«MeningealLymphaticsInvariants»,
+    `«ThalamocorticalSoPacInvariants»
   ]

@@ -88,8 +88,10 @@ def simulate_corticospinal_digit_grasp(
         "peak_m1_rate_hz": peak_m1,
         "final_fractionation_index": final_fractionation,
         "time": np.array(time_hist),
+        "m1_rate_hist": np.array(m1_rate_hist),
         "target_force_hist": np.array(target_force_hist),
-        "spillover_force_hist": np.array(spillover_force_hist)
+        "spillover_force_hist": np.array(spillover_force_hist),
+        "fractionation_index_hist": np.array(fractionation_index_hist)
     }
 
 if __name__ == "__main__":

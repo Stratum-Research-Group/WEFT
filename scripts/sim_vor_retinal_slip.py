@@ -55,5 +55,13 @@ def simulate_vor_retinal_slip():
     assert vor_gain > 0.95, "VOR gain must be calibrated near unity"
     print("\n[VERIFIED] Vestibulo-ocular reflex accurately counter-rotates eyes to minimize retinal slip.")
 
+    return {
+        "time": time,
+        "head_velocity": head_velocity,
+        "eye_velocity": eye_velocity,
+        "retinal_slip": retinal_slip,
+        "vor_gain": vor_gain
+    }
+
 if __name__ == "__main__":
     simulate_vor_retinal_slip()

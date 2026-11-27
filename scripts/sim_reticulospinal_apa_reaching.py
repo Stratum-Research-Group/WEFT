@@ -75,13 +75,25 @@ def run_reticulospinal_apa_sim():
         "peak_com_displacement_mm": peak_com_disp,
         "mean_apa_drive_hz": float(np.mean(rst_apa_drive[int(t_apa_start/dt):int(t_focal_start/dt)])),
         "mean_focal_drive_hz": float(np.mean(cst_focal_drive[int(t_focal_start/dt):int(t_movement_end/dt)])),
-        "feedforward_stabilization_verified": bool(peak_com_disp < 8.0 and lead_time_actual >= 50.0)
+        "feedforward_stabilization_verified": bool(peak_com_disp < 8.0 and lead_time_actual >= 50.0),
+        "time_s": time,
+        "rst_apa_drive": rst_apa_drive,
+        "cst_focal_drive": cst_focal_drive,
+        "com_displacement_mm": com_displacement_mm
     }
 
     out_path = Path("build/reticulospinal_apa_sim_results.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    json_summary = {
+        "status": summary["status"],
+        "apa_lead_time_ms": summary["apa_lead_time_ms"],
+        "peak_com_displacement_mm": summary["peak_com_displacement_mm"],
+        "mean_apa_drive_hz": summary["mean_apa_drive_hz"],
+        "mean_focal_drive_hz": summary["mean_focal_drive_hz"],
+        "feedforward_stabilization_verified": summary["feedforward_stabilization_verified"]
+    }
     with open(out_path, "w") as f:
-        json.dump(summary, f, indent=2)
+        json.dump(json_summary, f, indent=2)
 
     print("=== RETICULOSPINAL APA REACHING SIMULATION ===")
     print(f"Feedforward APA Lead Time: {lead_time_actual:.1f} ms")

@@ -45,5 +45,14 @@ def simulate_neural_integrator_drift():
 
     print("\n[VERIFIED] Neural integrator tonic step strictly prevents extraocular viscoelastic recoil.")
 
+    return {
+        "time": time,
+        "eye_pos_healthy": eye_pos_healthy,
+        "eye_pos_leaky": eye_pos_leaky,
+        "tau_healthy": tau_healthy,
+        "tau_leaky": tau_leaky,
+        "initial_angle": initial_gaze_angle
+    }
+
 if __name__ == "__main__":
     simulate_neural_integrator_drift()

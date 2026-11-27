@@ -29,8 +29,12 @@ def simulate_striatal_dopamine_rpe():
 
     p_choices = []
     rpes = []
+    d1_weights = []
+    d2_weights = []
 
     for t in range(trials):
+        d1_weights.append(w_d1)
+        d2_weights.append(w_d2)
         # Current expected value from opponent contrast
         q_val = w_d1 - w_d2
         p_choose = 1.0 / (1.0 + np.exp(-q_val * 4.0))
@@ -63,6 +67,14 @@ def simulate_striatal_dopamine_rpe():
     assert p_choices[24] > 0.70, "Agent must learn to prefer rich option prior to reversal"
     assert p_choices[49] < p_choices[24], "Agent must dynamically adapt preference following contingency reversal"
     print("\n[VERIFIED] Striatal D1/D2 opponent gating accurately tracks reward contingencies.")
+
+    return {
+        "trials": np.arange(1, trials + 1),
+        "rpes": np.array(rpes),
+        "d1_weights": np.array(d1_weights),
+        "d2_weights": np.array(d2_weights),
+        "p_choices": np.array(p_choices)
+    }
 
 if __name__ == "__main__":
     np.random.seed(42)

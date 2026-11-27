@@ -28,12 +28,14 @@ def simulate_cerebellar_vor_gain_adaptation():
 
     gains = []
     slips = []
+    weights = []
 
     for trial in range(1, trials + 1):
         # Slip error under 100 deg/s head rotation
         slip = abs(target_gain - current_gain) * 100.0
         gains.append(current_gain)
         slips.append(slip)
+        weights.append(purkinje_synaptic_weight)
 
         # Climbing fiber error rate
         cf_rate = 1.0 + (slip / 50.0) * 3.5
@@ -56,6 +58,14 @@ def simulate_cerebellar_vor_gain_adaptation():
     assert final_gain > 1.40, "Adaptive gain must converge toward target magnifying factor"
     assert final_slip < slips[0] * 0.1, "Retinal slip error must decrease by >90%"
     print("\n[VERIFIED] Cerebellar flocculus plasticity successfully restored optical stabilization.")
+
+    return {
+        "trials": np.arange(1, trials + 1),
+        "gains": np.array(gains),
+        "slips": np.array(slips),
+        "weights": np.array(weights),
+        "target_gain": target_gain
+    }
 
 if __name__ == "__main__":
     simulate_cerebellar_vor_gain_adaptation()

@@ -52,5 +52,14 @@ def simulate_stn_gpe_beta_resonance():
 
     print("\n[VERIFIED] Arkypallidal stop gating and pathological beta resonance verified.")
 
+    return {
+        "time": time,
+        "striatal_go_drive": striatal_go_drive,
+        "arky_rate": arky_rate,
+        "striatal_output": striatal_output,
+        "beta_res_freq": beta_res_freq,
+        "da_level": da_level
+    }
+
 if __name__ == "__main__":
     simulate_stn_gpe_beta_resonance()

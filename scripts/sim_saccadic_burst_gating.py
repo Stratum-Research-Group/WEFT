@@ -26,6 +26,7 @@ def simulate_saccadic_burst_gating():
 
     peak_velocities = []
     durations = []
+    pprf_burst_rates = []
 
     for amp in amplitudes:
         v_peak = V_max * (1.0 - np.exp(-amp / C))
@@ -34,6 +35,7 @@ def simulate_saccadic_burst_gating():
 
         peak_velocities.append(v_peak)
         durations.append(dur)
+        pprf_burst_rates.append(burst_rate)
 
         print(f"{amp:<12.1f} | {v_peak:<18.1f} deg/s | {dur:<14.1f} ms | {burst_rate:<18.1f} Hz | {'PAUSED'}")
 
@@ -53,6 +55,14 @@ def simulate_saccadic_burst_gating():
     print(f"Max Peak Velocity Reached: {peak_velocities[-1]:.1f} deg/s (Asymptote: {V_max:.1f} deg/s)")
     print(f"Longest Saccade Duration: {durations[-1]:.1f} ms")
     print("\n[VERIFIED] Saccadic burst generator strictly obeys main sequence kinematics.")
+
+    return {
+        "amplitudes": amplitudes,
+        "peak_velocities": peak_velocities,
+        "durations": durations,
+        "pprf_burst_rates": np.array(pprf_burst_rates),
+        "v_max": V_max
+    }
 
 if __name__ == "__main__":
     simulate_saccadic_burst_gating()

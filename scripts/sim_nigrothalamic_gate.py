@@ -50,5 +50,13 @@ def simulate_nigrothalamic_gate():
 
     print("\n[VERIFIED] Basal ganglia disinhibition successfully triggered motor thalamocortical rebound.")
 
+    return {
+        "time": time,
+        "dspn_activity": dspn_activity,
+        "snr_firing": snr_firing,
+        "thalamic_vm": thalamic_vm,
+        "rebound_burst": rebound_burst
+    }
+
 if __name__ == "__main__":
     simulate_nigrothalamic_gate()

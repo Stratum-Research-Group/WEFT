@@ -59,5 +59,14 @@ def simulate_ppn_locomotor_gating():
 
     print("\n[VERIFIED] PPN locomotor initiation and Freezing of Gait successfully simulated.")
 
+    return {
+        "time": time,
+        "ppn_glut_drive": ppn_glut_drive,
+        "bg_gaba_clamp": bg_gaba_clamp,
+        "net_locomotor_drive": net_locomotor_drive,
+        "cadence": cadence,
+        "speed_kmh": speed_mps * 3.6
+    }
+
 if __name__ == "__main__":
     simulate_ppn_locomotor_gating()

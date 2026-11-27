@@ -318,6 +318,20 @@
           </div>
         </div>
 
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:20px; text-align:center;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-bright); margin-bottom:6px;">Wilson-Cowan Excitatory-Inhibitory (E-I) Population Dynamic Phase Space</div>
+          <canvas id="wcCanvas" width="600" height="200" style="background:#020617; border-radius:6px; cursor:crosshair;"></canvas>
+          <div style="display:flex; justify-content:center; gap:16px; margin-top:8px; font-size:12px; color:#94a3b8; font-family:monospace;">
+            <label>w_ee: <input type="range" id="weeSlider" min="10" max="30" value="16" style="width:65px; vertical-align:middle;"> <span id="weeVal">16</span></label>
+            <label>w_ie: <input type="range" id="wieSlider" min="8" max="25" value="12" style="width:65px; vertical-align:middle;"> <span id="wieVal">12</span></label>
+            <label>External Input P: <input type="range" id="extPSlider" min="0" max="30" value="12" style="width:65px; vertical-align:middle;"> <span id="extPVal">1.2</span></label>
+          </div>
+          <div style="margin-top:6px; font-size:12px; color:#8b949e;">
+            <span>E-I Population Dynamics: Gamma Oscillation Limit-Cycle Birth & Hopf Bifurcation • E (Excitatory) vs. I (Inhibitory)</span>
+          </div>
+        </div>
+
+
 
 
 
@@ -368,6 +382,7 @@
       initNullclineCanvas(p.target_number);
       initCableCanvas();
       initCdfCanvas();
+      initWilsonCowanCanvas();
       initCellularAutomatonCanvas();
     }
 
@@ -570,6 +585,91 @@
         }
       }
       setInterval(stepCable, 30);
+    }
+
+    
+    function initWilsonCowanCanvas() {
+      const canvas = document.getElementById('wcCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w_ee = 16.0;
+      let w_ie = 12.0;
+      let ext_P = 1.2;
+      const w_ei = 15.0;
+      const w_ii = 3.0;
+      const ext_Q = 0.0;
+
+      const sWee = document.getElementById('weeSlider');
+      const sWie = document.getElementById('wieSlider');
+      const sExtP = document.getElementById('extPSlider');
+      if (sWee) sWee.oninput = (e) => { w_ee = parseFloat(e.target.value); document.getElementById('weeVal').textContent = w_ee; };
+      if (sWie) sWie.oninput = (e) => { w_ie = parseFloat(e.target.value); document.getElementById('wieVal').textContent = w_ie; };
+      if (sExtP) sExtP.oninput = (e) => { ext_P = parseFloat(e.target.value) / 10.0; document.getElementById('extPVal').textContent = ext_P.toFixed(1); };
+
+      let E = 0.2;
+      let I = 0.15;
+      const history = [];
+
+      function sigmoid(x) {
+        return 1.0 / (1.0 + Math.exp(-x));
+      }
+
+      function renderFrame() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const pad = 40;
+        const w = canvas.width - 2 * pad;
+        const h = canvas.height - 2 * pad;
+
+        // Axes
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, pad); ctx.lineTo(pad, pad + h); ctx.lineTo(pad + w, pad + h);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px monospace';
+        ctx.fillText('E (Excitatory)', pad + w - 80, pad + h + 24);
+        ctx.fillText('I (Inhibitory)', pad - 35, pad + 15);
+
+        // Numerical integration (Euler)
+        const dt = 0.08;
+        const tau_e = 1.0;
+        const tau_i = 1.5;
+
+        for (let s = 0; s < 5; s++) {
+          const dE = (-E + sigmoid(w_ee * E - w_ie * I + ext_P - 4.0)) / tau_e;
+          const dI = (-I + sigmoid(w_ei * E - w_ii * I + ext_Q - 3.7)) / tau_i;
+          E = Math.max(0.0, Math.min(1.0, E + dE * dt));
+          I = Math.max(0.0, Math.min(1.0, I + dI * dt));
+        }
+
+        history.push({ e: E, i: I });
+        if (history.length > 250) history.shift();
+
+        // Draw Limit-Cycle Trajectory
+        if (history.length > 1) {
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let idx = 0; idx < history.length; idx++) {
+            const px = pad + history[idx].e * w;
+            const py = (pad + h) - history[idx].i * h;
+            if (idx === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.stroke();
+
+          const head = history[history.length - 1];
+          ctx.fillStyle = '#f43f5e';
+          ctx.beginPath();
+          ctx.arc(pad + head.e * w, (pad + h) - head.i * h, 4, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+      setInterval(renderFrame, 35);
     }
 
     function initCdfCanvas() {

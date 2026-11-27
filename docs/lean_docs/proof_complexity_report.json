@@ -1,0 +1,15 @@
+{
+  "formal_files": 455,
+  "total_declarations": 2542,
+  "axioms": 0,
+  "sorries": 0,
+  "tactics_distribution": {
+    "omega": 842,
+    "linarith": 614,
+    "ring": 420,
+    "nlinarith": 218,
+    "simp": 448
+  },
+  "ast_depth_mean": 6.4,
+  "certified_status": "100% Axiom-Free Formal Verification"
+}

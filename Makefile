@@ -124,3 +124,7 @@ export-triton-configs:
 check-cpu-vnni:
 	@echo "[CPU-VNNI] Checking Native AVX-512 VNNI / VPOPCNTDQ Capabilities..."
 	python3 scripts/check_cpu_vnni.py
+
+bench-avx512:
+	@echo "[BENCH-AVX512] Benchmarking Native AVX-512 VPOPCNTDQ Sub-Bit Bitboard GEMV..."
+	python3 scripts/benchmark_avx512_gemv.py

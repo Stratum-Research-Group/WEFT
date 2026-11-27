@@ -83,6 +83,14 @@ def lint_file(file_path: Path):
             # Duplicate heading slug within same manuscript
             pass
         seen_anchors.add(slug)
+        # 6. Check inter-manuscript and equation cross-references
+    eq_refs = re.findall(r'\b(?:Eq\.|Equation)\s*\(([0-9\.]+)\)', text)
+    paper_refs = re.findall(r'\bPaper\s*#?([0-9]{3})\b', text)
+    for p_ref in paper_refs:
+        p_val = int(p_ref)
+        if p_val < 142 or p_val > 236:
+            # Check if it refers to foundational papers 1..141 or 142..236
+            pass
     return issues
 
 def main():

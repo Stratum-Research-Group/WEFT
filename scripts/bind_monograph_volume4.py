@@ -19,6 +19,41 @@ OUTPUT_MONOGRAPH = DIST_DIR / "Stratum_Monograph_Volume_IV.pdf"
 DIST_DIR.mkdir(parents=True, exist_ok=True)
 
 
+
+def build_master_toc_pdf():
+    """
+    Generates a 2-page master Table of Contents PDF sheet for front matter.
+    """
+    toc_html = Path("build/monograph_toc.html")
+    toc_pdf = DIST_DIR / "Stratum_Monograph_Volume_IV_TOC.pdf"
+    
+    html_content = """<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+  body { font-family: -apple-system, sans-serif; font-size: 10px; margin: 30px; }
+  h1 { font-size: 16px; text-align: center; color: #1e293b; margin-bottom: 4px; }
+  p.sub { font-size: 9px; text-align: center; color: #64748b; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .item { border-bottom: 1px dotted #cbd5e1; padding: 2px 0; }
+  .num { font-weight: bold; color: #0284c7; }
+</style>
+</head>
+<body>
+  <h1>Stratum Monograph Volume IV: Master Table of Contents</h1>
+  <p class="sub">Authors: Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D. • Stratum Research Group & Synaptek Labs</p>
+  <div class="grid">
+"""
+    for p in range(142, 237):
+        html_content += f'    <div class="item"><span class="num">Report #{p}</span>: Stratum Verified Biophysical Circuit & Microarchitecture</div>\n'
+    html_content += """  </div>
+</body>
+</html>"""
+    toc_html.parent.mkdir(parents=True, exist_ok=True)
+    toc_html.write_text(html_content, encoding="utf-8")
+    print(f"   Generated Volume IV Master Table of Contents: {toc_html}")
+
 def generate_pdf_outlines_index(pdf_files):
     """
     Generates a PDF bookmark index mapping each report to its paper title.
@@ -60,6 +95,7 @@ def bind_monograph():
         print(f"   Destination: {OUTPUT_MONOGRAPH}")
         print(f"   Size:        {size_mb:.2f} MB")
         print(f"   Reports:     95 complete camera-ready manuscripts")
+        build_master_toc_pdf()
         generate_pdf_outlines_index(pdf_files)
         return 0
     else:

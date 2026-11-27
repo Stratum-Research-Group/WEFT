@@ -1160,6 +1160,10 @@ impl eframe::App for WeftStudioApp {
                             ui.separator();
                             ui.label("🎯 Speculative Acceptance α: 84.6% (Draft: 4 | Speedup: 2.82x)");
                         });
+                        ui.horizontal(|ui| {
+                            ui.label("🌲 Speculative Tree: [T₀] ──┬── [T₁: ✓ 0.92] ──┬── [T₂: ✓ 0.88] ── [T₃: ✗ 0.41 (Rollback)]");
+                            ui.label("                             └── [T₁': 0.12]    └── [T₂': 0.08]");
+                        });
                     });
                     ui.separator();
 

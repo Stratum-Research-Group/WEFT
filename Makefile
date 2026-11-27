@@ -128,3 +128,11 @@ check-cpu-vnni:
 bench-avx512:
 	@echo "[BENCH-AVX512] Benchmarking Native AVX-512 VPOPCNTDQ Sub-Bit Bitboard GEMV..."
 	python3 scripts/benchmark_avx512_gemv.py
+
+profile-tma:
+	@echo "[TMA-PROFILE] Auditing Hopper SM90 & Blackwell SM100 TMA Asynchronous Readiness..."
+	python3 scripts/profile_triton_sram.py
+
+generate-energy-bom:
+	@echo "[ENERGY-BOM] Generating Stratum Volume V Hardware Manufacturing Specifications..."
+	python3 scripts/generate_energy_hardware_bom.py

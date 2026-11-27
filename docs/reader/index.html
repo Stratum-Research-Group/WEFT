@@ -388,6 +388,20 @@
           </div>
         </div>
 
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:20px; text-align:center;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-bright); margin-bottom:6px;">Volume V: Aneuronic Cusp Fusion & Electrostatic Direct Kinetic Energy Decelerator</div>
+          <canvas id="mhdCanvas" width="600" height="200" style="background:#020617; border-radius:6px; cursor:crosshair;"></canvas>
+          <div style="display:flex; justify-content:center; gap:16px; margin-top:8px; font-size:12px; color:#94a3b8; font-family:monospace;">
+            <label>Decel Grid V: <input type="range" id="mhdVSlider" min="10" max="60" value="45" style="width:65px; vertical-align:middle;"> <span id="mhdVVal">45 kV</span></label>
+            <label>Cusp Field B: <input type="range" id="mhdBSlider" min="5" max="25" value="14" style="width:65px; vertical-align:middle;"> <span id="mhdBVal">14 T</span></label>
+            <label>Direct Conversion η: <span id="mhdEffVal" style="color:#34d399; font-weight:bold;">86.4%</span></label>
+          </div>
+          <div style="margin-top:6px; font-size:12px; color:#8b949e;">
+            <span>p-11B Alpha Deceleration ($^4He^{2+}$): Kinetic-to-HVDC Direct Conversion • Bypassing Steam Turbine Carnot Limits</span>
+          </div>
+        </div>
+
+
 
 
 
@@ -446,6 +460,7 @@
       initHindmarshRoseCanvas();
       initKuramotoCanvas();
       initHopfieldCanvas();
+      initMhdCanvas();
       initCellularAutomatonCanvas();
     }
 
@@ -654,6 +669,90 @@
     
     
     
+    
+    function initMhdCanvas() {
+      const canvas = document.getElementById('mhdCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let gridV = 45.0;
+      let fieldB = 14.0;
+
+      const sV = document.getElementById('mhdVSlider');
+      const sB = document.getElementById('mhdBSlider');
+      const effEl = document.getElementById('mhdEffVal');
+
+      if (sV) sV.oninput = (e) => { gridV = parseFloat(e.target.value); document.getElementById('mhdVVal').textContent = gridV.toFixed(0) + ' kV'; updateEff(); };
+      if (sB) sB.oninput = (e) => { fieldB = parseFloat(e.target.value); document.getElementById('mhdBVal').textContent = fieldB.toFixed(0) + ' T'; updateEff(); };
+
+      function updateEff() {
+        const eff = 80.0 + (gridV / 60.0) * 8.0 + (fieldB / 25.0) * 4.0;
+        if (effEl) effEl.textContent = Math.min(94.2, eff).toFixed(1) + '%';
+      }
+
+      const particles = [];
+      for (let i = 0; i < 35; i++) {
+        particles.push({
+          x: Math.random() * 80,
+          y: canvas.height / 2 + (Math.random() - 0.5) * 40,
+          vx: 3.5 + Math.random() * 2.0,
+          vy: (Math.random() - 0.5) * 1.0,
+          charge: 2
+        });
+      }
+
+      function renderFrame() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw Cusp Magnetic Nozzle
+        const cy = canvas.height / 2;
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, cy - 30); ctx.bezierCurveTo(120, cy - 30, 200, cy - 70, 350, cy - 80);
+        ctx.moveTo(0, cy + 30); ctx.bezierCurveTo(120, cy + 30, 200, cy + 70, 350, cy + 80);
+        ctx.stroke();
+
+        // Draw Electrostatic Deceleration Grids
+        const gridPositions = [380, 440, 500, 560];
+        ctx.lineWidth = 2;
+        for (let g = 0; g < gridPositions.length; g++) {
+          const gx = gridPositions[g];
+          ctx.strokeStyle = g === gridPositions.length - 1 ? '#34d399' : '#38bdf8';
+          ctx.beginPath();
+          ctx.moveTo(gx, 20); ctx.lineTo(gx, canvas.height - 20);
+          ctx.stroke();
+          ctx.fillStyle = '#64748b';
+          ctx.font = '9px monospace';
+          ctx.fillText(`+${(gridV * (g + 1) / 4).toFixed(0)}kV`, gx - 12, 14);
+        }
+
+        // Update and draw alpha particles
+        for (let p of particles) {
+          // Decelerate as approaching grids
+          if (p.x > 350) {
+            p.vx *= 0.94;
+          }
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x > canvas.width - 20 || p.vx < 0.2) {
+            p.x = Math.random() * 60;
+            p.y = cy + (Math.random() - 0.5) * 35;
+            p.vx = 3.5 + Math.random() * 2.0;
+            p.vy = (Math.random() - 0.5) * 1.0;
+          }
+
+          // Particle trail
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+      setInterval(renderFrame, 35);
+    }
+
     function initHopfieldCanvas() {
       const canvas = document.getElementById('hopfieldCanvas');
       if (!canvas) return;

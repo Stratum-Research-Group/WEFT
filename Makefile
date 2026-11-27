@@ -1,4 +1,4 @@
-.PHONY: test test-unit test-regression test-cpp formal gate suite-smoke suite-standard audit matrix lint telemetry search paclet standalone-reader bench-triton eval-quant export-pdfs bind-monograph citation-graph validate-models
+.PHONY: test test-unit test-regression test-cpp formal gate suite-smoke suite-standard audit matrix lint telemetry search paclet standalone-reader bench-triton eval-quant export-pdfs bind-monograph citation-graph validate-models sign-release verify-vectors package-bundle
 
 test: test-unit test-regression test-cpp
 	@echo "================================================================="
@@ -76,6 +76,18 @@ citation-graph:
 validate-models:
 	@echo "[MODELS] Validating Sub-Bit Model Registry & Checkpoint Parity..."
 	python3 scripts/validate_model_registry.py
+
+sign-release:
+	@echo "[SIGN] Generating Cryptographic SHA-256 and SHA-512 Checksums..."
+	python3 scripts/sign_release_artifacts.py
+
+verify-vectors:
+	@echo "[VECTORS] Auditing XML and Geometric Fidelity of Vector SVGs..."
+	python3 scripts/verify_vector_fidelity.py
+
+package-bundle:
+	@echo "[BUNDLE] Creating Master Academic Submission Bundle..."
+	python3 scripts/package_distribution_bundle.py
 
 gate:
 	@echo "[GATE] Running Full QA Gatekeeper..."

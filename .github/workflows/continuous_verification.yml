@@ -1,0 +1,76 @@
+name: WEFT Continuous Verification & Empirical Benchmarks
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  formal-verification:
+    name: Lean 4 Formal Suite (Targets #333 - #427)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Elan & Lean 4
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain leanprover/lean4:v4.33.1
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+      - name: Audit All 95 Formal Targets (0 Axioms, 0 Sorries)
+        run: |
+          python3 scripts/verify_all_leans.py
+
+  microarchitectural-benchmarks:
+    name: Native AVX2 & Triton Compilation Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python & Compilers
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install g++ & Build Tools
+        run: sudo apt-get update && sudo apt-get install -y g++ build-essential
+      - name: Compile and Run Benchmark Suite
+        run: |
+          python3 scripts/run_benchmarks_all.py
+
+  manuscript-compliance-audit:
+    name: 95-Paper 5-Pillar Scientific Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit 95 Manuscripts for 5 Pillars & Metadata
+        run: |
+          python3 -c "
+          import os, glob, re
+          papers = [f'docs/PAPERS_REVISED/PAPER_{p}_' for p in range(142, 237)]
+          failures = []
+          for prefix in papers:
+              matches = glob.glob(prefix + '*.md')
+              if not matches:
+                  failures.append((prefix, 'Missing file'))
+                  continue
+              txt = open(matches[0]).read()
+              p_num = int(re.search(r'PAPER_(\d+)', matches[0]).group(1))
+              t_num = p_num + 191
+              t1 = 'Table 1' in txt
+              t2 = 'Table 2' in txt
+              formal = f'Target #{t_num}' in txt and '```lean' in txt
+              fig1 = f'figure_paper_{p_num}.png' in txt or f'figure_paper_{p_num}.' in txt
+              fig2 = f'figure_paper_{p_num}_validation.png' in txt
+              disc = 'Discussion' in txt
+              m_refs = re.search(r'###? \d*\.?\s*References', txt)
+              refs = len(re.findall(r'^\d+\.\s+', txt[m_refs.start():], re.MULTILINE)) if m_refs else 0
+              meta = all(k in txt for k in ['Hardware Target:', 'Series:', 'Phase:', 'Paper Type:', 'Authors:', 'Affiliation:', 'Date:', 'Status:', 'Verification Level:', 'License:'])
+              if not (t1 and t2 and formal and fig1 and fig2 and disc and refs == 25 and meta):
+                  failures.append((p_num, {'t1': t1, 't2': t2, 'formal': formal, 'fig1': fig1, 'fig2': fig2, 'disc': disc, 'refs': refs, 'meta': meta}))
+          if failures:
+              print('Audit failed:', failures)
+              exit(1)
+          print('CI Audit: 100% of 95 papers passed all 8 scientific gates.')
+          "

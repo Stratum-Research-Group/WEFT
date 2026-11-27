@@ -1202,6 +1202,19 @@ impl eframe::App for WeftStudioApp {
                                 if std::path::Path::new(&fig2_png).exists() {
                                     ui.label("Fig 2 (Validation): OK");
                                 }
+                                ui.separator();
+                                if ui.button("⚡ Verify Lean 4 Invariant").clicked() {
+                                    let target_num = num_str.parse::<usize>().unwrap_or(142) + 191;
+                                    let _ = std::process::Command::new("lake")
+                                        .args(["env", "lean", &format!("formal/Target_{}.lean", target_num)])
+                                        .spawn();
+                                }
+                                if ui.button("📄 Open Typeset PDF").clicked() {
+                                    let pdf_path = format!("docs/papers_kevin_mccairn/typeset_pdf/PAPER_{}.pdf", num_str);
+                                    let _ = std::process::Command::new("xdg-open")
+                                        .arg(pdf_path)
+                                        .spawn();
+                                }
                             });
                         }
 
@@ -1261,6 +1274,13 @@ impl eframe::App for WeftStudioApp {
                                         let _ = std::process::Command::new("python3")
                                             .arg("scripts/bench_triton_biophysical.py")
                                             .spawn();
+                                    }
+                                    if ui.button("⚡ Run AVX-512 In-Engine VNNI").clicked() {
+                                        let dummy_weights = vec![1u8; 512 * 512];
+                                        let dummy_inputs = vec![2u8; 16 * 512];
+                                        if let Ok(res) = vnni_ffi::speculative_vnni_eval(&dummy_weights, &dummy_inputs, 512, 16) {
+                                            println!("AVX-512 VNNI In-Engine Step: {} outputs evaluated", res.len());
+                                        }
                                     }
                                     if ui.button("🔍 Run Corpus Matrix Audit").clicked() {
                                         let _ = std::process::Command::new("python3")

@@ -68,3 +68,9 @@ jobs:
       - name: Lint Manuscripts for Markdown, KaTeX & Link Integrity
         run: |
           python3 scripts/lint_manuscripts.py
+      - name: Build Lean 4 Hyperlinked Documentation Atlas
+        run: |
+          python3 scripts/build_lean_docs.py
+      - name: Enforce Performance & Quantization Regression Gates
+        run: |
+          python3 scripts/check_benchmark_regression.py

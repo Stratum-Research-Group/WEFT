@@ -1,4 +1,4 @@
-.PHONY: test test-unit test-regression test-cpp formal gate suite-smoke suite-standard audit matrix lint telemetry search paclet standalone-reader bench-triton eval-quant
+.PHONY: test test-unit test-regression test-cpp formal gate suite-smoke suite-standard audit matrix lint telemetry search paclet standalone-reader bench-triton eval-quant export-pdfs bind-monograph citation-graph validate-models
 
 test: test-unit test-regression test-cpp
 	@echo "================================================================="
@@ -60,6 +60,22 @@ bench-triton:
 eval-quant:
 	@echo "[EVAL] Running Quantization Drift & Cosine Retention Analysis..."
 	.venv/bin/python scripts/evaluate_quantization_drift.py
+
+export-pdfs:
+	@echo "[PDF] Exporting All 95 Technical Reports to Individual PDFs..."
+	.venv/bin/python scripts/export_manuscript_pdf.py --all -j 12
+
+bind-monograph:
+	@echo "[BIND] Binding All 95 Reports into Master Monograph Volume IV PDF..."
+	python3 scripts/bind_monograph_volume4.py
+
+citation-graph:
+	@echo "[GRAPH] Building Co-Citation D3 Network..."
+	python3 scripts/build_citation_graph.py
+
+validate-models:
+	@echo "[MODELS] Validating Sub-Bit Model Registry & Checkpoint Parity..."
+	python3 scripts/validate_model_registry.py
 
 gate:
 	@echo "[GATE] Running Full QA Gatekeeper..."

@@ -134,12 +134,16 @@ def main():
     parser = argparse.ArgumentParser(description="Export publication PDF for Stratum manuscripts")
     parser.add_argument("paper", type=int, nargs="?", default=142, help="Paper number (e.g. 142)")
     parser.add_argument("--all", action="store_true", help="Export all 95 papers")
+    parser.add_argument("-j", "--workers", type=int, default=8, help="Number of parallel worker processes")
     args = parser.parse_args()
 
     if args.all:
-        print("Exporting all 95 manuscripts to PDF...")
-        for p in range(142, 237):
-            export_pdf(p)
+        import concurrent.futures
+        print(f"Exporting all 95 manuscripts to PDF using {args.workers} worker processes...")
+        papers = list(range(142, 237))
+        with concurrent.futures.ProcessPoolExecutor(max_workers=args.workers) as executor:
+            results = list(executor.map(export_pdf, papers))
+        print(f"\n✅ All 95 manuscripts successfully exported to {OUTPUT_DIR}")
     else:
         export_pdf(args.paper)
 

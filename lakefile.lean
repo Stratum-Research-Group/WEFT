@@ -427,5 +427,6 @@ lean_lib «FormalSuite» where
     `«ThalamocorticalSoPacInvariants»,
     `«VagalAntiInflammatoryInvariants»,
     `«MicroglialPruningInvariants»,
-    `«SnarePrimingInvariants»
+    `«SnarePrimingInvariants»,
+    `«HippocampalSwrInvariants»
   ]

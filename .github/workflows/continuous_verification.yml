@@ -71,6 +71,19 @@ jobs:
       - name: Build Lean 4 Hyperlinked Documentation Atlas
         run: |
           python3 scripts/build_lean_docs.py
+      - name: Validate Lean 4 Proof Topology & Acyclic Dependency DAG
+        run: |
+          python3 scripts/build_proof_dependency_graph.py
       - name: Enforce Performance & Quantization Regression Gates
         run: |
           python3 scripts/check_benchmark_regression.py
+      - name: Validate BibTeX Citation Quality & Master Bibliography
+        run: |
+          python3 scripts/validate_bibtex_citations.py
+      - name: Profile Triton Shared Memory & 32-Bank Conflict Hazards
+        run: |
+          python3 scripts/profile_triton_sram.py
+      - name: Package Dual-Format Monograph (Standalone Web Reader & Vector PDF)
+        run: |
+          python3 scripts/build_standalone_reader.py
+          test -f dist/weft_reader.standalone.html

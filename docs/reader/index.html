@@ -55,6 +55,17 @@
       color: var(--text-bright);
       border-radius: 6px;
       font-size: 13px;
+      margin-bottom: 8px;
+    }
+    #math-search {
+      width: 100%;
+      padding: 6px 12px;
+      background: #090d16;
+      border: 1px dashed #38bdf8;
+      color: #38bdf8;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: monospace;
     }
     #paper-list {
       flex: 1;
@@ -162,6 +173,7 @@
       <h1>Stratum Monograph Volume IV</h1>
       <p>95 Certified Papers (#142 - #236)</p>
       <input type="text" id="search" placeholder="Search by paper, circuit, or keyword...">
+      <input type="text" id="math-search" placeholder="TeX Equation search (e.g. \dot{V}_m, \gamma, \mathcal{L})...">
     </div>
     <ul id="paper-list"></ul>
   </div>
@@ -217,6 +229,11 @@
         <h2>Interactive 3D Phase-Space Attractor Visualizer</h2>
         <div style="background:#000; border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:20px; text-align:center;">
           <canvas id="phaseCanvas" width="600" height="260" style="background:#050811; border-radius:6px; cursor:crosshair;"></canvas>
+          <div style="display:flex; justify-content:center; gap:16px; margin-top:8px; font-size:12px; color:#94a3b8; font-family:monospace;">
+            <label>g_Na: <input type="range" id="gNaSlider" min="80" max="180" value="120" style="width:70px; vertical-align:middle;"> <span id="gNaVal">120</span></label>
+            <label>g_K: <input type="range" id="gKSlider" min="20" max="60" value="36" style="width:70px; vertical-align:middle;"> <span id="gKVal">36</span></label>
+            <label>g_Ca: <input type="range" id="gCaSlider" min="1" max="20" value="8" style="width:70px; vertical-align:middle;"> <span id="gCaVal">8</span></label>
+          </div>
           <div style="margin-top:8px; font-size:12px; color:#8b949e;">
             <span>Orbit Trajectory: Limit-Cycle Attractor ($V_m$ vs $\dot{V}_m$ vs Phase $\theta$) • Drag to Rotate</span>
           </div>
@@ -383,6 +400,14 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       let angle = 0;
+      let gNa = 120, gK = 36, gCa = 8;
+
+      const sNa = document.getElementById('gNaSlider');
+      const sK = document.getElementById('gKSlider');
+      const sCa = document.getElementById('gCaSlider');
+      if (sNa) sNa.oninput = (e) => { gNa = parseFloat(e.target.value); document.getElementById('gNaVal').textContent = gNa; };
+      if (sK) sK.oninput = (e) => { gK = parseFloat(e.target.value); document.getElementById('gKVal').textContent = gK; };
+      if (sCa) sCa.oninput = (e) => { gCa = parseFloat(e.target.value); document.getElementById('gCaVal').textContent = gCa; };
 
       function renderFrame() {
         ctx.fillStyle = '#050811';
@@ -394,11 +419,13 @@
         
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
-        const r_base = 70;
+        const r_base = 50 + (gNa / 120) * 20;
+        const modulation = (gCa / 8) * 25;
+        const harm = (gK / 36) * 3;
         
         for (let t = 0; t < 600; t++) {
           const theta = t * 0.05;
-          const r = r_base + 30 * Math.sin(theta * 3 + targetNum * 0.1);
+          const r = r_base + modulation * Math.sin(theta * harm + targetNum * 0.1);
           const x = cx + r * Math.cos(theta + angle);
           const y = cy + (r * 0.6) * Math.sin(theta + angle);
           if (t === 0) ctx.moveTo(x, y);
@@ -410,9 +437,42 @@
       setInterval(renderFrame, 30);
     }
 
-    document.getElementById('search').addEventListener('input', (e) => {
-      renderList(e.target.value);
-    });
+    function filterPapers() {
+      const q = (document.getElementById('search').value || '').toLowerCase();
+      const mq = (document.getElementById('math-search').value || '').toLowerCase();
+      const filtered = papers.filter(p => {
+        const matchesText = !q || p.title.toLowerCase().includes(q) || (p.abstract && p.abstract.toLowerCase().includes(q)) || (p.circuit && p.circuit.toLowerCase().includes(q));
+        const matchesMath = !mq || (p.content && p.content.toLowerCase().includes(mq)) || (p.abstract && p.abstract.toLowerCase().includes(mq));
+        return matchesText && matchesMath;
+      });
+      renderListFiltered(filtered);
+    }
+
+    function renderListFiltered(paperSubset) {
+      const listEl = document.getElementById('paper-list');
+      listEl.innerHTML = '';
+      paperSubset.forEach(paper => {
+        const li = document.createElement('li');
+        li.className = 'paper-item';
+        li.dataset.num = paper.num;
+        li.innerHTML = `<span class="paper-num">Paper #${paper.num}</span><span class="paper-title">${paper.title}</span>`;
+        li.addEventListener('click', () => {
+          document.querySelectorAll('.paper-item').forEach(el => el.classList.remove('active'));
+          li.classList.add('active');
+          renderPaper(paper);
+        });
+        listEl.appendChild(li);
+      });
+      if (paperSubset.length > 0 && !document.querySelector('.paper-item.active')) {
+        listEl.firstChild.classList.add('active');
+      }
+    }
+
+    document.getElementById('search').addEventListener('input', filterPapers);
+    const mathSearchEl = document.getElementById('math-search');
+    if (mathSearchEl) {
+      mathSearchEl.addEventListener('input', filterPapers);
+    }
 
     if (papers.length > 0) {
       renderList();

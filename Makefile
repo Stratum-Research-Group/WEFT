@@ -100,3 +100,11 @@ suite-smoke:
 suite-standard:
 	@echo "[SUITE] Executing WEFT Benchmark & Test Suite (Standard Tier)..."
 	.venv/bin/python run_weft_suite.py --tier standard --device cpu
+
+validate-bibtex:
+	@echo "[BIBTEX] Validating Master Deduplicated Bibliography..."
+	python3 scripts/validate_bibtex_citations.py
+
+profile-triton-sram:
+	@echo "[TRITON] Profiling Shared Memory Allocation and Bank Conflicts..."
+	python3 scripts/profile_triton_sram.py

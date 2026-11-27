@@ -1,6 +1,6 @@
 {
   "format": "LEAN-4-FORMAL-VERIFICATION-v2",
-  "total_theorems": 2518,
+  "total_theorems": 2528,
   "zero_axioms_guaranteed": true,
   "theorems": [
     {
@@ -1195,6 +1195,58 @@
       },
       "module": "AnabelianSectionTranslationInvariants",
       "file": "AnabelianSectionTranslationInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "def",
+        "name": "plasmaBeta",
+        "line": 18,
+        "signature": "def plasmaBeta (p B : \u211d) (\u03bc\u2080 : \u211d) : \u211d :="
+      },
+      "module": "AneuronicFusionMHDInvariants",
+      "file": "AneuronicFusionMHDInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "direct_conversion_efficiency_bounded",
+        "line": 22,
+        "signature": "theorem direct_conversion_efficiency_bounded"
+      },
+      "module": "AneuronicFusionMHDInvariants",
+      "file": "AneuronicFusionMHDInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "electrostatic_collector_current_conservation",
+        "line": 33,
+        "signature": "theorem electrostatic_collector_current_conservation"
+      },
+      "module": "AneuronicFusionMHDInvariants",
+      "file": "AneuronicFusionMHDInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "lawson_aneuronic_breakeven_bound",
+        "line": 41,
+        "signature": "theorem lawson_aneuronic_breakeven_bound"
+      },
+      "module": "AneuronicFusionMHDInvariants",
+      "file": "AneuronicFusionMHDInvariants.lean",
       "axioms": 0,
       "sorries": 0,
       "status": "CERTIFIED_MACHINE_CHECKED"
@@ -10048,6 +10100,84 @@
       },
       "module": "GeometricLanglandsInvariants",
       "file": "GeometricLanglandsInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "magnetic_energy_density_nonneg",
+        "line": 23,
+        "signature": "theorem magnetic_energy_density_nonneg (B \u03bc\u2080 : \u211d) (h_\u03bc\u2080 : 0 < \u03bc\u2080) :"
+      },
+      "module": "GlobalSolutionsThermodynamics",
+      "file": "GlobalSolutionsThermodynamics.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "magnetic_energy_density_pos",
+        "line": 30,
+        "signature": "theorem magnetic_energy_density_pos (B \u03bc\u2080 : \u211d) (h_\u03bc\u2080 : 0 < \u03bc\u2080) (h_B : B \u2260 0) :"
+      },
+      "module": "GlobalSolutionsThermodynamics",
+      "file": "GlobalSolutionsThermodynamics.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "multistage_collector_efficiency_le_one",
+        "line": 37,
+        "signature": "theorem multistage_collector_efficiency_le_one"
+      },
+      "module": "GlobalSolutionsThermodynamics",
+      "file": "GlobalSolutionsThermodynamics.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "power_balance_conservation",
+        "line": 45,
+        "signature": "theorem power_balance_conservation"
+      },
+      "module": "GlobalSolutionsThermodynamics",
+      "file": "GlobalSolutionsThermodynamics.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "hybrid_sheath_area_positive",
+        "line": 55,
+        "signature": "theorem hybrid_sheath_area_positive"
+      },
+      "module": "GlobalSolutionsThermodynamics",
+      "file": "GlobalSolutionsThermodynamics.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "bremsstrahlung_temperature_ratio_bound",
+        "line": 61,
+        "signature": "theorem bremsstrahlung_temperature_ratio_bound"
+      },
+      "module": "GlobalSolutionsThermodynamics",
+      "file": "GlobalSolutionsThermodynamics.lean",
       "axioms": 0,
       "sorries": 0,
       "status": "CERTIFIED_MACHINE_CHECKED"

@@ -87,3 +87,10 @@ jobs:
         run: |
           python3 scripts/build_standalone_reader.py
           test -f dist/weft_reader.standalone.html
+      - name: Validate Lean 4 Theorem Hyperlinks & Manuscript Formal Anchors
+        run: |
+          python3 scripts/validate_lean_hyperlinks.py
+      - name: Audit Fleet Perplexity Matrix & Hardware Configurations
+        run: |
+          python3 scripts/check_perplexity_gate.py
+          python3 scripts/export_triton_autotune_configs.py

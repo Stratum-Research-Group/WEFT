@@ -30,6 +30,20 @@ def verify_svgs():
             if not viewbox:
                 failures.append((svg.name, "Missing viewBox attribute"))
                 continue
+            # Verify standard bounding box aspects
+            vb_parts = [float(x) for x in viewbox.replace(",", " ").split() if x.strip()]
+            if len(vb_parts) == 4:
+                min_x, min_y, width, height = vb_parts
+                if width <= 0 or height <= 0:
+                    failures.append((svg.name, f"Invalid non-positive dimensions: {width}x{height}"))
+                    continue
+                aspect_ratio = width / height
+                if aspect_ratio < 0.2 or aspect_ratio > 5.0:
+                    failures.append((svg.name, f"Extreme aspect ratio ({aspect_ratio:.2f}) outside [0.2, 5.0]"))
+                    continue
+            else:
+                failures.append((svg.name, f"Malformed viewBox: {viewbox}"))
+                continue
             raw_text = svg.read_text(encoding="utf-8")
             if "NaN" in raw_text or "Infinity" in raw_text:
                 failures.append((svg.name, "Found NaN or Infinity coordinate values"))

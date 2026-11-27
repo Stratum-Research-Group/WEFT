@@ -112,3 +112,11 @@ profile-triton-sram:
 generate-lean-badge:
 	@echo "[LEAN] Generating Lean 4 Formal Verification Badge..."
 	python3 scripts/generate_lean_badge.py
+
+validate-hyperlinks:
+	@echo "[LEAN-LINKS] Validating Formal Lean 4 Manuscript Proof Anchors..."
+	python3 scripts/validate_lean_hyperlinks.py
+
+export-triton-configs:
+	@echo "[TRITON-CONFIGS] Exporting SM90/SM100 Hopper & Blackwell Configurations..."
+	python3 scripts/export_triton_autotune_configs.py

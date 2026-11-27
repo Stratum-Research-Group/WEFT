@@ -16,6 +16,28 @@
       --green: #3fb950;
       --purple: #bc8cff;
     }
+    body.theme-tokyo {
+      --bg: #1a1b26;
+      --sidebar-bg: #16161e;
+      --card-bg: #24283b;
+      --border: #414868;
+      --text: #a9b1d6;
+      --text-bright: #c0caf5;
+      --accent: #7aa2f7;
+      --green: #9ece6a;
+      --purple: #bb9af7;
+    }
+    body.theme-oled {
+      --bg: #000000;
+      --sidebar-bg: #050505;
+      --card-bg: #101010;
+      --border: #222222;
+      --text: #d4d4d8;
+      --text-bright: #ffffff;
+      --accent: #38bdf8;
+      --green: #4ade80;
+      --purple: #c084fc;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -172,6 +194,14 @@
     <div id="sidebar-header">
       <h1>Stratum Monograph Volume IV</h1>
       <p>95 Certified Papers (#142 - #236)</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:0.5px;">Theme</span>
+        <select id="themeSelect" style="background:var(--card-bg); border:1px solid var(--border); color:var(--text-bright); border-radius:4px; font-size:11px; padding:2px 6px;">
+          <option value="default">GitHub Dark</option>
+          <option value="theme-tokyo">Tokyo Night</option>
+          <option value="theme-oled">OLED Obsidian</option>
+        </select>
+      </div>
       <input type="text" id="search" placeholder="Search by paper, circuit, or keyword...">
       <input type="text" id="math-search" placeholder="TeX Equation search (e.g. \dot{V}_m, \gamma, \mathcal{L})...">
     </div>
@@ -252,6 +282,20 @@
           </div>
         </div>
 
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:20px; text-align:center;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-bright); margin-bottom:6px;">Neurochemical Phase-Plane Orbit & Nullcline Bifurcation (FitzHugh-Nagumo / Izhikevich)</div>
+          <canvas id="nullclineCanvas" width="600" height="220" style="background:#020617; border-radius:6px; cursor:crosshair;"></canvas>
+          <div style="display:flex; justify-content:center; gap:16px; margin-top:8px; font-size:12px; color:#94a3b8; font-family:monospace;">
+            <label>I_inj: <input type="range" id="injSlider" min="0" max="60" value="25" style="width:65px; vertical-align:middle;"> <span id="injVal">0.25</span></label>
+            <label>a (decay): <input type="range" id="aParamSlider" min="1" max="20" value="7" style="width:65px; vertical-align:middle;"> <span id="aVal">0.07</span></label>
+            <label>b (recovery): <input type="range" id="bParamSlider" min="10" max="40" value="20" style="width:65px; vertical-align:middle;"> <span id="bVal">0.20</span></label>
+          </div>
+          <div style="margin-top:6px; font-size:12px; color:#8b949e;">
+            <span>Phase-Plane: Cubic v-Nullcline ($\dot{V}_m = 0$) & Linear w-Nullcline ($\dot{w} = 0$) • Supercritical Limit Cycle Birth</span>
+          </div>
+        </div>
+
+
 
         <h2>Wolfram Computational Universe: Cellular Automaton & Causal Foliation</h2>
         <div style="background:#0d1117; border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:20px;">
@@ -297,6 +341,7 @@
 
       initPhaseSpaceCanvas(p.target_number);
       initCannCanvas(p.target_number);
+      initNullclineCanvas(p.target_number);
       initCellularAutomatonCanvas();
     }
 
@@ -419,6 +464,119 @@
     }
 
     
+    
+    function initThemeHandler() {
+      const themeSel = document.getElementById('themeSelect');
+      if (!themeSel) return;
+      const saved = localStorage.getItem('weft_theme') || 'default';
+      themeSel.value = saved;
+      if (saved !== 'default') document.body.className = saved;
+
+      themeSel.onchange = (e) => {
+        const val = e.target.value;
+        document.body.className = val === 'default' ? '' : val;
+        localStorage.setItem('weft_theme', val);
+      };
+    }
+
+    function initNullclineCanvas(targetNum) {
+      const canvas = document.getElementById('nullclineCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let I_inj = 0.25;
+      let a = 0.07;
+      let b = 0.20;
+
+      const sInj = document.getElementById('injSlider');
+      const sA = document.getElementById('aParamSlider');
+      const sB = document.getElementById('bParamSlider');
+      if (sInj) sInj.oninput = (e) => { I_inj = parseFloat(e.target.value) / 100.0; document.getElementById('injVal').textContent = I_inj.toFixed(2); };
+      if (sA) sA.oninput = (e) => { a = parseFloat(e.target.value) / 100.0; document.getElementById('aVal').textContent = a.toFixed(2); };
+      if (sB) sB.oninput = (e) => { b = parseFloat(e.target.value) / 100.0; document.getElementById('bVal').textContent = b.toFixed(2); };
+
+      let traj_v = -1.0;
+      let traj_w = -0.5;
+      const history = [];
+
+      function renderFrame() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const scaleX = 110;
+        const scaleY = 90;
+
+        // Draw coordinate axes
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy);
+        ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height);
+        ctx.stroke();
+
+        // Draw Cubic v-Nullcline: w = v - v^3 / 3 + I_inj
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let px = 0; px < canvas.width; px += 2) {
+          const v = (px - cx) / scaleX;
+          const w = v - (v * v * v) / 3.0 + I_inj;
+          const py = cy - w * scaleY;
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Draw Linear w-Nullcline: w = (v + a) / b
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let px = 0; px < canvas.width; px += 4) {
+          const v = (px - cx) / scaleX;
+          const w = (v + a) / Math.max(0.01, b);
+          const py = cy - w * scaleY;
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Numerical integration step (RK2 / Euler)
+        const dt = 0.05;
+        for (let step = 0; step < 4; step++) {
+          const dv = traj_v - (traj_v * traj_v * traj_v) / 3.0 - traj_w + I_inj;
+          const dw = 0.08 * (traj_v + 0.7 - 0.8 * traj_w);
+          traj_v += dv * dt;
+          traj_w += dw * dt;
+        }
+
+        history.push({ v: traj_v, w: traj_w });
+        if (history.length > 250) history.shift();
+
+        // Draw Trajectory
+        if (history.length > 1) {
+          ctx.strokeStyle = '#34d399';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < history.length; i++) {
+            const hx = cx + history[i].v * scaleX;
+            const hy = cy - history[i].w * scaleY;
+            if (i === 0) ctx.moveTo(hx, hy);
+            else ctx.lineTo(hx, hy);
+          }
+          ctx.stroke();
+
+          // Current state head
+          const head = history[history.length - 1];
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath();
+          ctx.arc(cx + head.v * scaleX, cy - head.w * scaleY, 4, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+      setInterval(renderFrame, 35);
+    }
+
     function initCannCanvas(targetNum) {
       const canvas = document.getElementById('cannCanvas');
       if (!canvas) return;
@@ -552,6 +710,7 @@
       mathSearchEl.addEventListener('input', filterPapers);
     }
 
+    initThemeHandler();
     if (papers.length > 0) {
       renderList();
       renderPaper(papers[0]);

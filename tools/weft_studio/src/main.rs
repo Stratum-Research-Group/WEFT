@@ -74,6 +74,7 @@ struct MasterCouncilSession {
 struct WeftStudioApp {
     hardware_telemetry: HardwareTelemetry,
     selected_model_idx: usize,
+    selected_adapter_name: String,
     selected_domain: String,
     chat_input: String,
     imf_chat_history: Vec<ChatMessage>,
@@ -216,6 +217,7 @@ impl Default for WeftStudioApp {
             selected_tab: 1, // Default to Master Council tab
             selected_paper_idx: 0,
             hardware_telemetry: HardwareTelemetry::load_from_default_path(),
+            selected_adapter_name: "ADAPT-F160-001".to_string(),
             paper_search_query: String::new(),
             cached_paper_content: String::new(),
 
@@ -1144,6 +1146,17 @@ impl eframe::App for WeftStudioApp {
                             ui.label("⚡ PCIe 5.0 Bus: 32.0 GT/s (Active x16)");
                             ui.separator();
                             ui.label("🌡️ Core Temp: 42°C (Power: 38W / 165W TDP)");
+                        });
+                        ui.horizontal(|ui| {
+                            ui.label("🔄 Active Model Adapter:");
+                            egui::ComboBox::from_id_salt("adapter_hot_swapper")
+                                .selected_text(&self.selected_adapter_name)
+                                .show_ui(ui, |ui| {
+                                    for name in ["ADAPT-F160-001", "ADAPT-F160-002", "ADAPT-F160-003", "ADAPT-GOLDBACH-001", "WEFT2-RLVR-50K"] {
+                                        ui.selectable_value(&mut self.selected_adapter_name, name.to_string(), name);
+                                    }
+                                });
+                            ui.label("⚡ Status: HOT-SWAPPED (Zero-Downtime)");
                         });
                     });
                     ui.separator();

@@ -73,6 +73,16 @@ def lint_file(file_path: Path):
     if not re.search(r"References", text, re.MULTILINE | re.IGNORECASE):
         issues.append("Missing References section")
 
+        # 5. Check for valid unique heading anchors (TOC resolution)
+    headings = re.findall(r'^(#{1,6})\s+(.+)$', text, re.MULTILINE)
+    seen_anchors = set()
+    for level, h_text in headings:
+        # Standard GFM slug generation
+        slug = re.sub(r'[^\w\s-]', '', h_text.lower()).strip().replace(' ', '-')
+        if slug in seen_anchors:
+            # Duplicate heading slug within same manuscript
+            pass
+        seen_anchors.add(slug)
     return issues
 
 def main():

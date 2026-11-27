@@ -120,3 +120,7 @@ validate-hyperlinks:
 export-triton-configs:
 	@echo "[TRITON-CONFIGS] Exporting SM90/SM100 Hopper & Blackwell Configurations..."
 	python3 scripts/export_triton_autotune_configs.py
+
+check-cpu-vnni:
+	@echo "[CPU-VNNI] Checking Native AVX-512 VNNI / VPOPCNTDQ Capabilities..."
+	python3 scripts/check_cpu_vnni.py

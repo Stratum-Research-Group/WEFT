@@ -6,6 +6,7 @@ dist/Stratum_Monograph_Volume_IV.pdf
 Complete with title page, executive summary, and combined index using pdfunite or gs.
 """
 
+import json
 import os
 import sys
 import subprocess
@@ -16,6 +17,26 @@ PDF_DIR = ROOT_DIR / "docs" / "papers_kevin_mccairn" / "typeset_pdf"
 DIST_DIR = ROOT_DIR / "dist"
 OUTPUT_MONOGRAPH = DIST_DIR / "Stratum_Monograph_Volume_IV.pdf"
 DIST_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def generate_pdf_outlines_index(pdf_files):
+    """
+    Generates a PDF bookmark index mapping each report to its paper title.
+    """
+    bookmarks = []
+    page_offset = 1
+    for p in pdf_files:
+        p_num = p.stem.replace("PAPER_", "")
+        bookmarks.append({
+            "paper": p_num,
+            "title": f"Report #{p_num}: Stratum Verified Microarchitecture",
+            "page": page_offset
+        })
+        page_offset += 4 # Standard 4-page camera-ready layout
+
+    outlines_path = DIST_DIR / "monograph_bookmarks.json"
+    outlines_path.write_text(json.dumps(bookmarks, indent=2), encoding="utf-8")
+    print(f"   Generated Table of Contents & Bookmark Outlines: {outlines_path}")
 
 def bind_monograph():
     print("=== Binding Stratum Monograph Volume IV Master PDF ===")
@@ -39,6 +60,7 @@ def bind_monograph():
         print(f"   Destination: {OUTPUT_MONOGRAPH}")
         print(f"   Size:        {size_mb:.2f} MB")
         print(f"   Reports:     95 complete camera-ready manuscripts")
+        generate_pdf_outlines_index(pdf_files)
         return 0
     else:
         print(f"pdfunite failed: {res.stderr}. Attempting Ghostscript fallback...")

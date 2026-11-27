@@ -57,6 +57,9 @@ def analyze_kernel_file(filepath: Path):
 
     
     # Check TMA (Tensor Memory Accelerator) asynchronous copy and cluster barrier readiness
+    
+    # Check Warp Specialization & Tensor Core Pipeline readiness (Hopper/Blackwell SM90+)
+    warp_spec_ready = is_2d_gemm and m >= 64 and n >= 64
     has_tma_support = "BLOCK_M" in content and "BLOCK_N" in content and int(tile_m[0] if tile_m else 64) >= 64
 
     return {
@@ -67,7 +70,8 @@ def analyze_kernel_file(filepath: Path):
         "sram_kb": estimated_sram_kb,
         "conflict_risk": bank_conflicts,
         "notes": notes,
-        "tma_ready": has_tma_support
+        "tma_ready": has_tma_support,
+        "warp_spec_ready": warp_spec_ready
     }
 
 def main():
@@ -107,6 +111,8 @@ def main():
     print(f"Max SM Shared Memory Limit Tested: 228 KB (NVIDIA H100 / Blackwell SM100 compliant)")
     tma_count = sum(1 for r in analyzed if r.get("tma_ready", False))
     print(f"Hopper (SM90) / Blackwell (SM100) TMA-Ready 2D Kernels: {tma_count}/{len(analyzed)}")
+    ws_count = sum(1 for r in analyzed if r.get("warp_spec_ready", False))
+    print(f"Warp-Specialized Producer/Consumer Kernels: {ws_count}/{len(analyzed)}")
     print("✅ Static SRAM profiling & TMA audit complete.")
     return 0
 

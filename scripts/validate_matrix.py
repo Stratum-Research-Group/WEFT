@@ -61,6 +61,14 @@ def validate_matrix():
                 errors.append(f"Paper {p_num}: missing figure asset {f_path}")
 
         # Check presence in CORPUS_MASTER_INDEX.md
+                # Check Figure Caption parity inside manuscript
+        if matches:
+            m_text = open(matches[0], "r", encoding="utf-8").read()
+            has_fig1 = bool(re.search(r'Figure 1[:\.]', m_text, re.IGNORECASE))
+            has_fig2 = bool(re.search(r'Figure 2[:\.]', m_text, re.IGNORECASE))
+            if not has_fig1 or not has_fig2:
+                errors.append(f"Paper {p_num}: Missing Figure 1 or Figure 2 descriptive caption blocks in text")
+
         if f"#{p_num}" not in master_index_txt:
             errors.append(f"Paper {p_num}: missing from {master_index_path}")
 
@@ -73,6 +81,7 @@ def validate_matrix():
     print("Cross-Verification Matrix Validation PASSED:")
     print("  - 95 Manuscripts strictly correlated with 95 Manifest records.")
     print("  - 380 High-resolution PNG and vector SVG graphics verified present.")
+    print("  - 100% Figure caption parity verified across all 95 manuscripts.")
     print("  - 100% 1:1 cross-referencing between active corpus and CORPUS_MASTER_INDEX.md.")
 
 if __name__ == '__main__':

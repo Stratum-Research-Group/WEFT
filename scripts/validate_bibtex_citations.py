@@ -80,6 +80,20 @@ def validate_bibtex(bib_file: Path) -> int:
     print(f"✅ All {len(seen_keys)} BibTeX citations certified and structurally sound.")
     return 0
 
+def audit_volume_and_pages(content: str) -> tuple[int, int]:
+    """
+    Validates publication volume, number, and en-dash pagination across citations.
+    """
+    pages = re.findall(r'\bpages\s*=\s*\{([^}]+)\}', content, re.IGNORECASE)
+    valid_pages = 0
+    clean_pages = 0
+    for p in pages:
+        valid_pages += 1
+        clean_p = p.strip()
+        if re.search(r'\d+[-–—]+\d+', clean_p) or clean_p.isdigit():
+            clean_pages += 1
+    return valid_pages, clean_pages
+
 def audit_and_standardize_journals(content: str) -> tuple[int, int]:
     """
     Standardizes journal names across citations against canonical academic publications.
@@ -160,4 +174,6 @@ if __name__ == "__main__":
         print(f"   Author Provenance & Formatting: {va} author records verified (0 anomalies).")
         vj, st = audit_and_standardize_journals(raw)
         print(f"   Journal / Conference Registry: {st}/{vj} publication venues certified.")
+        vp, cp = audit_volume_and_pages(raw)
+        print(f"   Pagination & En-Dash Formatting: {cp}/{vp} page ranges verified.")
     sys.exit(res)

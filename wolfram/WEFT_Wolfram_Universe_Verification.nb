@@ -1,0 +1,195 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='WEFT Monograph Suite - Stratum Research Group & Synaptek Labs' *)
+(* Authors: Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D. *)
+
+Notebook[{
+Cell[CellGroupData[{
+Cell["WEFT: Wolfram Computational Universe & Multiway Causal Dynamics", "Title",
+ CellChangeTimes->{3.95e+9}],
+
+Cell["Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.\nStratum Research Group & Synaptek Labs", "Subtitle",
+ CellChangeTimes->{3.95e+9}],
+
+Cell["This notebook explores the correspondence between Wolfram's Computational Universe (Cellular Automata, Multiway Substitution Systems, and Causal Graphs) and the WEFT microarchitectural biophysical kernels (Lean Targets #142-#236).", "Text",
+ CellChangeTimes->{3.95e+9}],
+
+Cell[CellGroupData[{
+Cell["1. Interactive Cellular Automata Space-Time Foliation", "Section",
+ CellChangeTimes->{3.95e+9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Manipulate", "[", 
+   RowBox[{
+    RowBox[{"ArrayPlot", "[", 
+     RowBox[{
+      RowBox[{"CellularAutomaton", "[", 
+       RowBox[{"rule", ",", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", "1", "}"}], ",", " ", "0"}], "}"}], ",", " ", 
+        "steps"}], "]"}], ",", " ", 
+      RowBox[{"ColorFunction", " ", "->", " ", "\"", "DarkRainbow\"", "}"}], 
+      ",", " ", 
+      RowBox[{"Frame", " ", "->", " ", "False"}], ",", " ", 
+      RowBox[{"ImageSize", " ", "->", " ", "Large"}], ",", " ", 
+      RowBox[{"PlotLabel", " ", "->", " ", 
+       RowBox[{"Row", "[", 
+        RowBox[{"{", 
+         RowBox[{"\"Cellular Automaton Rule \", rule, \" | Steps: \", steps}],
+          "}"}], "]"}]}]}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"rule", ",", " ", "30", ",", " ", "\"Automaton Rule\""}], "}"}],
+       ",", " ", "0", ",", " ", "255", ",", " ", "1"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"steps", ",", " ", "64", ",", " ", "\"Evolution Horizons\""}], 
+       "}"}], ",", " ", "16", ",", " ", "256", ",", " ", "8"}], "}"}]}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{3.95e+9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell["2. Dynamic Multiway Branchial & Causal Graph Visualizer", "Section",
+ CellChangeTimes->{3.95e+9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Manipulate", "[", 
+   RowBox[{
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"rules", ",", "init", ",", "stepFn", ",", "states", ",", "edges"}], "}"}], 
+      ",", 
+      RowBox[{
+       RowBox[{"rules", " ", "=", " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"\"A\"", " ", "->", " ", 
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"branching", " ", "==", " ", "2"}], ",", " ", 
+             "\"AB\"", ",", " ", "\"ABA\""}], "]"}]}], ",", " ", 
+          RowBox[{"\"B\"", " ", "->", " ", "\"BA\""}]}], "}"}]}], ";", 
+       RowBox[{"init", " ", "=", " ", 
+        RowBox[{"{", "\"A\"", "}"}]}], ";", 
+       RowBox[{
+        RowBox[{"stepFn", "[", "s_List", "]"}], " ", ":=", " ", 
+        RowBox[{"DeleteDuplicates", "[", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"Map", "[", 
+           RowBox[{
+            RowBox[{"Function", "[", 
+             RowBox[{"x", ",", " ", 
+              RowBox[{"StringReplaceList", "[", 
+               RowBox[{"x", ",", " ", "rules"}], "]"}]}], "]"}], ",", " ", 
+            "s"}], "]"}], "]"}], "]"}]}], ";", 
+       RowBox[{"states", " ", "=", " ", 
+        RowBox[{"NestList", "[", 
+         RowBox[{"stepFn", ",", " ", "init", ",", " ", "depth"}], "]"}]}], ";",
+       RowBox[{"edges", " ", "=", " ", 
+        RowBox[{"Flatten", "[", 
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"Map", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"#1", " ", "->", " ", "#2"}], " ", "&"}], ",", " ", 
+             RowBox[{"states", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+             RowBox[{"{", "1", "}"}]}], "]"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", " ", "1", ",", " ", 
+             RowBox[{"depth", " ", "-", " ", "1"}]}], "}"}]}], "]"}], 
+         "]"}]}], ";", 
+       RowBox[{"GraphPlot3D", "[", 
+        RowBox[{
+         RowBox[{"Flatten", "[", "states", "]"}], ",", " ", 
+         RowBox[{"Method", " ", "->", " ", "\"SpringElectricalEmbedding\""}],
+          ",", " ", 
+         RowBox[{"PlotStyle", " ", "->", " ", "Directive", "[", 
+          RowBox[{"Cyan", ",", "Thick"}], "]"}], ",", " ", 
+         RowBox[{"ImageSize", " ", "->", " ", "Large"}]}], "]"}]}]}], "]"}], 
+    ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"depth", ",", " ", "4", ",", " ", "\"Multiway Rewriting Steps\""}], 
+       "}"}], ",", " ", "1", ",", " ", "6", ",", " ", "1"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"branching", ",", " ", "3", ",", " ", "\"Branching Cardinality\""}], 
+       "}"}], ",", " ", "2", ",", " ", "3", ",", " ", "1"}], "}"}]}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{3.95e+9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell["3. Biophysical Limit Cycles & Causal Foliation Mapping", "Section",
+ CellChangeTimes->{3.95e+9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Manipulate", "[", 
+   RowBox[{
+    RowBox[{"ParametricPlot3D", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"r0", " ", "+", " ", 
+           RowBox[{"0.2", " ", 
+            RowBox[{"Sin", "[", 
+             RowBox[{"coupling", " ", "*", " ", "t"}], "]"}]}]}], ")"}], 
+         " ", 
+         RowBox[{"Cos", "[", "t", "]"}]}], ",", " ", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"r0", " ", "+", " ", 
+           RowBox[{"0.2", " ", 
+            RowBox[{"Sin", "[", 
+             RowBox[{"coupling", " ", "*", " ", "t"}], "]"}]}]}], ")"}], 
+         " ", 
+         RowBox[{"Sin", "[", "t", "]"}]}], ",", " ", 
+        RowBox[{"0.5", " ", 
+         RowBox[{"Cos", "[", 
+          RowBox[{"2", " ", "t"}], "]"}]}]}], "}"}], ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"t", ",", " ", "0", ",", " ", 
+        RowBox[{"8", " ", "Pi"}]}], "}"}], ",", " ", 
+      RowBox[{"PlotStyle", " ", "->", " ", 
+       RowBox[{"Directive", "[", 
+        RowBox[{"Orange", ",", "Thick"}], "]"}]}], ",", " ", 
+      RowBox[{"Boxed", " ", "->", " ", "True"}], ",", " ", 
+      RowBox[{"AxesLabel", " ", "->", " ", 
+       RowBox[{"{", 
+        RowBox[{"\"V_m\"", ",", " ", "\"dV_m/dt\"", ",", " ", "\"PAC Phase \[Theta]\""}], 
+        "}"}]}], ",", " ", 
+      RowBox[{"ImageSize", " ", "->", " ", "Large"}]}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"r0", ",", " ", "1.0", ",", " ", "\"Attractor Radius r_0\""}], 
+       "}"}], ",", " ", "0.5", ",", " ", "2.0", ",", " ", "0.1"}], "}"}], 
+    ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"coupling", ",", " ", "3.0", ",", " ", "\"Cross-Frequency Modulation \[Chi]\""}], 
+       "}"}], ",", " ", "1.0", ",", " ", "8.0", ",", " ", "0.5"}], "}"}]}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{3.95e+9}]
+}, Open  ]]
+}, Open  ]]
+}
+]

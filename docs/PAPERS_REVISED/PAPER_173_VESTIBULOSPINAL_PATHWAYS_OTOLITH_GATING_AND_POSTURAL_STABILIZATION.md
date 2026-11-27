@@ -5,7 +5,7 @@
 **Phase:** Phase IV — Production Microarchitecture & Mathematical Certification  
 **Paper Type:** Primary Research Technical Report  
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
-**Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
+**Affiliation:** Stratum Research Group & Synaptek Labs  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
 **Verification Level:** 100% Machine-Checked under Lean 4 (Target #364: VestibulospinalPosturalInvariants, 0 Axioms, 0 Sorries)  

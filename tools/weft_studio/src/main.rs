@@ -1240,6 +1240,19 @@ impl eframe::App for WeftStudioApp {
                                 ui.label("• SRAM to HBM3e Bandwidth Hierarchy: 14.2 TB/s -> 1.18 TB/s");
                                 ui.label("• Speculative Decoding: Multi-branch recurrent verification");
                                 ui.separator();
+                                ui.horizontal(|ui| {
+                                    if ui.button("⚡ Run Triton Biophysical Benchmark").clicked() {
+                                        let _ = std::process::Command::new("python3")
+                                            .arg("scripts/bench_triton_biophysical.py")
+                                            .spawn();
+                                    }
+                                    if ui.button("🔍 Run Corpus Matrix Audit").clicked() {
+                                        let _ = std::process::Command::new("python3")
+                                            .arg("scripts/validate_matrix.py")
+                                            .spawn();
+                                    }
+                                });
+                                ui.separator();
                                 ui.strong("📁 Generated Publication Visualizations:");
                                 ui.label("• docs/telemetry_visualizations/throughput_latency_roofline.svg");
                                 ui.label("• docs/telemetry_visualizations/memory_bandwidth_hierarchy.svg");

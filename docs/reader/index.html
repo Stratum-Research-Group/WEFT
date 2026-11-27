@@ -222,6 +222,16 @@
           </div>
         </div>
 
+        <h2>Wolfram Computational Universe: Cellular Automaton & Causal Foliation</h2>
+        <div style="background:#0d1117; border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <label style="font-size:13px; font-weight:600; color:var(--text-bright);">Rule: <span id="caRuleLabel">30</span> (ECA Horizon)</label>
+            <input type="range" id="caRuleSlider" min="0" max="255" value="30" style="width:200px;">
+            <button id="caRecomputeBtn" style="padding:4px 10px; background:var(--card-bg); border:1px solid var(--border); color:var(--accent); border-radius:4px; cursor:pointer;">Simulate Step</button>
+          </div>
+          <canvas id="caCanvas" width="600" height="120" style="background:#000; border-radius:6px; width:100%; display:block;"></canvas>
+        </div>
+
         <h2>Publication Figures & Phase Manifolds</h2>
         <div class="figures-grid">
           <div class="fig-card">
@@ -239,6 +249,48 @@
       `;
 
       initPhaseSpaceCanvas(p.target_number);
+      initCellularAutomatonCanvas();
+    }
+
+    function initCellularAutomatonCanvas() {
+      const slider = document.getElementById('caRuleSlider');
+      const label = document.getElementById('caRuleLabel');
+      const canvas = document.getElementById('caCanvas');
+      if (!slider || !canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      function drawCA(rule) {
+        label.innerText = rule;
+        const w = 150;
+        const h = 40;
+        let row = new Uint8Array(w);
+        row[Math.floor(w / 2)] = 1;
+
+        ctx.fillStyle = '#050811';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const cellW = canvas.width / w;
+        const cellH = canvas.height / h;
+
+        for (let t = 0; t < h; t++) {
+          for (let i = 0; i < w; i++) {
+            if (row[i]) {
+              ctx.fillStyle = (rule === 30) ? '#f43f5e' : (rule === 110 ? '#38bdf8' : '#34d399');
+              ctx.fillRect(i * cellW, t * cellH, cellW, cellH);
+            }
+          }
+          let nextRow = new Uint8Array(w);
+          for (let i = 1; i < w - 1; i++) {
+            const neighborhood = (row[i - 1] << 2) | (row[i] << 1) | row[i + 1];
+            nextRow[i] = (rule >> neighborhood) & 1;
+          }
+          row = nextRow;
+        }
+      }
+
+      slider.oninput = (e) => drawCA(parseInt(e.target.value));
+      document.getElementById('caRecomputeBtn').onclick = () => drawCA(parseInt(slider.value));
+      drawCA(parseInt(slider.value));
     }
 
     function initPhaseSpaceCanvas(targetNum) {

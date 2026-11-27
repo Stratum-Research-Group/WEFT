@@ -1,0 +1,27 @@
+{
+  "precision_tiers": {
+    "FP16": {
+      "bits_per_weight": 16.0,
+      "cosine_similarity": 1.0,
+      "mse_loss": 0.0
+    },
+    "INT4": {
+      "bits_per_weight": 4.0,
+      "cosine_similarity": 0.990105,
+      "mse_loss": 0.020339
+    },
+    "Ternary_1.58b": {
+      "bits_per_weight": 1.58,
+      "cosine_similarity": 0.887153,
+      "mse_loss": 0.265929
+    },
+    "WEFT_SubBit_0.8b": {
+      "bits_per_weight": 0.82,
+      "cosine_similarity": 0.940589,
+      "mse_loss": 0.162147
+    }
+  },
+  "compression_factor_vs_fp16": 19.5,
+  "cosine_retention_pct": 94.06,
+  "status": "PASS"
+}

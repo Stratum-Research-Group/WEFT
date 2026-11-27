@@ -1,4 +1,4 @@
-.PHONY: test test-unit test-regression test-cpp formal gate suite-smoke suite-standard
+.PHONY: test test-unit test-regression test-cpp formal gate suite-smoke suite-standard audit matrix lint telemetry search paclet standalone-reader bench-triton eval-quant
 
 test: test-unit test-regression test-cpp
 	@echo "================================================================="
@@ -23,6 +23,43 @@ test-cpp:
 formal:
 	@echo "[FORMAL] Compiling Lean 4 Mathematical Invariants..."
 	lake build FormalSuite
+
+audit:
+	@echo "[AUDIT] Auditing 95 Scientific Manuscripts and Formal Lean 4 Suite..."
+	python3 scripts/audit_manuscripts.py
+	python3 scripts/audit_lean_axioms.py
+
+matrix:
+	@echo "[MATRIX] Validating 1:1 Cross-Verification Parity & Figures..."
+	python3 scripts/validate_matrix.py
+
+lint:
+	@echo "[LINT] Linting Manuscript Markdown, KaTeX & Link Integrity..."
+	python3 scripts/lint_manuscripts.py
+
+telemetry:
+	@echo "[TELEMETRY] Rendering Publication Visualizations..."
+	.venv/bin/python scripts/generate_telemetry_visualizations.py
+
+search:
+	@echo "[SEARCH] Usage: python3 tools/weft_corpus_search.py <query>"
+	@python3 tools/weft_corpus_search.py "purkinje"
+
+paclet:
+	@echo "[PACLET] Packaging Wolfram WEFT.paclet..."
+	tar -czf dist/WEFT-4.0.0.paclet -C wolfram/Paclet/WEFT .
+
+standalone-reader:
+	@echo "[READER] Building Standalone Offline Web Reader..."
+	python3 scripts/build_standalone_reader.py
+
+bench-triton:
+	@echo "[BENCH] Running Triton 3.9 Biophysical Micro-Kernel Benchmarks..."
+	.venv/bin/python scripts/bench_triton_biophysical.py
+
+eval-quant:
+	@echo "[EVAL] Running Quantization Drift & Cosine Retention Analysis..."
+	.venv/bin/python scripts/evaluate_quantization_drift.py
 
 gate:
 	@echo "[GATE] Running Full QA Gatekeeper..."

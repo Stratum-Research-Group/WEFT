@@ -48,7 +48,7 @@ jobs:
           "
 
   manuscript-compliance-audit:
-    name: 95-Paper 5-Pillar Scientific Audit
+    name: 95-Paper 5-Pillar Scientific Audit & Gates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,3 +59,12 @@ jobs:
       - name: Audit 95 Manuscripts for 5 Pillars & Metadata
         run: |
           python3 scripts/audit_manuscripts.py
+      - name: Audit Zero Axioms and Zero Sorries in Formal Lean 4 Suite
+        run: |
+          python3 scripts/audit_lean_axioms.py
+      - name: Validate Cross-Verification Matrix & Asset Parity
+        run: |
+          python3 scripts/validate_matrix.py
+      - name: Lint Manuscripts for Markdown, KaTeX & Link Integrity
+        run: |
+          python3 scripts/lint_manuscripts.py

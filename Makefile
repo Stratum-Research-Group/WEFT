@@ -108,3 +108,7 @@ validate-bibtex:
 profile-triton-sram:
 	@echo "[TRITON] Profiling Shared Memory Allocation and Bank Conflicts..."
 	python3 scripts/profile_triton_sram.py
+
+generate-lean-badge:
+	@echo "[LEAN] Generating Lean 4 Formal Verification Badge..."
+	python3 scripts/generate_lean_badge.py

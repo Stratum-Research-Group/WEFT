@@ -38,12 +38,19 @@ def analyze_kernel_file(filepath: Path):
     n = int(tile_n[0]) if tile_n else 64
     k = int(tile_k[0]) if tile_k else 32
 
-    # Check stride power-of-two bank conflict risk (stride % 32 == 0 without padding)
-    if n % 32 == 0 and "padding" not in content.lower() and "+ 1" not in content and "+ 8" not in content:
-        bank_conflicts = True
-        notes.append(f"Potential 2D tile stride bank conflict: BLOCK_N={n} is a multiple of 32 without explicit bank padding (+1 or +8).")
+    # Distinguish 1D coalesced vector kernels from 2D strided matrix kernels
+    is_2d_gemm = "BLOCK_M" in content and "BLOCK_N" in content
+    
+    if is_2d_gemm:
+        if n % 32 == 0 and "padding" not in content.lower() and "+ 1" not in content and "+ 8" not in content:
+            bank_conflicts = True
+            notes.append(f"Potential 2D tile stride bank conflict: BLOCK_N={n} is a multiple of 32 without explicit bank padding (+1 or +8).")
+        else:
+            notes.append("2D bank conflict mitigation verified (strided accesses padded with +1 or +8 bank offset).")
     else:
-        notes.append("Bank conflict mitigation verified (strided accesses padded or contiguous).")
+        # 1D vectorized elementwise kernels have contiguous coalesced warp loads
+        bank_conflicts = False
+        notes.append("1D vectorized kernel: fully coalesced global-to-SRAM streaming without 2D stride bank conflicts.")
 
     # Shared memory footprint calculation (Bytes): 2 buffers for double buffering * (M*K + K*N) * sizeof(fp16)
     estimated_sram_kb = (2 * (m * k + k * n) * 2) / 1024.0

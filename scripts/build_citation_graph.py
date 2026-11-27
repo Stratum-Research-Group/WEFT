@@ -12,6 +12,21 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 BIB_PATH = ROOT_DIR / "docs" / "references.bib"
 OUTPUT_HTML = ROOT_DIR / "docs" / "citation_network.html"
 
+
+def map_citations_to_papers():
+    citation_to_papers = {}
+    if BIB_PATH.exists():
+        bib_text = BIB_PATH.read_text(encoding="utf-8")
+        keys = re.findall(r"@article\{([^,]+),", bib_text)
+        for k in keys:
+            m = re.search(r'reference_(\d+)_', k)
+            if m:
+                p_num = m.group(1)
+                citation_to_papers[k] = [f"PAPER_{p_num}"]
+            else:
+                citation_to_papers[k] = []
+    return citation_to_papers
+
 def build_network():
     print("=== Generating Citation Network Co-Occurrence Graph ===")
     if not BIB_PATH.exists():
@@ -21,6 +36,8 @@ def build_network():
     text = BIB_PATH.read_text(encoding="utf-8")
     entries = re.findall(r"@article\{([^,]+),\s*author\s*=\s*\{([^}]+)\},\s*title\s*=\s*\{\{([^}]+)\}\},\s*year\s*=\s*\{([^}]+)\}", text)
     print(f"Parsed {len(entries)} bibliography entries.")
+    citation_map = map_citations_to_papers()
+    print(f"Mapped citations across {len(citation_map)} bibliography keys in active corpus.")
 
     nodes = []
     node_map = {}
@@ -35,11 +52,14 @@ def build_network():
             group = 4
 
         node_map[key] = idx
+        citing_papers = citation_map.get(key, [])
         nodes.append({
             "id": key,
             "label": f"{author.split()[0]} ({year})",
             "title": title,
-            "group": group
+            "group": group,
+            "citations_count": len(citing_papers),
+            "cited_in": citing_papers[:3]
         })
 
     links = []

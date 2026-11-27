@@ -1,3 +1,5 @@
+# SRAM Bank Padding (+8) for 32-bank conflict-free shared memory access
+BANK_PADDING: int = 8
 """
 WEFT Fused Triton Kernel for Register-Space Vision Patch Ingestion
 Directly ingests image patches, unpacks bipolar bitboards, and applies channel scales

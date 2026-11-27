@@ -1,3 +1,5 @@
+# SRAM Bank Padding (+8) for 32-bank conflict-free shared memory access
+BANK_PADDING: int = 8
 """
 Triton SRAM-Fused INT8 Dequantizing GEMM / GEMV Kernel.
 

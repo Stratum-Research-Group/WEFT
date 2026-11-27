@@ -1,4 +1,4 @@
-# PAPER #187: Cerebellar Flocculus Purkinje Cell Plasticity and Adaptive Vestibulo-Ocular Reflex Gain Calibration
+# Technical Report #187: Cerebellar Flocculus Purkinje Cell Plasticity and Adaptive Vestibulo-Ocular Reflex Gain Calibration
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #378, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #378: CerebellarPurkinjeVORAdaptationInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 The open-loop nature of the fast three-neuron vestibulo-ocular reflex (VOR) requires continuous long-term cerebellar calibration to preserve optical image stabilization during ocular maturation, orbital fatigue, or optical alteration (e.g., magnifying or minifying spectacles). Retinal slip occurring during head rotation is detected by the dorsal cap of the inferior olive (IO), which emits low-frequency (1–5 Hz) climbing fiber action potentials to the cerebellar flocculus and ventral paraflocculus. Simultaneous conjunctive activation of parallel fibers (carrying head velocity signals from mossy fibers) and climbing fibers induces long-term depression (LTD) at parallel fiber–Purkinje cell (PF-PC) synapses. Reduced Purkinje cell GABAergic inhibition disinhibits secondary vestibular neurons within the medial vestibular nucleus, adaptively increasing compensatory VOR gain toward unity. Here, we formalize the cerebellar plasticity and asymptotic slip convergence invariants in Lean 4 (Target #378), implement an AVX2-accelerated floccular plasticity engine yielding $>3.4\times 10^9$ plasticity updates per second, develop a Triton 3.9 fused GPU kernel, and integrate an interactive real-time visual HUD into WEFT MSS Void.
 
 ---

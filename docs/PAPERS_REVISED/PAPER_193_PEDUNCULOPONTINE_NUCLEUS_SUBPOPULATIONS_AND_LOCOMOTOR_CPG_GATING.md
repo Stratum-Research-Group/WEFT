@@ -1,4 +1,4 @@
-# PAPER #193: Pedunculopontine Nucleus Subpopulations, Mesencephalic Locomotor Region Gating, and Spinal Central Pattern Generator Rhythms
+# Technical Report #193: Pedunculopontine Nucleus Subpopulations, Mesencephalic Locomotor Region Gating, and Spinal Central Pattern Generator Rhythms
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #384, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #384: PPNSubpopulationLocomotorInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 Locomotion requires the coordinated, rhythmic alternation of flexor and extensor motor pools across limb pairs, generated autonomously by intrinsic spinal networks known as central pattern generators (CPGs). The initiation, cadence, and termination of CPG activity are governed supraspinally by the mesencephalic locomotor region (MLR), whose principal anatomical node is the pedunculopontine nucleus (PPN). Comprising two neurochemically divergent subpopulations—cholinergic neurons within the pars compacta ($ChAT^+$) and glutamatergic neurons within the pars dissipata ($vGluT2^+$)—the PPN integrates basal ganglia inhibitory control with descending reticulospinal drive. Selective activation of glutamatergic PPN neurons recruits reticulospinal projection neurons in the ventromedial medulla, triggering spinal CPG rhythmogenesis and driving speed-dependent gait frequency transitions (from slow walking to running). Conversely, pathological hyper-inhibition of the PPN by GABAergic inputs from the substantia nigra pars reticulata (SNr) and internal pallidum (GPi) in Parkinsonian states causes abrupt locomotor arrest, clinically manifesting as Freezing of Gait (FoG). Here, we formalize PPN locomotor CPG gating and speed scaling in Lean 4 (Target #384), implement an AVX2-accelerated CPG cadence engine yielding $>2.3\times 10^5\text{ Melem/s}$, provide a Triton 3.9 fused GPU kernel, and deploy an interactive real-time visual HUD into WEFT MSS Void.
 
 ---

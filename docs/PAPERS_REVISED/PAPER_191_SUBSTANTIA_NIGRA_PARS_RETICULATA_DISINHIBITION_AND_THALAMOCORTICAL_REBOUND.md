@@ -1,4 +1,4 @@
-# PAPER #191: Substantia Nigra Pars Reticulata Output Gating: Striatonigral Pause-Mediated Disinhibition and Thalamocortical Post-Inhibitory Rebound Bursts
+# Technical Report #191: Substantia Nigra Pars Reticulata Output Gating: Striatonigral Pause-Mediated Disinhibition and Thalamocortical Post-Inhibitory Rebound Bursts
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #382, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #382: SNrThalamocorticalReboundInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 The basal ganglia exert profound control over movement initiation not through direct excitation, but via a selective disinhibition mechanism. Projection neurons of the substantia nigra pars reticulata (SNr) and internal segment of the globus pallidus (GPi) fire tonically at exceptionally high spontaneous rates (50–100 Hz), delivering continuous GABAergic synaptic inhibition that clamps motor thalamocortical relay cells and brainstem premotor targets. Voluntary movement initiation requires transient silencing of this tonic output. Phasic activation of direct-pathway striatonigral spiny projection neurons (dSPNs) elicits rapid GABAergic suppression of SNr targets, opening a permissive temporal window. This sudden relief from hyperpolarizing inhibition de-inactivates low-threshold voltage-gated T-type calcium channels ($Ca_v3.1 / Ca_v3.2$) in ventromedial (VM) and ventral anterior (VA) motor thalamic neurons, triggering high-frequency post-inhibitory rebound spike bursts that activate primary and premotor cortices. In this work, we formalize the nigrothalamic disinhibition and T-channel rebound burst invariants in Lean 4 (Target #382), implement an AVX2 SIMD disinhibition engine achieving $>1.1\times 10^5\text{ Melem/s}$, provide a Triton 3.9 fused GPU kernel, and integrate an interactive real-time visual HUD into WEFT MSS Void.
 
 ---

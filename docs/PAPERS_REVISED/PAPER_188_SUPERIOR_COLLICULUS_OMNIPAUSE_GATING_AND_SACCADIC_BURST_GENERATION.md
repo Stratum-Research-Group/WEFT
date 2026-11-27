@@ -1,4 +1,4 @@
-# PAPER #188: Superior Colliculus Deep Layers Motor Topography, Omnipause Gating, and Saccadic Burst Generation Kinematics
+# Technical Report #188: Superior Colliculus Deep Layers Motor Topography, Omnipause Gating, and Saccadic Burst Generation Kinematics
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #379, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #379: SuperiorColliculusGazeHoldInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 Primate saccades represent among the fastest orienting movements in animal physiology, attaining peak ocular angular velocities exceeding 800 deg/s. Gaze shifts follow a stereotyped non-linear relationship termed the "main sequence," wherein saccadic duration scales approximately linearly with target amplitude while peak velocity exhibits non-linear exponential saturation. The neural substrate responsible for initiating and shaping horizontal saccades comprises the deep layers of the superior colliculus (SCdl), omnipause neurons (OPNs) of the nucleus raphe interpositus (RIP), and medium-lead burst neurons (EBNs) of the paramedian pontine reticular formation (PPRF). Under baseline conditions, tonic glycinergic discharge from OPNs clamps PPRF burst neurons, preventing premature saccadic trigger. Upon collicular population vector discharge, OPNs are inhibited, disinhibiting PPRF burst neurons whose high-frequency discharge drives the abducens nucleus. In this work, we formalize the omnipause gating and velocity saturation invariants in Lean 4 (Target #379), implement an AVX2-accelerated saccadic burst generator achieving $>3.3\times 10^9$ kinematic evaluations per second, develop a Triton 3.9 fused kernel, and provide an interactive real-time visual HUD in WEFT MSS Void.
 
 ---

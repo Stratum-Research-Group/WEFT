@@ -1,4 +1,4 @@
-# Lateral Habenula (LHb) Anti-Reward Circuitry, Rostromedial Tegmental Nucleus (RMTg) GABA Relay, and Midbrain Dopaminergic Pause Invariants
+# Technical Report #198: Lateral Habenula (LHb) Anti-Reward Circuitry, Rostromedial Tegmental Nucleus (RMTg) GABA Relay, and Midbrain Dopaminergic Pause Invariants
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,7 +8,7 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #389, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #389: LHbAntiRewardAversionInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---

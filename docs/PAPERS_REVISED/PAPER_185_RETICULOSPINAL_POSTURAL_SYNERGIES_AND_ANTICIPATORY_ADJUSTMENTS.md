@@ -1,4 +1,4 @@
-# PAPER #185: Pontomedullary Reticular Formation & Reticulospinal Tract Postural Synergies: Anticipatory Adjustments and Dynamic Equilibrium Invariants
+# Technical Report #185: Pontomedullary Reticular Formation & Reticulospinal Tract Postural Synergies: Anticipatory Adjustments and Dynamic Equilibrium Invariants
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #376, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #376: ReticulospinalSynergyInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 Voluntary focal motor behaviors, such as ballistic reaching and manual grasping, exert substantial reactive inertial forces on proximal joints and the bodily center of mass (CoM). Without anticipatory compensatory stabilization, limb acceleration displaces the CoM beyond the base of support (BoS), compromising equilibrium. The pontomedullary reticular formation (PMRF) and its descending reticulospinal tract (RST) mediate anticipatory postural adjustments (APAs) by activating bilateral axial and proximal musculature 50–100 ms prior to distal corticospinal prime-mover recruitment. In this work, we formalize the phase-lead and biomechanical invariance constraints of reticulospinal postural control in Lean 4 (Target #376), present an ultra-low-latency AVX2 vector engine ($>1.8\times 10^5\text{ Melem/s}$), provide a high-throughput Triton 3.9 GPU stabilization kernel, and integrate an interactive real-time visual HUD in WEFT MSS Void.
 
 ---

@@ -1,4 +1,4 @@
-# Hypothalamic AgRP/POMC Metabolic Energy Homeostasis Invariants: Competitive Melanocortin Receptor Gating, Neuro-Endocrine Feedback, and Autonomic Energy Expenditure
+# Technical Report #236: Hypothalamic AgRP/POMC Metabolic Energy Homeostasis Invariants: Competitive Melanocortin Receptor Gating, Neuro-Endocrine Feedback, and Autonomic Energy Expenditure
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #427, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #427: AgrpPomcHomeostasisInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 Energy homeostasis in mammals is maintained by reciprocal neural populations within the arcuate nucleus of the hypothalamus: orexigenic agouti-related peptide (AgRP)/neuropeptide Y (NPY) neurons and anorexigenic pro-opiomelanocortin (POMC) neurons. In this work, we formalize the competitive biophysical antagonism at the melanocortin-4 receptor (MC4R) across varying neuro-endocrine hormonal states. Using formal verification in Lean 4, we establish invariant bounds on circuit stability under acute hunger surges and post-prandial satiety transitions. We demonstrate that mutual synaptic inhibition between AgRP and POMC populations creates an ultra-sensitive toggle switch that dictates autonomic tone, brown adipose tissue thermogenesis, and feeding motivation. Vectorized AVX2/FMA execution achieves 4.10 billion channel updates per second, while a custom Triton 3.9 kernel enables scalable parallel simulation across distributed neural clusters.
 
 ---

@@ -1,4 +1,4 @@
-# PAPER #184: Posterior Parietal Cortex (Area 5d / 7a) Multimodal Coordinate Transformations, Eye-Position Gain Fields, and Hand-Centered Invariant Reach Vector Extraction
+# Technical Report #184: Posterior Parietal Cortex (Area 5d / 7a) Multimodal Coordinate Transformations, Eye-Position Gain Fields, and Hand-Centered Invariant Reach Vector Extraction
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #375, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #375: ParietoFrontalCoordinateTransformInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 Voluntary reaching movements require mapping visual target locations acquired in a retinotopic frame of reference into hand-centered motor error vectors appropriate for descending corticospinal motor execution. Neurons in the posterior parietal cortex (PPC)—specifically Area 7a and the lateral intraparietal area (LIP)—exhibit retinotopic receptive fields that are multiplicatively modulated by eye position, forming planar "gain fields." Downstream in the medial intraparietal area (MIP) and dorsal Area 5 (Area 5d), multimodal inputs integrating visual target signals with proprioceptive joint coordinates converge to extract hand-centered displacement vectors ($\Delta \mathbf{x} = \mathbf{x}_{\text{target, head}} - \mathbf{x}_{\text{hand, head}}$). Here, we formalize this coordinate transformation in Lean 4 (Target #375), prove invariant reach vector extraction across compensatory gaze shifts, implement an AVX2-accelerated coordinate transform engine yielding $>1.6\times 10^9$ conversions per second, and provide an interactive real-time visual HUD in WEFT MSS Void.
 
 ---

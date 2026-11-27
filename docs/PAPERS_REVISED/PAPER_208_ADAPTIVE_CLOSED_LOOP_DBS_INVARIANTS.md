@@ -1,4 +1,4 @@
-# Paper #208: Adaptive Closed-Loop DBS (aDBS): Phase-Specific Desynchronization & Beta-Burst Truncation Invariants
+# Technical Report #208: Adaptive Closed-Loop DBS (aDBS): Phase-Specific Desynchronization & Beta-Burst Truncation Invariants
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,7 +8,7 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #399, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #399: AdaptiveClosedLoopDBSInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---

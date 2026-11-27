@@ -1,4 +1,4 @@
-# Systemic Vascular Microclotting Under SARS-CoV-2 S1 Spike: Fibrinogen Amyloidogenesis, Endothelialitis, and SHED-CM Secretome Invariants
+# Technical Report #217: Systemic Vascular Microclotting Under SARS-CoV-2 S1 Spike: Fibrinogen Amyloidogenesis, Endothelialitis, and SHED-CM Secretome Invariants
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,7 +8,7 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #408, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #408: S1SpikeMicroclottingInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---

@@ -1,4 +1,4 @@
-# PAPER #186: Vestibulo-Ocular Reflex (VOR) Three-Neuron Arc: Semicircular Canal Velocity Transduction and Dynamic Retinal Slip Minimization
+# Technical Report #186: Vestibulo-Ocular Reflex (VOR) Three-Neuron Arc: Semicircular Canal Velocity Transduction and Dynamic Retinal Slip Minimization
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #377, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #377: VORPhaseSlipInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 Maintaining clear foveal vision during natural head movement requires continuous optical stabilization of images across the photoreceptor mosaic. If head motion induces retinal slip velocities exceeding 2.0–2.5 deg/s, dynamic visual acuity degrades precipitously. The horizontal vestibulo-ocular reflex (VOR) mediates optical stabilization with the shortest latency in mammalian motor control (5–8 ms) via an elementary three-neuron disynaptic arc: primary vestibular afferents from the semicircular canal ampullae, secondary neurons within the medial vestibular nucleus (MVN), and motor neurons in the abducens (CN VI) and oculomotor (CN III) nuclei. In this paper, we formalize the algebraic and metric invariants of the VOR three-neuron arc in Lean 4 (Target #377), implement an ultra-high-throughput AVX2 SIMD processor achieving $>2.1\times 10^5\text{ Melem/s}$, provide a Triton 3.9 fused reflex kernel, and deliver an interactive real-time visual HUD in WEFT MSS Void.
 
 ---

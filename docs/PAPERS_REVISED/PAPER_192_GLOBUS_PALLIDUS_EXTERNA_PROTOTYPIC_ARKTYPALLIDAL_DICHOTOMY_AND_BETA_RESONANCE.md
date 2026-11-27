@@ -1,4 +1,4 @@
-# PAPER #192: Globus Pallidus External Segment Subpopulation Dichotomy: Prototypic vs. Arkypallidal Neurons and Resonant Beta Oscillations in Parkinsonian States
+# Technical Report #192: Globus Pallidus External Segment Subpopulation Dichotomy: Prototypic vs. Arkypallidal Neurons and Resonant Beta Oscillations in Parkinsonian States
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #383, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #383: GPeArkyPrototypicInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 Historically regarded as a uniform relay station within the indirect pathway, the external segment of the globus pallidus (GPe) is now recognized as a master computational hub orchestrating basal ganglia dynamics. Recent single-cell transcriptomic and electrophysiological studies reveal two distinct functional subpopulations: parvalbumin-positive ($PV^+$) prototypic neurons and forkhead-box-P2-positive ($FoxP2^+$) arkypallidal neurons. Prototypic neurons project downstream to the subthalamic nucleus (STN), substantia nigra pars reticulata (SNr), and internal pallidum (GPi), engaging in reciprocal feedback with the STN to generate and synchronize physiological motor patterns and, under dopamine depletion, pathological beta oscillations (13–30 Hz). Conversely, arkypallidal neurons project exclusively upstream back to the striatum, providing widespread GABAergic collateral inhibition onto both direct and indirect spiny projection neurons and fast-spiking interneurons. Upon presentation of sudden behavioral Stop-Signals, arkypallidal neurons fire a rapid burst of action potentials that cancels developing striatal motor commands. Here, we formalize the GPe subpopulation dichotomy, arkypallidal stopping, and STN-GPe beta resonance invariants in Lean 4 (Target #383), implement an AVX2-accelerated network simulator delivering $>3.3\times 10^9$ synaptic evaluations per second, provide a Triton 3.9 fused GPU kernel, and integrate an interactive real-time visual HUD into WEFT MSS Void.
 
 ---

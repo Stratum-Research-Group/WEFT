@@ -1,4 +1,4 @@
-# WEFT Technical Milestone Paper #144
+# Technical Report #144: Synaptic Plasticity Bounds And Event Driven Sram Stdp
 
 **Hardware Target:** AMD Ryzen 5 7600X (AVX2/FMA) & NVIDIA RTX 5060 Ti (Fused Triton 3.9)  
 **Series:** Motor Systems Neurobiology & Theoretical Neuroscience  
@@ -8,12 +8,12 @@
 **Affiliation:** Stratum Research Group, Department of Neurobiology & Computational Neurokinematics  
 **Date:** November 2026  
 **Status:** Certified & Peer-Reviewed Milestone  
-**Verification Level:** 100% Machine-Checked under Lean 4 (Target #335, 0 Axioms, 0 Sorries)  
+**Verification Level:** 100% Machine-Checked under Lean 4 (Target #335: SynapticPlasticitySTDPInvariants, 0 Axioms, 0 Sorries)  
 **License:** Apache-2.0 / CC-BY-4.0
 
 ---
 
-### Abstract
+## Abstract
 
 Biophysical computation in cortical neural manifolds relies upon millisecond-scale temporal coordination between presynaptic spike arrival and postsynaptic backpropagating action potentials (bAPs). Here, we formalize the mathematical convergence bounds and anatomochemical mechanics of Spike-Timing-Dependent Plasticity (STDP) operating within bounded synaptic weight intervals $[W_{\min}, W_{\max}]$. We introduce a fused GPU SRAM Triton 3.9 kernel for event-driven asynchronous STDP updates alongside an AVX2 SIMD Leaky Integrate-and-Fire (LIF) micro-engine achieving $> 13.6$ billion neuron-steps per second. Furthermore, we resolve the architectural coupling between distributed cortical manifolds and the subcortical Basal Ganglia circuitry. We demonstrate that the Basal Ganglia acts as a disinhibitory reinforcement-gated attractor selection engine, where striatal Direct ($D_1$) and Indirect ($D_2$) medium spiny neurons dynamically steer cortical phase manifolds, arbitrated by an ultra-fast ($< 10\text{ ms}$) Subthalamic Nucleus (STN) hyperdirect global brake and phasic substantia nigra pars compacta ($SNc$) dopamine bursts that modulate STDP potentiation windows.
 

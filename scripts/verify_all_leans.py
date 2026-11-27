@@ -107,7 +107,8 @@ def verify_formal_suite():
         "ChoroidPlexusInvariants.lean",
         "StriatalD1D2PlasticityInvariants.lean",
         "RpePhagocytosisInvariants.lean",
-        "PurkinjeComplexSpikeInvariants.lean"
+        "PurkinjeComplexSpikeInvariants.lean",
+        "AgrpPomcHomeostasisInvariants.lean"
     ]
 
     print("Auditing Co-Authored Synaptic & Motor Biology Formal Targets (Targets #368 - #426):")

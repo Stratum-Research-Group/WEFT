@@ -432,5 +432,6 @@ lean_lib «FormalSuite» where
     `«ChoroidPlexusInvariants»,
     `«StriatalD1D2PlasticityInvariants»,
     `«RpePhagocytosisInvariants»,
-    `«PurkinjeComplexSpikeInvariants»
+    `«PurkinjeComplexSpikeInvariants»,
+    `«AgrpPomcHomeostasisInvariants»
   ]

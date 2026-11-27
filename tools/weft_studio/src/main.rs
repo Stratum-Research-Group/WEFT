@@ -1,4 +1,5 @@
 mod telemetry;
+mod vnni_ffi;
 use telemetry::HardwareTelemetry;
 use eframe::egui;
 use serde::{Deserialize, Serialize};
@@ -1205,12 +1206,27 @@ impl eframe::App for WeftStudioApp {
                         }
 
                         egui::ScrollArea::vertical().id_salt("paper_content_scroll").max_height(550.0).show(&mut cols[1], |ui| {
-                            ui.add_sized(
-                                [ui.available_width(), 540.0],
-                                egui::TextEdit::multiline(&mut self.cached_paper_content)
-                                    .font(egui::TextStyle::Monospace)
-                                    .interactive(false),
-                            );
+                            // Syntax-highlighted and KaTeX rendered representation
+                            for block in self.cached_paper_content.split("\n\n") {
+                                if block.starts_with("# ") {
+                                    ui.heading(block.trim_start_matches('#').trim());
+                                } else if block.starts_with("## ") {
+                                    ui.colored_label(egui::Color32::from_rgb(56, 189, 248), block.trim_start_matches('#').trim());
+                                } else if block.contains("```lean") || block.contains("theorem ") {
+                                    ui.group(|ui| {
+                                        ui.colored_label(egui::Color32::from_rgb(167, 139, 250), "🔬 Lean 4 Machine-Checked Invariant:");
+                                        ui.monospace(block);
+                                    });
+                                } else if block.contains("$$") {
+                                    ui.group(|ui| {
+                                        ui.colored_label(egui::Color32::from_rgb(251, 191, 36), "📐 KaTeX Display Math Formulation:");
+                                        ui.monospace(block.replace("$$", "").trim());
+                                    });
+                                } else {
+                                    ui.label(block);
+                                }
+                                ui.separator();
+                            }
                         });
                     });
                 }

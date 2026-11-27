@@ -1,0 +1,2404 @@
+<?xml version="1.0" ?>
+<doi_batch xmlns="http://www.crossref.org/schema/5.3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="5.3.1" xsi:schemaLocation="http://www.crossref.org/schema/5.3.1 https://www.crossref.org/schemas/crossref5.3.1.xsd">
+  <head>
+    <doi_batch_id>WEFT-MONOGRAPH-VOL-IV-20261127</doi_batch_id>
+    <timestamp>20261127170000</timestamp>
+    <depositor>
+      <depositor_name>Stratum Research Group</depositor_name>
+      <email_address>research@stratum.org</email_address>
+    </depositor>
+    <registrant>Stratum Research Group &amp; Synaptek Labs</registrant>
+  </head>
+  <body>
+    <book book_type="monograph">
+      <book_metadata language="en">
+        <titles>
+          <title>Stratum Monograph Volume IV: Neuromorphic &amp; Biophysical Computing</title>
+        </titles>
+        <publication_date>
+          <year>2026</year>
+          <month>11</month>
+        </publication_date>
+        <doi_data>
+          <doi>10.5555/stratum.monograph.vol4</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT</resource>
+        </doi_data>
+      </book_metadata>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #142: Higher-Dimensional Manifold Integration in Cortical informational Compute, Phase-Oscillatory Coupling, and Anatomochemical Constraints</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report142</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_142</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #143: Phase-Amplitude Coupling and SRAM Cross-Frequency Modulation Tiling</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report143</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_143</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #144: Synaptic Plasticity Bounds And Event Driven Sram Stdp</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report144</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_144</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #145: Basal Ganglia Reinforcement Gating and Attractor Manifold Selection</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report145</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_145</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #146: Thalamocortical Burst Dynamics, Low-Threshold Calcium Currents, and Sensory Aperture Gating</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report146</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_146</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #147: Hippocampal Theta Phase Precession, Compressed Sequence Encoding, and Sharp-Wave Ripple Replay</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report147</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_147</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #148: Cerebellar Forward Models, Heterosynaptic Long-Term Depression, and Disinhibitory Motor Adaptation</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report148</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_148</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #149: Ascending Monoaminergic Neuromodulation, Cortical Gain Control, and the Yerkes-Dodson State Manifold</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report149</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_149</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #150: Claustrocortical Salience Synchronization, Feedforward GABAergic Suppression, and Cross-Modal Perceptual Binding</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report150</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_150</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #151: Whole-Brain Biophysical Synthesis, Macro-Connectome Routing, and Closed-Loop Dynamical Stability</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report151</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_151</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #152: Corticothalamic Feedback, Dual-Target Receptive Field Sharpening, and Center-Surround Contrast Normalization</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report152</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_152</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #153: Amygdalar Valence Gating, Associative Pavlovian Plasticity, and Infralimbic Prefrontal Extinction Circuits</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report153</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_153</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #154: Lateral Habenula Aversion Circuits, Negative Reward Prediction Errors, and Dopaminergic Dip Dynamics</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report154</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_154</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #155: Dentate Gyrus Sparse Expansion, Hilar Feedback Clamping, and Episodic Pattern Separation</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report155</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_155</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #156: Hippocampal CA3 Auto-Associative Attractor Networks, Recurrent Collaterals, and Partial Cue Pattern Completion</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report156</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_156</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #157: Hippocampal CA1 Dual-Stream Comparator Architecture, Temporal Sequence Readout, and Theta-Phase Gated Memory Consolidation</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report157</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_157</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #158: Subicular Gating, Sharp-Wave Ripple (SWR) Burst Dynamics, and Neocortical Replay Broadcasting</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report158</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_158</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #159: Complementary Learning Systems, Interleaved Replay, and Neocortical Schema Consolidation</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report159</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_159</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #160: Prefrontal Working Memory Bistability, Delay-Period Persistent Activity, and Mediodorsal Thalamocortical Gating</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report160</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_160</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #161: Striatal D1/D2 Opponent Pathways, Dopaminergic Reward Prediction Error, and Action Gating Arbitration</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report161</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_161</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #162: Pedunculopontine Nucleus Cholinergic Gating, Mesencephalic Locomotor Region Disinhibition, and Central Pattern Generator Rhythmogenesis</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report162</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_162</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #163: Inferior Olive Gap-Junction Electrotonic Coupling, Subthreshold Oscillations, and Climbing Fiber Complex Spike Plasticity</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report163</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_163</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #164: Cerebellar Granule Layer Sparse Divergent Expansion, 4-Claw Glomerular Coding, and Golgi Cell Feedback Inhibition</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report164</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_164</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #165: Deep Cerebellar Nuclei Disinhibition and Post-Inhibitory Rebound Bursting: Biophysical Mechanisms, Low-Threshold T-Type Calcium Conductances, and High-Throughput Triton/AVX2 Synthesis</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report165</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_165</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #166: Heterosynaptic Coincidence Detection, Cerebellar LTD, and Error-Driven Motor Adaptation: Biophysical Formulations and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report166</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_166</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #167: Cerebro-Cerebellar Closed-Loop Connectivity, Pontine Collaterals, and Smith Predictor Internal Models in Sensorimotor Control</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report167</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_167</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #168: Spinal Central Pattern Generators, Renshaw Cell Recurrent Inhibition, and Reciprocal Ia Antagonist Coordination: Biophysical Modeling and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report168</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_168</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #169: Quantal Neurotransmitter Release at the Mammalian Neuromuscular Junction: Calcium Cooperativity, Acetylcholinesterase Clearance, and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report169</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_169</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #170: Muscle Spindles, Gamma Motoneuron Fusimotor Bias, and the Monosynaptic Myotatic Stretch Reflex: Biophysical Foundations and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report170</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_170</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #171: Golgi Tendon Organs, Group Ib Interneurons, and Autogenic Inverse Myotatic Inhibition: Force Regulation, Tendon Protection, and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report171</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_171</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #172: Polysynaptic Spinal Reflex Pathways, Flexor Reflex Afferents (FRA), and the Crossed-Extensor Postural Preservation Circuit: Biophysical Modeling and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report172</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_172</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #173: Vestibulospinal Pathways, Otolith Graviceptive Gating, and Semicircular Canal Angular Dynamics: Antigravity Postural Stabilization and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report173</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_173</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #174: Reticulospinal Projections, Anticipatory Postural Adjustments (APAs), and Pontomedullary Motor Gating: Feedforward Synergies and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report174</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_174</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #175: The Rubrospinal Tract, Magnocellular Red Nucleus, and Cerebellar Interposed Synergy: Velocity Modulation in Distal Digit Control and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report175</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_175</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #176: The Tectospinal Tract, Superior Colliculus Deep Layers, and Eye-Head Coordinated Gaze Shifts: Retinotopic Population Vectors and High-Throughput Triton Implementations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report176</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_176</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #177: The Lateral Corticospinal Tract, Primary Motor Cortex Betz Cells, and Distal Digit Force Fractionation: Monosynaptic Cortico-Motoneuronal Verification and Microarchitectural Optimization</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report177</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_177</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #178: Anterior Intraparietal Area (AIP) Visual Affordance, Ventral Premotor (F5) Motor Prototypes, and Jeannerod Hand Aperture Preshaping: Formal Verification and Fused Triton Microarchitecture</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report178</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_178</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #179: Spinal Presynaptic Primary Afferent Depolarization (PAD), Axo-Axonic GABAergic Inflow Gating, and Reflex Suppression During Voluntary Locomotion</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report179</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_179</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #180: The Supplementary Motor Area, Pre-SMA Hierarchical Chunking, and Temporal Phasing of Complex Motor Sequences: Formal Verification and Fused Triton Operators</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report180</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_180</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #181: Primary Somatosensory Cutaneous Afferents, Fast-Adapting Mechanoreceptor Slip Transduction, and Reflex Grip Force Escalation</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report181</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_181</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #182: Dentato-Thalamo-Cortical Projections, Ventrolateral Thalamic Gating, and Sub-Millisecond Phase Alignment of Voluntary Motor Commands</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report182</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_182</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #183: The Cortico-Subthalamic Hyperdirect Pathway, Global Basal Ganglia Motor Braking, and Stop-Signal Reaction Dynamics</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report183</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_183</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #184: Posterior Parietal Cortex (Area 5d / 7a) Multimodal Coordinate Transformations, Eye-Position Gain Fields, and Hand-Centered Invariant Reach Vector Extraction</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report184</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_184</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #185: Pontomedullary Reticular Formation &amp; Reticulospinal Tract Postural Synergies: Anticipatory Adjustments and Dynamic Equilibrium Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report185</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_185</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #186: Vestibulo-Ocular Reflex (VOR) Three-Neuron Arc: Semicircular Canal Velocity Transduction and Dynamic Retinal Slip Minimization</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report186</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_186</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #187: Cerebellar Flocculus Purkinje Cell Plasticity and Adaptive Vestibulo-Ocular Reflex Gain Calibration</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report187</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_187</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #188: Superior Colliculus Deep Layers Motor Topography, Omnipause Gating, and Saccadic Burst Generation Kinematics</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report188</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_188</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #189: Horizontal Oculomotor Neural Integrator: Velocity-to-Position Transformation, Orbital Viscoelastic Recoil, and Gaze-Holding Drift Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report189</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_189</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #190: Striatal Dopaminergic D1/D2 Opponent Gating: Three-Factor Synaptic Plasticity, Reward Prediction Errors, and Action Selection Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report190</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_190</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #191: Substantia Nigra Pars Reticulata Output Gating: Striatonigral Pause-Mediated Disinhibition and Thalamocortical Post-Inhibitory Rebound Bursts</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report191</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_191</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #192: Globus Pallidus External Segment Subpopulation Dichotomy: Prototypic vs. Arkypallidal Neurons and Resonant Beta Oscillations in Parkinsonian States</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report192</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_192</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #193: Pedunculopontine Nucleus Subpopulations, Mesencephalic Locomotor Region Gating, and Spinal Central Pattern Generator Rhythms</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report193</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_193</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #194: Cuneiform Nucleus High-Speed Locomotor Escape: Mesencephalic Subpopulation Specialization and Asymmetric Gait Bifurcations</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report194</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_194</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #195: Locus Coeruleus Norepinephrine (LC-NE) Gain Modulation, Cortical Signal-to-Noise Ratio, and Yerkes-Dodson Arousal Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report195</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_195</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #196: Dorsal Raphe Nucleus Serotonin (5-HT) Firing Tone, Hyperbolic Temporal Discounting, and Impulsive Waiting Abort Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report196</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_196</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #197: Basal Forebrain Acetylcholine (BF-ACh) Attention Cue Detection, Thalamocortical Gain Amplification, and Expected Uncertainty Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report197</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_197</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #198: Lateral Habenula (LHb) Anti-Reward Circuitry, Rostromedial Tegmental Nucleus (RMTg) GABA Relay, and Midbrain Dopaminergic Pause Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report198</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_198</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #199: Ventral Tegmental Area (VTA) Dopaminergic Plasticity, Three-Factor Learning Rules, and Synaptic Consolidation Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report199</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_199</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #200: Central Neuromodulatory Convergence, Multi-Transmitter Dynamics, and Motor Action Arbitration Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report200</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_200</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #201: Thalamic Reticular Nucleus (TRN) Sensory Attentional Filtering, Cross-Modal Lateral Inhibition, and T-Type Burst-Tonic Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report201</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_201</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #202: Claustrum Cortical Synchronization &amp; Salience Switching Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report202</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_202</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #203: Zona Incerta (ZI) Visceromotor Integration &amp; Binge Feeding Gating Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report203</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_203</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #204: Ventrolateral Periaqueductal Gray (vlPAG) Freezing vs Fight/Flight Action Selection Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report204</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_204</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #205: Lateral Hypothalamus (LH) Orexin/Hypocretin Arousal &amp; Muscle Tone Gating Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report205</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_205</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #206: Electrophysiological Disease State Prediction Invariants: LFP Beta Resonance, Phase-Amplitude Coupling &amp; Spectral Tilt</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report206</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_206</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #207: Striatal Cholinergic Interneuron (ChI) Hyper-Rebound &amp; Dystonic Co-Contraction Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report207</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_207</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #208: Adaptive Closed-Loop DBS (aDBS): Phase-Specific Desynchronization &amp; Beta-Burst Truncation Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report208</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_208</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #209: Milestone Paper #209: Huntington’s Disease Striatal D2-SPN Degeneration &amp; Hyperkinetic Chorea Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report209</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_209</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #210: Amyotrophic Lateral Sclerosis (ALS) Corticomotoneuronal Excitotoxicity &amp; Renshaw Recurrent Disinhibition Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report210</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_210</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #211: Essential Tremor (ET) Inferior Olivary Pacemaking &amp; Dentato-Rubro-Thalamic Hyper-Oscillation Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report211</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_211</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #212: Alzheimer’s Disease Corticocortical Gamma Uncoupling &amp; Parvalbumin Interneuron Hypoactivity Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report212</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_212</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #213: Paroxysmal Dyskinesia &amp; Channelopathy: Cerebellar-Basal Ganglia Crosstalk, SNARE-Complex Mutations, and Spreading Depolarization Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report213</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_213</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #214: Unified Closed-Loop Neuromodulation Engine: Multi-Modal Electrophysiological Biomarker Integration &amp; Autonomous Rescue Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report214</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_214</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #215: Fibrinogen-SHED-CM Molecular Interactions: Proteomic Docking, Epitope Masking, and Suppression of Amyloidogenic Fibrinogen-to-Fibrin Cascades</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report215</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_215</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #216: Blood-Brain Barrier (BBB) Endothelial Tight-Junction Restoration &amp; Pericyte Tie2 Signaling Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report216</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_216</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #217: Systemic Vascular Microclotting Under SARS-CoV-2 S1 Spike: Fibrinogen Amyloidogenesis, Endothelialitis, and SHED-CM Secretome Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report217</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_217</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #218: Microglial Mac-1 (CD11b/CD18) Cryptic Epitope Neutralization &amp; NLRP3 Inflammasome Gating Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report218</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_218</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #219: Glymphatic Convective Flux &amp; Aquaporin-4 (AQP4) Polarized Perivascular Clearance Invariants</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report219</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_219</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #220: Neurovascular Coupling &amp; $BK_{Ca}$ Vasomotor Invariants: Astrocytic Endfoot Calcium Transients, Potassium Siphoning, and Perfusion Homeostasis</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report220</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_220</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #221: Pericyte Capillary Constriction &amp; Ischemic No-Reflow Invariants: Calcium-Mediated Microvascular Stalling, Erythrocyte Trapping, and Secretome Chaperone Rescue</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report221</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_221</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #222: Endothelial Shear-Stress Mechanotransduction &amp; eNOS Invariants: Glycocalyx Sensing, Ser1177 Phosphorylation, and Atheroprotective Paracrine Rescue</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report222</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_222</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #223: Oligodendrocyte Precursor Cell (OPC) Differentiation &amp; Saltatory Conduction Invariants: GPR17 Clearance, Myelin Compaction, and Paracrine Functional Rescue</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report223</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_223</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #224: Presynaptic Mitochondrial Fission-Fusion Balance &amp; Synaptosomal ATP Invariants: Bioenergetic Coupling, mPTP Gating, and Paracrine Mitoprotection</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report224</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_224</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #225: Blood-Tumor Barrier (BTB) Heterogeneity &amp; Convective Extravasation Invariants: Interstitial Fluid Pressure Mechanics, Starling Flux, and Focused Ultrasound Cavitation</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report225</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_225</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #226: Dural Meningeal Lymphatic Drainage &amp; Deep Cervical Clearance Invariants: Macromolecular Efflux, VEGFR3 Signaling, and Tauopathy Resolution</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report226</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_226</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #227: Thalamocortical Spindle-Slow Oscillation Phase-Amplitude Coupling (SO-PAC) Invariants: Memory Trace Consolidation, Cross-Frequency Synchronization, and Closed-Loop Acoustic Rescue</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report227</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_227</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #228: Vagal Cholinergic Anti-Inflammatory Reflex Invariants: Splenic Macrophage $\alpha7\text{nAChR}$ Activation, STAT3 Phosphorylation, and Systemic Cytokine Suppression</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report228</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_228</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #229: Microglial Complement-Mediated Synaptic Pruning Invariants: C1q/C3 Opsonization, CD47 Checkpoint Protection, and Cortical Circuit Balance</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report229</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_229</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #230: Presynaptic SNARE Complex Assembly &amp; Munc18-1 Priming Invariants: Syntaxin-1A Open Conformation, Active-Zone Docking, and Sub-Millisecond Quantal Synchrony</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report230</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_230</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #231: Hippocampal CA1 Sharp Wave-Ripple (SWR) Invariants: Parvalbumin Basket Cell Reciprocal Inhibition, High-Frequency Phase-Locking, and Episodic Memory Replay</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report231</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_231</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #232: Choroid Plexus CSF Secretion &amp; Carbonic Anhydrase II / NKCC1 Transport Invariants: Transepithelial Osmotic Pumping, AQP1 Bulk Flow, and Intracranial Compliance</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report232</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_232</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #233: Striatal Medium Spiny Neuron (MSN) D1/D2 Dopaminergic Plasticity Invariants: Direct vs Indirect Pathway Balance, PKA/Calcineurin Dynamics, and Motor Initiation Gating</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report233</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_233</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #234: Retinal Photoreceptor Outer Segment (POS) Phagocytosis Invariants: MerTK Phosphorylation, αvβ5 Integrin Tethering, and Bisretinoid A2E Homeostasis</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report234</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_234</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #235: Cerebellar Purkinje Cell Complex Spike Climbing Fiber Burst Invariants: Dendritic Ca²⁺ Spikelets, mGluR1/IP3 Co-Activation, and Parallel Fiber LTD</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report235</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_235</resource>
+        </doi_data>
+      </content_item>
+      <content_item component_type="chapter" language="en">
+        <titles>
+          <title>Technical Report #236: Hypothalamic AgRP/POMC Metabolic Energy Homeostasis Invariants: Competitive Melanocortin Receptor Gating, Neuro-Endocrine Feedback, and Autonomic Energy Expenditure</title>
+        </titles>
+        <contributors>
+          <person_name sequence="first" contributor_role="author">
+            <given_name>Nicholas Charles</given_name>
+            <surname>Mynhardt</surname>
+            <affiliations>
+              <institution>Stratum Research Group</institution>
+            </affiliations>
+          </person_name>
+          <person_name sequence="additional" contributor_role="author">
+            <given_name>Kevin W.</given_name>
+            <surname>McCairn</surname>
+            <affiliations>
+              <institution>Synaptek Labs</institution>
+            </affiliations>
+          </person_name>
+        </contributors>
+        <doi_data>
+          <doi>10.5555/stratum.vol4.report236</doi>
+          <resource>https://github.com/Stratum-Research-Group/WEFT/tree/master/docs/papers_kevin_mccairn/active_corpus/PAPER_236</resource>
+        </doi_data>
+      </content_item>
+    </book>
+  </body>
+</doi_batch>

@@ -230,6 +230,12 @@
             <button id="caRecomputeBtn" style="padding:4px 10px; background:var(--card-bg); border:1px solid var(--border); color:var(--accent); border-radius:4px; cursor:pointer;">Simulate Step</button>
           </div>
           <canvas id="caCanvas" width="600" height="120" style="background:#000; border-radius:6px; width:100%; display:block;"></canvas>
+
+          <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+            <div style="font-size:13px; font-weight:600; color:var(--text-bright); margin-bottom:8px;">Multiway Substitution Graph Force-Directed Foliation (A &rarr; ABA, B &rarr; BA)</div>
+            <canvas id="multiwayCanvas" width="600" height="160" style="background:#020617; border-radius:6px; width:100%; display:block; cursor:grab;"></canvas>
+            <div style="margin-top:6px; font-size:11px; color:#8b949e;">Interactive Branchial Graph: Causal confluence invariants & state-space metric evolution</div>
+          </div>
         </div>
 
         <h2>Publication Figures & Phase Manifolds</h2>
@@ -291,6 +297,55 @@
       slider.oninput = (e) => drawCA(parseInt(e.target.value));
       document.getElementById('caRecomputeBtn').onclick = () => drawCA(parseInt(slider.value));
       drawCA(parseInt(slider.value));
+      initMultiwayGraphCanvas();
+    }
+
+    function initMultiwayGraphCanvas() {
+      const canvas = document.getElementById('multiwayCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      
+      const nodes = [
+        { id: 'A', x: 80, y: 80, color: '#f43f5e' },
+        { id: 'ABA', x: 220, y: 50, color: '#38bdf8' },
+        { id: 'BA', x: 220, y: 110, color: '#fbbf24' },
+        { id: 'ABABA', x: 380, y: 35, color: '#34d399' },
+        { id: 'BAABA', x: 380, y: 75, color: '#a78bfa' },
+        { id: 'BABA', x: 380, y: 125, color: '#38bdf8' },
+        { id: 'ABABA-C', x: 520, y: 80, color: '#34d399' }
+      ];
+
+      const edges = [
+        [0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [3, 6], [4, 6]
+      ];
+
+      function renderGraph() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw edges
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#334155';
+        for (const [u, v] of edges) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[u].x, nodes[u].y);
+          ctx.lineTo(nodes[v].x, nodes[v].y);
+          ctx.stroke();
+        }
+
+        // Draw nodes
+        for (const n of nodes) {
+          ctx.fillStyle = n.color;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 7, 0, 2 * Math.PI);
+          ctx.fill();
+
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = '10px monospace';
+          ctx.fillText(n.id, n.x - 12, n.y - 10);
+        }
+      }
+      renderGraph();
     }
 
     function initPhaseSpaceCanvas(targetNum) {

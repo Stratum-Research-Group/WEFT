@@ -1,0 +1,89 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WEFT Stratum Papers REST API",
+    "version": "1.0.0",
+    "description": "Programmatic interface to the 95-Paper Motor Systems & Theoretical Neuroscience Monograph Volume IV co-authored by Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8095"
+    }
+  ],
+  "paths": {
+    "/v1/papers": {
+      "get": {
+        "summary": "List all 95 scientific papers",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substring search query across title and abstract"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of paper metadata records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/papers/{paper_id}": {
+      "get": {
+        "summary": "Retrieve complete paper details, parameters, and figure paths",
+        "parameters": [
+          {
+            "name": "paper_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Full manuscript metadata and abstract"
+          },
+          "404": {
+            "description": "Paper not found"
+          }
+        }
+      }
+    },
+    "/v1/papers/{paper_id}/proof": {
+      "get": {
+        "summary": "Retrieve machine-checked Lean 4 formal proof for paper",
+        "parameters": [
+          {
+            "name": "paper_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lean 4 theorem code"
+          },
+          "404": {
+            "description": "Paper not found"
+          }
+        }
+      }
+    }
+  }
+}

@@ -9,6 +9,19 @@ import triton
 import triton.language as tl
 
 
+def compute_habenular_step(rpe: float, aversive: float = 0.0, da_base: float = 0.5, beta_rpe: float = 1.5, gamma_rmtg: float = 0.4) -> tuple[float, float]:
+    """Scalar reference step for Lateral Habenula - RMTg dopamine suppression testing."""
+    if rpe < 0.0:
+        nrpe = -rpe
+        lhb_act = beta_rpe * nrpe + 0.8 * aversive
+        da_suppression = gamma_rmtg * lhb_act
+        da_out = max(0.0, da_base - da_suppression)
+    else:
+        lhb_act = 0.0
+        da_out = min(1.0, da_base + 0.5 * rpe)
+    return float(lhb_act), float(da_out)
+
+
 @triton.jit
 def _fused_lateral_habenula_kernel(
     exp_reward_ptr,

@@ -28,6 +28,15 @@ class CerebellarPlasticityState(IntEnum):
     LTD_DEPRESSING = 2
 
 
+def compute_cerebellar_ltd_step(w_curr: float, pf: float = 1.0, cf: float = 1.0, eta_ltd: float = 0.05, eta_ltp: float = 0.01) -> float:
+    """Scalar reference step for Cerebellar LTD/LTP testing."""
+    if cf > 0.0:
+        dw = - eta_ltd * pf * cf
+    else:
+        dw = eta_ltp * pf
+    return float(max(0.0, min(1.0, w_curr + dw)))
+
+
 def fused_cerebellar_ltd_step(
     weights: torch.Tensor,
     pf_activity: torch.Tensor,

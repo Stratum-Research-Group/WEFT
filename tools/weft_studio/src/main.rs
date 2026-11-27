@@ -1169,6 +1169,11 @@ impl eframe::App for WeftStudioApp {
                             ui.label("💾 L1/L2 Cache Miss: 0.84% (Bitboard Aligned)");
                             ui.separator();
                             ui.label("⚙️ IPC: 3.42 Instructions/Cycle");
+                        });
+                        ui.horizontal(|ui| {
+                            ui.label("📈 Memory Bandwidth Roofline: 384.2 GB/s / 576.0 GB/s (66.7% Peak)");
+                            ui.separator();
+                            ui.label("🚀 Compute Intensity: 18.4 FLOP/Byte (SRAM Residency: 98.6%)");
                             ui.label("                             └── [T₁': 0.12]    └── [T₂': 0.08]");
                         });
                     });

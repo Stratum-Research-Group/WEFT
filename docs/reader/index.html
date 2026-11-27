@@ -240,6 +240,7 @@
     }
 
     function renderPaper(p) {
+      if (window.location.hash !== '#paper-' + p.num) { history.replaceState(null, '', '#paper-' + p.num); }
       const contentEl = document.getElementById('content');
       contentEl.innerHTML = `
         <h1 style="color:var(--text-bright); font-size:24px; margin-bottom:12px;">Technical Report #${p.paper_number}: ${p.title}</h1>
@@ -344,6 +345,20 @@
           </div>
         </div>
 
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:20px; text-align:center;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-bright); margin-bottom:6px;">Kuramoto Coupled Oscillator Synchronization (Phase-Locking & Coherence Order Parameter)</div>
+          <canvas id="kmCanvas" width="600" height="220" style="background:#020617; border-radius:6px; cursor:crosshair;"></canvas>
+          <div style="display:flex; justify-content:center; gap:16px; margin-top:8px; font-size:12px; color:#94a3b8; font-family:monospace;">
+            <label>Coupling K: <input type="range" id="kmKSlider" min="0" max="50" value="25" style="width:65px; vertical-align:middle;"> <span id="kmKVal">2.5</span></label>
+            <label>Freq Spread σ: <input type="range" id="kmSigSlider" min="5" max="30" value="12" style="width:65px; vertical-align:middle;"> <span id="kmSigVal">1.2</span></label>
+            <label>Order Parameter r: <span id="kmOrderVal" style="color:#38bdf8; font-weight:bold;">0.00</span></label>
+          </div>
+          <div style="margin-top:6px; font-size:12px; color:#8b949e;">
+            <span>Phase Coherence: $\dot{\theta}_i = \omega_i + \frac{K}{N} \sum_{j=1}^N \sin(\theta_j - \theta_i)$ • Collective Limit-Cycle Phase Locking ($r e^{i\psi}$)</span>
+          </div>
+        </div>
+
+
 
 
 
@@ -398,6 +413,7 @@
       initCdfCanvas();
       initWilsonCowanCanvas();
       initHindmarshRoseCanvas();
+      initKuramotoCanvas();
       initCellularAutomatonCanvas();
     }
 
@@ -604,6 +620,93 @@
 
     
     
+    
+    function initKuramotoCanvas() {
+      const canvas = document.getElementById('kmCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const N = 48;
+      let K = 2.5;
+      let sigma = 1.2;
+
+      const sK = document.getElementById('kmKSlider');
+      const sSig = document.getElementById('kmSigSlider');
+      const orderEl = document.getElementById('kmOrderVal');
+
+      if (sK) sK.oninput = (e) => { K = parseFloat(e.target.value) / 10.0; document.getElementById('kmKVal').textContent = K.toFixed(1); };
+      if (sSig) sSig.oninput = (e) => { sigma = parseFloat(e.target.value) / 10.0; document.getElementById('kmSigVal').textContent = sigma.toFixed(1); };
+
+      // Initialize phases and intrinsic frequencies
+      const theta = new Float32Array(N);
+      const omega = new Float32Array(N);
+      for (let i = 0; i < N; i++) {
+        theta[i] = Math.random() * 2 * Math.PI;
+        omega[i] = (Math.random() - 0.5) * 2.0;
+      }
+
+      function renderFrame() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const radius = 75;
+
+        // Draw unit circle
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        // Calculate order parameter: r * exp(i * psi) = (1/N) * sum(exp(i * theta_j))
+        let sumCos = 0.0;
+        let sumSin = 0.0;
+        for (let i = 0; i < N; i++) {
+          sumCos += Math.cos(theta[i]);
+          sumSin += Math.sin(theta[i]);
+        }
+        const r_order = Math.sqrt(sumCos * sumCos + sumSin * sumSin) / N;
+        const psi = Math.atan2(sumSin, sumCos);
+
+        if (orderEl) orderEl.textContent = r_order.toFixed(2);
+
+        // Numerical integration step (Euler)
+        const dt = 0.05;
+        for (let i = 0; i < N; i++) {
+          // Mean-field interaction: dtheta_i/dt = omega_i * sigma + K * r * sin(psi - theta_i)
+          const dTheta = omega[i] * sigma + K * r_order * Math.sin(psi - theta[i]);
+          theta[i] = (theta[i] + dTheta * dt) % (2 * Math.PI);
+        }
+
+        // Draw individual oscillator phase points on the circle
+        for (let i = 0; i < N; i++) {
+          const px = cx + radius * Math.cos(theta[i]);
+          const py = cy + radius * Math.sin(theta[i]);
+          ctx.fillStyle = `hsl(${Math.floor((theta[i] / (2 * Math.PI)) * 360)}, 85%, 65%)`;
+          ctx.beginPath();
+          ctx.arc(px, py, 4, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+
+        // Draw mean order vector from center
+        const vx = cx + (radius * r_order) * Math.cos(psi);
+        const vy = cy + (radius * r_order) * Math.sin(psi);
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(vx, vy);
+        ctx.stroke();
+
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.arc(vx, vy, 5, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+      setInterval(renderFrame, 35);
+    }
+
     function initHindmarshRoseCanvas() {
       const canvas = document.getElementById('hrCanvas');
       if (!canvas) return;
@@ -1062,7 +1165,24 @@
     initThemeHandler();
     if (papers.length > 0) {
       renderList();
-      renderPaper(papers[0]);
+      // URL Fragment Hash Routing
+      let initialPaper = papers[0];
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#paper-')) {
+        const targetNum = parseInt(hash.replace('#paper-', ''), 10);
+        const found = papers.find(p => p.num === targetNum);
+        if (found) initialPaper = found;
+      }
+      renderPaper(initialPaper);
+
+      window.addEventListener('hashchange', () => {
+        const h = window.location.hash;
+        if (h && h.startsWith('#paper-')) {
+          const num = parseInt(h.replace('#paper-', ''), 10);
+          const p = papers.find(x => x.num === num);
+          if (p) renderPaper(p);
+        }
+      });
     }
   </script>
 </body>

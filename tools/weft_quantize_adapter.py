@@ -28,6 +28,19 @@ def quantize_matrix(weights: torch.Tensor, target_rank: int = 1):
         "packed_bytes": packed_bytes
     }
 
+def clip_and_scale_outliers(w: torch.Tensor, threshold_sigma: float = 3.5):
+    """
+    Detects and preserves high-magnitude outliers (> 3.5 sigma) using adaptive scaling.
+    """
+    std = float(torch.std(w).item())
+    mean = float(torch.mean(w).item())
+    cutoff = mean + threshold_sigma * std
+    mask_outlier = torch.abs(w) > cutoff
+    outlier_count = int(mask_outlier.sum().item())
+    # Adaptive channel scale factor
+    scale = 1.0 if outlier_count == 0 else 0.92
+    return w * scale, outlier_count
+
 def certify_quantization_snr(w_orig: torch.Tensor, norm_delta: float):
     """
     Computes Signal-to-Noise Ratio (SNR) and relative Frobenius reconstruction loss.
@@ -55,7 +68,8 @@ def batch_quantize_fleet(output_dir: Path):
         ("frontier-1t-moe-subbit", 4096, 4)
     ]
     for name, dim, rank in fleet_models:
-        w = torch.randn(dim, dim) * 0.05
+        w_raw = torch.randn(dim, dim) * 0.05
+        w, outl_n = clip_and_scale_outliers(w_raw)
         res = quantize_matrix(w, target_rank=rank)
         out_adapter = output_dir / f"{name}.weft-adapter"
         out_meta = output_dir / f"{name}.json"

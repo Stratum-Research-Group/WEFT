@@ -1,0 +1,1056 @@
+TY  - BOOK
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Biophysical Foundations, Formal Invariants, and Microarchitectural Optimization of Motor Systems & Neurodegenerative Circuitry
+T2  - Stratum Monograph Series in Theoretical Neuroscience
+VL  - IV
+PY  - 2026
+PB  - Stratum Research Group & Synaptek Labs
+UR  - https://github.com/Stratum-Research-Group/WEFT
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Higher-Dimensional Manifold Integration in Cortical informational Compute, Phase-Oscillatory Coupling, and Anatomochemical Constraints
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-142
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #333)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_142_CORTICAL_MANIFOLD_INFORMATIONAL_COUPLING_AND_ANATOMOCHEMISTRY.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Phase-Amplitude Coupling and SRAM Cross-Frequency Modulation Tiling
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-143
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #334)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_143_PHASE_AMPLITUDE_COUPLING_AND_SRAM_CROSS_FREQUENCY_MODULATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Synaptic Plasticity Bounds And Event Driven Sram Stdp
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-144
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #335)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_144_SYNAPTIC_PLASTICITY_BOUNDS_AND_EVENT_DRIVEN_SRAM_STDP.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Basal Ganglia Reinforcement Gating and Attractor Manifold Selection
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-145
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #336)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_145_BASAL_GANGLIA_REINFORCEMENT_GATING_AND_ATTRACTOR_MANIFOLDS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Thalamocortical Burst Dynamics, Low-Threshold Calcium Currents, and Sensory Aperture Gating
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-146
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #337)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_146_THALAMOCORTICAL_BURST_DYNAMICS_AND_SENSORY_APERTURE_GATING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Hippocampal Theta Phase Precession, Compressed Sequence Encoding, and Sharp-Wave Ripple Replay
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-147
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #338)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_147_HIPPOCAMPAL_PHASE_PRECESSION_AND_COMPRESSED_MEMORY_REPLAY.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Cerebellar Forward Models, Heterosynaptic Long-Term Depression, and Disinhibitory Motor Adaptation
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-148
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #339)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_148_CEREBELLAR_FORWARD_MODELS_AND_CLIMBING_FIBER_SYNAPTIC_PLASTICITY.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Ascending Monoaminergic Neuromodulation, Cortical Gain Control, and the Yerkes-Dodson State Manifold
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-149
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #340)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_149_ASCENDING_MONOAMINERGIC_NEUROMODULATION_AND_CORTICAL_GAIN_CONTROL.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Claustrocortical Salience Synchronization, Feedforward GABAergic Suppression, and Cross-Modal Perceptual Binding
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-150
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #341)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_150_CLAUSTROCORTICAL_SALIENCE_SYNCHRONY_AND_PERCEPTUAL_BINDING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Whole-Brain Biophysical Synthesis, Macro-Connectome Routing, and Closed-Loop Dynamical Stability
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-151
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #342)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_151_WHOLE_BRAIN_BIOPHYSICAL_SYNTHESIS_AND_CLOSED_LOOP_STABILITY.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Corticothalamic Feedback, Dual-Target Receptive Field Sharpening, and Center-Surround Contrast Normalization
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-152
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #343)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_152_CORTICOTHALAMIC_FEEDBACK_AND_ATTENTIONAL_RECEPTIVE_FIELD_SHARPENING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Amygdalar Valence Gating, Associative Pavlovian Plasticity, and Infralimbic Prefrontal Extinction Circuits
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-153
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #344)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_153_AMYGDALAR_VALENCE_GATING_AND_PREFRONTAL_EXTINCTION_CIRCUITS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Lateral Habenula Aversion Circuits, Negative Reward Prediction Errors, and Dopaminergic Dip Dynamics
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-154
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #345)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_154_LATERAL_HABENULA_AVERSION_CIRCUITS_AND_DOPAMINERGIC_DIP_DYNAMICS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Dentate Gyrus Sparse Expansion, Hilar Feedback Clamping, and Episodic Pattern Separation
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-155
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #346)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_155_DENTATE_GYRUS_SPARSE_EXPANSION_AND_EPISODIC_PATTERN_SEPARATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Hippocampal CA3 Auto-Associative Attractor Networks, Recurrent Collaterals, and Partial Cue Pattern Completion
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-156
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #347)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_156_HIPPOCAMPAL_CA3_AUTOASSOCIATIVE_ATTRACTORS_AND_PATTERN_COMPLETION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Hippocampal CA1 Dual-Stream Comparator Architecture, Temporal Sequence Readout, and Theta-Phase Gated Memory Consolidation
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-157
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #348)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_157_HIPPOCAMPAL_CA1_DUAL_STREAM_COMPARATOR_AND_TEMPORAL_SEQUENCE_READOUT.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Subicular Gating, Sharp-Wave Ripple (SWR) Burst Dynamics, and Neocortical Replay Broadcasting
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-158
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #349)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_158_SUBICULAR_GATING_SHARP_WAVE_RIPPLE_BURSTING_AND_NEOCORTICAL_REPLAY.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Complementary Learning Systems, Interleaved Replay, and Neocortical Schema Consolidation
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-159
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #350)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_159_COMPLEMENTARY_LEARNING_SYSTEMS_AND_NEOCORTICAL_SCHEMA_CONSOLIDATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Prefrontal Working Memory Bistability, Delay-Period Persistent Activity, and Mediodorsal Thalamocortical Gating
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-160
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #351)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_160_PREFRONTAL_WORKING_MEMORY_BISTABILITY_AND_MEDIODORSAL_THALAMOCORTICAL_GATING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Striatal D1/D2 Opponent Pathways, Dopaminergic Reward Prediction Error, and Action Gating Arbitration
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-161
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #352)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_161_STRIATAL_D1_D2_OPPONENT_PATHWAYS_AND_DOPAMINERGIC_ACTION_ARBITRATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Pedunculopontine Nucleus Cholinergic Gating, Mesencephalic Locomotor Region Disinhibition, and Central Pattern Generator Rhythmogenesis
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-162
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #353)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_162_PEDUNCULOPONTINE_NUCLEUS_CHOLINERGIC_GATING_AND_MESENCEPHALIC_LOCOMOTOR_CONTROL.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Inferior Olive Gap-Junction Electrotonic Coupling, Subthreshold Oscillations, and Climbing Fiber Complex Spike Plasticity
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-163
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #354)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_163_INFERIOR_OLIVE_GAP_JUNCTION_COUPLING_AND_CLIMBING_FIBER_COMPLEX_SPIKES.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Cerebellar Granule Layer Sparse Divergent Expansion, 4-Claw Glomerular Coding, and Golgi Cell Feedback Inhibition
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-164
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #355)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_164_CEREBELLAR_GRANULE_LAYER_SPARSE_EXPANSION_AND_GOLGI_FEEDBACK_INHIBITION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Deep Cerebellar Nuclei Disinhibition and Post-Inhibitory Rebound Bursting: Biophysical Mechanisms, Low-Threshold T-Type Calcium Conductances, and High-Throughput Triton/AVX2 Synthesis
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-165
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #356)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_165_DEEP_CEREBELLAR_NUCLEI_DISINHIBITION_AND_POST_INHIBITORY_REBOUND_BURSTING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Heterosynaptic Coincidence Detection, Cerebellar LTD, and Error-Driven Motor Adaptation: Biophysical Formulations and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-166
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #357)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_166_HETEROSYNAPTIC_COINCIDENCE_DETECTION_CEREBELLAR_LTD_AND_MOTOR_ADAPTATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Cerebro-Cerebellar Closed-Loop Connectivity, Pontine Collaterals, and Smith Predictor Internal Models in Sensorimotor Control
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-167
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #358)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_167_CEREBRO_CEREBELLAR_CLOSED_LOOPS_AND_SMITH_PREDICTOR_INTERNAL_MODELS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Spinal Central Pattern Generators, Renshaw Cell Recurrent Inhibition, and Reciprocal Ia Antagonist Coordination: Biophysical Modeling and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-168
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #359)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_168_SPINAL_CPGS_RENSHAW_CELLS_AND_RECIPROCAL_IA_INHIBITION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Quantal Neurotransmitter Release at the Mammalian Neuromuscular Junction: Calcium Cooperativity, Acetylcholinesterase Clearance, and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-169
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #360)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_169_QUANTAL_NEUROTRANSMITTER_RELEASE_AT_THE_NEUROMUSCULAR_JUNCTION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Muscle Spindles, Gamma Motoneuron Fusimotor Bias, and the Monosynaptic Myotatic Stretch Reflex: Biophysical Foundations and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-170
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #361)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_170_MUSCLE_SPINDLES_GAMMA_FUSIMOTOR_BIAS_AND_MYOTATIC_REFLEX.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Golgi Tendon Organs, Group Ib Interneurons, and Autogenic Inverse Myotatic Inhibition: Force Regulation, Tendon Protection, and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-171
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #362)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_171_GOLGI_TENDON_ORGANS_GROUP_IB_AND_AUTOGENIC_INHIBITION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Polysynaptic Spinal Reflex Pathways, Flexor Reflex Afferents (FRA), and the Crossed-Extensor Postural Preservation Circuit: Biophysical Modeling and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-172
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #363)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_172_POLYSYNAPTIC_SPINAL_REFLEXES_AND_CROSSED_EXTENSOR_CIRCUITS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Vestibulospinal Pathways, Otolith Graviceptive Gating, and Semicircular Canal Angular Dynamics: Antigravity Postural Stabilization and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-173
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #364)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_173_VESTIBULOSPINAL_PATHWAYS_OTOLITH_GATING_AND_POSTURAL_STABILIZATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Reticulospinal Projections, Anticipatory Postural Adjustments (APAs), and Pontomedullary Motor Gating: Feedforward Synergies and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-174
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #365)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_174_RETICULOSPINAL_PROJECTIONS_ANTICIPATORY_POSTURAL_ADJUSTMENTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - The Rubrospinal Tract, Magnocellular Red Nucleus, and Cerebellar Interposed Synergy: Velocity Modulation in Distal Digit Control and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-175
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #366)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_175_THE_RUBROSPINAL_TRACT_RED_NUCLEUS_AND_DISTAL_DIGIT_VELOCITY.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - The Tectospinal Tract, Superior Colliculus Deep Layers, and Eye-Head Coordinated Gaze Shifts: Retinotopic Population Vectors and High-Throughput Triton Implementations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-176
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #367)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_176_THE_TECTOSPINAL_TRACT_SUPERIOR_COLLICULUS_AND_EYE_HEAD_GAZE.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - The Lateral Corticospinal Tract, Primary Motor Cortex Betz Cells, and Distal Digit Force Fractionation: Monosynaptic Cortico-Motoneuronal Verification and Microarchitectural Optimization
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-177
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #368)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_177_THE_CORTICOSPINAL_TRACT_BETZ_CELLS_AND_DIGIT_FRACTIONATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Anterior Intraparietal Area (AIP) Visual Affordance, Ventral Premotor (F5) Motor Prototypes, and Jeannerod Hand Aperture Preshaping: Formal Verification and Fused Triton Microarchitecture
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-178
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #369)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_178_ANTERIOR_INTRAPARIETAL_AREA_AIP_VENTRAL_PREMOTOR_F5_AND_GRASP_AFFORDANCE.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Spinal Presynaptic Primary Afferent Depolarization (PAD), Axo-Axonic GABAergic Inflow Gating, and Reflex Suppression During Voluntary Locomotion
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-179
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #370)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_179_SPINAL_PRESYNAPTIC_PRIMARY_AFFERENT_DEPOLARIZATION_PAD_AND_INFLOW_GATING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - The Supplementary Motor Area, Pre-SMA Hierarchical Chunking, and Temporal Phasing of Complex Motor Sequences: Formal Verification and Fused Triton Operators
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-180
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #371)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_180_THE_SUPPLEMENTARY_MOTOR_AREA_PRE_SMA_AND_MOTOR_SEQUENCE_CHUNKING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Primary Somatosensory Cutaneous Afferents, Fast-Adapting Mechanoreceptor Slip Transduction, and Reflex Grip Force Escalation
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-181
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #372)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_181_PRIMARY_SOMATOSENSORY_CUTANEOUS_AFFERENTS_AND_REFLEX_GRIP_ESCALATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Dentato-Thalamo-Cortical Projections, Ventrolateral Thalamic Gating, and Sub-Millisecond Phase Alignment of Voluntary Motor Commands
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-182
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #373)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_182_DENTATO_THALAMO_CORTICAL_PROJECTIONS_AND_SUB_MILLISECOND_PHASE_ALIGNMENT.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - The Cortico-Subthalamic Hyperdirect Pathway, Global Basal Ganglia Motor Braking, and Stop-Signal Reaction Dynamics
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-183
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #374)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_183_THE_CORTICO_SUBTHALAMIC_HYPERDIRECT_PATHWAY_AND_MOTOR_BRAKING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Posterior Parietal Cortex (Area 5d / 7a) Multimodal Coordinate Transformations, Eye-Position Gain Fields, and Hand-Centered Invariant Reach Vector Extraction
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-184
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #375)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_184_POSTERIOR_PARIETAL_AREAS_5_AND_7_COORDINATE_TRANSFORMATIONS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Pontomedullary Reticular Formation & Reticulospinal Tract Postural Synergies: Anticipatory Adjustments and Dynamic Equilibrium Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-185
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #376)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_185_RETICULOSPINAL_POSTURAL_SYNERGIES_AND_ANTICIPATORY_ADJUSTMENTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Vestibulo-Ocular Reflex (VOR) Three-Neuron Arc: Semicircular Canal Velocity Transduction and Dynamic Retinal Slip Minimization
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-186
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #377)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_186_VESTIBULO_OCULAR_REFLEX_THREE_NEURON_ARC_AND_RETINAL_SLIP_MINIMIZATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Cerebellar Flocculus Purkinje Cell Plasticity and Adaptive Vestibulo-Ocular Reflex Gain Calibration
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-187
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #378)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_187_CEREBELLAR_FLOCCULUS_PURKINJE_PLASTICITY_AND_VOR_GAIN_ADAPTATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Superior Colliculus Deep Layers Motor Topography, Omnipause Gating, and Saccadic Burst Generation Kinematics
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-188
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #379)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_188_SUPERIOR_COLLICULUS_OMNIPAUSE_GATING_AND_SACCADIC_BURST_GENERATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Horizontal Oculomotor Neural Integrator: Velocity-to-Position Transformation, Orbital Viscoelastic Recoil, and Gaze-Holding Drift Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-189
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #380)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_189_HORIZONTAL_NEURAL_INTEGRATOR_NPH_MVN_PULSE_STEP_AND_GAZE_HOLDING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Striatal Dopaminergic D1/D2 Opponent Gating: Three-Factor Synaptic Plasticity, Reward Prediction Errors, and Action Selection Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-190
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #381)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_190_STRIATAL_DOPAMINERGIC_D1_D2_OPPONENT_GATING_AND_REWARD_PREDICTION_ERROR.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Substantia Nigra Pars Reticulata Output Gating: Striatonigral Pause-Mediated Disinhibition and Thalamocortical Post-Inhibitory Rebound Bursts
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-191
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #382)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_191_SUBSTANTIA_NIGRA_PARS_RETICULATA_DISINHIBITION_AND_THALAMOCORTICAL_REBOUND.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Globus Pallidus External Segment Subpopulation Dichotomy: Prototypic vs. Arkypallidal Neurons and Resonant Beta Oscillations in Parkinsonian States
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-192
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #383)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_192_GLOBUS_PALLIDUS_EXTERNA_PROTOTYPIC_ARKTYPALLIDAL_DICHOTOMY_AND_BETA_RESONANCE.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Pedunculopontine Nucleus Subpopulations, Mesencephalic Locomotor Region Gating, and Spinal Central Pattern Generator Rhythms
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-193
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #384)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_193_PEDUNCULOPONTINE_NUCLEUS_SUBPOPULATIONS_AND_LOCOMOTOR_CPG_GATING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Cuneiform Nucleus High-Speed Locomotor Escape: Mesencephalic Subpopulation Specialization and Asymmetric Gait Bifurcations
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-194
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #385)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_194_CUNEIFORM_NUCLEUS_HIGH_SPEED_LOCOMOTOR_ESCAPE_AND_GAIT_BIFURCATIONS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Locus Coeruleus Norepinephrine (LC-NE) Gain Modulation, Cortical Signal-to-Noise Ratio, and Yerkes-Dodson Arousal Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-195
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #386)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_195_LOCUS_COERULEUS_NOREPINEPHRINE_GAIN_MODULATION_AND_AROUSAL_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Dorsal Raphe Nucleus Serotonin (5-HT) Firing Tone, Hyperbolic Temporal Discounting, and Impulsive Waiting Abort Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-196
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #387)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_196_DORSAL_RAPHE_SEROTONIN_TEMPORAL_PATIENCE_AND_IMPULSIVITY_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Basal Forebrain Acetylcholine (BF-ACh) Attention Cue Detection, Thalamocortical Gain Amplification, and Expected Uncertainty Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-197
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #388)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_197_BASAL_FOREBRAIN_ACETYLCHOLINE_ATTENTION_CUE_DETECTION_AND_EXPECTED_UNCERTAINTY.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Lateral Habenula (LHb) Anti-Reward Circuitry, Rostromedial Tegmental Nucleus (RMTg) GABA Relay, and Midbrain Dopaminergic Pause Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-198
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #389)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_198_LATERAL_HABENULA_ANTI_REWARD_SIGNALING_AND_AVERSION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Ventral Tegmental Area (VTA) Dopaminergic Plasticity, Three-Factor Learning Rules, and Synaptic Consolidation Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-199
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #390)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_199_VENTRAL_TEGMENTAL_AREA_DOPAMINE_PLASTICITY_AND_THREE_FACTOR_LEARNING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Central Neuromodulatory Convergence, Multi-Transmitter Dynamics, and Motor Action Arbitration Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-200
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #391)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_200_CENTRAL_NEUROMODULATORY_CONVERGENCE_AND_MULTITRANSMITTER_MOTOR_ARBITRATION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Thalamic Reticular Nucleus (TRN) Sensory Attentional Filtering, Cross-Modal Lateral Inhibition, and T-Type Burst-Tonic Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-201
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #392)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_201_THALAMIC_RETICULAR_NUCLEUS_ATTENTIONAL_FILTERING_AND_BURST_TONIC_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Claustrum Cortical Synchronization & Salience Switching Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-202
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #393)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_202_CLAUSTRUM_CORTICAL_SYNCHRONIZATION_AND_SALIENCE_SWITCHING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Zona Incerta (ZI) Visceromotor Integration & Binge Feeding Gating Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-203
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #394)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_203_ZONA_INCERTA_VISCEROMOTOR_INTEGRATION_AND_FEEDING_GATING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Ventrolateral Periaqueductal Gray (vlPAG) Freezing vs Fight/Flight Action Selection Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-204
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #395)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_204_VLPAG_FREEZING_AND_FIGHT_FLIGHT_ACTION_SELECTION.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Lateral Hypothalamus (LH) Orexin/Hypocretin Arousal & Muscle Tone Gating Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-205
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #396)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_205_LH_OREXIN_AROUSAL_AND_MUSCLE_TONE_GATING.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Electrophysiological Disease State Prediction Invariants: LFP Beta Resonance, Phase-Amplitude Coupling & Spectral Tilt
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-206
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #397)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_206_ELECTROPHYSIOLOGICAL_DISEASE_STATE_PREDICTION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Striatal Cholinergic Interneuron (ChI) Hyper-Rebound & Dystonic Co-Contraction Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-207
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #398)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_207_STRIATAL_CHOLINERGIC_INTERNEURON_DYSTONIA_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Adaptive Closed-Loop DBS (aDBS): Phase-Specific Desynchronization & Beta-Burst Truncation Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-208
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #399)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_208_ADAPTIVE_CLOSED_LOOP_DBS_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Milestone Paper #209: Huntington’s Disease Striatal D2-SPN Degeneration & Hyperkinetic Chorea Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-209
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #400)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_209_HUNTINGTON_CHOREA_INDIRECT_PATHWAY_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Amyotrophic Lateral Sclerosis (ALS) Corticomotoneuronal Excitotoxicity & Renshaw Recurrent Disinhibition Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-210
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #401)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_210_ALS_CORTICOMOTONEURONAL_EXCITOTOXICITY_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Essential Tremor (ET) Inferior Olivary Pacemaking & Dentato-Rubro-Thalamic Hyper-Oscillation Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-211
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #402)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_211_ESSENTIAL_TREMOR_DRT_HYPER_OSCILLATION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Alzheimer’s Disease Corticocortical Gamma Uncoupling & Parvalbumin Interneuron Hypoactivity Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-212
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #403)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_212_ALZHEIMER_GAMMA_UNCOUPLING_PV_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Paroxysmal Dyskinesia & Channelopathy: Cerebellar-Basal Ganglia Crosstalk, SNARE-Complex Mutations, and Spreading Depolarization Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-213
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #404)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_213_PAROXYSMAL_DYSKINESIA_CEREBELLAR_BASAL_GANGLIA_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Unified Closed-Loop Neuromodulation Engine: Multi-Modal Electrophysiological Biomarker Integration & Autonomous Rescue Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-214
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #405)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_214_UNIFIED_CLOSED_LOOP_NEUROMODULATION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Fibrinogen-SHED-CM Molecular Interactions: Proteomic Docking, Epitope Masking, and Suppression of Amyloidogenic Fibrinogen-to-Fibrin Cascades
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-215
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #406)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_215_FIBRINOGEN_SHED_AMYLOID_SUPPRESSION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Blood-Brain Barrier (BBB) Endothelial Tight-Junction Restoration & Pericyte Tie2 Signaling Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-216
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #407)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_216_BBB_TIGHT_JUNCTION_TIE2_RESTORATION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Systemic Vascular Microclotting Under SARS-CoV-2 S1 Spike: Fibrinogen Amyloidogenesis, Endothelialitis, and SHED-CM Secretome Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-217
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #408)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_217_S1_SPIKE_VASCULAR_MICROCLOTTING_SHED_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Microglial Mac-1 (CD11b/CD18) Cryptic Epitope Neutralization & NLRP3 Inflammasome Gating Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-218
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #409)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_218_MICROGLIAL_MAC1_INFLAMMASOME_GATING_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Glymphatic Convective Flux & Aquaporin-4 (AQP4) Polarized Perivascular Clearance Invariants
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-219
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #410)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_219_GLYMPHATIC_AQP4_PERIVASCULAR_CLEARANCE_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Neurovascular Coupling & $BK_{Ca}$ Vasomotor Invariants: Astrocytic Endfoot Calcium Transients, Potassium Siphoning, and Perfusion Homeostasis
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-220
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #411)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_220_NEUROVASCULAR_COUPLING_BKCA_VASOMOTOR_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Pericyte Capillary Constriction & Ischemic No-Reflow Invariants: Calcium-Mediated Microvascular Stalling, Erythrocyte Trapping, and Secretome Chaperone Rescue
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-221
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #412)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_221_PERICYTE_CAPILLARY_NO_REFLOW_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Endothelial Shear-Stress Mechanotransduction & eNOS Invariants: Glycocalyx Sensing, Ser1177 Phosphorylation, and Atheroprotective Paracrine Rescue
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-222
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #413)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_222_ENDOTHELIAL_SHEAR_STRESS_ENOS_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Oligodendrocyte Precursor Cell (OPC) Differentiation & Saltatory Conduction Invariants: GPR17 Clearance, Myelin Compaction, and Paracrine Functional Rescue
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-223
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #414)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_223_OPC_DIFFERENTIATION_SALTATORY_CONDUCTION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Presynaptic Mitochondrial Fission-Fusion Balance & Synaptosomal ATP Invariants: Bioenergetic Coupling, mPTP Gating, and Paracrine Mitoprotection
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-224
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #415)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_224_PRESYNAPTIC_MITOCHONDRIAL_DYNAMICS_ATP_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Blood-Tumor Barrier (BTB) Heterogeneity & Convective Extravasation Invariants: Interstitial Fluid Pressure Mechanics, Starling Flux, and Focused Ultrasound Cavitation
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-225
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #416)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_225_BTB_HETEROGENEITY_CONVECTIVE_EXTRAVASATION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Dural Meningeal Lymphatic Drainage & Deep Cervical Clearance Invariants: Macromolecular Efflux, VEGFR3 Signaling, and Tauopathy Resolution
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-226
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #417)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_226_MENINGEAL_LYMPHATIC_DRAINAGE_DCLN_CLEARANCE_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Thalamocortical Spindle-Slow Oscillation Phase-Amplitude Coupling (SO-PAC) Invariants: Memory Trace Consolidation, Cross-Frequency Synchronization, and Closed-Loop Acoustic Rescue
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-227
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #418)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_227_THALAMOCORTICAL_SO_PAC_MEMORY_CONSOLIDATION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Vagal Cholinergic Anti-Inflammatory Reflex Invariants: Splenic Macrophage $\alpha7\text{nAChR}$ Activation, STAT3 Phosphorylation, and Systemic Cytokine Suppression
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-228
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #419)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_228_VAGAL_CHOLINERGIC_ANTI_INFLAMMATORY_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Microglial Complement-Mediated Synaptic Pruning Invariants: C1q/C3 Opsonization, CD47 Checkpoint Protection, and Cortical Circuit Balance
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-229
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #420)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_229_MICROGLIAL_COMPLEMENT_PRUNING_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Presynaptic SNARE Complex Assembly & Munc18-1 Priming Invariants: Syntaxin-1A Open Conformation, Active-Zone Docking, and Sub-Millisecond Quantal Synchrony
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-230
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #421)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_230_PRESYNAPTIC_SNARE_MUNC18_PRIMING_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Hippocampal CA1 Sharp Wave-Ripple (SWR) Invariants: Parvalbumin Basket Cell Reciprocal Inhibition, High-Frequency Phase-Locking, and Episodic Memory Replay
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-231
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #422)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_231_HIPPOCAMPAL_SWR_PARVALBUMIN_PAC_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Choroid Plexus CSF Secretion & Carbonic Anhydrase II / NKCC1 Transport Invariants: Transepithelial Osmotic Pumping, AQP1 Bulk Flow, and Intracranial Compliance
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-232
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #423)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_232_CHOROID_PLEXUS_CSF_SECRETION_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Striatal Medium Spiny Neuron (MSN) D1/D2 Dopaminergic Plasticity Invariants: Direct vs Indirect Pathway Balance, PKA/Calcineurin Dynamics, and Motor Initiation Gating
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-233
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #424)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_233_STRIATAL_MSN_D1_D2_PLASTICITY_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Retinal Photoreceptor Outer Segment (POS) Phagocytosis Invariants: MerTK Phosphorylation, αvβ5 Integrin Tethering, and Bisretinoid A2E Homeostasis
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-234
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #425)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_234_RPE_PHOTORECEPTOR_PHAGOCYTOSIS_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Cerebellar Purkinje Cell Complex Spike Climbing Fiber Burst Invariants: Dendritic Ca²⁺ Spikelets, mGluR1/IP3 Co-Activation, and Parallel Fiber LTD
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-235
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #426)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_235_PURKINJE_COMPLEX_SPIKE_CLIMBING_FIBER_LTD_INVARIANTS.md
+ER  - 
+
+TY  - RPRT
+AU  - Mynhardt, Nicholas Charles
+AU  - McCairn, Kevin W.
+TI  - Hypothalamic AgRP/POMC Metabolic Energy Homeostasis Invariants: Competitive Melanocortin Receptor Gating, Neuro-Endocrine Feedback, and Autonomic Energy Expenditure
+PB  - Stratum Research Group & Synaptek Labs
+PY  - 2026
+M1  - STRATUM-TR-236
+N1  - Machine-Checked under Lean 4 Formal Suite (Target #427)
+UR  - https://github.com/Stratum-Research-Group/WEFT/blob/master/docs/papers_kevin_mccairn/active_corpus/PAPER_236_HYPOTHALAMIC_AGRP_POMC_ENERGY_HOMEOSTASIS_INVARIANTS.md
+ER  - 
+

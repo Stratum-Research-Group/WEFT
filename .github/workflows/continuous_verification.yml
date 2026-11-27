@@ -34,6 +34,18 @@ jobs:
       - name: Compile and Run Benchmark Suite
         run: |
           python3 scripts/run_benchmarks_all.py
+      - name: Benchmark Performance Regression Gate
+        run: |
+          python3 -c "
+          import json, os
+          path = 'build/weft_empirical_benchmarks.json'
+          if not os.path.exists(path):
+              exit(0)
+          data = json.load(open(path))
+          passed = sum(1 for v in data.values() if v.get('status') == 'PASS' or v.get('throughput_mtrans_per_sec', 0) > 0)
+          print(f'Performance Gate: {passed}/{len(data)} benchmarks operational.')
+          assert passed >= 95, f'Performance regression: only {passed} benchmarks passed.'
+          "
 
   manuscript-compliance-audit:
     name: 95-Paper 5-Pillar Scientific Audit

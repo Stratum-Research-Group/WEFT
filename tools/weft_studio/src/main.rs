@@ -1,3 +1,5 @@
+mod telemetry;
+use telemetry::HardwareTelemetry;
 use eframe::egui;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
@@ -69,6 +71,7 @@ struct MasterCouncilSession {
 }
 
 struct WeftStudioApp {
+    hardware_telemetry: HardwareTelemetry,
     selected_model_idx: usize,
     selected_domain: String,
     chat_input: String,
@@ -211,6 +214,7 @@ impl Default for WeftStudioApp {
             sandbox_cli_output: String::from("Interactive Sandbox Terminal ready. Select an artifact to edit and test."),
             selected_tab: 1, // Default to Master Council tab
             selected_paper_idx: 0,
+            hardware_telemetry: HardwareTelemetry::load_from_default_path(),
             paper_search_query: String::new(),
             cached_paper_content: String::new(),
 
@@ -1122,6 +1126,17 @@ impl eframe::App for WeftStudioApp {
                     // Stratum 95-Paper Monograph & Figure Explorer
                     ui.heading("📚 Stratum Research Group & Synaptek Labs - 95-Paper Monograph Explorer");
                     ui.label("Certified 5-Pillar Corpus: Biophysical Parameters, Microarchitectures, Lean 4 Invariants, & Figures (#142 - #236)");
+                    
+                    // Live Hardware Telemetry HUD
+                    ui.group(|ui| {
+                        ui.horizontal(|ui| {
+                            ui.label(format!("⚡ Live Hardware Benchmarks: {}/{} Operational", self.hardware_telemetry.passing_benchmarks, self.hardware_telemetry.total_benchmarks));
+                            ui.separator();
+                            ui.label(format!("🚀 Mean AVX2 Throughput: {:.2} GTrans/s", self.hardware_telemetry.avg_throughput_gtrans));
+                            ui.separator();
+                            ui.label("🎮 GPU Engine: NVIDIA RTX 5060 Ti (Triton 3.9 Fused)");
+                        });
+                    });
                     ui.separator();
 
                     let papers_dir = PathBuf::from("docs/PAPERS_REVISED");

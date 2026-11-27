@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #425, Papers #177 through #234).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #426, Papers #177 through #235).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #425) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #426) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (425 jobs).`
+- `Build completed successfully (426 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -865,3 +865,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftChoroidPlexusHUD.tsx` (CA-II Catalysis, NKCC1 Cotransport, AQP1 Osmotic Gradient & ICP Compliance Gate)
 - `WeftStriatalD1D2PlasticityHUD.tsx` (D1 Golf PKA vs D2 Gi Calcineurin Gain Ratio & Motor Initiation Gate)
 - `WeftRpePhagocytosisHUD.tsx` (MerTK Autophosphorylation, avb5 Tethering, Diurnal POS Clearance & A2E Gate)
+- `WeftPurkinjeComplexSpikeHUD.tsx` (Climbing Fiber Cav2.1 Ca2+ Influx, mGluR1/IP3/DAG Cascade & GluA2 LTD Gate)

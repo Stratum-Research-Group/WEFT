@@ -1,0 +1,77 @@
+# The New Way (TNW) — The Civil & Commercial Codex
+## Universal Protocols for Every Walk of Life, Deal, Contract, and Civil Compact
+
+**Document Status:** Constitutional Codex  
+**Classification:** Universal Civil & Commercial Law  
+**Authority:** The Sovereign Wards & The National Consortium Blockchain (NCB)  
+**Philosophical Anchor:** Absolute Subsidiarity, High-Trust Reciprocity, Duty Before Right  
+
+---
+
+## Preamble & Scope
+This Codex defines the legal, contractual, and operational protocols governing **every walk of life and commercial transaction** within the Republic. In the New Way, there are no sprawling ambiguous statutes, no manipulative regulatory loopholes, and no predatory legal monopolies. Every agreement is a mathematically unambiguous, cryptographic compact backed by real physical assets, verified on the National Consortium Blockchain (NCB), and adjudicated under absolute subsidiarity.
+
+---
+
+## 1. Daily Life, Family, and Generational Compacts
+
+### 1.1 Matrimonial & Household Covenants
+1. **The Sovereign Household Compact:** Marriage is a biological and economic alliance anchored to the soil of a specific Ward. It is formalized as a dual-signature covenant registered on the NCB.
+2. **Generational Asset Stewardship:** Property registered under a multi-generational homestead cannot be seized or encumbered by external speculative creditors. Homestead title descends directly to recognized heirs who maintain physical residency and fulfill the Ward civic duty.
+3. **Childhood Educational Duty:** Parents hold exclusive custody and moral responsibility for the education of their offspring under the *Chi-Toku-Tai* doctrine (Intellect, Morality, Physical Strength). State kidnapping or ideological indoctrination is defined as high treason.
+
+### 1.2 Communal Mutual-Aid & Elder Care Syndicates
+1. **The Ward Care Endowment:** Each Ward maintains an algorithmic mutual-aid pool funded by voluntary micro-tithes and surplus energy credits from the Ward Fusion/SMR battery.
+2. **Elder Honorarium:** Elders who have completed three decades of verified productive labor or military service receive guaranteed lifetime allocations of food calories, clean water, high-efficiency dwelling heating, and SynapTek medical dispensations.
+
+---
+
+## 2. Commerce, Trades, Crafts, and Labor Covenants
+
+### 2.1 The Master-Craftsman & Guild System
+1. **Apprenticeship Covenants:** Craft skills (machining, welding, metallurgy, farming, surgery, software engineering) are transmitted via standardized 4-year guild covenants. An apprentice receives guaranteed subsistence and tools in exchange for graduated productive labor.
+2. **Product Quality Certification & The Seal of the Forge:** Every manufactured good, structural weld, or software release must carry the cryptographic signature of the producing craftsman. Selling intentionally substandard, defective, or poisoned goods constitutes fraud against the High-Trust society, triggering immediate forfeiture of trade franchise.
+
+### 2.2 Freelance Enterprise & The Ban on Usury
+1. **Zero Income Tax on Productive Labor:** A citizen's labor is their sovereign property. No council, syndicate, or national body possesses the authority to levy an income tax or payroll deduction.
+2. **Absolute Outlawing of Usury:** Compound interest lending, unsecured consumer debt traps, and fiat credit expansion are classified as economic predation. All loans must take the form of:
+   - **Direct Equity Partnership:** Risk and profit shared proportionally between creditor and debtor.
+   - **Zero-Interest Commodity Credit:** Repayable strictly in physical asset equivalents (kilowatt-hours, grams of gold, bushels of grain) without compounded interest.
+
+---
+
+## 3. Real Estate, Soil, and Natural Resource Deals
+
+### 3.1 The Torrens Zero-Knowledge Title Register
+1. **Immutable Cadastral Mapping:** All land parcels, boundary coordinates, and riparian rights are mapped via high-precision RTK-GPS and recorded on the NCB using Zero-Knowledge proofs.
+2. **No Absentee Speculation:** Land ownership requires physical utilization, maintenance, and ecological defense. Vacant speculative land hoarding by foreign corporations is voided; unworked arable land reverts to the Ward land bank for reallocation to productive homesteaders.
+
+### 3.2 Riparian, Hydrological, and Sub-Soil Mineral Rights
+1. **The Hydrological Equity Invariant:** Upstream landowners cannot divert or contaminate natural watercourses to the detriment of downstream Wards. Permitted draw rates are regulated in real-time by IoT acoustic flow meters linked to the NCB.
+2. **Sub-Soil Mineral Royalties:** Minerals extracted beneath a Ward belong 50% to the surface property holder and 50% to the Ward Common Treasury, ensuring localized enrichment rather than multinational extraction.
+
+---
+
+## 4. Heavy Industry, Energy, and Utility Power Agreements (PPA)
+
+### 4.1 The Kilowatt-Hour Standard Power Purchase Agreement (PPA)
+1. **Physical Energy Currency:** Electricity generated by localized $100\text{ MW}_e$ Aneuronic Fusion units (Volume V Paper 1) or SMPB-10 Micro-Batteries (Volume V Paper 8) is traded as the primary unit of exchange.
+2. **Continuous P2P Wheeling:** Citizens and industrial workshops buy and sell power peer-to-peer across the localized microgrid. Smart-contract meters clear accounts every $60\text{ seconds}$ without intermediate utility utility bureaucracy.
+
+### 4.2 Automated Industrial Supply Chain Covenants
+1. **Feedstock Delivery Protocols:** Raw materials (scrap batteries, pig iron, chemical lixiviants, crushed olivine) delivered to processing syndicates are inspected by automated spectral scanners. Payment clears into the supplier's wallet the microsecond elemental purity thresholds are verified.
+
+---
+
+## 5. Algorithmic Dispute Resolution & Tiered Justice
+
+### 5.1 Tier One: Localized Restorative Justice
+1. **Informal Civil Arbitration:** Commercial disagreements under $10,000$ energy credits are heard before a 3-person citizen arbitration panel chosen by random sortition.
+2. **Strict Restitution Mandate:** If breach of contract or accidental property damage is proven, the judgment requires 100% replacement of the physical loss plus a mandatory $50\%$ restitution penalty paid directly to the victim.
+
+### 5.2 Tier Two: The Unyielding Sword for Malicious Breach
+1. **Premeditated Fraud & Theft:** Intentional embezzlement, identity spoofing, violent assault, or ecological contamination forfeits the perpetrator's civil franchise.
+2. **The Algorithmic Blacklist:** A convicted predator's Soulbound Token is stripped of commercial privileges. They are exiled to physical labor penal works until their debt to the Republic is fully worked off.
+
+---
+*The New Way — Universal Sovereign Civil & Commercial Framework*

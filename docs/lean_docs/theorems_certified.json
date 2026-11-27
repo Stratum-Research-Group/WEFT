@@ -1,6 +1,6 @@
 {
   "format": "LEAN-4-FORMAL-VERIFICATION-v2",
-  "total_theorems": 2532,
+  "total_theorems": 2536,
   "zero_axioms_guaranteed": true,
   "theorems": [
     {
@@ -23815,6 +23815,58 @@
       },
       "module": "SyntomicRegulatorInvariants",
       "file": "SyntomicRegulatorInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "subsidiarity_level_minimization",
+        "line": 25,
+        "signature": "theorem subsidiarity_level_minimization (level_resolved level_delegated : \u2115)"
+      },
+      "module": "TNWConstitutionalInvariants",
+      "file": "TNWConstitutionalInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "ward_nullification_supremacy",
+        "line": 33,
+        "signature": "theorem ward_nullification_supremacy (ward_vote regional_vote : Bool)"
+      },
+      "module": "TNWConstitutionalInvariants",
+      "file": "TNWConstitutionalInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "asset_backed_currency_bound",
+        "line": 41,
+        "signature": "theorem asset_backed_currency_bound (circulating_tokens verified_reserves : \u211d)"
+      },
+      "module": "TNWConstitutionalInvariants",
+      "file": "TNWConstitutionalInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "principal_equity_bounded",
+        "line": 50,
+        "signature": "theorem principal_equity_bounded (principal equity_gain total_debt : \u211d)"
+      },
+      "module": "TNWConstitutionalInvariants",
+      "file": "TNWConstitutionalInvariants.lean",
       "axioms": 0,
       "sorries": 0,
       "status": "CERTIFIED_MACHINE_CHECKED"

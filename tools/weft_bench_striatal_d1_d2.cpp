@@ -1,105 +1,108 @@
+// tools/weft_bench_striatal_d1_d2.cpp
+// Native AVX2/FMA SIMD benchmark for Striatal MSN D1/D2 Dopaminergic Plasticity Kinetics
+// Computes D1 PKA phosphorylation, D2 Calcineurin modulation, Direct/Indirect pathway gains, and initiation ratio
+
+#include <immintrin.h>
+#include <chrono>
 #include <iostream>
 #include <vector>
-#include <chrono>
 #include <cmath>
-#include <immintrin.h>
-#include <iomanip>
 
-// Benchmark for Striatal Dopaminergic D1/D2 Opponent Gating Engine
-// Evaluates:
-// 1. D1 dSPN "Go" pathway facilitation: d1 = cortex * (1.0 + da * 0.8)
-// 2. D2 iSPN "NoGo" pathway suppression: d2 = cortex * max(0.1, 1.0 - da * 0.7)
-// 3. Opponent contrast & logistic action probability: p = 1 / (1 + exp(-(d1 - d2)/25))
-// Target #381 in WEFT Verification Suite.
+static constexpr size_t N_CHANNELS = 65536;
+static constexpr int N_ITERATIONS = 1000;
 
-void benchmark_scalar_striatal(const std::vector<float>& cortex,
-                               const std::vector<float>& da_rpe,
-                               std::vector<float>& d1_go,
-                               std::vector<float>& d2_nogo,
-                               std::vector<float>& action_prob,
-                               size_t n) {
-    for (size_t i = 0; i < n; ++i) {
-        float c = cortex[i];
-        float da = da_rpe[i];
-        float d1 = c * std::fmax(0.1f, 1.0f + da * 0.8f);
-        float d2 = c * std::fmax(0.1f, 1.0f - da * 0.7f);
-        d1_go[i] = d1;
-        d2_nogo[i] = d2;
-        float diff = (d1 - d2) / 25.0f;
-        action_prob[i] = 1.0f / (1.0f + std::exp(-diff));
-    }
-}
-
-void benchmark_avx2_striatal(const float* cortex,
-                             const float* da_rpe,
-                             float* d1_go,
-                             float* d2_nogo,
-                             float* action_prob,
-                             size_t n) {
-    const __m256 v_one = _mm256_set1_ps(1.0f);
-    const __m256 v_0_1 = _mm256_set1_ps(0.1f);
-    const __m256 v_0_8 = _mm256_set1_ps(0.8f);
-    const __m256 v_neg_0_7 = _mm256_set1_ps(-0.7f);
-    const __m256 v_inv_25 = _mm256_set1_ps(1.0f / 25.0f);
-    const __m256 v_half = _mm256_set1_ps(0.5f);
+void benchmark_striatal_d1_d2_avx2(
+    const float* __restrict__ da_conc,
+    const float* __restrict__ glut_drive,
+    float* __restrict__ out_pka,
+    float* __restrict__ out_cn,
+    float* __restrict__ out_d1_gain,
+    float* __restrict__ out_d2_gain,
+    float* __restrict__ out_ratio,
+    size_t n
+) {
+    const __m256 v_pka_base = _mm256_set1_ps(0.5f);
+    const __m256 v_pka_amp = _mm256_set1_ps(4.5f);
+    const __m256 v_k_d1 = _mm256_set1_ps(600.0f);
+    const __m256 v_cn_base = _mm256_set1_ps(4.5f);
+    const __m256 v_cn_amp = _mm256_set1_ps(3.5f);
+    const __m256 v_k_d2 = _mm256_set1_ps(150.0f);
+    const __m256 v_hundred = _mm256_set1_ps(100.0f);
+    const __m256 v_d1_scale = _mm256_set1_ps(0.0075f);
+    const __m256 v_d2_scale = _mm256_set1_ps(0.0045f);
+    const __m256 v_eps = _mm256_set1_ps(0.01f);
 
     for (size_t i = 0; i < n; i += 8) {
-        __m256 c = _mm256_loadu_ps(cortex + i);
-        __m256 da = _mm256_loadu_ps(da_rpe + i);
+        __m256 v_da = _mm256_loadu_ps(da_conc + i);
+        __m256 v_glu = _mm256_loadu_ps(glut_drive + i);
 
-        // D1: c * max(0.1, 1.0 + da * 0.8)
-        __m256 d1_mod = _mm256_max_ps(v_0_1, _mm256_fmadd_ps(da, v_0_8, v_one));
-        __m256 d1 = _mm256_mul_ps(c, d1_mod);
-        _mm256_storeu_ps(d1_go + i, d1);
+        // pka = 0.5 + (da / (da + 600.0)) * 4.5
+        __m256 v_d1_denom = _mm256_add_ps(v_da, v_k_d1);
+        __m256 v_pka_norm = _mm256_div_ps(v_da, v_d1_denom);
+        __m256 v_pka = _mm256_fmadd_ps(v_pka_norm, v_pka_amp, v_pka_base);
+        _mm256_storeu_ps(out_pka + i, v_pka);
 
-        // D2: c * max(0.1, 1.0 - da * 0.7)
-        __m256 d2_mod = _mm256_max_ps(v_0_1, _mm256_fmadd_ps(da, v_neg_0_7, v_one));
-        __m256 d2 = _mm256_mul_ps(c, d2_mod);
-        _mm256_storeu_ps(d2_nogo + i, d2);
+        // cn = 4.5 - (da / (da + 150.0)) * 3.5
+        __m256 v_d2_denom = _mm256_add_ps(v_da, v_k_d2);
+        __m256 v_cn_norm = _mm256_div_ps(v_da, v_d2_denom);
+        __m256 v_cn = _mm256_fnmadd_ps(v_cn_norm, v_cn_amp, v_cn_base);
+        _mm256_storeu_ps(out_cn + i, v_cn);
 
-        // Net contrast: (d1 - d2) / 25.0
-        __m256 diff = _mm256_mul_ps(_mm256_sub_ps(d1, d2), v_inv_25);
+        // d1_gain = (glu / 100.0) * pka * 0.75
+        __m256 v_d1 = _mm256_mul_ps(_mm256_mul_ps(v_glu, v_pka), v_d1_scale);
+        _mm256_storeu_ps(out_d1_gain + i, v_d1);
 
-        // Sigmoid rational approximation: 0.5 + 0.5 * (diff / (1.0 + |diff|))
-        __m256 abs_diff = _mm256_and_ps(diff, _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff)));
-        __m256 denom = _mm256_add_ps(v_one, abs_diff);
-        __m256 soft = _mm256_fmadd_ps(v_half, _mm256_mul_ps(diff, _mm256_rcp_ps(denom)), v_half);
-        _mm256_storeu_ps(action_prob + i, soft);
+        // d2_gain = (glu / 100.0) * cn * 0.45
+        __m256 v_d2 = _mm256_mul_ps(_mm256_mul_ps(v_glu, v_cn), v_d2_scale);
+        _mm256_storeu_ps(out_d2_gain + i, v_d2);
+
+        // ratio = d1 / max(0.01, d2)
+        __m256 v_d2_safe = _mm256_max_ps(v_eps, v_d2);
+        __m256 v_rat = _mm256_div_ps(v_d1, v_d2_safe);
+        _mm256_storeu_ps(out_ratio + i, v_rat);
     }
 }
 
 int main() {
-    const size_t N = 1000000;
-    const int WARMUP = 10;
-    const int RUNS = 50;
+    std::vector<float> da(N_CHANNELS, 850.0f);
+    std::vector<float> glut(N_CHANNELS, 75.0f);
+    std::vector<float> pka(N_CHANNELS);
+    std::vector<float> cn(N_CHANNELS);
+    std::vector<float> d1(N_CHANNELS);
+    std::vector<float> d2(N_CHANNELS);
+    std::vector<float> ratio(N_CHANNELS);
 
-    std::vector<float> cortex(N, 75.0f);
-    std::vector<float> da_rpe(N, 0.4f);
-    std::vector<float> d1_go(N, 0.0f);
-    std::vector<float> d2_nogo(N, 0.0f);
-    std::vector<float> action_prob(N, 0.0f);
-
-    for (int w = 0; w < WARMUP; ++w) {
-        benchmark_avx2_striatal(cortex.data(), da_rpe.data(),
-                                d1_go.data(), d2_nogo.data(), action_prob.data(), N);
+    // Warmup
+    for (int i = 0; i < 50; ++i) {
+        benchmark_striatal_d1_d2_avx2(
+            da.data(), glut.data(),
+            pka.data(), cn.data(), d1.data(), d2.data(), ratio.data(),
+            N_CHANNELS
+        );
     }
 
     auto start = std::chrono::high_resolution_clock::now();
-    for (int r = 0; r < RUNS; ++r) {
-        benchmark_avx2_striatal(cortex.data(), da_rpe.data(),
-                                d1_go.data(), d2_nogo.data(), action_prob.data(), N);
+    for (int i = 0; i < N_ITERATIONS; ++i) {
+        benchmark_striatal_d1_d2_avx2(
+            da.data(), glut.data(),
+            pka.data(), cn.data(), d1.data(), d2.data(), ratio.data(),
+            N_CHANNELS
+        );
     }
     auto end = std::chrono::high_resolution_clock::now();
-    double dur_ms = std::chrono::duration<double, std::milli>(end - start).count() / RUNS;
 
-    std::cout << "--- Striatal D1/D2 Opponent Gating Microbenchmark ---" << std::endl;
-    std::cout << "Elements: " << N << " per run (" << RUNS << " iterations)" << std::endl;
-    std::cout << "AVX2+FMA Execution Time: " << std::fixed << std::setprecision(3) << dur_ms << " ms" << std::endl;
-    double throughput_melem = (N / (dur_ms / 1000.0)) / 1e6;
-    std::cout << "AVX2+FMA Throughput: " << throughput_melem << " Melem/s" << std::endl;
-    std::cout << "Sample D1 Go Drive: " << d1_go[0] << " %" << std::endl;
-    std::cout << "Sample D2 NoGo Drive: " << d2_nogo[0] << " %" << std::endl;
-    std::cout << "Sample Action Probability: " << action_prob[0] << std::endl;
+    double total_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    double avg_us = total_us / N_ITERATIONS;
+    double throughput_mch_s = (static_cast<double>(N_CHANNELS) / (avg_us * 1e-6)) / 1e6;
+
+    std::cout << "[AVX2-FMA Benchmark] Striatal MSN D1/D2 Plasticity Kinetics" << std::endl;
+    std::cout << "Channels: " << N_CHANNELS << " | Iterations: " << N_ITERATIONS << std::endl;
+    std::cout << "Avg latency per iteration: " << avg_us << " us" << std::endl;
+    std::cout << "Throughput: " << throughput_mch_s << " Million channels/sec" << std::endl;
+    std::cout << "Sample verification [Channel 0]:" << std::endl;
+    std::cout << "  [DA]: " << da[0] << " nM | Glut Drive: " << glut[0] << "%" << std::endl;
+    std::cout << "  D1 PKA: " << pka[0] << "x | D2 Calcineurin: " << cn[0] << "x" << std::endl;
+    std::cout << "  Direct Gain: " << d1[0] << " | Indirect Gain: " << d2[0] << " | D1/D2 Ratio: " << ratio[0] << std::endl;
 
     return 0;
 }

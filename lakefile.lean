@@ -429,5 +429,6 @@ lean_lib «FormalSuite» where
     `«MicroglialPruningInvariants»,
     `«SnarePrimingInvariants»,
     `«HippocampalSwrInvariants»,
-    `«ChoroidPlexusInvariants»
+    `«ChoroidPlexusInvariants»,
+    `«StriatalD1D2PlasticityInvariants»
   ]

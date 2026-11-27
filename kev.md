@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #423, Papers #177 through #232).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #424, Papers #177 through #233).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #423) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #424) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (423 jobs).`
+- `Build completed successfully (424 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -863,3 +863,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftSnarePrimingHUD.tsx` (Munc13-1 Priming Drive, Syntaxin Open State, RRP Docking & Sub-250us Jitter Gate)
 - `WeftHippocampalSwrHUD.tsx` (PV+ Basket Cell GABAergic Drive, 150-250Hz Ripple PLV & Replay Fidelity Gate)
 - `WeftChoroidPlexusHUD.tsx` (CA-II Catalysis, NKCC1 Cotransport, AQP1 Osmotic Gradient & ICP Compliance Gate)
+- `WeftStriatalD1D2PlasticityHUD.tsx` (D1 Golf PKA vs D2 Gi Calcineurin Gain Ratio & Motor Initiation Gate)

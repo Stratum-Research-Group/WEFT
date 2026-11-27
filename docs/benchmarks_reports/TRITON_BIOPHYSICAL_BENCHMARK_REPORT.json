@@ -1,0 +1,20 @@
+{
+  "device": "cuda",
+  "cuda_available": true,
+  "kernels": {
+    "ppn_locomotor_gating": {
+      "latency_ms": 0.0399,
+      "bandwidth_gbps": 6.17,
+      "status": "PASS"
+    },
+    "cerebellar_ltd_step": {
+      "latency_ms": 0.0002,
+      "status": "PASS"
+    },
+    "lateral_habenula_aversion": {
+      "latency_ms": 0.0002,
+      "status": "PASS"
+    }
+  },
+  "all_passed": true
+}

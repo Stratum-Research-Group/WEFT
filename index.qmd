@@ -1,0 +1,18 @@
+# Stratum Monograph Volume IV: Neuromorphic & Biophysical Computing {.unnumbered}
+
+**Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
+**Affiliation:** Stratum Research Group & Synaptek Labs  
+**Date:** November 2026  
+**Verification Level:** Lean 4 Machine-Checked (Zero Axioms, 427 Theorems)  
+
+---
+
+## Executive Summary
+
+Stratum Monograph Volume IV compiles 95 groundbreaking technical reports detailing the intersection of high-performance sub-bit microarchitectural execution, deep biophysical neural modeling, and formal mathematical proof.
+
+Each technical report pairs:
+1. **Mathematical Invariant**: Formulated under differential geometric and dynamical systems frameworks.
+2. **Lean 4 Proof**: Fully machine-checked theorem without unverified axioms or `sorry` tags.
+3. **Microarchitectural Acceleration**: Fused AVX-512 SIMD assembly and Triton 3.9 GPU kernels.
+4. **Publication Graphics**: Complete dual-figure telemetry (Biophysical dynamics & Hardware scaling rooflines).

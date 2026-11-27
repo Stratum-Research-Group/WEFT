@@ -1,0 +1,39 @@
+project:
+  type: book
+  title: "Stratum Monograph Volume IV: Neuromorphic & Biophysical Computing"
+  subtitle: "Microarchitectural Kernels, Multiway Causal Graphs & Formal Verification"
+  author:
+    - name: "Nicholas Charles Mynhardt"
+      affiliation: "Stratum Research Group"
+    - name: "Kevin W. McCairn, Ph.D."
+      affiliation: "Synaptek Labs"
+  date: "November 2026"
+
+book:
+  title: "Stratum Monograph Volume IV"
+  reader-mode: true
+  search: true
+  sidebar:
+    style: "docked"
+    search: true
+  chapters:
+    - index.qmd
+    - docs/CORPUS_MASTER_INDEX.md
+    - notebooks/01_wolfram_computational_universe_reproducibility.ipynb
+    - notebooks/02_weft_telemetry_and_rooflines.ipynb
+
+format:
+  html:
+    theme: darkly
+    toc: true
+    code-fold: show
+    code-tools: true
+    html-math-method: katex
+  pdf:
+    documentclass: scrreprt
+    classoption: ["oneside", "openany"]
+    geometry:
+      - top=25mm
+      - left=20mm
+      - right=20mm
+      - bottom=25mm

@@ -430,5 +430,6 @@ lean_lib «FormalSuite» where
     `«SnarePrimingInvariants»,
     `«HippocampalSwrInvariants»,
     `«ChoroidPlexusInvariants»,
-    `«StriatalD1D2PlasticityInvariants»
+    `«StriatalD1D2PlasticityInvariants»,
+    `«RpePhagocytosisInvariants»
   ]

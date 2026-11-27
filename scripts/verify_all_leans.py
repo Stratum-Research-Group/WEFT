@@ -101,10 +101,11 @@ def verify_formal_suite():
         "MeningealLymphaticsInvariants.lean",
         "ThalamocorticalSoPacInvariants.lean",
         "VagalAntiInflammatoryInvariants.lean",
-        "MicroglialPruningInvariants.lean"
+        "MicroglialPruningInvariants.lean",
+        "SnarePrimingInvariants.lean"
     ]
 
-    print("Auditing Co-Authored Synaptic & Motor Biology Formal Targets (Targets #368 - #420):")
+    print("Auditing Co-Authored Synaptic & Motor Biology Formal Targets (Targets #368 - #421):")
     for t in neuro_coauthored_targets:
         full_p = os.path.join(formal_dir, t)
         if not os.path.exists(full_p):

@@ -4,7 +4,7 @@
 **Authors:** Nicholas Charles Mynhardt & Kevin W. McCairn, Ph.D.  
 **Repository:** WEFT Monorepo (`github/master`)
 
-This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #420, Papers #177 through #229).
+This document provides exact, copy-pasteable terminal instructions to reproduce, simulate, formally verify, and benchmark every neurobiological and motor systems target co-authored with Kevin W. McCairn, Ph.D. (Targets #368 through #421, Papers #177 through #230).
 
 ---
 
@@ -26,13 +26,13 @@ elan --version && lake --version
 
 ## 2. Automated Lean 4 Formal Verification Audit
 
-To verify all formal targets (#368 through #420) without speculative axioms or unproven tactics:
+To verify all formal targets (#368 through #421) without speculative axioms or unproven tactics:
 ```bash
 # Run automated verification engine and lake compilation
 .venv/bin/python scripts/verify_all_leans.py
 ```
 *Expected Result:*
-- `Build completed successfully (420 jobs).`
+- `Build completed successfully (421 jobs).`
 - `0` unproven obligations across all co-authored neurobiology targets.
 
 ---
@@ -860,3 +860,4 @@ All interactive React HUDs are committed to `tools/weft-mss-void/src/vs/workbenc
 - `WeftThalamocorticalSoPacHUD.tsx` (Slow-Wave Upstate Phase, TRN Spindle Amplitude & PLV Coupling Gate)
 - `WeftVagalAntiInflammatoryHUD.tsx` (Splenic ACh Release, alpha7nAChR Binding, STAT3 Phos & NF-kB Suppression Gate)
 - `WeftMicroglialPruningHUD.tsx` (Synaptic CD47 Level, C1q/C3b Opsonization, CR3 Phagocytosis & E/I Balance Gate)
+- `WeftSnarePrimingHUD.tsx` (Munc13-1 Priming Drive, Syntaxin Open State, RRP Docking & Sub-250us Jitter Gate)

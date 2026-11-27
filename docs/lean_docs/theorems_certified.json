@@ -1,6 +1,6 @@
 {
   "format": "LEAN-4-FORMAL-VERIFICATION-v2",
-  "total_theorems": 2536,
+  "total_theorems": 2540,
   "zero_axioms_guaranteed": true,
   "theorems": [
     {
@@ -8176,6 +8176,58 @@
       },
       "module": "DynamicDepthScalingBounds",
       "file": "DynamicDepthScalingBounds.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "electrodynamic_lift_nonneg",
+        "line": 25,
+        "signature": "theorem electrodynamic_lift_nonneg"
+      },
+      "module": "ElectrodynamicLevitationInvariants",
+      "file": "ElectrodynamicLevitationInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "linear_motor_power_conservation",
+        "line": 39,
+        "signature": "theorem linear_motor_power_conservation"
+      },
+      "module": "ElectrodynamicLevitationInvariants",
+      "file": "ElectrodynamicLevitationInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "escape_kinetic_energy_pos",
+        "line": 50,
+        "signature": "theorem escape_kinetic_energy_pos"
+      },
+      "module": "ElectrodynamicLevitationInvariants",
+      "file": "ElectrodynamicLevitationInvariants.lean",
+      "axioms": 0,
+      "sorries": 0,
+      "status": "CERTIFIED_MACHINE_CHECKED"
+    },
+    {
+      "theorem": {
+        "kind": "theorem",
+        "name": "dynamic_guidance_restorative_force",
+        "line": 61,
+        "signature": "theorem dynamic_guidance_restorative_force"
+      },
+      "module": "ElectrodynamicLevitationInvariants",
+      "file": "ElectrodynamicLevitationInvariants.lean",
       "axioms": 0,
       "sorries": 0,
       "status": "CERTIFIED_MACHINE_CHECKED"

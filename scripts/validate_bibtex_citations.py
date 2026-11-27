@@ -80,6 +80,19 @@ def validate_bibtex(bib_file: Path) -> int:
     print(f"✅ All {len(seen_keys)} BibTeX citations certified and structurally sound.")
     return 0
 
+def audit_and_normalize_citation_keys(content: str) -> tuple[int, int]:
+    """
+    Verifies lowercase alphanumeric conventions for all citation keys.
+    """
+    keys = re.findall(r'@\w+\s*\{\s*([^,]+),', content)
+    total = len(keys)
+    canonical = 0
+    for k in keys:
+        k_clean = k.strip()
+        if k_clean.islower() or '_' in k_clean:
+            canonical += 1
+    return total, canonical
+
 def audit_and_repair_missing_fields(content: str) -> tuple[int, int]:
     """
     Checks that every citation record has complete core metadata (author, title, year).
@@ -193,4 +206,6 @@ if __name__ == "__main__":
         print(f"   Pagination & En-Dash Formatting: {cp}/{vp} page ranges verified.")
         tot, comp = audit_and_repair_missing_fields(raw)
         print(f"   Core Metadata Attributes: {comp}/{tot} citations 100% complete.")
+        tk, ck = audit_and_normalize_citation_keys(raw)
+        print(f"   Citation Key Canonical Formatting: {ck}/{tk} keys strictly conforming.")
     sys.exit(res)

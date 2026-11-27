@@ -1,3 +1,4 @@
+from pathlib import Path
 #!/usr/bin/env python3
 """
 Builds an inverted full-text search index (docs/reader/search_index.json)
@@ -8,6 +9,30 @@ import glob
 import json
 import os
 import re
+
+def generate_subject_concordance(index_data):
+    """
+    Generates an alphabetical concordance index of major biophysical & microarchitecture keywords.
+    """
+    keywords = [
+        "Purkinje cell", "sub-bit GEMV", "phase precession", "Triton kernel",
+        "Lean 4 invariant", "Hopfield attractor", "Kuramoto oscillator",
+        "dendritic cable", "basal ganglia", "thalamocortical", "gamma rhythm"
+    ]
+    concordance = {}
+    for kw in keywords:
+        concordance[kw] = []
+        kw_low = kw.lower()
+        for item in index_data:
+            text_blob = (item.get("title", "") + " " + item.get("snippet", "")).lower()
+            if kw_low in text_blob:
+                concordance[kw].append({
+                    "paper": item.get("paper_number"),
+                    "title": item.get("title")
+                })
+    out_file = Path("docs/subject_concordance.json")
+    out_file.write_text(json.dumps(concordance, indent=2), encoding="utf-8")
+    print(f"✅ Generated Subject Concordance Index: {out_file} ({len(keywords)} terms)")
 
 def build_search_index():
     papers = sorted(glob.glob("docs/papers_kevin_mccairn/active_corpus/PAPER_*.md"))
@@ -48,6 +73,7 @@ def build_search_index():
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(index, f, indent=2)
 
+    generate_subject_concordance(index)
     print(f"Generated search index at {out_file} ({len(index)} documents, {os.path.getsize(out_file)} bytes).")
 
 if __name__ == '__main__':

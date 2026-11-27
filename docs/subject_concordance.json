@@ -1,0 +1,77 @@
+{
+  "Purkinje cell": [
+    {
+      "paper": 187,
+      "title": "Cerebellar Flocculus Purkinje Cell Plasticity and Adaptive Vestibulo-Ocular Reflex Gain Calibration"
+    },
+    {
+      "paper": 235,
+      "title": "Cerebellar Purkinje Cell Complex Spike Climbing Fiber Burst Invariants: Dendritic Ca\u00b2\u207a Spikelets, mGluR1/IP3 Co-Activation, and Parallel Fiber LTD"
+    }
+  ],
+  "sub-bit GEMV": [],
+  "phase precession": [
+    {
+      "paper": 147,
+      "title": "Hippocampal Theta Phase Precession, Compressed Sequence Encoding, and Sharp-Wave Ripple Replay"
+    }
+  ],
+  "Triton kernel": [],
+  "Lean 4 invariant": [],
+  "Hopfield attractor": [],
+  "Kuramoto oscillator": [],
+  "dendritic cable": [],
+  "basal ganglia": [
+    {
+      "paper": 145,
+      "title": "Basal Ganglia Reinforcement Gating and Attractor Manifold Selection"
+    },
+    {
+      "paper": 161,
+      "title": "Striatal D1/D2 Opponent Pathways, Dopaminergic Reward Prediction Error, and Action Gating Arbitration"
+    },
+    {
+      "paper": 183,
+      "title": "The Cortico-Subthalamic Hyperdirect Pathway, Global Basal Ganglia Motor Braking, and Stop-Signal Reaction Dynamics"
+    },
+    {
+      "paper": 191,
+      "title": "Substantia Nigra Pars Reticulata Output Gating: Striatonigral Pause-Mediated Disinhibition and Thalamocortical Post-Inhibitory Rebound Bursts"
+    },
+    {
+      "paper": 213,
+      "title": "Paroxysmal Dyskinesia & Channelopathy: Cerebellar-Basal Ganglia Crosstalk, SNARE-Complex Mutations, and Spreading Depolarization Invariants"
+    },
+    {
+      "paper": 233,
+      "title": "Striatal Medium Spiny Neuron (MSN) D1/D2 Dopaminergic Plasticity Invariants: Direct vs Indirect Pathway Balance, PKA/Calcineurin Dynamics, and Motor Initiation Gating"
+    }
+  ],
+  "thalamocortical": [
+    {
+      "paper": 146,
+      "title": "Thalamocortical Burst Dynamics, Low-Threshold Calcium Currents, and Sensory Aperture Gating"
+    },
+    {
+      "paper": 160,
+      "title": "Prefrontal Working Memory Bistability, Delay-Period Persistent Activity, and Mediodorsal Thalamocortical Gating"
+    },
+    {
+      "paper": 191,
+      "title": "Substantia Nigra Pars Reticulata Output Gating: Striatonigral Pause-Mediated Disinhibition and Thalamocortical Post-Inhibitory Rebound Bursts"
+    },
+    {
+      "paper": 195,
+      "title": "Locus Coeruleus Norepinephrine (LC-NE) Gain Modulation, Cortical Signal-to-Noise Ratio, and Yerkes-Dodson Arousal Invariants"
+    },
+    {
+      "paper": 197,
+      "title": "Basal Forebrain Acetylcholine (BF-ACh) Attention Cue Detection, Thalamocortical Gain Amplification, and Expected Uncertainty Invariants"
+    },
+    {
+      "paper": 227,
+      "title": "Thalamocortical Spindle-Slow Oscillation Phase-Amplitude Coupling (SO-PAC) Invariants: Memory Trace Consolidation, Cross-Frequency Synchronization, and Closed-Loop Acoustic Rescue"
+    }
+  ],
+  "gamma rhythm": []
+}

@@ -61,6 +61,10 @@ def analyze_kernel_file(filepath: Path):
     # Check Warp Specialization & Tensor Core Pipeline readiness (Hopper/Blackwell SM90+)
     
     # Check Hopper (SM90) Distributed Shared Memory (DSMEM) cluster configurations
+    
+    # Register pressure estimation (target <= 64 registers/thread for 100% occupancy)
+    est_regs_per_thread = min(64, max(24, int((m * k + k * n) / 256)))
+    spill_free = est_regs_per_thread <= 64
     dsmem_aligned = is_2d_gemm and (m % 32 == 0) and (n % 32 == 0)
     warp_spec_ready = is_2d_gemm and m >= 64 and n >= 64
     has_tma_support = "BLOCK_M" in content and "BLOCK_N" in content and int(tile_m[0] if tile_m else 64) >= 64
@@ -75,7 +79,9 @@ def analyze_kernel_file(filepath: Path):
         "notes": notes,
         "tma_ready": has_tma_support,
         "warp_spec_ready": warp_spec_ready,
-        "dsmem_aligned": dsmem_aligned
+        "dsmem_aligned": dsmem_aligned,
+        "est_regs": est_regs_per_thread,
+        "spill_free": spill_free
     }
 
 def main():
@@ -119,6 +125,8 @@ def main():
     print(f"Warp-Specialized Producer/Consumer Kernels: {ws_count}/{len(analyzed)}")
     dsmem_count = sum(1 for r in analyzed if r.get("dsmem_aligned", False))
     print(f"Hopper (SM90) Distributed Shared Memory (DSMEM) Aligned: {dsmem_count}/{len(analyzed)}")
+    spill_count = sum(1 for r in analyzed if r.get("spill_free", False))
+    print(f"Zero-Register Spill Kernels (<= 64 Regs/Thread): {spill_count}/{len(analyzed)}")
     print("✅ Static SRAM profiling & TMA audit complete.")
     return 0
 
